@@ -10,6 +10,8 @@ type SceneCardProps = {
   scene: VideoScene;
   index: number;
   compositionFps: number;
+  isFirstScene: boolean;
+  isLastScene: boolean;
 };
 
 type AudioTrackLayerProps = {
@@ -210,9 +212,8 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
   const lifeInFrames = system.lifeInFrames;
   const opacity = system.opacity ?? 0.8;
   const gravity = system.gravity ?? 0;
-  const systemStart = system.startInFrames ?? 0;
   const systemDuration = system.durationInFrames ?? Number.POSITIVE_INFINITY;
-  const isActive = frame < systemDuration;
+  const isActive = frame >= 0 && frame < systemDuration;
 
   // Keep the emitter bounded to its own timeline window. Sequence supplies a
   // local frame, so the field starts deterministically at age zero every render.
@@ -344,11 +345,11 @@ const AnimatedText: FC<AnimatedTextProps> = ({ animation, children, style }) => 
   );
 };
 
-const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps }) => {
+const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps, isFirstScene, isLastScene }) => {
   const frame = useCurrentFrame();
   const duration = scene.durationInFrames;
-  // Adjacent scenes use short, overlapping fades at their sequence boundaries.
-  // This avoids every cut dipping to black while preserving the opening fade.
+  // Fade the complete film at its outer edges only. Internal scene cuts remain
+  // fully visible instead of dipping to black at every Series boundary.
   const fadeIn = interpolate(frame, [0, 12], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -357,7 +358,7 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps }) => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const opacity = Math.min(fadeIn, fadeOut);
+  const opacity = (isFirstScene ? fadeIn : 1) * (isLastScene ? fadeOut : 1);
   const rise = interpolate(frame, [0, 20], [36, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -552,7 +553,13 @@ export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], compo
       <Series>
         {scenes.map((scene, index) => (
           <Series.Sequence key={scene.id} durationInFrames={scene.durationInFrames}>
-            <SceneCard scene={scene} index={index} compositionFps={composition.fps} />
+            <SceneCard
+              scene={scene}
+              index={index}
+              compositionFps={composition.fps}
+              isFirstScene={index === 0}
+              isLastScene={index === scenes.length - 1}
+            />
           </Series.Sequence>
         ))}
       </Series>
