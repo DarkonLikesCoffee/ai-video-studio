@@ -18,7 +18,7 @@ A `ProjectVideo` project can define:
 - Media placement (`background`, `left`, `right`), fit (`cover` or `contain`), object position and opacity.
 - Video trim point, playback rate, mute state and volume.
 - Up to 80 vector graphic elements per scene: rectangles, ellipses, SVG paths and free-positioned text.
-- SVG path draw-on animation and keyframed transforms, opacity and scale.
+- SVG path draw-on animation, same-topology path morphing, and keyframed transforms, opacity and scale.
 - Up to six deterministic particle systems per scene, with a combined limit of 360 particles.
 - Up to 16 overlapping global audio tracks for music, voice-over, sound effects and ambience.
 - Per-track high/low-pass filters, parametric EQ, compression, algorithmic echo/reverb and stereo panning.
@@ -262,7 +262,7 @@ Supported element types:
 - `path`: SVG path data in a local 0–100 coordinate system, with `stroke`, `strokeWidth` and optional `lineCap`.
 - `text`: independent text content with font family, size, weight, letter spacing and alignment.
 
-All graphics can use `fill`, `stroke`, `strokeWidth`, `opacity`, `rotation`, `zIndex`, `startInFrames`, `durationInFrames` and keyframe `animations`. SVG paths additionally support `pathProgress` from 0 to 1 to animate a stroke being drawn. Each scene supports up to 80 vector elements.
+All graphics can use `fill`, `stroke`, `strokeWidth`, `opacity`, `rotation`, `zIndex`, `startInFrames`, `durationInFrames` and keyframe `animations`. SVG paths support `pathProgress` from 0 to 1 to animate a stroke being drawn, plus optional `pathMorph.keyframes` to interpolate absolute `M`, `L`, `C`, `Q` and `Z` path coordinates. Morphs require 2–12 keyframes with identical command topology; the first keyframe must be frame 0 and match the initial `d` path. Keyframe easing uses the same presets, Bezier curves and spring settings as other animation tracks. Relative commands and arc segments are intentionally excluded from morph tracks to keep point correspondence deterministic. Each scene supports up to 80 vector elements.
 
 Example:
 
@@ -544,7 +544,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
 - Audio DSP uses local FFmpeg binaries. Tracks that need EQ, compression, reverb, panning or sidechain processing must use local assets; remote audio can still be used for unprocessed playback.
-- SVG path morphing, video looping, subtitles, 3D scenes, shader-based effects and automatic prompt-to-project generation are not implemented yet. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
+- Video looping, subtitles, 3D scenes, shader-based effects and automatic prompt-to-project generation are not implemented yet. SVG path morphing is supported for compatible absolute M/L/C/Q/Z path topologies. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
