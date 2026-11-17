@@ -76,10 +76,70 @@ const getExtension = (path: string): string => {
   return dot < 0 ? "" : filename.slice(dot).toLowerCase();
 };
 
+const isNonPublicIpv4 = (hostname: string): boolean => {
+  const parts = hostname.split(".");
+  if (parts.length !== 4 || parts.some((part) => !/^\\d+$/.test(part))) return false;
+
+  const [first, second, third] = parts.map(Number);
+  if (first === undefined || second === undefined || third === undefined) return false;
+  if ([first, second, third, Number(parts[3])].some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
+    return false;
+  }
+
+  return first === 0 ||
+    first === 10 ||
+    first === 127 ||
+    first >= 224 ||
+    (first === 100 && second >= 64 && second <= 127) ||
+    (first === 169 && second === 254) ||
+    (first === 172 && second >= 16 && second <= 31) ||
+    (first === 192 && second === 168) ||
+    (first === 192 && second === 0) ||
+    (first === 198 && (second === 18 || second === 19 || second === 51)) ||
+    (first === 203 && second === 0 && third === 113);
+};
+
+const isNonPublicHostname = (hostname: string): boolean => {
+  const host = hostname.toLowerCase().replace(/\\.$/, "").replace(/^\\[|\\]$/g, "");
+  if (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    host.endsWith(".local") ||
+    host.endsWith(".internal") ||
+    host === "metadata.google.internal"
+  ) {
+    return true;
+  }
+
+  if (isNonPublicIpv4(host)) return true;
+
+  if (host.includes(":")) {
+    const normalized = host.split("%")[0] ?? host;
+    if (
+      normalized === "::" ||
+      normalized === "::1" ||
+      normalized.startsWith("fc") ||
+      normalized.startsWith("fd") ||
+      /^fe[89ab]/.test(normalized) ||
+      normalized.startsWith("ff")
+    ) {
+      return true;
+    }
+    if (normalized.startsWith("::ffff:")) {
+      return isNonPublicIpv4(normalized.slice("::ffff:".length));
+    }
+  }
+
+  return false;
+};
+
 export const isRemoteMediaUrl = (src: string): boolean => {
   try {
     const url = new URL(src);
-    return url.protocol === "https:" && !url.username && !url.password;
+    return url.protocol === "https:" &&
+      !url.username &&
+      !url.password &&
+      !isNonPublicHostname(url.hostname);
   } catch {
     return false;
   }
