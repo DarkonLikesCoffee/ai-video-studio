@@ -13,8 +13,8 @@ type SceneCardProps = {
   compositionFps: number;
   isFirstScene: boolean;
   isLastScene: boolean;
-  transitionIn?: SceneTransition;
-  transitionOut?: SceneTransition;
+  transitionIn?: SceneTransition | undefined;
+  transitionOut?: SceneTransition | undefined;
   transitionOutDurationInFrames: number;
 };
 
