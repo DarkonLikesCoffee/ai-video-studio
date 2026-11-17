@@ -1,7 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { getProjectDurationInFrames, validateProjectDefinition, type VideoProject } from "../packages/video-engine/src/project";
+import {
+  getProjectDurationInFrames,
+  isRemoteMediaUrl,
+  isSafeProjectAssetPath,
+  validateProjectDefinition,
+  type VideoProject
+} from "../packages/video-engine/src/project";
 
 const readExample = async (): Promise<VideoProject> =>
   JSON.parse(await readFile(new URL("../projects/examples/three-scene-story/scene.json", import.meta.url), "utf8")) as VideoProject;
@@ -13,9 +19,7 @@ test("three-scene example is a valid ProjectVideo project with image and video m
   assert.equal(project.scenes.length, 3);
   assert.equal(getProjectDurationInFrames(project), 300);
   assert.equal(project.scenes[0]!.media?.type, "image");
-  assert.equal(project.scenes[0]!.media?.source, "public");
   assert.equal(project.scenes[1]!.media?.type, "video");
-  assert.equal(project.scenes[1]!.media?.source, "remote");
 });
 
 test("project duration is derived from all scene durations", async () => {
@@ -48,34 +52,33 @@ test("validator caps total project duration at 60 seconds", async () => {
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("total scene duration")));
 });
 
-test("validator rejects insecure remote media URLs", async () => {
-  const project = await readExample();
-  const media = project.scenes[1]!.media as unknown as { src: string };
-  media.src = "http://example.com/clip.mp4";
-  assert.ok(validateProjectDefinition(project).some((error) => error.includes("public HTTPS URL")));
+test("local media paths must stay below the project assets directory", () => {
+  assert.equal(isSafeProjectAssetPath("assets/connection-map.svg"), true);
+  assert.equal(isSafeProjectAssetPath("assets/photos/frame-01.webp"), true);
+  assert.equal(isSafeProjectAssetPath("../secret.png"), false);
+  assert.equal(isSafeProjectAssetPath("assets/../../secret.png"), false);
+  assert.equal(isSafeProjectAssetPath("/assets/photo.png"), false);
+  assert.equal(isSafeProjectAssetPath("assets\\photo.png"), false);
 });
 
-test("validator rejects path traversal in local media", async () => {
-  const project = await readExample();
-  const media = project.scenes[0]!.media as unknown as { src: string };
-  media.src = "assets/../../secrets.png";
-  assert.ok(validateProjectDefinition(project).some((error) => error.includes("safe path")));
+test("remote media sources must use HTTPS and have no embedded credentials", () => {
+  assert.equal(isRemoteMediaUrl("https://example.com/clip.mp4"), true);
+  assert.equal(isRemoteMediaUrl("http://example.com/clip.mp4"), false);
+  assert.equal(isRemoteMediaUrl("https://user:pass@example.com/clip.mp4"), false);
 });
 
-test("validator rejects incompatible local file extensions and playback rates", async () => {
+test("validator rejects media with unsafe paths or mismatched file types", async () => {
   const project = await readExample();
-  const imageMedia = project.scenes[0]!.media as unknown as { src: string };
-  const videoMedia = project.scenes[1]!.media as unknown as { playbackRate: number };
-  imageMedia.src = "assets/not-an-image.mp4";
-  videoMedia.playbackRate = 9;
+  project.scenes[0]!.media!.src = "assets/../../outside.svg";
+  project.scenes[1]!.media!.src = "https://example.com/poster.png";
   const errors = validateProjectDefinition(project);
-  assert.ok(errors.some((error) => error.includes("supported image extension")));
-  assert.ok(errors.some((error) => error.includes("playbackRate must be between 0.25 and 4")));
+  assert.ok(errors.some((error) => error.includes("safe path under assets/")));
+  assert.ok(errors.some((error) => error.includes("unsupported extension for video media")));
 });
 
-test("validator rejects private or credentialed remote URLs", async () => {
+test("validator rejects video playback controls on image media", async () => {
   const project = await readExample();
-  const media = project.scenes[1]!.media as unknown as { src: string };
-  media.src = "https://user:password@example.com/clip.mp4";
-  assert.ok(validateProjectDefinition(project).some((error) => error.includes("public HTTPS URL")));
+  const media = project.scenes[0]!.media as unknown as { volume: number };
+  media.volume = 0.5;
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("video playback options")));
 });
