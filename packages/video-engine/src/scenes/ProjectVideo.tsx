@@ -62,9 +62,8 @@ const AnimatedMedia: FC<AnimatedMediaProps> = ({ media, index }) => {
 };
 
 type AnimatedTextProps = {
-  animation?: AnimationTracks;
+  animation?: AnimationTracks | undefined;
   children: ReactNode;
-  className?: string;
   style?: CSSProperties;
 };
 
