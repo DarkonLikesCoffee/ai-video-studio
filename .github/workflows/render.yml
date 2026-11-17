@@ -68,6 +68,10 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         run: npm install --no-audit --no-fund
 
+      - name: Generate original sample audio fixtures
+        if: steps.request.outputs.provider == 'github-actions'
+        run: npm run assets:audio
+
       - name: Validate selected project
         if: steps.request.outputs.provider == 'github-actions'
         env:
