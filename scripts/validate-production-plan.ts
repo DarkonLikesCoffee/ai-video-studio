@@ -71,7 +71,8 @@ export const validateProductionPlan = (value: unknown): string[] => {
     errors.push("creativeDirection is required.");
   } else {
     for (const field of ["objective", "audience", "concept", "motionLanguage", "soundDirection"] as const) {
-      if (typeof direction[field] !== "string" || !direction[field]?.trim()) {
+      const fieldValue = direction[field];
+      if (typeof fieldValue !== "string" || !fieldValue.trim()) {
         errors.push(`creativeDirection.${field} is required.`);
       }
     }
@@ -103,7 +104,8 @@ export const validateProductionPlan = (value: unknown): string[] => {
         errors.push(`shots[${index}] extends beyond the delivery duration.`);
       }
       for (const field of ["purpose", "visual", "framing", "cameraMovement", "transition", "audio"] as const) {
-        if (typeof shot[field] !== "string" || !shot[field]?.trim()) {
+        const fieldValue = shot[field];
+        if (typeof fieldValue !== "string" || !fieldValue.trim()) {
           errors.push(`shots[${index}].${field} is required.`);
         }
       }
