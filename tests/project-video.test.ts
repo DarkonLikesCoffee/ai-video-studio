@@ -862,6 +862,8 @@ test("subtitle renderer overlays the full project timeline above scene transitio
   assert.ok(source.includes("durationInFrames={cue.durationInFrames}"));
   assert.ok(source.includes("name={\"subtitle-\" + cue.id}"));
   assert.ok(source.includes("zIndex: 1000"));
+  assert.ok(source.includes('position === "top" ? "11% 8% 0"'));
+  assert.ok(source.includes('whiteSpace: "pre-line"'));
 });
  
 test("KINETIC visual showcase exercises global captions across all five scenes", async () => {
@@ -887,6 +889,8 @@ test("PULSE editorial showcase is a distinct five-scene, twenty-second motion be
   assert.equal(project.scenes.length, 5);
   assert.equal(getProjectDurationInFrames(project), 600);
   assert.equal(project.subtitles?.length, 5);
+  assert.ok(project.subtitles?.every((cue) => cue.position === "top" && cue.alignment === "left"));
+  assert.ok(project.scenes.every((scene) => scene.title.includes("\n")));
   assert.equal(project.audioTracks?.length, 7);
   assert.equal(project.audioTracks?.filter((track) => track.role === "sfx").length, 6);
   assert.ok(project.scenes.every((scene) => (scene.graphics?.length ?? 0) >= 4));
