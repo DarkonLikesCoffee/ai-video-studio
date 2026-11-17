@@ -20,6 +20,7 @@ A `ProjectVideo` project can define:
 - Up to 80 vector graphic elements per scene: rectangles, ellipses, SVG paths and free-positioned text.
 - SVG path draw-on animation, same-topology path morphing, and keyframed transforms, opacity and scale.
 - Up to six deterministic particle systems per scene, with a combined limit of 360 particles.
+- Up to 200 timed subtitle/caption cues on the global project timeline, with speaker labels, safe-area positions, alignment and frame-based fades.
 - Up to 16 overlapping global audio tracks for music, voice-over, sound effects and ambience.
 - Per-track high/low-pass filters, parametric EQ, compression, algorithmic echo/reverb and stereo panning.
 - Sidechain compression to duck music under voice-over, plus final EBU R128 loudness mastering.
@@ -491,6 +492,44 @@ This is still a lightweight DSP chain, not a full DAW or mastering suite. Text-t
 
 The scene title/body and existing graphic accents are rendered above media layers.
 
+## Subtitle and caption timeline
+
+Subtitles are optional project-level cues, measured in composition frames rather than scene-local frames. Because the cues are rendered above the complete scene sequence, a caption can continue across a hard cut or cinematic transition without being restarted. Cues may overlap for simultaneous speakers.
+
+Each cue supports:
+- Required `id`, `startInFrames`, `durationInFrames` and `text`.
+- Optional `speaker` label.
+- `position`: `top`, `center` or `bottom` (default: `bottom`).
+- `alignment`: `left`, `center` or `right` (default: `center`).
+- Optional font size, weight, family and text color.
+- A dark readability panel with configurable opacity.
+- Optional fade-in and fade-out frame counts (short fades are applied by default).
+
+Example:
+
+```json
+{
+  "subtitles": [
+    {
+      "id": "caption-01",
+      "startInFrames": 42,
+      "durationInFrames": 75,
+      "text": "A visual story begins with a single shift.",
+      "speaker": "NARRATOR",
+      "position": "bottom",
+      "alignment": "center",
+      "fontSize": 36,
+      "fontWeight": 600,
+      "color": "#FFFFFF",
+      "backgroundOpacity": 0.78,
+      "fadeInFrames": 6,
+      "fadeOutFrames": 8
+    }
+  ]
+}
+```
+
+The validator limits a project to 200 cues, requires every cue to remain inside the complete video timeline, and checks IDs, text lengths, style values and fade durations. This is a timed overlay system; it does not generate speech or automatically transcribe audio.
 ## Prompt-driven cloud rendering
 
 A render request is represented by `render-request.json`. In a ChatGPT conversation, specify the project file, provider, and output name; ChatGPT can create or update this request in the repository.
@@ -544,7 +583,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
 - Audio DSP uses local FFmpeg binaries. Tracks that need EQ, compression, reverb, panning or sidechain processing must use local assets; remote audio can still be used for unprocessed playback.
-- Video looping, subtitles, 3D scenes, shader-based effects and automatic prompt-to-project generation are not implemented yet. SVG path morphing is supported for compatible absolute M/L/C/Q/Z path topologies. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
+- Video looping, 3D scenes, shader-based effects and automatic prompt-to-project generation are not implemented yet. Timed subtitle overlays are supported, but automatic transcription and text-to-speech are not implemented. SVG path morphing is supported for compatible absolute M/L/C/Q/Z path topologies. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
