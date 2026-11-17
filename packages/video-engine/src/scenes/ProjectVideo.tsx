@@ -209,14 +209,10 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
   }, [system, fps]);
 
   const lifeInFrames = system.lifeInFrames;
-  const lifeInFrames = system.lifeInFrames;
   const opacity = system.opacity ?? 0.8;
   const gravity = system.gravity ?? 0;
-  const isActive = frame >= 0;
-
-  // Keep the emitter bounded to its own timeline window. Sequence supplies a
-  // local frame, so the field starts deterministically at age zero every render.
-  if (!isActive || frame < 0) return null;
+  // Sequence supplies a local frame, so the emitter starts at age zero on each
+  // render and remains deterministic regardless of seek order.
 
   return (
     <AbsoluteFill
