@@ -1,12 +1,61 @@
+import { Audio } from "@remotion/media";
 import { AbsoluteFill, Img, OffthreadVideo, Sequence, Series, interpolate, staticFile, useCurrentFrame } from "remotion";
 import type { CSSProperties, FC, ReactNode } from "react";
-import type { AnimationTracks, SceneMedia, VideoProject, VideoScene } from "../project";
+import type { AnimationTrack, AnimationTracks, AudioTrack, SceneMedia, VideoProject, VideoScene } from "../project";
 import { isRemoteMediaUrl } from "../project";
 import { evaluateAnimationTrack } from "../animation";
 
 type SceneCardProps = {
   scene: VideoScene;
   index: number;
+};
+
+type AudioTrackLayerProps = {
+  track: AudioTrack;
+  projectDurationInFrames: number;
+};
+
+const AudioTrackLayer: FC<AudioTrackLayerProps> = ({ track, projectDurationInFrames }) => {
+  const frame = useCurrentFrame();
+  const durationInFrames = track.durationInFrames ?? projectDurationInFrames - track.startInFrames;
+  const localFrame = frame - track.startInFrames;
+  const baseVolume = evaluateAnimationTrack(
+    localFrame,
+    track.volumeAutomation,
+    track.volume ?? 1
+  );
+
+  const fadeIn = track.fadeInFrames && track.fadeInFrames > 0
+    ? interpolate(localFrame, [0, track.fadeInFrames], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    : 1;
+  const fadeOut = track.fadeOutFrames && track.fadeOutFrames > 0
+    ? interpolate(
+        localFrame,
+        [Math.max(0, durationInFrames - track.fadeOutFrames), durationInFrames],
+        [1, 0],
+        { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+      )
+    : 1;
+  const volume = Math.max(0, Math.min(1, baseVolume * fadeIn * fadeOut));
+  const src = isRemoteMediaUrl(track.src) ? track.src : staticFile(track.src);
+
+  return (
+    <Audio
+      name={`${track.role}: ${track.id}`}
+      src={src}
+      from={track.startInFrames}
+      durationInFrames={durationInFrames}
+      trimBefore={track.trimBefore ?? 0}
+      playbackRate={track.playbackRate ?? 1}
+      preservePitch={track.preservePitch ?? false}
+      volume={volume}
+      muted={track.muted ?? false}
+      loop={track.loop ?? false}
+    />
+  );
 };
 
 type AnimatedMediaProps = {
@@ -259,14 +308,25 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
   );
 };
 
-export const ProjectVideo: FC<VideoProject> = ({ scenes }) => (
-  <AbsoluteFill>
-    <Series>
-      {scenes.map((scene, index) => (
-        <Series.Sequence key={scene.id} durationInFrames={scene.durationInFrames}>
-          <SceneCard scene={scene} index={index} />
-        </Series.Sequence>
+export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [] }) => {
+  const projectDurationInFrames = scenes.reduce((total, scene) => total + scene.durationInFrames, 0);
+
+  return (
+    <AbsoluteFill>
+      {audioTracks.map((track) => (
+        <AudioTrackLayer
+          key={track.id}
+          track={track}
+          projectDurationInFrames={projectDurationInFrames}
+        />
       ))}
-    </Series>
-  </AbsoluteFill>
-);
+      <Series>
+        {scenes.map((scene, index) => (
+          <Series.Sequence key={scene.id} durationInFrames={scene.durationInFrames}>
+            <SceneCard scene={scene} index={index} />
+          </Series.Sequence>
+        ))}
+      </Series>
+    </AbsoluteFill>
+  );
+};
