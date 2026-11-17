@@ -382,6 +382,7 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps }) => {
       style={{
         background: `radial-gradient(circle at 78% 22%, ${accent}25, transparent 34%), ${background}`,
         color: "#F8FAFC",
+        opacity,
         justifyContent: "center",
         alignItems: hasSideMedia ? textSide : scene.type === "content" ? "flex-start" : "center",
         padding: "0 13%",
@@ -460,7 +461,6 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps }) => {
           position: "relative",
           width: textWidth,
           maxWidth: 1320,
-          opacity,
           transform: `translateY(${rise}px)`,
           textAlign,
           zIndex: 50,
