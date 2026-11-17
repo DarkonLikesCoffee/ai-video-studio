@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "tsx --test tests/*.test.ts",
     "validate:demo": "tsx scripts/validate-project.ts projects/demo/scene.json",
-    "render": "npm run render --workspace @ai-video-studio/video-engine"
+    "validate:project": "tsx scripts/validate-project.ts",
+    "render": "npm run render --workspace @ai-video-studio/video-engine",
+    "render:custom": "npm run render:custom --workspace @ai-video-studio/video-engine --"
   },
   "devDependencies": {
     "tsx": "^4.20.6",
