@@ -63,10 +63,3 @@ jobs:
         run: npm run audio:prepare -- projects/showcase-motion/scene.json
       - name: Build studio
         run: npm run build
-      - name: Upload cinematic 3D ad benchmark
-        uses: actions/upload-artifact@v4
-        with:
-          name: cinematic-3d-ad-benchmark
-          path: render-output/cinematic-3d-ad-benchmark.mp4
-          if-no-files-found: error
-          retention-days: 3
