@@ -101,7 +101,7 @@ const SubtitleCueLayer: FC<SubtitleCueLayerProps> = ({ cue }) => {
         display: "flex",
         alignItems,
         justifyContent: position === "top" ? "flex-start" : position === "center" ? "center" : "flex-end",
-        padding: position === "top" ? "7% 8% 0" : position === "center" ? "0 8%" : "0 8% 8%",
+        padding: position === "top" ? "11% 8% 0" : position === "center" ? "0 8%" : "0 8% 8%",
         boxSizing: "border-box",
         opacity: fadeIn * fadeOut,
         pointerEvents: "none",
@@ -489,6 +489,7 @@ const SceneCard: FC<SceneCardProps> = ({
     lineHeight: 1.06,
     fontWeight: 760,
     letterSpacing: -4,
+    whiteSpace: "pre-line",
     maxWidth: 1320,
     margin: 0,
   };
