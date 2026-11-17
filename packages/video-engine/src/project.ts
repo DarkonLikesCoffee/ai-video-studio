@@ -5,7 +5,7 @@ export type MediaFit = "cover" | "contain";
 
 export type AnimationProperty =
   | "x" | "y" | "width" | "height"
-  | "opacity" | "rotation" | "scaleX" | "scaleY";
+  | "opacity" | "rotation" | "scaleX" | "scaleY" | "pathProgress";
 
 export type AnimationEasing =
   | "linear" | "ease-in" | "ease-out" | "ease-in-out"
@@ -129,6 +129,68 @@ export type SceneMedia = {
   animations?: AnimationTracks;
 };
 
+export type GraphicBase = {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  opacity?: number;
+  rotation?: number;
+  zIndex?: number;
+  startInFrames?: number;
+  durationInFrames?: number;
+  animations?: AnimationTracks;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+};
+
+export type GraphicElement =
+  | (GraphicBase & {
+      type: "rect" | "ellipse";
+      radius?: number;
+    })
+  | (GraphicBase & {
+      type: "path";
+      /** SVG path data in a local 0–100 coordinate system. */
+      d: string;
+      lineCap?: "butt" | "round" | "square";
+    })
+  | (GraphicBase & {
+      type: "text";
+      text: string;
+      fontSize?: number;
+      fontWeight?: 400 | 500 | 600 | 700 | 800 | 900;
+      fontFamily?: string;
+      textAnchor?: "start" | "middle" | "end";
+      letterSpacing?: number;
+    });
+
+export type ParticleSystem = {
+  id: string;
+  count: number;
+  seed: number;
+  startInFrames?: number;
+  durationInFrames?: number;
+  originX: number;
+  originY: number;
+  spreadX?: number;
+  spreadY?: number;
+  lifeInFrames: number;
+  angleMinDeg?: number;
+  angleMaxDeg?: number;
+  speedMin?: number;
+  speedMax?: number;
+  gravity?: number;
+  sizeMin?: number;
+  sizeMax?: number;
+  opacity?: number;
+  colors: string[];
+  shape?: "circle" | "square" | "diamond";
+  blendMode?: "normal" | "screen" | "lighten";
+};
+
 export type VideoScene = {
   id: string;
   type: SceneType;
@@ -142,6 +204,10 @@ export type VideoScene = {
   media?: SceneMedia;
   /** Up to eight simultaneous composited image/video layers. */
   mediaLayers?: SceneMedia[];
+  /** Up to 80 resolution-independent vector elements, rendered above media layers. */
+  graphics?: GraphicElement[];
+  /** Up to six deterministic particle emitters, with a combined budget of 360 particles per scene. */
+  particleSystems?: ParticleSystem[];
   /** Independent timeline animation tracks for text elements. x/y are percentage translations. */
   eyebrowAnimation?: AnimationTracks;
   titleAnimation?: AnimationTracks;
@@ -279,7 +345,7 @@ export const isSafeProjectAssetPath = (src: string): boolean => {
 
 
 const animationProperties = new Set<AnimationProperty>([
-  "x", "y", "width", "height", "opacity", "rotation", "scaleX", "scaleY"
+  "x", "y", "width", "height", "opacity", "rotation", "scaleX", "scaleY", "pathProgress"
 ]);
 const easingNames = new Set(["linear", "ease-in", "ease-out", "ease-in-out", "back", "bounce", "elastic", "spring"]);
 
@@ -365,6 +431,8 @@ export const validateAnimationTracks = (
       } else if ((property === "scaleX" || property === "scaleY") &&
                  (keyframe.value < 0 || keyframe.value > 20)) {
         errors.push(`${keyframePrefix}.value for ${property} must be between 0 and 20`);
+      } else if (property === "pathProgress" && (keyframe.value < 0 || keyframe.value > 1)) {
+        errors.push(`${keyframePrefix}.value for pathProgress must be between 0 and 1`);
       }
 
       if (keyframe.easing !== undefined) {
@@ -497,6 +565,210 @@ const validateSceneMedia = (value: unknown, prefix: string, sceneDuration: numbe
     media.volume !== undefined
   ) {
     errors.push(`${prefix} video playback options are only valid for video media`);
+  }
+
+  return errors;
+};
+
+const validateGraphicElement = (value: unknown, prefix: string, sceneDuration: number): string[] => {
+  const errors: string[] = [];
+  const graphic = isRecord(value) ? value : {};
+
+  if (!isNonEmptyString(graphic.id) || !/^[A-Za-z0-9_-]{1,40}$/.test(graphic.id)) {
+    errors.push(`${prefix}.id must contain 1-40 letters, numbers, underscores, or hyphens`);
+  }
+  if (!["rect", "ellipse", "path", "text"].includes(String(graphic.type))) {
+    errors.push(`${prefix}.type must be rect, ellipse, path, or text`);
+  }
+
+  for (const field of ["x", "y"] as const) {
+    if (!isFiniteNumber(graphic[field]) || graphic[field] < 0 || graphic[field] > 100) {
+      errors.push(`${prefix}.${field} must be between 0 and 100`);
+    }
+  }
+  for (const field of ["width", "height"] as const) {
+    if (!isFiniteNumber(graphic[field]) || graphic[field] <= 0 || graphic[field] > 100) {
+      errors.push(`${prefix}.${field} must be greater than 0 and at most 100`);
+    }
+  }
+  if (isFiniteNumber(graphic.x) && isFiniteNumber(graphic.width) && graphic.x + graphic.width > 100) {
+    errors.push(`${prefix}.x + width cannot exceed 100`);
+  }
+  if (isFiniteNumber(graphic.y) && isFiniteNumber(graphic.height) && graphic.y + graphic.height > 100) {
+    errors.push(`${prefix}.y + height cannot exceed 100`);
+  }
+
+  for (const field of ["fill", "stroke"] as const) {
+    if (graphic[field] !== undefined && !isHexColor(graphic[field])) {
+      errors.push(`${prefix}.${field} must be a six-digit hex color`);
+    }
+  }
+  if (graphic.fill === undefined && graphic.stroke === undefined) {
+    errors.push(`${prefix} must define fill or stroke`);
+  }
+  if (graphic.opacity !== undefined &&
+      (!isFiniteNumber(graphic.opacity) || graphic.opacity < 0 || graphic.opacity > 1)) {
+    errors.push(`${prefix}.opacity must be between 0 and 1`);
+  }
+  if (graphic.rotation !== undefined &&
+      (!isFiniteNumber(graphic.rotation) || graphic.rotation < -360 || graphic.rotation > 360)) {
+    errors.push(`${prefix}.rotation must be between -360 and 360 degrees`);
+  }
+  if (graphic.zIndex !== undefined &&
+      (!isInteger(graphic.zIndex) || graphic.zIndex < -20 || graphic.zIndex > 80)) {
+    errors.push(`${prefix}.zIndex must be an integer between -20 and 80`);
+  }
+  if (graphic.strokeWidth !== undefined &&
+      (!isFiniteNumber(graphic.strokeWidth) || graphic.strokeWidth < 0 || graphic.strokeWidth > 20)) {
+    errors.push(`${prefix}.strokeWidth must be between 0 and 20`);
+  }
+  if (graphic.radius !== undefined &&
+      (!isFiniteNumber(graphic.radius) || graphic.radius < 0 || graphic.radius > 50)) {
+    errors.push(`${prefix}.radius must be between 0 and 50`);
+  }
+
+  if (graphic.type === "path") {
+    if (typeof graphic.d !== "string" || graphic.d.length < 1 || graphic.d.length > 4000 ||
+        !/^[MmLlHhVvCcSsQqTtAaZz0-9eE+.,\\s-]+$/.test(graphic.d)) {
+      errors.push(`${prefix}.d must be valid-looking SVG path data of at most 4000 characters`);
+    }
+    if (graphic.stroke === undefined) errors.push(`${prefix}.stroke is required for path elements`);
+    if (graphic.lineCap !== undefined && !["butt", "round", "square"].includes(String(graphic.lineCap))) {
+      errors.push(`${prefix}.lineCap must be butt, round, or square`);
+    }
+  } else if (graphic.d !== undefined || graphic.lineCap !== undefined) {
+    errors.push(`${prefix}.d and lineCap are only valid for path elements`);
+  }
+
+  if (graphic.type === "text") {
+    if (!isNonEmptyString(graphic.text) || graphic.text.length > 300) {
+      errors.push(`${prefix}.text is required and must be at most 300 characters`);
+    }
+    if (graphic.fontSize !== undefined &&
+        (!isFiniteNumber(graphic.fontSize) || graphic.fontSize < 8 || graphic.fontSize > 240)) {
+      errors.push(`${prefix}.fontSize must be between 8 and 240 pixels`);
+    }
+    if (graphic.fontWeight !== undefined && ![400, 500, 600, 700, 800, 900].includes(Number(graphic.fontWeight))) {
+      errors.push(`${prefix}.fontWeight must be 400, 500, 600, 700, 800, or 900`);
+    }
+    if (graphic.fontFamily !== undefined &&
+        (typeof graphic.fontFamily !== "string" || graphic.fontFamily.length > 80 ||
+         !/^[A-Za-z0-9 ,'"_-]+$/.test(graphic.fontFamily))) {
+      errors.push(`${prefix}.fontFamily contains unsupported characters`);
+    }
+    if (graphic.textAnchor !== undefined && !["start", "middle", "end"].includes(String(graphic.textAnchor))) {
+      errors.push(`${prefix}.textAnchor must be start, middle, or end`);
+    }
+    if (graphic.letterSpacing !== undefined &&
+        (!isFiniteNumber(graphic.letterSpacing) || graphic.letterSpacing < -5 || graphic.letterSpacing > 40)) {
+      errors.push(`${prefix}.letterSpacing must be between -5 and 40 pixels`);
+    }
+  } else if (["text", "fontSize", "fontWeight", "fontFamily", "textAnchor", "letterSpacing"].some((field) =>
+    graphic[field] !== undefined)) {
+    errors.push(`${prefix} text properties are only valid for text elements`);
+  }
+
+  const start = graphic.startInFrames === undefined ? 0 : graphic.startInFrames;
+  const duration = graphic.durationInFrames === undefined
+    ? sceneDuration - (isInteger(start) ? start : 0)
+    : graphic.durationInFrames;
+  if (!isInteger(start) || start < 0 || start >= sceneDuration) {
+    errors.push(`${prefix}.startInFrames must be between 0 and the last frame of the scene`);
+  }
+  if (!isInteger(duration) || duration < 1) {
+    errors.push(`${prefix}.durationInFrames must be a positive integer`);
+  } else if (isInteger(start) && start >= 0 && start + duration > sceneDuration) {
+    errors.push(`${prefix} timeline window cannot extend beyond its scene`);
+  }
+  if (graphic.animations !== undefined) {
+    const effectiveDuration = isInteger(duration) ? duration : 0;
+    errors.push(...validateAnimationTracks(graphic.animations, `${prefix}.animations`, effectiveDuration));
+  }
+
+  return errors;
+};
+
+const validateParticleSystem = (value: unknown, prefix: string, sceneDuration: number): string[] => {
+  const errors: string[] = [];
+  const system = isRecord(value) ? value : {};
+
+  if (!isNonEmptyString(system.id) || !/^[A-Za-z0-9_-]{1,40}$/.test(system.id)) {
+    errors.push(`${prefix}.id must contain 1-40 letters, numbers, underscores, or hyphens`);
+  }
+  if (!isInteger(system.count) || system.count < 1 || system.count > 160) {
+    errors.push(`${prefix}.count must be an integer between 1 and 160`);
+  }
+  if (!isInteger(system.seed) || system.seed < -2147483648 || system.seed > 2147483647) {
+    errors.push(`${prefix}.seed must be a 32-bit signed integer`);
+  }
+  for (const field of ["originX", "originY"] as const) {
+    if (!isFiniteNumber(system[field]) || system[field] < 0 || system[field] > 100) {
+      errors.push(`${prefix}.${field} must be between 0 and 100`);
+    }
+  }
+  for (const field of ["spreadX", "spreadY"] as const) {
+    if (system[field] !== undefined &&
+        (!isFiniteNumber(system[field]) || system[field] < 0 || system[field] > 100)) {
+      errors.push(`${prefix}.${field} must be between 0 and 100`);
+    }
+  }
+  if (!isInteger(system.lifeInFrames) || system.lifeInFrames < 8 || system.lifeInFrames > 900) {
+    errors.push(`${prefix}.lifeInFrames must be an integer between 8 and 900`);
+  }
+  for (const field of ["angleMinDeg", "angleMaxDeg"] as const) {
+    if (system[field] !== undefined &&
+        (!isFiniteNumber(system[field]) || system[field] < -360 || system[field] > 360)) {
+      errors.push(`${prefix}.${field} must be between -360 and 360 degrees`);
+    }
+  }
+  for (const field of ["speedMin", "speedMax"] as const) {
+    if (system[field] !== undefined &&
+        (!isFiniteNumber(system[field]) || system[field] < 0 || system[field] > 100)) {
+      errors.push(`${prefix}.${field} must be between 0 and 100 percent per second`);
+    }
+  }
+  if (isFiniteNumber(system.speedMin) && isFiniteNumber(system.speedMax) && system.speedMin > system.speedMax) {
+    errors.push(`${prefix}.speedMin cannot exceed speedMax`);
+  }
+  if (system.gravity !== undefined &&
+      (!isFiniteNumber(system.gravity) || system.gravity < -100 || system.gravity > 100)) {
+    errors.push(`${prefix}.gravity must be between -100 and 100 percent per second squared`);
+  }
+  for (const field of ["sizeMin", "sizeMax"] as const) {
+    if (system[field] !== undefined &&
+        (!isFiniteNumber(system[field]) || system[field] < 1 || system[field] > 64)) {
+      errors.push(`${prefix}.${field} must be between 1 and 64 pixels`);
+    }
+  }
+  if (isFiniteNumber(system.sizeMin) && isFiniteNumber(system.sizeMax) && system.sizeMin > system.sizeMax) {
+    errors.push(`${prefix}.sizeMin cannot exceed sizeMax`);
+  }
+  if (system.opacity !== undefined &&
+      (!isFiniteNumber(system.opacity) || system.opacity < 0 || system.opacity > 1)) {
+    errors.push(`${prefix}.opacity must be between 0 and 1`);
+  }
+  if (!Array.isArray(system.colors) || system.colors.length < 1 || system.colors.length > 8 ||
+      system.colors.some((color) => !isHexColor(color))) {
+    errors.push(`${prefix}.colors must contain 1-8 six-digit hex colors`);
+  }
+  if (system.shape !== undefined && !["circle", "square", "diamond"].includes(String(system.shape))) {
+    errors.push(`${prefix}.shape must be circle, square, or diamond`);
+  }
+  if (system.blendMode !== undefined && !["normal", "screen", "lighten"].includes(String(system.blendMode))) {
+    errors.push(`${prefix}.blendMode must be normal, screen, or lighten`);
+  }
+
+  const start = system.startInFrames === undefined ? 0 : system.startInFrames;
+  const duration = system.durationInFrames === undefined
+    ? sceneDuration - (isInteger(start) ? start : 0)
+    : system.durationInFrames;
+  if (!isInteger(start) || start < 0 || start >= sceneDuration) {
+    errors.push(`${prefix}.startInFrames must be between 0 and the last frame of the scene`);
+  }
+  if (!isInteger(duration) || duration < 1) {
+    errors.push(`${prefix}.durationInFrames must be a positive integer`);
+  } else if (isInteger(start) && start >= 0 && start + duration > sceneDuration) {
+    errors.push(`${prefix} timeline window cannot extend beyond its scene`);
   }
 
   return errors;
@@ -808,6 +1080,45 @@ export const validateProjectDefinition = (value: unknown): string[] => {
               `${prefix}.${field}`,
               isInteger(scene.durationInFrames) ? scene.durationInFrames : 0
             ));
+          }
+        }
+
+        const graphics = scene.graphics;
+        if (graphics !== undefined) {
+          if (!Array.isArray(graphics) || graphics.length > 80) {
+            errors.push(`${prefix}.graphics must be an array containing at most 80 elements`);
+          } else {
+            const graphicIds = new Set<string>();
+            graphics.forEach((graphic, graphicIndex) => {
+              const graphicPrefix = `${prefix}.graphics[${graphicIndex}]`;
+              const record = isRecord(graphic) ? graphic : {};
+              if (typeof record.id === "string") {
+                if (graphicIds.has(record.id)) errors.push(`${graphicPrefix}.id must be unique`);
+                graphicIds.add(record.id);
+              }
+              errors.push(...validateGraphicElement(graphic, graphicPrefix, isInteger(scene.durationInFrames) ? scene.durationInFrames : 0));
+            });
+          }
+        }
+
+        const particleSystems = scene.particleSystems;
+        if (particleSystems !== undefined) {
+          if (!Array.isArray(particleSystems) || particleSystems.length > 6) {
+            errors.push(`${prefix}.particleSystems must be an array containing at most 6 systems`);
+          } else {
+            let particleCount = 0;
+            const particleIds = new Set<string>();
+            particleSystems.forEach((system, systemIndex) => {
+              const systemPrefix = `${prefix}.particleSystems[${systemIndex}]`;
+              const record = isRecord(system) ? system : {};
+              if (typeof record.id === "string") {
+                if (particleIds.has(record.id)) errors.push(`${systemPrefix}.id must be unique`);
+                particleIds.add(record.id);
+              }
+              if (isInteger(record.count)) particleCount += record.count;
+              errors.push(...validateParticleSystem(system, systemPrefix, isInteger(scene.durationInFrames) ? scene.durationInFrames : 0));
+            });
+            if (particleCount > 360) errors.push(`${prefix}.particleSystems combined count must not exceed 360 particles`);
           }
         }
 
