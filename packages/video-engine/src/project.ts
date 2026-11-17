@@ -629,7 +629,7 @@ const validateGraphicElement = (value: unknown, prefix: string, sceneDuration: n
 
   if (graphic.type === "path") {
     if (typeof graphic.d !== "string" || graphic.d.length < 1 || graphic.d.length > 4000 ||
-        !/^[MmLlHhVvCcSsQqTtAaZz0-9eE+.,\\s-]+$/.test(graphic.d)) {
+        !/^[MmLlHhVvCcSsQqTtAaZz0-9eE+.,\s-]+$/.test(graphic.d)) {
       errors.push(`${prefix}.d must be valid-looking SVG path data of at most 4000 characters`);
     }
     if (graphic.stroke === undefined) errors.push(`${prefix}.stroke is required for path elements`);
