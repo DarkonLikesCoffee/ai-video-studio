@@ -12,6 +12,21 @@ import {
 const readExample = async (): Promise<VideoProject> =>
   JSON.parse(await readFile(new URL("../projects/examples/three-scene-story/scene.json", import.meta.url), "utf8")) as VideoProject;
 
+const readAetherShowcase = async (): Promise<VideoProject> =>
+  JSON.parse(await readFile(new URL("../projects/showcase-motion/scene.json", import.meta.url), "utf8")) as VideoProject;
+
+test("Aether showcase is a valid four-scene motion design project with advanced audio", async () => {
+  const project = await readAetherShowcase();
+  assert.deepEqual(validateProjectDefinition(project), []);
+  assert.equal(project.scenes.length, 4);
+  assert.equal(getProjectDurationInFrames(project), 480);
+  assert.equal(project.audioTracks?.length, 5);
+  assert.equal(project.audioTracks?.filter((track) => track.effects).length, 4);
+  assert.equal(project.audioTracks?.[0]?.ducking?.sidechainTrackIds[0], "ducking-key");
+  assert.equal(project.audioTracks?.find((track) => track.id === "ducking-key")?.muted, true);
+  assert.equal(project.audioMastering?.integratedLufs, -16);
+});
+
 test("three-scene example is a valid ProjectVideo project with image and video media", async () => {
   const project = await readExample();
   assert.deepEqual(validateProjectDefinition(project), []);
