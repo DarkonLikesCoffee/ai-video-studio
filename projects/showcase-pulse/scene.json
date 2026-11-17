@@ -1280,9 +1280,111 @@
       "fadeOutFrames": 6
     }
   ],
-  "audioTracks": [],
+  "audioTracks": [
+    {
+      "id": "pulse-score",
+      "role": "music",
+      "src": "assets/audio/score.wav",
+      "startInFrames": 0,
+      "durationInFrames": 600,
+      "volume": 0.62,
+      "fadeInFrames": 24,
+      "fadeOutFrames": 42,
+      "loop": false,
+      "preservePitch": true,
+      "effects": {
+        "highPassHz": 32,
+        "lowPassHz": 17000,
+        "eqBands": [
+          {
+            "frequency": 90,
+            "gainDb": 1.4,
+            "q": 0.8
+          },
+          {
+            "frequency": 2400,
+            "gainDb": 1.2,
+            "q": 1.1
+          }
+        ],
+        "compressor": {
+          "thresholdDb": -24,
+          "ratio": 2.2,
+          "attackMs": 25,
+          "releaseMs": 240,
+          "makeupGainDb": 1.1
+        },
+        "pan": 0
+      }
+    },
+    {
+      "id": "pulse-opening-impact",
+      "role": "sfx",
+      "src": "assets/audio/impact.wav",
+      "startInFrames": 0,
+      "durationInFrames": 30,
+      "volume": 0.7,
+      "fadeInFrames": 1,
+      "fadeOutFrames": 18
+    },
+    {
+      "id": "pulse-transition-1",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 104,
+      "durationInFrames": 42,
+      "volume": 0.42,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 16
+    },
+    {
+      "id": "pulse-transition-2",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 224,
+      "durationInFrames": 42,
+      "volume": 0.42,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 16
+    },
+    {
+      "id": "pulse-transition-3",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 344,
+      "durationInFrames": 42,
+      "volume": 0.42,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 16
+    },
+    {
+      "id": "pulse-transition-4",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 464,
+      "durationInFrames": 42,
+      "volume": 0.42,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 16
+    },
+    {
+      "id": "pulse-final-impact",
+      "role": "sfx",
+      "src": "assets/audio/impact.wav",
+      "startInFrames": 540,
+      "durationInFrames": 30,
+      "volume": 0.36,
+      "fadeInFrames": 1,
+      "fadeOutFrames": 24
+    }
+  ],
   "output": {
     "format": "mp4",
     "codec": "h264"
+  },
+  "audioMastering": {
+    "integratedLufs": -16,
+    "truePeakDb": -1.5,
+    "loudnessRange": 11
   }
 }
