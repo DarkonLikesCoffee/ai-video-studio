@@ -196,3 +196,12 @@ test("validator keeps animation keyframes inside each media layer lifetime", asy
   };
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("frame must be between 0 and 39")));
 });
+
+test("validator allows off-canvas movement but rejects extreme animated positions", async () => {
+  const project = await readExample();
+  assert.ok(validateProjectDefinition(project).length === 0);
+  project.scenes[0]!.titleAnimation = {
+    x: { keyframes: [{ frame: 0, value: -201 }, { frame: 20, value: 0 }] },
+  };
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("between -200 and 200")));
+});
