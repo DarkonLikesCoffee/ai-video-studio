@@ -12,6 +12,21 @@ import {
 const readExample = async (): Promise<VideoProject> =>
   JSON.parse(await readFile(new URL("../projects/examples/three-scene-story/scene.json", import.meta.url), "utf8")) as VideoProject;
 
+const readAetherShowcase = async (): Promise<VideoProject> =>
+  JSON.parse(await readFile(new URL("../projects/showcase-motion/scene.json", import.meta.url), "utf8")) as VideoProject;
+
+test("Aether showcase is a valid four-scene motion design project with advanced audio", async () => {
+  const project = await readAetherShowcase();
+  assert.deepEqual(validateProjectDefinition(project), []);
+  assert.equal(project.scenes.length, 4);
+  assert.equal(getProjectDurationInFrames(project), 480);
+  assert.equal(project.audioTracks?.length, 5);
+  assert.equal(project.audioTracks?.filter((track) => track.effects).length, 4);
+  assert.equal(project.audioTracks?.[0]?.ducking?.sidechainTrackIds[0], "ducking-key");
+  assert.equal(project.audioTracks?.find((track) => track.id === "ducking-key")?.muted, true);
+  assert.equal(project.audioMastering?.integratedLufs, -16);
+});
+
 test("three-scene example is a valid ProjectVideo project with image and video media", async () => {
   const project = await readExample();
   assert.deepEqual(validateProjectDefinition(project), []);
@@ -285,4 +300,106 @@ test("audio fades, playback rate, volume and boolean flags are range checked", a
   assert.ok(errors.some((error) => error.includes("playbackRate must be between 0.25 and 4")));
   assert.ok(errors.some((error) => error.includes("loop must be a boolean")));
   assert.ok(errors.some((error) => error.includes("preservePitch must be a boolean")));
+});
+
+test("audio effects accept EQ, compression, reverb and panning settings", async () => {
+  const project = await readExample();
+  project.audioTracks = [
+    {
+      id: "music-bed",
+      role: "music",
+      src: "assets/audio/ambient-bed.wav",
+      startInFrames: 0,
+      effects: {
+        highPassHz: 40,
+        lowPassHz: 16000,
+        eqBands: [
+          { frequency: 90, gainDb: 2, q: 0.8 },
+          { frequency: 2800, gainDb: -1.5, q: 1.2 },
+        ],
+        compressor: {
+          thresholdDb: -22,
+          ratio: 3,
+          attackMs: 20,
+          releaseMs: 240,
+          makeupGainDb: 1,
+        },
+        reverb: { wet: 0.2, roomSize: 0.7 },
+        pan: -0.25,
+      },
+      ducking: { sidechainTrackIds: ["narration"], thresholdDb: -30, ratio: 6 },
+    },
+    {
+      id: "narration",
+      role: "voiceover",
+      src: "assets/audio/ambient-bed.wav",
+      startInFrames: 0,
+      muted: true,
+    },
+  ];
+  project.audioMastering = { integratedLufs: -16, truePeakDb: -1.5, loudnessRange: 11 };
+  assert.deepEqual(validateProjectDefinition(project), []);
+});
+
+test("advanced audio validation rejects invalid EQ, compressor, reverb and pan values", async () => {
+  const project = await readExample();
+  project.audioTracks![0]!.effects = {
+    highPassHz: 18000,
+    lowPassHz: 200,
+    eqBands: [{ frequency: 22000, gainDb: 18, q: 20 }],
+    compressor: { thresholdDb: -80, ratio: 30, attackMs: 0, releaseMs: 12000 },
+    reverb: { wet: 1.5, roomSize: -0.1 },
+    pan: 2,
+  };
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("highPassHz must be between 20 and 1000 Hz")));
+  assert.ok(errors.some((error) => error.includes("highPassHz must be lower than lowPassHz")));
+  assert.ok(errors.some((error) => error.includes("eqBands[0].frequency")));
+  assert.ok(errors.some((error) => error.includes("eqBands[0].gainDb")));
+  assert.ok(errors.some((error) => error.includes("compressor.thresholdDb")));
+  assert.ok(errors.some((error) => error.includes("reverb.wet")));
+  assert.ok(errors.some((error) => error.includes("pan must be between -1 and 1")));
+});
+
+test("sidechain ducking must reference existing voiceover tracks and local assets", async () => {
+  const project = await readExample();
+  project.audioTracks = [
+    {
+      id: "music-bed",
+      role: "music",
+      src: "assets/audio/ambient-bed.wav",
+      startInFrames: 0,
+      ducking: { sidechainTrackIds: ["missing-voice"] },
+    },
+  ];
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("existing voiceover tracks")));
+
+  project.audioTracks.push({
+    id: "voice",
+    role: "voiceover",
+    src: "https://cdn.example.com/narration.wav",
+    startInFrames: 0,
+  });
+  project.audioTracks[0]!.ducking!.sidechainTrackIds = ["voice"];
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("sidechain tracks must use local assets/ files")));
+});
+
+test("advanced DSP is only allowed on local audio files", async () => {
+  const project = await readExample();
+  project.audioTracks![0]!.src = "https://cdn.example.com/music.mp3";
+  project.audioTracks![0]!.effects = { pan: 0.5 };
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("with effects or ducking must use a local assets/ audio file")));
+});
+
+test("audio mastering settings validate LUFS, true peak and loudness range", async () => {
+  const project = await readExample();
+  project.audioMastering = { integratedLufs: -16, truePeakDb: -1.5, loudnessRange: 10 };
+  assert.deepEqual(validateProjectDefinition(project), []);
+
+  project.audioMastering = { integratedLufs: -40, truePeakDb: 2, loudnessRange: 30 };
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("integratedLufs must be between -24 and -8 LUFS")));
+  assert.ok(errors.some((error) => error.includes("truePeakDb must be between -9 and 0 dBTP")));
+  assert.ok(errors.some((error) => error.includes("loudnessRange must be between 1 and 20 LU")));
 });

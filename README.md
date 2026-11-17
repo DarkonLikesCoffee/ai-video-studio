@@ -17,6 +17,8 @@ A `ProjectVideo` project can define:
 - Media placement (`background`, `left`, `right`), fit (`cover` or `contain`), object position and opacity.
 - Video trim point, playback rate, mute state and volume.
 - Up to 16 overlapping global audio tracks for music, voice-over, sound effects and ambience.
+- Per-track high/low-pass filters, parametric EQ, compression, algorithmic echo/reverb and stereo panning.
+- Sidechain compression to duck music under voice-over, plus final EBU R128 loudness mastering.
 - Composition width, height and frame rate.
 - MP4/H.264 output.
 
@@ -24,22 +26,24 @@ The current validator limits projects to 1,800 total frames, with each scene bet
 
 ## Example project
 
-The repository includes [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json). It demonstrates a local SVG illustration in the opening scene and a short CC0 MP4 clip in the second scene. The SVG is stored at [projects/examples/three-scene-story/assets/connection-map.svg](projects/examples/three-scene-story/assets/connection-map.svg).
+The repository keeps [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json) as a compatibility sample for local SVG and remote MP4 assets.
 
-Remote video sample source: [MDN CC0 flower video](https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4).
+The current visual test is [AETHER — Motion Design Showcase](projects/showcase-motion/scene.json): a 16-second, four-scene motion-design film with original orbital artwork, flowing vector fields, spectrum graphics, keyframed movement and an original soundtrack. Its SVG source art lives under [projects/showcase-motion/assets](projects/showcase-motion/assets).
 
 ### Local rendering
 
-Requirements: Node.js 22+ and npm.
+Requirements: Node.js 22+, npm and FFmpeg on PATH.
 
 ```bash
 npm install
 npm run typecheck
 npm test
 npm run assets:audio
-npm run validate:project -- projects/examples/three-scene-story/scene.json
+npm run validate:project -- projects/showcase-motion/scene.json
+npm run audio:prepare -- projects/showcase-motion/scene.json
 mkdir -p render-output
-npm run render:custom -- ProjectVideo ../../render-output/internet-explainer.mp4 --props=../../projects/examples/three-scene-story/scene.json --public-dir=../../projects/examples/three-scene-story
+npm run render:custom -- ProjectVideo ../../render-output/aether-motion-showcase.mp4 --props=../../projects/showcase-motion/.render-project.json --public-dir=../../projects/showcase-motion
+npm run audio:master -- render-output/aether-motion-showcase.mp4 projects/showcase-motion/scene.json
 ```
 
 The renderer uses the folder containing the selected project JSON as Remotion's public directory. That makes the project's `assets/` paths resolve consistently in local renders, GitHub Actions and CircleCI. The default `npm run render` command remains the original M1 `DemoVideo` render.
@@ -277,7 +281,60 @@ npm run assets:audio
 npm run validate:project -- projects/examples/three-scene-story/scene.json
 ```
 
-The current audio engine handles track placement, trimming, looping, speed, gain, fades, and keyframed volume. It does not yet synthesize speech, generate music, perform automatic dialogue/music ducking, provide EQ/compression/reverb, pan tracks, or master loudness. A `voiceover` track currently means adding an existing voice recording; text-to-speech is a separate future feature.
+### Audio DSP, ducking and mastering
+
+The base Remotion audio timeline still controls track placement, trims, playback speed, looping, fades and keyframed gain. Before rendering, `npm run audio:prepare -- <project.json>` uses FFmpeg to process any track with `effects` or `ducking` and writes a temporary `.render-project.json` plus generated WAV files under `assets/audio/.processed/`. The original project JSON is not modified.
+
+Per-track `effects` supports:
+
+- `highPassHz` / `lowPassHz`: remove unwanted low or high frequencies.
+- `eqBands`: up to eight parametric bands, each with `frequency`, `gainDb` and optional `q`.
+- `compressor`: threshold, ratio, attack, release and makeup gain.
+- `reverb`: a lightweight algorithmic echo/reverb, controlled by `wet` and `roomSize`.
+- `pan`: -1 (left) through 0 (centre) to 1 (right).
+
+Music tracks can use `ducking` to reference one or more `voiceover` track IDs. FFmpeg's sidechain compressor lowers the music while the referenced voice signal is active, with configurable threshold, ratio, attack and release. For deterministic offline DSP, all tracks processed with effects or used as sidechains must be local files under the project's `assets/` directory.
+
+Example:
+
+```json
+{
+  "id": "music-bed",
+  "role": "music",
+  "src": "assets/audio/music.wav",
+  "startInFrames": 0,
+  "effects": {
+    "highPassHz": 35,
+    "lowPassHz": 16000,
+    "eqBands": [
+      { "frequency": 90, "gainDb": 2, "q": 0.8 },
+      { "frequency": 2800, "gainDb": -1.5, "q": 1.2 }
+    ],
+    "compressor": {
+      "thresholdDb": -22,
+      "ratio": 3,
+      "attackMs": 20,
+      "releaseMs": 240,
+      "makeupGainDb": 1
+    },
+    "reverb": { "wet": 0.2, "roomSize": 0.7 },
+    "pan": 0
+  },
+  "ducking": {
+    "sidechainTrackIds": ["narration"],
+    "thresholdDb": -30,
+    "ratio": 6,
+    "attackMs": 25,
+    "releaseMs": 350
+  }
+}
+```
+
+A project may also specify `audioMastering` with `integratedLufs`, `truePeakDb` and `loudnessRange`. After Remotion renders the mixed MP4, `npm run audio:master -- <video.mp4> <project.json>` applies FFmpeg's EBU R128 `loudnorm` filter to the final audio stream while copying the video stream. Defaults are -16 LUFS, -1.5 dBTP and 11 LU.
+
+The new AETHER showcase exercises EQ, compression, algorithmic reverb, panning, sidechain ducking and final loudness mastering in CI. Its ducking key is a muted deterministic test signal so the demo can verify sidechain behaviour without pretending it contains recorded speech.
+
+This is still a lightweight DSP chain, not a full DAW or mastering suite. Text-to-speech, voice generation, convolution reverb, multiband dynamics, advanced noise reduction and automatic speech transcription are future work. A `voiceover` track currently means importing an existing recording.
 
 
 
@@ -292,9 +349,9 @@ Example request:
 ```json
 {
   "provider": "github-actions",
-  "projectPath": "projects/examples/three-scene-story/scene.json",
+  "projectPath": "projects/showcase-motion/scene.json",
   "compositionId": "ProjectVideo",
-  "outputName": "internet-explainer",
+  "outputName": "aether-motion-showcase",
   "requestId": "replace-with-a-unique-id"
 }
 ```
@@ -335,7 +392,8 @@ A push that changes only this file starts a short GitHub Actions status check. I
 ## Current limitations
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
-- Dedicated arbitrary text layers, shape primitives, SVG path morphing, video looping, subtitles and automatic prompt-to-project generation are not implemented yet. Keyframe animation currently supports numeric transforms and opacity for media layers and the built-in text elements. Audio synthesis, text-to-speech, audio effects processing and automatic mixing are future work.
+- Audio DSP uses local FFmpeg binaries. Tracks that need EQ, compression, reverb, panning or sidechain processing must use local assets; remote audio can still be used for unprocessed playback.
+- Dedicated arbitrary text layers, shape primitives, SVG path morphing, video looping, subtitles and automatic prompt-to-project generation are not implemented yet. Keyframe animation currently supports numeric transforms and opacity for media layers and built-in text elements. Audio synthesis, text-to-speech, convolution reverb, multiband processing and advanced mastering are future work.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
@@ -343,4 +401,4 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 ## CI
 
-GitHub Actions runs type-checking, tests, demo and project validation, Remotion composition discovery with the example project's props and local public directory, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
+GitHub Actions runs type-checking, tests, legacy-project validation, the Aether project and local-asset validation, FFmpeg audio preparation (including sidechain DSP), Remotion composition discovery, a full MP4 render, final loudness mastering, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.

@@ -68,7 +68,16 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         run: npm install --no-audit --no-fund
 
-      - name: Generate original sample audio fixtures
+      - name: Ensure FFmpeg is available
+        if: steps.request.outputs.provider == 'github-actions'
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+
+      - name: Generate original audio fixtures
         if: steps.request.outputs.provider == 'github-actions'
         run: npm run assets:audio
 
@@ -77,6 +86,12 @@ jobs:
         env:
           PROJECT_PATH: ${{ steps.request.outputs.project_path }}
         run: npm run validate:project -- "$PROJECT_PATH"
+
+      - name: Prepare project audio processing
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'ProjectVideo'
+        env:
+          PROJECT_PATH: ${{ steps.request.outputs.project_path }}
+        run: npm run audio:prepare -- "$PROJECT_PATH"
 
       - name: Render MP4 with GitHub Actions
         if: steps.request.outputs.provider == 'github-actions'
@@ -88,10 +103,17 @@ jobs:
           mkdir -p render-output
           if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
-            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_DIR/.render-project.json" "--public-dir=../../$PROJECT_DIR"
           else
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
           fi
+
+      - name: Master final audio
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'ProjectVideo'
+        env:
+          PROJECT_PATH: ${{ steps.request.outputs.project_path }}
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+        run: npm run audio:master -- "render-output/$OUTPUT_NAME.mp4" "$PROJECT_PATH"
 
       - name: Upload MP4 artifact
         if: steps.request.outputs.provider == 'github-actions'
