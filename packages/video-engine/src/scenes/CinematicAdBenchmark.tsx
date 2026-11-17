@@ -55,36 +55,36 @@ const SpeakerProduct: FC = () => {
     ...clamp,
     easing: Easing.inOut(Easing.cubic),
   });
-  const rotationY = interpolate(frame, [0, 120, 240, 360, 480, 600], [-0.58, 0.52, -0.42, 0.68, -0.62, 0.44], clamp);
-  const rotationX = interpolate(frame, [0, 150, 300, 450, 600], [0.08, -0.16, 0.12, -0.1, 0.06], clamp);
+  const rotationY = interpolate(frame, [0, 120, 240, 360, 480, 600], [-0.72, 0.62, -0.58, 0.76, -0.7, 0.52], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const rotationX = interpolate(frame, [0, 150, 300, 450, 600], [0.12, -0.22, 0.18, -0.16, 0.1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
   const bob = Math.sin(frame / 34) * 0.035;
 
   return (
-    <group scale={entrance} position={[0, bob, 0]} rotation={[rotationX, rotationY, 0]}>
+    <group scale={entrance * 1.12} position={[0, bob, 0]} rotation={[rotationX, rotationY, 0]}>
       {/* Main anodized-aluminium enclosure */}
       <mesh position={[0, 0, 0]}>
         <cylinderGeometry args={[0.82, 0.82, 2.52, 96, 1, false]} />
         <meshPhysicalMaterial
-          color="#202b38"
-          metalness={0.82}
-          roughness={0.24}
+          color="#40566b"
+          metalness={0.62}
+          roughness={0.32}
           clearcoat={1}
           clearcoatRoughness={0.16}
         />
       </mesh>
 
       {/* Floating end caps separate during the exploded-view sequence */}
-      <mesh position={[0, 1.27 + explode * 0.48, 0]}>
+      <mesh position={[0, 1.27 + explode * 0.78, 0]}>
         <cylinderGeometry args={[0.79, 0.79, 0.055, 96]} />
         <meshStandardMaterial color="#8295a8" metalness={0.92} roughness={0.2} />
       </mesh>
-      <mesh position={[0, -1.27 - explode * 0.48, 0]}>
+      <mesh position={[0, -1.27 - explode * 0.78, 0]}>
         <cylinderGeometry args={[0.79, 0.79, 0.055, 96]} />
         <meshStandardMaterial color="#65788b" metalness={0.9} roughness={0.23} />
       </mesh>
 
       {/* Precision-machined front driver */}
-      <group position={[0, 0, 0.79 + explode * 0.28]}>
+      <group position={[0, 0, 0.79 + explode * 0.52]}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.69, 0.69, 0.055, 96]} />
           <meshStandardMaterial color="#0d1621" metalness={0.76} roughness={0.3} />
@@ -109,11 +109,11 @@ const SpeakerProduct: FC = () => {
       </group>
 
       {/* Rear acoustic chamber and floating internal ring */}
-      <mesh position={[0, 0, -0.68 - explode * 0.42]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0, -0.68 - explode * 0.62]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.58, 0.58, 0.16, 64]} />
         <meshStandardMaterial color="#0c1722" metalness={0.72} roughness={0.34} />
       </mesh>
-      <mesh position={[0, 0, -0.9 - explode * 0.62]}>
+      <mesh position={[0, 0, -0.9 - explode * 0.9]}>
         <torusGeometry args={[0.57, 0.035, 12, 80]} />
         <meshPhysicalMaterial color="#56d6d1" metalness={0.82} roughness={0.2} emissive="#0b494b" emissiveIntensity={0.8} />
       </mesh>
@@ -231,9 +231,11 @@ const Chapter: FC<ChapterProps> = ({ frame, start, end, kicker, title, body, ali
 export const CinematicAdBenchmark: FC = () => {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
-  const cameraX = interpolate(frame, [0, 120, 240, 360, 480, 600], [1.15, -1.35, 1.55, -1.2, 1.7, -1.45], clamp);
-  const cameraY = interpolate(frame, [0, 150, 300, 450, 600], [0.55, 1.05, -0.48, 0.72, -0.28], clamp);
-  const cameraZ = interpolate(frame, [0, 120, 240, 360, 480, 600], [9.2, 6.1, 7.5, 6.25, 7.7, 6.65], clamp);
+  const cameraX = interpolate(frame, [0, 120, 240, 360, 480, 600], [2.55, -2.7, 2.85, -2.5, 2.65, -2.2], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const cameraY = interpolate(frame, [0, 150, 300, 450, 600], [1.15, -0.85, 1.25, -0.9, 0.75], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const cameraZ = interpolate(frame, [0, 120, 240, 360, 480, 600], [6.4, 5.2, 6.0, 5.1, 6.2, 5.5], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const cameraYaw = Math.atan2(cameraX, cameraZ);
+  const cameraPitch = -Math.atan2(cameraY, Math.hypot(cameraX, cameraZ));
   const cameraRoll = Math.sin(frame / 125) * 0.035;
   const heroOpacity = phaseOpacity(frame, 478, 600);
   const wipe = Math.max(
@@ -262,7 +264,7 @@ export const CinematicAdBenchmark: FC = () => {
         camera={{
           position: [cameraX, cameraY, cameraZ],
           fov: 36,
-          rotation: [0, 0, cameraRoll],
+          rotation: [cameraPitch, cameraYaw, cameraRoll],
         }}
         style={{ width: "100%", height: "100%" }}
       >
