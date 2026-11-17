@@ -1107,7 +1107,8 @@ const validateSubtitleCue = (
   if (cue.fontSize !== undefined && (!isFiniteNumber(cue.fontSize) || cue.fontSize < 18 || cue.fontSize > 96)) {
     errors.push(prefix + ".fontSize must be between 18 and 96 pixels");
   }
-  if (cue.fontWeight !== undefined && ![400, 500, 600, 700, 800, 900].includes(Number(cue.fontWeight))) {
+  if (cue.fontWeight !== undefined &&
+      (!isInteger(cue.fontWeight) || ![400, 500, 600, 700, 800, 900].includes(cue.fontWeight))) {
     errors.push(prefix + ".fontWeight must be 400, 500, 600, 700, 800, or 900");
   }
   if (cue.fontFamily !== undefined &&
