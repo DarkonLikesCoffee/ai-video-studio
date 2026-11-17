@@ -40,6 +40,8 @@ jobs:
         run: npm run typecheck
       - name: Test
         run: npm test
+      - name: Validate example production plan
+        run: npm run validate:plan -- projects/examples/production-plan.json
       - name: Ensure FFmpeg is available
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1; then
@@ -59,10 +61,6 @@ jobs:
         run: npm run validate:project -- projects/showcase-transitions/scene.json
       - name: Prepare track DSP and sidechain processing
         run: npm run audio:prepare -- projects/showcase-motion/scene.json
-      - name: Resolve cinematic ad benchmark composition
-        run: npx remotion compositions packages/video-engine/src/index.ts --public-dir=projects/showcase-pulse
-      - name: Render cinematic 3D product ad benchmark
-        run: npx remotion render packages/video-engine/src/index.ts CinematicAdBenchmark render-output/cinematic-3d-ad-benchmark.mp4 --gl=swangle --public-dir=projects/showcase-pulse
       - name: Build studio
         run: npm run build
       - name: Upload cinematic 3D ad benchmark
