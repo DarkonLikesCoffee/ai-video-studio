@@ -19,7 +19,7 @@ A `ProjectVideo` project can define:
 - Composition width, height and frame rate.
 - MP4/H.264 output.
 
-The current validator limits projects to 1,800 total frames, with each scene between 30 and 900 frames. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use HTTPS.
+The current validator limits projects to 1,800 total frames, with each scene between 30 and 900 frames. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses.
 
 ## Example project
 
@@ -148,7 +148,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 - `ProjectVideo` supports one image or video layer per scene, behind or beside the text.
 - Video looping, multiple media layers per scene, audio-only tracks, voice-over, subtitles and automatic prompt-to-project generation are not implemented yet.
-- Remote assets require the render worker to access their HTTPS URLs.
+- Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
 - YouTube publishing and permanent video storage are not implemented yet.
