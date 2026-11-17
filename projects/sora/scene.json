@@ -69,7 +69,8 @@
           }
         }
       ],
-      "title": "ENGINEERED TO DISAPPEAR."
+      "title": "ENGINEERED TO DISAPPEAR.",
+      "eyebrow": "SORA / MATERIAL STUDY"
     },
     {
       "id": "silhouette",
@@ -132,7 +133,8 @@
           }
         }
       ],
-      "title": "SORA — SOUND, SHAPED AROUND YOU."
+      "title": "SORA — SOUND, SHAPED AROUND YOU.",
+      "eyebrow": "SORA / FORM STUDY"
     },
     {
       "id": "control",
@@ -197,7 +199,8 @@
           }
         }
       ],
-      "title": "EVERY DETAIL, CONSIDERED."
+      "title": "EVERY DETAIL, CONSIDERED.",
+      "eyebrow": "SORA / DETAIL STUDY"
     },
     {
       "id": "hero",
@@ -250,11 +253,50 @@
           }
         }
       ],
-      "title": "SORA — LISTEN CLOSER."
+      "title": "SORA — LISTEN CLOSER.",
+      "eyebrow": "SORA / THE FULL FORM"
     }
   ],
   "output": {
     "format": "mp4",
     "codec": "h264"
-  }
+  },
+  "audioTracks": [
+    {
+      "id": "sora-original-score",
+      "role": "music",
+      "src": "assets/audio/score.wav",
+      "startInFrames": 0,
+      "durationInFrames": 360,
+      "volume": 0.48,
+      "fadeInFrames": 30,
+      "fadeOutFrames": 45,
+      "loop": false,
+      "preservePitch": true,
+      "effects": {
+        "highPassHz": 38,
+        "lowPassHz": 15000,
+        "eqBands": [
+          {
+            "frequency": 120,
+            "gainDb": 1.2,
+            "q": 0.8
+          },
+          {
+            "frequency": 3200,
+            "gainDb": 1.1,
+            "q": 1
+          }
+        ],
+        "compressor": {
+          "thresholdDb": -25,
+          "ratio": 2,
+          "attackMs": 28,
+          "releaseMs": 260,
+          "makeupGainDb": 0.8
+        },
+        "pan": 0
+      }
+    }
+  ]
 }
