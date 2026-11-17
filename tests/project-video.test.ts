@@ -869,7 +869,7 @@ test("KINETIC visual showcase exercises global captions across all five scenes",
     await readFile(new URL("../projects/showcase-transitions/scene.json", import.meta.url), "utf8")
   ) as VideoProject;
   assert.deepEqual(validateProjectDefinition(project), []);
-  assert.equal(project.subtitles?.length, 5);\n  assert.equal(project.audioTracks?.length, 6);\n  assert.equal(project.audioTracks?.filter((track) => track.role === "sfx").length, 5);
+  assert.equal(project.subtitles?.length, 5);\n  assert.equal(project.audioTracks?.length, 7);\n  assert.equal(project.audioTracks?.filter((track) => track.role === "sfx").length, 6);
   assert.ok(project.subtitles?.every((cue) => cue.speaker === "NARRATOR"));
   assert.ok(project.subtitles?.every((cue) => cue.startInFrames + cue.durationInFrames <= getProjectDurationInFrames(project)));
   const firstCutFrame = project.scenes[0]!.durationInFrames;
