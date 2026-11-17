@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "render": "remotion render src/index.ts DemoVideo render-output/demo.mp4" },
+  "scripts": {
+    "render": "remotion render src/index.ts DemoVideo render-output/demo.mp4",
+    "render:custom": "remotion render src/index.ts"
+  },
   "dependencies": {
     "@remotion/cli": "^4.0.398",
     "react": "^19.1.1",
