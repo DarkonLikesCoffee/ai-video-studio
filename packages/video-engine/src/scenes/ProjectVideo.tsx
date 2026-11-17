@@ -427,7 +427,7 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
             durationInFrames={durationInFrames}
             name={`particles-${system.id}`}
           >
-            <ParticleField system={system} fps={30} />
+            <ParticleField system={system} fps={composition.fps} />
           </Sequence>
         );
       })}
@@ -527,7 +527,7 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
   );
 };
 
-export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [] }) => {
+export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], composition }) => {
   const projectDurationInFrames = scenes.reduce((total, scene) => total + scene.durationInFrames, 0);
 
   return (
