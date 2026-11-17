@@ -150,7 +150,7 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0
+                  "value": 0.01
                 },
                 {
                   "frame": 50,
@@ -621,7 +621,7 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0
+                  "value": 0.01
                 },
                 {
                   "frame": 45,
