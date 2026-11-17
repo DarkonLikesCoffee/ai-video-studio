@@ -68,7 +68,8 @@
             }
           }
         }
-      ]
+      ],
+      "title": "ENGINEERED TO DISAPPEAR."
     },
     {
       "id": "silhouette",
@@ -130,7 +131,8 @@
             }
           }
         }
-      ]
+      ],
+      "title": "SORA — SOUND, SHAPED AROUND YOU."
     },
     {
       "id": "control",
@@ -194,7 +196,8 @@
             }
           }
         }
-      ]
+      ],
+      "title": "EVERY DETAIL, CONSIDERED."
     },
     {
       "id": "hero",
@@ -246,7 +249,8 @@
             }
           }
         }
-      ]
+      ],
+      "title": "SORA — LISTEN CLOSER."
     }
   ],
   "output": {
