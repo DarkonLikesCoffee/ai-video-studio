@@ -25,6 +25,11 @@ test("Aether showcase is a valid four-scene motion design project with advanced 
   assert.equal(project.audioTracks?.[0]?.ducking?.sidechainTrackIds[0], "ducking-key");
   assert.equal(project.audioTracks?.find((track) => track.id === "ducking-key")?.muted, true);
   assert.equal(project.audioMastering?.integratedLufs, -16);
+  assert.ok(project.scenes.every((scene) => (scene.graphics?.length ?? 0) > 0));
+  assert.ok(project.scenes.every((scene) => (scene.particleSystems?.length ?? 0) > 0));
+  assert.ok(project.scenes.flatMap((scene) => scene.graphics ?? []).some((graphic) => graphic.type === "path"));
+  assert.ok(project.scenes.flatMap((scene) => scene.graphics ?? []).some((graphic) => graphic.type === "text"));
+  assert.ok(project.scenes.flatMap((scene) => scene.particleSystems ?? []).some((system) => system.blendMode === "screen"));
 });
 
 test("three-scene example is a valid ProjectVideo project with image and video media", async () => {
@@ -402,4 +407,189 @@ test("audio mastering settings validate LUFS, true peak and loudness range", asy
   assert.ok(errors.some((error) => error.includes("integratedLufs must be between -24 and -8 LUFS")));
   assert.ok(errors.some((error) => error.includes("truePeakDb must be between -9 and 0 dBTP")));
   assert.ok(errors.some((error) => error.includes("loudnessRange must be between 1 and 20 LU")));
+});
+
+test("vector graphics accept shapes, text and animated SVG path reveals", async () => {
+  const project = await readExample();
+  project.scenes[0]!.graphics = [
+    {
+      id: "outline-card",
+      type: "rect",
+      x: 10,
+      y: 12,
+      width: 80,
+      height: 70,
+      fill: "#101A33",
+      stroke: "#75E8FF",
+      strokeWidth: 2,
+      radius: 4,
+    },
+    {
+      id: "orb",
+      type: "ellipse",
+      x: 32,
+      y: 24,
+      width: 36,
+      height: 48,
+      fill: "#7D73FF",
+      opacity: 0.8,
+    },
+    {
+      id: "reveal-line",
+      type: "path",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      d: "M0 50 C25 0 75 100 100 50",
+      stroke: "#FFFFFF",
+      strokeWidth: 2,
+      animations: {
+        pathProgress: {
+          keyframes: [{ frame: 0, value: 0 }, { frame: 40, value: 1, easing: "ease-out" }],
+        },
+      },
+    },
+    {
+      id: "label",
+      type: "text",
+      x: 12,
+      y: 82,
+      width: 70,
+      height: 8,
+      fill: "#FFFFFF",
+      text: "VECTOR SYSTEM",
+      fontSize: 32,
+      fontWeight: 700,
+      textAnchor: "middle",
+      letterSpacing: 2,
+    },
+  ];
+  assert.deepEqual(validateProjectDefinition(project), []);
+});
+
+test("vector graphic validation rejects malformed geometry, path data and text styling", async () => {
+  const project = await readExample();
+  project.scenes[0]!.graphics = [
+    {
+      id: "bad-path",
+      type: "path",
+      x: 90,
+      y: 5,
+      width: 20,
+      height: 30,
+      d: "M0 0 onload=alert(1)",
+      stroke: "red",
+      strokeWidth: 40,
+    } as unknown as VideoProject["scenes"][number]["graphics"][number],
+    {
+      id: "bad-text",
+      type: "text",
+      x: 0,
+      y: 0,
+      width: 30,
+      height: 10,
+      fill: "#FFFFFF",
+      text: "x".repeat(301),
+      fontSize: 400,
+      fontWeight: 100,
+      fontFamily: "url(javascript:alert(1))",
+      textAnchor: "side",
+      letterSpacing: 50,
+    } as unknown as VideoProject["scenes"][number]["graphics"][number],
+  ];
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("x + width cannot exceed 100")));
+  assert.ok(errors.some((error) => error.includes("valid-looking SVG path data")));
+  assert.ok(errors.some((error) => error.includes("stroke must be a six-digit hex color")));
+  assert.ok(errors.some((error) => error.includes("strokeWidth must be between 0 and 20")));
+  assert.ok(errors.some((error) => error.includes("text is required and must be at most 300 characters")));
+  assert.ok(errors.some((error) => error.includes("fontSize must be between 8 and 240 pixels")));
+  assert.ok(errors.some((error) => error.includes("fontFamily contains unsupported characters")));
+  assert.ok(errors.some((error) => error.includes("textAnchor must be start, middle, or end")));
+});
+
+test("path progress keyframes must stay between zero and one", async () => {
+  const project = await readExample();
+  project.scenes[0]!.graphics = [{
+    id: "path",
+    type: "path",
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    d: "M0 0 L100 100",
+    stroke: "#FFFFFF",
+    animations: {
+      pathProgress: { keyframes: [{ frame: 0, value: 0 }, { frame: 30, value: 1.1 }] },
+    },
+  }];
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("pathProgress must be between 0 and 1")));
+});
+
+test("particle systems accept seeded emitters with bounded motion and color palettes", async () => {
+  const project = await readExample();
+  project.scenes[0]!.particleSystems = [
+    {
+      id: "stars",
+      count: 120,
+      seed: 42,
+      originX: 50,
+      originY: 50,
+      spreadX: 80,
+      spreadY: 70,
+      lifeInFrames: 90,
+      angleMinDeg: 220,
+      angleMaxDeg: 320,
+      speedMin: 0.5,
+      speedMax: 6,
+      gravity: 0.2,
+      sizeMin: 1,
+      sizeMax: 8,
+      opacity: 0.8,
+      colors: ["#FFFFFF", "#7DEBFF", "#A98BFF"],
+      shape: "circle",
+      blendMode: "screen",
+    },
+  ];
+  assert.deepEqual(validateProjectDefinition(project), []);
+});
+
+test("particle validation enforces per-system limits and scene-wide budgets", async () => {
+  const project = await readExample();
+  project.scenes[0]!.particleSystems = Array.from({ length: 3 }, (_, index) => ({
+    id: `particles-${index}`,
+    count: 140,
+    seed: index,
+    originX: 50,
+    originY: 50,
+    lifeInFrames: 90,
+    colors: ["#FFFFFF"],
+  }));
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("combined count must not exceed 360 particles")));
+
+  project.scenes[0]!.particleSystems = [{
+    id: "invalid",
+    count: 161,
+    seed: 3.4,
+    originX: -1,
+    originY: 150,
+    lifeInFrames: 2,
+    speedMin: 10,
+    speedMax: 1,
+    sizeMin: 12,
+    sizeMax: 4,
+    colors: ["not-a-color"],
+    shape: "triangle" as "circle",
+    blendMode: "multiply" as "normal",
+  }];
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("count must be an integer between 1 and 160")));
+  assert.ok(errors.some((error) => error.includes("seed must be a 32-bit signed integer")));
+  assert.ok(errors.some((error) => error.includes("originX must be between 0 and 100")));
+  assert.ok(errors.some((error) => error.includes("lifeInFrames must be an integer between 8 and 900")));
+  assert.ok(errors.some((error) => error.includes("speedMin cannot exceed speedMax")));
+  assert.ok(errors.some((error) => error.includes("sizeMin cannot exceed sizeMax")));
+  assert.ok(errors.some((error) => error.includes("colors must contain 1-8 six-digit hex colors")));
+  assert.ok(errors.some((error) => error.includes("shape must be circle, square, or diamond")));
 });
