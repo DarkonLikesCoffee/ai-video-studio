@@ -14,3 +14,6 @@ render-output/
 .DS_Store
 Thumbs.db
 projects/examples/three-scene-story/assets/audio/*.wav
+projects/showcase-motion/assets/audio/*.wav
+projects/showcase-motion/assets/audio/.processed/
+projects/showcase-motion/.render-project.json
