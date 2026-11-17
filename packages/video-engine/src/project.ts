@@ -37,6 +37,9 @@ const isRecord = (value: unknown): value is JsonRecord =>
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;
 
+const isInteger = (value: unknown): value is number =>
+  typeof value === "number" && Number.isInteger(value);
+
 const isHexColor = (value: unknown): value is string =>
   typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
 
@@ -62,20 +65,20 @@ export const validateProjectDefinition = (value: unknown): string[] => {
   if (compositionId !== "DemoVideo" && compositionId !== "ProjectVideo") {
     errors.push("composition.id must be DemoVideo or ProjectVideo");
   }
-  if (!Number.isInteger(composition.width) || Number(composition.width) < 1 || Number(composition.width) > 3840) {
+  if (!isInteger(composition.width) || composition.width < 1 || composition.width > 3840) {
     errors.push("composition.width must be an integer between 1 and 3840");
   }
-  if (!Number.isInteger(composition.height) || Number(composition.height) < 1 || Number(composition.height) > 2160) {
+  if (!isInteger(composition.height) || composition.height < 1 || composition.height > 2160) {
     errors.push("composition.height must be an integer between 1 and 2160");
   }
-  if (!Number.isInteger(composition.fps) || Number(composition.fps) < 1 || Number(composition.fps) > 60) {
+  if (!isInteger(composition.fps) || composition.fps < 1 || composition.fps > 60) {
     errors.push("composition.fps must be an integer between 1 and 60");
   }
 
   if (compositionId === "DemoVideo") {
-    if (!Number.isInteger(composition.durationInFrames) ||
-        Number(composition.durationInFrames) < 1 ||
-        Number(composition.durationInFrames) > 1800) {
+    if (!isInteger(composition.durationInFrames) ||
+        composition.durationInFrames < 1 ||
+        composition.durationInFrames > 1800) {
       errors.push("DemoVideo composition.durationInFrames must be between 1 and 1800");
     }
   }
@@ -102,12 +105,12 @@ export const validateProjectDefinition = (value: unknown): string[] => {
         if (typeof scene.type !== "string" || !sceneTypes.has(scene.type as SceneType)) {
           errors.push(`${prefix}.type must be title, content, or outro`);
         }
-        if (!Number.isInteger(scene.durationInFrames) ||
-            Number(scene.durationInFrames) < 30 ||
-            Number(scene.durationInFrames) > 900) {
+        if (!isInteger(scene.durationInFrames) ||
+            scene.durationInFrames < 30 ||
+            scene.durationInFrames > 900) {
           errors.push(`${prefix}.durationInFrames must be between 30 and 900`);
         } else {
-          totalFrames += Number(scene.durationInFrames);
+          totalFrames += scene.durationInFrames;
         }
         if (!isNonEmptyString(scene.title) || scene.title.length > 120) {
           errors.push(`${prefix}.title is required and must be at most 120 characters`);
