@@ -99,7 +99,7 @@ const SubtitleCueLayer: FC<SubtitleCueLayerProps> = ({ cue }) => {
     <AbsoluteFill
       style={{
         display: "flex",
-        alignItems: "center",
+        alignItems,
         justifyContent: position === "top" ? "flex-start" : position === "center" ? "center" : "flex-end",
         padding: position === "top" ? "7% 8% 0" : position === "center" ? "0 8%" : "0 8% 8%",
         boxSizing: "border-box",
