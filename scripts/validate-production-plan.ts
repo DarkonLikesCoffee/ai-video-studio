@@ -48,6 +48,10 @@ export const validateProductionPlan = (value: unknown): string[] => {
   if (typeof plan.title !== "string" || !plan.title.trim()) errors.push("title is required.");
 
   const delivery = plan.delivery;
+  const totalDurationSeconds =
+    delivery && typeof delivery.durationSeconds === "number" && Number.isFinite(delivery.durationSeconds)
+      ? delivery.durationSeconds
+      : null;
   if (!delivery || typeof delivery !== "object") {
     errors.push("delivery is required.");
   } else {
@@ -81,7 +85,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
 
   if (!Array.isArray(plan.shots) || plan.shots.length === 0 || plan.shots.length > 80) {
     errors.push("shots must contain between 1 and 80 entries.");
-  } else if (delivery && typeof delivery.durationSeconds === "number") {
+  } else if (totalDurationSeconds !== null) {
     const ids = new Set<string>();
     let previousStart = -1;
     plan.shots.forEach((shot, index) => {
@@ -100,7 +104,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
       if (!Number.isFinite(duration) || duration <= 0) errors.push(`shots[${index}].durationSeconds must be greater than zero.`);
       if (Number.isFinite(start) && start < previousStart) errors.push("shots must be ordered by startSeconds.");
       if (Number.isFinite(start)) previousStart = start;
-      if (Number.isFinite(start) && Number.isFinite(duration) && start + duration > delivery.durationSeconds + 1e-6) {
+      if (Number.isFinite(start) && Number.isFinite(duration) && start + duration > totalDurationSeconds + 1e-6) {
         errors.push(`shots[${index}] extends beyond the delivery duration.`);
       }
       for (const field of ["purpose", "visual", "framing", "cameraMovement", "transition", "audio"] as const) {
@@ -114,7 +118,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
     const last = plan.shots[plan.shots.length - 1];
     if (first && Number(first.startSeconds) !== 0) errors.push("The first shot must start at 0 seconds.");
     if (last && Number.isFinite(Number(last.startSeconds)) && Number.isFinite(Number(last.durationSeconds)) &&
-        Math.abs(Number(last.startSeconds) + Number(last.durationSeconds) - delivery.durationSeconds) > 1e-6) {
+        Math.abs(Number(last.startSeconds) + Number(last.durationSeconds) - totalDurationSeconds) > 1e-6) {
       errors.push("The final shot must end at delivery.durationSeconds.");
     }
   }
