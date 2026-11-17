@@ -1,4 +1,4 @@
-import { realpath, stat } from "node:fs/promises";
+import { readFile, realpath, stat } from "node:fs/promises";
 import { dirname, resolve, sep } from "node:path";
 import { isRemoteMediaUrl, validateProjectDefinition } from "../packages/video-engine/src/project";
 
@@ -11,7 +11,7 @@ if (!input) {
 const projectPath = resolve(input);
 let project: unknown;
 try {
-  project = JSON.parse(await (await import("node:fs/promises")).readFile(projectPath, "utf8")) as unknown;
+  project = JSON.parse(await readFile(projectPath, "utf8")) as unknown;
 } catch (error) {
   console.error("Could not parse project JSON:", error);
   process.exit(1);
