@@ -3,6 +3,30 @@ export type MediaType = "image" | "video";
 export type MediaPlacement = "background" | "left" | "right";
 export type MediaFit = "cover" | "contain";
 
+export type AnimationProperty =
+  | "x" | "y" | "width" | "height"
+  | "opacity" | "rotation" | "scaleX" | "scaleY";
+
+export type AnimationEasing =
+  | "linear" | "ease-in" | "ease-out" | "ease-in-out"
+  | "back" | "bounce" | "elastic" | "spring"
+  | { type: "bezier"; x1: number; y1: number; x2: number; y2: number }
+  | { type: "spring"; stiffness?: number; damping?: number; mass?: number; overshootClamping?: boolean };
+
+export type AnimationKeyframe = {
+  /** Frame relative to the start of this element's own timeline. */
+  frame: number;
+  value: number;
+  /** Easing applied from this keyframe to the next keyframe. */
+  easing?: AnimationEasing;
+};
+
+export type AnimationTrack = {
+  keyframes: AnimationKeyframe[];
+};
+
+export type AnimationTracks = Partial<Record<AnimationProperty, AnimationTrack>>;
+
 export type SceneMedia = {
   type: MediaType;
   /** Local paths must be inside the project's assets/ folder. HTTPS URLs are also supported. */
@@ -28,6 +52,8 @@ export type SceneMedia = {
   /** Timeline visibility window relative to the start of the scene. */
   startInFrames?: number;
   durationInFrames?: number;
+  /** Animated geometry and appearance, evaluated relative to this layer's start. */
+  animations?: AnimationTracks;
 };
 
 export type VideoScene = {
@@ -43,6 +69,10 @@ export type VideoScene = {
   media?: SceneMedia;
   /** Up to eight simultaneous composited image/video layers. */
   mediaLayers?: SceneMedia[];
+  /** Independent timeline animation tracks for text elements. x/y are percentage translations. */
+  eyebrowAnimation?: AnimationTracks;
+  titleAnimation?: AnimationTracks;
+  bodyAnimation?: AnimationTracks;
 };
 
 export type VideoProject = {
@@ -171,6 +201,104 @@ export const isSafeProjectAssetPath = (src: string): boolean => {
 };
 
 
+const animationProperties = new Set<AnimationProperty>([
+  "x", "y", "width", "height", "opacity", "rotation", "scaleX", "scaleY"
+]);
+const easingNames = new Set(["linear", "ease-in", "ease-out", "ease-in-out", "back", "bounce", "elastic", "spring"]);
+
+const validateEasing = (value: unknown, prefix: string): string[] => {
+  if (typeof value === "string") {
+    return easingNames.has(value) ? [] : [`${prefix} has an unsupported easing preset`];
+  }
+  if (!isRecord(value)) return [`${prefix} must be a supported easing preset or object`];
+
+  const errors: string[] = [];
+  if (value.type === "bezier") {
+    for (const field of ["x1", "y1", "x2", "y2"] as const) {
+      if (!isFiniteNumber(value[field])) errors.push(`${prefix}.${field} must be a finite number`);
+    }
+    if (isFiniteNumber(value.x1) && (value.x1 < 0 || value.x1 > 1)) errors.push(`${prefix}.x1 must be between 0 and 1`);
+    if (isFiniteNumber(value.x2) && (value.x2 < 0 || value.x2 > 1)) errors.push(`${prefix}.x2 must be between 0 and 1`);
+    if (isFiniteNumber(value.y1) && (value.y1 < -2 || value.y1 > 2)) errors.push(`${prefix}.y1 must be between -2 and 2`);
+    if (isFiniteNumber(value.y2) && (value.y2 < -2 || value.y2 > 2)) errors.push(`${prefix}.y2 must be between -2 and 2`);
+    return errors;
+  }
+
+  if (value.type === "spring") {
+    for (const field of ["stiffness", "damping", "mass"] as const) {
+      if (value[field] !== undefined &&
+          (!isFiniteNumber(value[field]) || value[field] <= 0 || value[field] > 1000)) {
+        errors.push(`${prefix}.${field} must be greater than 0 and at most 1000`);
+      }
+    }
+    if (value.overshootClamping !== undefined && typeof value.overshootClamping !== "boolean") {
+      errors.push(`${prefix}.overshootClamping must be a boolean`);
+    }
+    return errors;
+  }
+
+  return [`${prefix}.type must be bezier or spring`];
+};
+
+export const validateAnimationTracks = (
+  value: unknown,
+  prefix: string,
+  maxFrames: number
+): string[] => {
+  if (!isRecord(value)) return [`${prefix} must be an object of animation tracks`];
+  const errors: string[] = [];
+
+  for (const [property, trackValue] of Object.entries(value)) {
+    if (!animationProperties.has(property as AnimationProperty)) {
+      errors.push(`${prefix}.${property} is not an animatable property`);
+      continue;
+    }
+
+    const track = isRecord(trackValue) ? trackValue : {};
+    if (!Array.isArray(track.keyframes) || track.keyframes.length < 1 || track.keyframes.length > 30) {
+      errors.push(`${prefix}.${property}.keyframes must contain between 1 and 30 keyframes`);
+      continue;
+    }
+
+    let previousFrame = -1;
+    track.keyframes.forEach((keyframeValue, index) => {
+      const keyframe = isRecord(keyframeValue) ? keyframeValue : {};
+      const keyframePrefix = `${prefix}.${property}.keyframes[${index}]`;
+
+      if (!isInteger(keyframe.frame) || keyframe.frame < 0 || keyframe.frame >= maxFrames) {
+        errors.push(`${keyframePrefix}.frame must be between 0 and ${Math.max(0, maxFrames - 1)}`);
+      } else if (keyframe.frame <= previousFrame) {
+        errors.push(`${keyframePrefix}.frame must be strictly greater than the previous frame`);
+      } else {
+        previousFrame = keyframe.frame;
+      }
+
+      if (!isFiniteNumber(keyframe.value)) {
+        errors.push(`${keyframePrefix}.value must be a finite number`);
+      } else if (property === "opacity" && (keyframe.value < 0 || keyframe.value > 1)) {
+        errors.push(`${keyframePrefix}.value for opacity must be between 0 and 1`);
+      } else if ((property === "width" || property === "height") &&
+                 (keyframe.value <= 0 || keyframe.value > 100)) {
+        errors.push(`${keyframePrefix}.value for ${property} must be greater than 0 and at most 100`);
+      } else if ((property === "x" || property === "y") &&
+                 (keyframe.value < -200 || keyframe.value > 200)) {
+        errors.push(`${keyframePrefix}.value for ${property} must be between -200 and 200`);
+      } else if (property === "rotation" && (keyframe.value < -3600 || keyframe.value > 3600)) {
+        errors.push(`${keyframePrefix}.value for rotation must be between -3600 and 3600`);
+      } else if ((property === "scaleX" || property === "scaleY") &&
+                 (keyframe.value < 0 || keyframe.value > 20)) {
+        errors.push(`${keyframePrefix}.value for ${property} must be between 0 and 20`);
+      }
+
+      if (keyframe.easing !== undefined) {
+        errors.push(...validateEasing(keyframe.easing, `${keyframePrefix}.easing`));
+      }
+    });
+  }
+
+  return errors;
+};
+
 const validateSceneMedia = (value: unknown, prefix: string, sceneDuration: number): string[] => {
   const errors: string[] = [];
   const media = isRecord(value) ? value : {};
@@ -260,6 +388,13 @@ const validateSceneMedia = (value: unknown, prefix: string, sceneDuration: numbe
     errors.push(`${prefix}.durationInFrames must be a positive integer`);
   } else if (isInteger(start) && start >= 0 && start + duration > sceneDuration) {
     errors.push(`${prefix} timeline window cannot extend beyond its scene`);
+  }
+
+  if (media.animations !== undefined) {
+    const effectiveDuration = isInteger(media.durationInFrames)
+      ? media.durationInFrames
+      : sceneDuration - (isInteger(media.startInFrames) ? media.startInFrames : 0);
+    errors.push(...validateAnimationTracks(media.animations, `${prefix}.animations`, effectiveDuration));
   }
 
   if (media.type === "video") {
@@ -371,6 +506,16 @@ export const validateProjectDefinition = (value: unknown): string[] => {
           const color = scene[field];
           if (color !== undefined && !isHexColor(color)) {
             errors.push(`${prefix}.${field} must be a six-digit hex color`);
+          }
+        }
+
+        for (const field of ["eyebrowAnimation", "titleAnimation", "bodyAnimation"] as const) {
+          if (scene[field] !== undefined) {
+            errors.push(...validateAnimationTracks(
+              scene[field],
+              `${prefix}.${field}`,
+              isInteger(scene.durationInFrames) ? scene.durationInFrames : 0
+            ));
           }
         }
 

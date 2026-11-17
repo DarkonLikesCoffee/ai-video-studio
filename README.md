@@ -147,7 +147,64 @@ Use `mediaLayers` instead of the legacy `media` property to compose up to eight 
 
 When custom geometry is provided, it overrides `placement`. The validator ensures a layer remains within the canvas and its timeline window stays inside its scene. The old single `media` property remains supported for existing projects; do not define both properties on the same scene.
 
-The scene title/body and existing graphic accents are rendered above media layers. Dedicated independently positioned text layers, shape primitives, and keyframe animation are later milestones.
+### Keyframe animation
+
+Media layers and text elements can be animated with independent numeric tracks. Supported properties are:
+
+- `x`, `y`: normalized canvas position in percent for media and percentage translation for text. Animated values may range from -200 to 200 so elements can enter from outside the canvas; static media geometry remains within the canvas.
+- `width`, `height`: media or text element size in percent.
+- `opacity`: 0 (transparent) to 1 (opaque).
+- `rotation`: degrees.
+- `scaleX`, `scaleY`: scale multiplier, where 1 is the original size.
+
+A keyframe's `easing` controls the segment from that keyframe to the next. Supported presets are `linear`, `ease-in`, `ease-out`, `ease-in-out`, `back`, `bounce`, `elastic`, and `spring`. For precise motion, use a cubic Bezier curve or custom spring settings.
+
+Example media animation:
+
+```json
+{
+  "id": "hero-image",
+  "type": "image",
+  "src": "assets/hero.webp",
+  "x": 60,
+  "y": 10,
+  "width": 35,
+  "height": 80,
+  "animations": {
+    "x": {
+      "keyframes": [
+        { "frame": 0, "value": 100, "easing": "ease-out" },
+        { "frame": 30, "value": 60 }
+      ]
+    },
+    "opacity": {
+      "keyframes": [
+        { "frame": 0, "value": 0 },
+        { "frame": 24, "value": 1 }
+      ]
+    },
+    "scaleX": {
+      "keyframes": [
+        { "frame": 0, "value": 0.7, "easing": { "type": "spring", "stiffness": 120, "damping": 16 } },
+        { "frame": 30, "value": 1 }
+      ]
+    },
+    "rotation": {
+      "keyframes": [
+        { "frame": 0, "value": 12 },
+        { "frame": 30, "value": 0 }
+      ]
+    }
+  }
+}
+```
+
+Text elements use `titleAnimation`, `bodyAnimation`, and `eyebrowAnimation` at the scene level. Their keyframe frames are relative to the start of the scene. Media keyframes are relative to the start of that media layer's own visibility window. Keyframes must be strictly increasing and stay inside the relevant timeline duration; each property supports up to 30 keyframes.
+
+The animation evaluator uses Remotion's deterministic frame-based `interpolate()` and easing primitives, including physics-style spring easing. This makes the same project render consistently in GitHub Actions, CircleCI, and local renders.
+
+
+The scene title/body and existing graphic accents are rendered above media layers.
 
 ## Prompt-driven cloud rendering
 
@@ -201,7 +258,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 ## Current limitations
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
-- Dedicated text layers, shape primitives, keyframe animation, video looping, audio-only tracks, voice-over, subtitles and automatic prompt-to-project generation are not implemented yet.
+- Dedicated arbitrary text layers, shape primitives, SVG path morphing, video looping, audio-only tracks, voice-over, subtitles and automatic prompt-to-project generation are not implemented yet. Keyframe animation currently supports numeric transforms and opacity for media layers and the built-in text elements.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
