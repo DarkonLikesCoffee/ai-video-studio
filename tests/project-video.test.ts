@@ -863,3 +863,14 @@ test("subtitle renderer overlays the full project timeline above scene transitio
   assert.ok(source.includes("name={\"subtitle-\" + cue.id}"));
   assert.ok(source.includes("zIndex: 1000"));
 });
+ 
+test("KINETIC visual showcase exercises global captions across all five scenes", async () => {
+  const project = JSON.parse(
+    await readFile(new URL("../projects/showcase-transitions/scene.json", import.meta.url), "utf8")
+  ) as VideoProject;
+  assert.deepEqual(validateProjectDefinition(project), []);
+  assert.equal(project.subtitles?.length, 5);
+  assert.ok(project.subtitles?.every((cue) => cue.speaker === "NARRATOR"));
+  assert.ok(project.subtitles?.every((cue) => cue.startInFrames + cue.durationInFrames <= getProjectDurationInFrames(project)));
+});
+
