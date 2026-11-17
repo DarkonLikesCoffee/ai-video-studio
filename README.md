@@ -151,7 +151,7 @@ When custom geometry is provided, it overrides `placement`. The validator ensure
 
 Media layers and text elements can be animated with independent numeric tracks. Supported properties are:
 
-- `x`, `y`: for media, normalized canvas position in percent; for text, percentage translation.
+- `x`, `y`: normalized canvas position in percent for media and percentage translation for text. Animated values may range from -200 to 200 so elements can enter from outside the canvas; static media geometry remains within the canvas.
 - `width`, `height`: media or text element size in percent.
 - `opacity`: 0 (transparent) to 1 (opaque).
 - `rotation`: degrees.
