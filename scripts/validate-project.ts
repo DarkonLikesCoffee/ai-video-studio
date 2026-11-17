@@ -1,6 +1,6 @@
-import { readFile, stat } from "node:fs/promises";
-import { isAbsolute, relative, resolve, sep } from "node:path";
-import { validateProjectDefinition } from "../packages/video-engine/src/project";
+import { realpath, stat } from "node:fs/promises";
+import { dirname, resolve, sep } from "node:path";
+import { isRemoteMediaUrl, validateProjectDefinition } from "../packages/video-engine/src/project";
 
 const input = process.argv[2];
 if (!input) {
@@ -8,39 +8,16 @@ if (!input) {
   process.exit(2);
 }
 
+const projectPath = resolve(input);
 let project: unknown;
 try {
-  project = JSON.parse(await readFile(resolve(input), "utf8")) as unknown;
+  project = JSON.parse(await (await import("node:fs/promises")).readFile(projectPath, "utf8")) as unknown;
 } catch (error) {
   console.error("Could not parse project JSON:", error);
   process.exit(1);
 }
 
 const errors = validateProjectDefinition(project);
-if (errors.length === 0 && typeof project === "object" && project !== null) {
-  const scenes = (project as { scenes?: Array<{ media?: { source?: string; src?: string } }> }).scenes ?? [];
-  const publicRoot = resolve("packages/video-engine/public");
-
-  for (const [index, scene] of scenes.entries()) {
-    const media = scene.media;
-    if (media?.source !== "public" || typeof media.src !== "string") continue;
-
-    const assetPath = resolve(publicRoot, media.src);
-    const assetRelativePath = relative(publicRoot, assetPath);
-    if (assetRelativePath.startsWith(".." + sep) || assetRelativePath === ".." || isAbsolute(assetRelativePath)) {
-      errors.push(`scenes[${index}].media.src resolves outside the public assets directory`);
-      continue;
-    }
-
-    try {
-      const details = await stat(assetPath);
-      if (!details.isFile()) errors.push(`scenes[${index}].media.src must point to a file`);
-    } catch {
-      errors.push(`scenes[${index}].media.src file was not found: ${media.src}`);
-    }
-  }
-}
-
 if (errors.length > 0) {
   console.error("Project validation failed:\n" + errors.map((error) => "- " + error).join("\n"));
   process.exit(1);
@@ -49,10 +26,30 @@ if (errors.length > 0) {
 const metadata = project as {
   title: string;
   composition: { id: string; durationInFrames?: number };
-  scenes?: Array<{ durationInFrames: number }>;
+  scenes?: Array<{ durationInFrames: number; media?: { src: string } }>;
 };
 const durationInFrames = metadata.composition.id === "ProjectVideo"
   ? metadata.scenes?.reduce((total, scene) => total + scene.durationInFrames, 0) ?? 0
   : metadata.composition.durationInFrames ?? 0;
-const sceneCount = metadata.scenes?.length ?? 1;
-console.log(`Valid project: ${metadata.title} — ${sceneCount} scenes, ${durationInFrames} frames`);
+
+if (metadata.composition.id === "ProjectVideo") {
+  const projectDirectory = await realpath(dirname(projectPath));
+  for (const [index, scene] of (metadata.scenes ?? []).entries()) {
+    const source = scene.media?.src;
+    if (!source || isRemoteMediaUrl(source)) continue;
+
+    try {
+      const assetPath = await realpath(resolve(projectDirectory, source));
+      if (!assetPath.startsWith(projectDirectory + sep)) {
+        throw new Error("asset resolves outside the project directory");
+      }
+      const assetInfo = await stat(assetPath);
+      if (!assetInfo.isFile()) throw new Error("asset is not a file");
+    } catch (error) {
+      console.error(`Project asset validation failed for scenes[${index}].media.src (${source}):`, error);
+      process.exit(1);
+    }
+  }
+}
+
+console.log(`Valid project: ${metadata.title} — ${durationInFrames} frames`);
