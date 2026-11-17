@@ -1,7 +1,8 @@
 import { Audio } from "@remotion/media";
 import { AbsoluteFill, Img, OffthreadVideo, Sequence, Series, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { useMemo } from "react";
 import type { CSSProperties, FC, ReactNode } from "react";
-import type { AnimationTracks, AudioTrack, SceneMedia, VideoProject, VideoScene } from "../project";
+import type { AnimationTracks, AudioTrack, GraphicElement, ParticleSystem, SceneMedia, VideoProject, VideoScene } from "../project";
 import { isRemoteMediaUrl } from "../project";
 import { evaluateAnimationTrack } from "../animation";
 
@@ -57,6 +58,194 @@ const AudioTrackLayer: FC<AudioTrackLayerProps> = ({ track, projectDurationInFra
       muted={track.muted ?? false}
       loop={track.loop ?? false}
     />
+  );
+};
+
+type AnimatedGraphicProps = {
+  graphic: GraphicElement;
+};
+
+const AnimatedGraphic: FC<AnimatedGraphicProps> = ({ graphic }) => {
+  const frame = useCurrentFrame();
+  const x = evaluateAnimationTrack(frame, graphic.animations?.x, graphic.x);
+  const y = evaluateAnimationTrack(frame, graphic.animations?.y, graphic.y);
+  const width = evaluateAnimationTrack(frame, graphic.animations?.width, graphic.width);
+  const height = evaluateAnimationTrack(frame, graphic.animations?.height, graphic.height);
+  const opacity = evaluateAnimationTrack(frame, graphic.animations?.opacity, graphic.opacity ?? 1);
+  const rotation = evaluateAnimationTrack(frame, graphic.animations?.rotation, graphic.rotation ?? 0);
+  const scaleX = evaluateAnimationTrack(frame, graphic.animations?.scaleX, 1);
+  const scaleY = evaluateAnimationTrack(frame, graphic.animations?.scaleY, 1);
+  const baseStyle: CSSProperties = {
+    position: "absolute",
+    left: `${x}%`,
+    top: `${y}%`,
+    width: `${width}%`,
+    height: `${height}%`,
+    opacity,
+    zIndex: graphic.zIndex ?? 20,
+    transform: `scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`,
+    transformOrigin: "center center",
+    pointerEvents: "none",
+    overflow: "visible",
+  };
+
+  if (graphic.type === "text") {
+    const align = graphic.textAnchor ?? "start";
+    return (
+      <div
+        style={{
+          ...baseStyle,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: align === "middle" ? "center" : align === "end" ? "flex-end" : "flex-start",
+          color: graphic.fill ?? "#FFFFFF",
+          fontFamily: graphic.fontFamily ?? "Arial, sans-serif",
+          fontSize: graphic.fontSize ?? 48,
+          fontWeight: graphic.fontWeight ?? 600,
+          letterSpacing: graphic.letterSpacing ?? 0,
+          whiteSpace: "pre-wrap",
+          lineHeight: 1.1,
+        }}
+      >
+        {graphic.text}
+      </div>
+    );
+  }
+
+  const sharedShapeProps = {
+    fill: graphic.fill ?? "none",
+    stroke: graphic.stroke ?? "none",
+    strokeWidth: graphic.strokeWidth ?? 1,
+    vectorEffect: "non-scaling-stroke" as const,
+    strokeLinejoin: "round" as const,
+  };
+
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      style={baseStyle}
+      aria-hidden="true"
+    >
+      {graphic.type === "rect" ? (
+        <rect
+          x="0"
+          y="0"
+          width="100"
+          height="100"
+          rx={graphic.radius ?? 0}
+          {...sharedShapeProps}
+        />
+      ) : graphic.type === "ellipse" ? (
+        <ellipse
+          cx="50"
+          cy="50"
+          rx="49.5"
+          ry="49.5"
+          {...sharedShapeProps}
+        />
+      ) : (
+        <path
+          d={graphic.d}
+          pathLength={1}
+          strokeDasharray="1 1"
+          strokeDashoffset={1 - evaluateAnimationTrack(frame, graphic.animations?.pathProgress, 1)}
+          strokeLinecap={graphic.lineCap ?? "round"}
+          {...sharedShapeProps}
+        />
+      )}
+    </svg>
+  );
+};
+
+type ParticleSpec = {
+  offsetX: number;
+  offsetY: number;
+  angleRadians: number;
+  speed: number;
+  size: number;
+  color: string;
+  phase: number;
+  rotation: number;
+};
+
+type ParticleFieldProps = {
+  system: ParticleSystem;
+  fps: number;
+};
+
+const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
+  const frame = useCurrentFrame();
+  const specs = useMemo<ParticleSpec[]>(() => {
+    let state = system.seed >>> 0;
+    const random = (): number => {
+      state += 0x6D2B79F5;
+      let value = state;
+      value = Math.imul(value ^ (value >>> 15), value | 1);
+      value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+      return ((value ^ (value >>> 14)) >>> 0) / 4_294_967_296;
+    };
+
+    const speedMin = system.speedMin ?? 1.5;
+    const speedMax = system.speedMax ?? 8;
+    const sizeMin = system.sizeMin ?? 2;
+    const sizeMax = system.sizeMax ?? 6;
+    const angleMin = system.angleMinDeg ?? 0;
+    const angleMax = system.angleMaxDeg ?? 360;
+
+    return Array.from({ length: system.count }, () => ({
+      offsetX: (random() - 0.5) * (system.spreadX ?? 24),
+      offsetY: (random() - 0.5) * (system.spreadY ?? 24),
+      angleRadians: (angleMin + random() * (angleMax - angleMin)) * Math.PI / 180,
+      speed: speedMin + random() * (speedMax - speedMin),
+      size: sizeMin + random() * (sizeMax - sizeMin),
+      color: system.colors[Math.floor(random() * system.colors.length)] ?? "#FFFFFF",
+      phase: random(),
+      rotation: random() * 360,
+    }));
+  }, [system, fps]);
+
+  const lifeInFrames = system.lifeInFrames;
+  const opacity = system.opacity ?? 0.8;
+  const gravity = system.gravity ?? 0;
+
+  return (
+    <AbsoluteFill
+      style={{
+        overflow: "hidden",
+        pointerEvents: "none",
+        zIndex: 15,
+        mixBlendMode: system.blendMode ?? "screen",
+      }}
+    >
+      {specs.map((particle, index) => {
+        const phaseOffset = Math.floor(particle.phase * lifeInFrames);
+        const ageFrames = (frame + phaseOffset) % lifeInFrames;
+        const ageSeconds = ageFrames / fps;
+        const fade = Math.sin(Math.PI * ageFrames / lifeInFrames);
+        const travel = particle.speed * ageSeconds;
+        const xRaw = (system.originX + particle.offsetX) +
+          Math.cos(particle.angleRadians) * travel;
+        const yRaw = (system.originY + particle.offsetY) +
+          Math.sin(particle.angleRadians) * travel +
+          0.5 * gravity * ageSeconds * ageSeconds;
+        const x = ((xRaw % 110) + 110) % 110 - 5;
+        const y = ((yRaw % 110) + 110) % 110 - 5;
+        const shapeStyle: CSSProperties = {
+          position: "absolute",
+          left: `${x}%`,
+          top: `${y}%`,
+          width: particle.size,
+          height: particle.size,
+          backgroundColor: particle.color,
+          opacity: opacity * fade,
+          borderRadius: system.shape === "square" ? 2 : system.shape === "diamond" ? 2 : "50%",
+          transform: `translate(-50%, -50%) rotate(${particle.rotation + ageFrames * 1.8}deg)${system.shape === "diamond" ? " rotate(45deg)" : ""}`,
+          boxShadow: system.blendMode === "screen" ? `0 0 ${particle.size * 2}px ${particle.color}` : undefined,
+        };
+        return <div key={index} style={shapeStyle} />;
+      })}
+    </AbsoluteFill>
   );
 };
 
@@ -211,6 +400,34 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
             style={{ zIndex: media.zIndex ?? layerIndex }}
           >
             <AnimatedMedia media={media} index={layerIndex} />
+          </Sequence>
+        );
+      })}
+      {(scene.graphics ?? []).map((graphic, graphicIndex) => {
+        const startInFrames = graphic.startInFrames ?? 0;
+        const durationInFrames = graphic.durationInFrames ?? duration - startInFrames;
+        return (
+          <Sequence
+            key={graphic.id}
+            from={startInFrames}
+            durationInFrames={durationInFrames}
+            name={`graphic-${graphic.id}`}
+          >
+            <AnimatedGraphic graphic={graphic} />
+          </Sequence>
+        );
+      })}
+      {(scene.particleSystems ?? []).map((system) => {
+        const startInFrames = system.startInFrames ?? 0;
+        const durationInFrames = system.durationInFrames ?? duration - startInFrames;
+        return (
+          <Sequence
+            key={system.id}
+            from={startInFrames}
+            durationInFrames={durationInFrames}
+            name={`particles-${system.id}`}
+          >
+            <ParticleField system={system} fps={30} />
           </Sequence>
         );
       })}
