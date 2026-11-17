@@ -18,6 +18,8 @@ type AudioTrackLayerProps = {
 const AudioTrackLayer: FC<AudioTrackLayerProps> = ({ track, projectDurationInFrames }) => {
   const frame = useCurrentFrame();
   const durationInFrames = track.durationInFrames ?? projectDurationInFrames - track.startInFrames;
+  const playbackRate = track.playbackRate ?? 1;
+  const sourceDurationInFrames = Math.round(durationInFrames * playbackRate);
   const localFrame = frame - track.startInFrames;
   const baseVolume = evaluateAnimationTrack(
     localFrame,
@@ -47,9 +49,9 @@ const AudioTrackLayer: FC<AudioTrackLayerProps> = ({ track, projectDurationInFra
       name={`${track.role}: ${track.id}`}
       src={src}
       from={track.startInFrames}
-      durationInFrames={durationInFrames}
+      durationInFrames={sourceDurationInFrames}
       trimBefore={track.trimBefore ?? 0}
-      playbackRate={track.playbackRate ?? 1}
+      playbackRate={playbackRate}
       preservePitch={track.preservePitch ?? false}
       volume={volume}
       muted={track.muted ?? false}
