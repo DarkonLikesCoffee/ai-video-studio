@@ -12,6 +12,7 @@ Two Remotion compositions are registered:
 A `ProjectVideo` project can define:
 - 1–20 scenes of type `title`, `content`, or `outro`.
 - Per-scene text, duration, background and accent colors.
+- Per-scene cinematic transitions: fade, directional slide, zoom and directional wipe, with configurable frame duration and easing.
 - Local image assets (`png`, `jpg`, `jpeg`, `webp`, `svg`, `avif`) or remote HTTPS images.
 - Local video clips (`mp4`, `mov`, `m4v`, `webm`, `mkv`) or remote HTTPS clips.
 - Media placement (`background`, `left`, `right`), fit (`cover` or `contain`), object position and opacity.
@@ -31,7 +32,9 @@ The current validator limits projects to 1,800 total frames, with each scene bet
 
 The repository keeps [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json) as a compatibility sample for local SVG and remote MP4 assets.
 
-The current visual test is [AETHER — Motion Design Showcase](projects/showcase-motion/scene.json): a 16-second, four-scene motion-design film with original orbital artwork, flowing vector fields, spectrum graphics, vector path reveals, deterministic particle fields, keyframed movement and an original soundtrack. Its SVG source art lives under [projects/showcase-motion/assets](projects/showcase-motion/assets).
+The audio/VFX test is [AETHER — Motion Design Showcase](projects/showcase-motion/scene.json): a 16-second, four-scene film with original orbital artwork, flowing vector fields, spectrum graphics, vector path reveals, deterministic particles, keyframed movement and an original soundtrack. Its SVG source art lives under [projects/showcase-motion/assets](projects/showcase-motion/assets).
+
+The separate [KINETIC — Scene Transition Showcase](projects/showcase-transitions/scene.json) is a 15-second, five-scene visual test dedicated to fade, slide, zoom and wipe transitions. It gives CI a different composition to render so transition regressions are not hidden by the AETHER layout.
 
 ### Local rendering
 
@@ -211,6 +214,42 @@ Example media animation:
 Text elements use `titleAnimation`, `bodyAnimation`, and `eyebrowAnimation` at the scene level. Their keyframe frames are relative to the start of the scene. Media keyframes are relative to the start of that media layer's own visibility window. Keyframes must be strictly increasing and stay inside the relevant timeline duration; each property supports up to 30 keyframes.
 
 The animation evaluator uses Remotion's deterministic frame-based `interpolate()` and easing primitives, including physics-style spring easing. This makes the same project render consistently in GitHub Actions, CircleCI, and local renders.
+
+### Scene transitions
+
+A scene can define `transitionIn` to overlap its entrance with the end of the previous scene. The previous scene stays rendered underneath while the incoming scene animates above it. Transition time is taken from the overlap, not added to the final video duration; music and other global audio tracks remain on the same project timeline.
+
+Supported transition types:
+
+- `cut`: immediate hard cut; use `durationInFrames: 0`.
+- `fade`: incoming scene fades over the previous scene.
+- `slide-left`, `slide-right`, `slide-up`, `slide-down`: a directional push, with both scenes moving together.
+- `zoom`: incoming scene scales down into place while fading in.
+- `wipe-left`, `wipe-right`: reveal the incoming scene with a directional clip-path wipe.
+
+Animated transitions use 1–90 frames and accept the same easing presets, cubic Bezier curves and spring settings as keyframe animations. The first scene has no previous scene to transition over. The final scene has no outgoing transition. For each intermediate scene, its incoming and outgoing transition windows must leave at least one frame of normal scene time between them.
+
+Example:
+
+```json
+{
+  "scenes": [
+    {
+      "id": "chapter-two",
+      "type": "content",
+      "durationInFrames": 120,
+      "title": "A new perspective",
+      "transitionIn": {
+        "type": "slide-left",
+        "durationInFrames": 24,
+        "easing": "ease-out"
+      }
+    }
+  ]
+}
+```
+
+The renderer extends the previous scene's sequence only for the overlap and keeps layers whose visibility reaches the scene boundary alive throughout that transition. Explicitly shorter layer windows remain unchanged.
 
 ### Vector graphics and VFX
 
@@ -505,7 +544,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
 - Audio DSP uses local FFmpeg binaries. Tracks that need EQ, compression, reverb, panning or sidechain processing must use local assets; remote audio can still be used for unprocessed playback.
-- SVG path morphing, video looping, subtitles, 3D scenes, shader-based effects and automatic prompt-to-project generation are not implemented yet. The current vector system supports rectangles, ellipses, paths, text and deterministic particle fields; it is a 2D compositor, not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
+- SVG path morphing, video looping, subtitles, 3D scenes, shader-based effects and automatic prompt-to-project generation are not implemented yet. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
@@ -513,4 +552,4 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 ## CI
 
-GitHub Actions runs type-checking, tests, legacy-project validation, the Aether project and local-asset validation, FFmpeg audio preparation (including sidechain DSP), Remotion composition discovery, a full MP4 render, final loudness mastering, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
+GitHub Actions runs type-checking, tests, legacy-project validation, the Aether and KINETIC transition projects, FFmpeg audio preparation (including sidechain DSP), Remotion composition discovery, full MP4 renders for both showcases, final AETHER loudness mastering, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
