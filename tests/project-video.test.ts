@@ -872,5 +872,9 @@ test("KINETIC visual showcase exercises global captions across all five scenes",
   assert.equal(project.subtitles?.length, 5);
   assert.ok(project.subtitles?.every((cue) => cue.speaker === "NARRATOR"));
   assert.ok(project.subtitles?.every((cue) => cue.startInFrames + cue.durationInFrames <= getProjectDurationInFrames(project)));
+  const firstCutFrame = project.scenes[0]!.durationInFrames;
+  assert.ok(project.subtitles?.some((cue) =>
+    cue.startInFrames < firstCutFrame && cue.startInFrames + cue.durationInFrames > firstCutFrame
+  ));
 });
 
