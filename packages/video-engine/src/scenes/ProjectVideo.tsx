@@ -1,10 +1,11 @@
 import { Audio } from "@remotion/media";
-import { AbsoluteFill, Img, OffthreadVideo, Sequence, Series, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { useMemo } from "react";
 import type { CSSProperties, FC, ReactNode } from "react";
-import type { AnimationTracks, AudioTrack, GraphicElement, ParticleSystem, SceneMedia, VideoProject, VideoScene } from "../project";
+import type { AnimationTracks, AudioTrack, GraphicElement, ParticleSystem, SceneMedia, SceneTransition, VideoProject, VideoScene } from "../project";
 import { isRemoteMediaUrl } from "../project";
 import { evaluateAnimationTrack } from "../animation";
+import { getSceneTransitionStyle } from "../transitions";
 
 type SceneCardProps = {
   scene: VideoScene;
@@ -12,6 +13,9 @@ type SceneCardProps = {
   compositionFps: number;
   isFirstScene: boolean;
   isLastScene: boolean;
+  transitionIn?: SceneTransition;
+  transitionOut?: SceneTransition;
+  transitionOutDurationInFrames: number;
 };
 
 type AudioTrackLayerProps = {
@@ -340,7 +344,27 @@ const AnimatedText: FC<AnimatedTextProps> = ({ animation, children, style }) => 
   );
 };
 
-const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps, isFirstScene, isLastScene }) => {
+const getTransitionExtendedDuration = (
+  startInFrames: number,
+  declaredDurationInFrames: number | undefined,
+  sceneDurationInFrames: number,
+  transitionOutDurationInFrames: number
+): number => {
+  const duration = declaredDurationInFrames ?? sceneDurationInFrames - startInFrames;
+  const endsWithScene = startInFrames + duration === sceneDurationInFrames;
+  return endsWithScene ? duration + transitionOutDurationInFrames : duration;
+};
+
+const SceneCard: FC<SceneCardProps> = ({
+  scene,
+  index,
+  compositionFps,
+  isFirstScene,
+  isLastScene,
+  transitionIn,
+  transitionOut,
+  transitionOutDurationInFrames,
+}) => {
   const frame = useCurrentFrame();
   const duration = scene.durationInFrames;
   // Fade the film at its outer edges only. Internal scene cuts stay fully visible.
@@ -352,7 +376,15 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps, isFirstSc
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const opacity = (isFirstScene ? fadeIn : 1) * (isLastScene ? fadeOut : 1);
+  const transitionStyle = getSceneTransitionStyle(
+    frame,
+    duration,
+    transitionIn,
+    transitionOut
+  );
+  const opacity = (isFirstScene ? fadeIn : 1) *
+    (isLastScene ? fadeOut : 1) *
+    (transitionStyle.opacity ?? 1);
   const rise = interpolate(frame, [0, 20], [36, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -392,11 +424,21 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps, isFirstSc
         padding: "0 13%",
         boxSizing: "border-box",
         overflow: "hidden",
+        ...(transitionStyle.transform ? { transform: transitionStyle.transform } : {}),
+        ...(transitionStyle.clipPath ? { clipPath: transitionStyle.clipPath } : {}),
+        ...(transitionStyle.transform || transitionStyle.clipPath || transitionStyle.opacity !== undefined
+          ? { willChange: "transform, opacity, clip-path" }
+          : {}),
       }}
     >
       {mediaLayers.map((media, layerIndex) => {
         const startInFrames = media.startInFrames ?? 0;
-        const durationInFrames = media.durationInFrames ?? duration - startInFrames;
+        const durationInFrames = getTransitionExtendedDuration(
+          startInFrames,
+          media.durationInFrames,
+          duration,
+          transitionOutDurationInFrames
+        );
         return (
           <Sequence
             key={media.id ?? `${media.src}-${layerIndex}`}
@@ -411,7 +453,12 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps, isFirstSc
       })}
       {(scene.graphics ?? []).map((graphic, graphicIndex) => {
         const startInFrames = graphic.startInFrames ?? 0;
-        const durationInFrames = graphic.durationInFrames ?? duration - startInFrames;
+        const durationInFrames = getTransitionExtendedDuration(
+          startInFrames,
+          graphic.durationInFrames,
+          duration,
+          transitionOutDurationInFrames
+        );
         return (
           <Sequence
             key={graphic.id}
@@ -425,7 +472,12 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps, isFirstSc
       })}
       {(scene.particleSystems ?? []).map((system) => {
         const startInFrames = system.startInFrames ?? 0;
-        const durationInFrames = system.durationInFrames ?? duration - startInFrames;
+        const durationInFrames = getTransitionExtendedDuration(
+          startInFrames,
+          system.durationInFrames,
+          duration,
+          transitionOutDurationInFrames
+        );
         return (
           <Sequence
             key={system.id}
@@ -534,6 +586,40 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps, isFirstSc
 
 export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], composition }) => {
   const projectDurationInFrames = scenes.reduce((total, scene) => total + scene.durationInFrames, 0);
+  let nextSceneStartInFrames = 0;
+
+  const sceneSequences = scenes.map((scene, index) => {
+    const from = nextSceneStartInFrames;
+    nextSceneStartInFrames += scene.durationInFrames;
+
+    const nextScene = scenes[index + 1];
+    const transitionOut = nextScene?.transitionIn;
+    const transitionOutDurationInFrames = transitionOut && transitionOut.type !== "cut"
+      ? transitionOut.durationInFrames
+      : 0;
+    const transitionIn = index === 0 ? undefined : scene.transitionIn;
+
+    return (
+      <Sequence
+        key={scene.id}
+        from={from}
+        durationInFrames={scene.durationInFrames + transitionOutDurationInFrames}
+        name={`scene-${scene.id}`}
+        style={{ zIndex: index }}
+      >
+        <SceneCard
+          scene={scene}
+          index={index}
+          compositionFps={composition.fps}
+          isFirstScene={index === 0}
+          isLastScene={index === scenes.length - 1}
+          transitionIn={transitionIn}
+          transitionOut={transitionOut}
+          transitionOutDurationInFrames={transitionOutDurationInFrames}
+        />
+      </Sequence>
+    );
+  });
 
   return (
     <AbsoluteFill>
@@ -544,19 +630,7 @@ export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], compo
           projectDurationInFrames={projectDurationInFrames}
         />
       ))}
-      <Series>
-        {scenes.map((scene, index) => (
-          <Series.Sequence key={scene.id} durationInFrames={scene.durationInFrames}>
-            <SceneCard
-              scene={scene}
-              index={index}
-              compositionFps={composition.fps}
-              isFirstScene={index === 0}
-              isLastScene={index === scenes.length - 1}
-            />
-          </Series.Sequence>
-        ))}
-      </Series>
+      {sceneSequences}
     </AbsoluteFill>
   );
 };
