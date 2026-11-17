@@ -139,3 +139,60 @@ test("validator rejects simultaneous legacy media and mediaLayers", async () => 
   scene.media = { type: "image", src: "assets/connection-map.svg" };
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("cannot define both media and mediaLayers")));
 });
+
+test("validator accepts valid media and text animation tracks", async () => {
+  const project = await readExample();
+  project.scenes[0]!.mediaLayers![0]!.animations = {
+    x: { keyframes: [{ frame: 0, value: 54, easing: "ease-out" }, { frame: 60, value: 50 }] },
+    opacity: { keyframes: [{ frame: 0, value: 0 }, { frame: 20, value: 1 }] },
+    scaleX: { keyframes: [{ frame: 0, value: 0.8 }, { frame: 30, value: 1 }] },
+  };
+  project.scenes[0]!.titleAnimation = {
+    y: { keyframes: [{ frame: 0, value: 15 }, { frame: 20, value: 0 }] },
+    opacity: { keyframes: [{ frame: 0, value: 0 }, { frame: 18, value: 1 }] },
+  };
+  assert.deepEqual(validateProjectDefinition(project), []);
+});
+
+test("validator rejects unsorted, duplicate, and out-of-range animation keyframes", async () => {
+  const project = await readExample();
+  project.scenes[0]!.mediaLayers![0]!.animations = {
+    x: { keyframes: [{ frame: 10, value: 10 }, { frame: 5, value: 20 }] },
+    opacity: { keyframes: [{ frame: 0, value: 0 }, { frame: 20, value: 1.5 }] },
+  };
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("strictly greater than the previous frame")));
+  assert.ok(errors.some((error) => error.includes("opacity must be between 0 and 1")));
+});
+
+test("validator rejects invalid easing curves and excessive keyframes", async () => {
+  const project = await readExample();
+  project.scenes[0]!.titleAnimation = {
+    rotation: {
+      keyframes: [
+        { frame: 0, value: 0, easing: { type: "bezier", x1: 2, y1: 0, x2: 0.5, y2: 1 } },
+        { frame: 10, value: 45 },
+      ],
+    },
+  };
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("x1 must be between 0 and 1")));
+
+  project.scenes[0]!.titleAnimation = {
+    opacity: {
+      keyframes: Array.from({ length: 31 }, (_, index) => ({ frame: index, value: 1 })),
+    },
+  };
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("between 1 and 30 keyframes")));
+});
+
+test("validator keeps animation keyframes inside each media layer lifetime", async () => {
+  const project = await readExample();
+  const layer = project.scenes[0]!.mediaLayers![0]!;
+  layer.startInFrames = 10;
+  layer.durationInFrames = 40;
+  layer.animations = {
+    x: { keyframes: [{ frame: 0, value: 0 }, { frame: 40, value: 50 }] },
+  };
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("frame must be between 0 and 39")));
+});
