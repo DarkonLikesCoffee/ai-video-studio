@@ -21,7 +21,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -83,6 +83,10 @@ jobs:
           npm run render:custom -- ProjectVideo ../../render-output/pulse-editorial-film.mp4 --props=../../projects/showcase-pulse/.render-project.json --public-dir=../../projects/showcase-pulse
       - name: Master PULSE final audio
         run: npm run audio:master -- render-output/pulse-editorial-film.mp4 projects/showcase-pulse/scene.json
+      - name: Resolve 3D showcase composition
+        run: npx remotion compositions packages/video-engine/src/index.ts
+      - name: Render deterministic 3D showcase
+        run: npx remotion render packages/video-engine/src/index.ts ThreeDShowcase render-output/three-d-showcase.mp4 --gl=angle
       - name: Build studio
         run: npm run build
       - name: Upload PULSE editorial motion film
@@ -104,5 +108,12 @@ jobs:
         with:
           name: cinematic-transitions-showcase
           path: render-output/cinematic-transitions-showcase.mp4
+          if-no-files-found: error
+          retention-days: 3
+      - name: Upload 3D showcase
+        uses: actions/upload-artifact@v4
+        with:
+          name: three-d-showcase
+          path: render-output/three-d-showcase.mp4
           if-no-files-found: error
           retention-days: 3
