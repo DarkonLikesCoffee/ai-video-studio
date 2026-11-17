@@ -1046,8 +1046,8 @@
   "subtitles": [
     {
       "id": "kinetic-signal-caption",
-      "startInFrames": 12,
-      "durationInFrames": 64,
+      "startInFrames": 74,
+      "durationInFrames": 38,
       "text": "A visual story begins with a single shift.",
       "speaker": "NARRATOR",
       "position": "bottom",
@@ -1060,7 +1060,7 @@
     },
     {
       "id": "kinetic-arrival-caption",
-      "startInFrames": 102,
+      "startInFrames": 120,
       "durationInFrames": 64,
       "text": "Let the next idea arrive without breaking its momentum.",
       "speaker": "NARRATOR",
