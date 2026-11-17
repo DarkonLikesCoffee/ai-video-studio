@@ -2,6 +2,6 @@
   "provider": "github-actions",
   "projectPath": "projects/examples/three-scene-story/scene.json",
   "compositionId": "ProjectVideo",
-  "outputName": "m3-projectvideo-github-actions-test",
-  "requestId": "m3-projectvideo-e2e-20261117-01"
+  "outputName": "m3-media-assets-e2e-test",
+  "requestId": "m3-media-assets-e2e-20261117-01"
 }
