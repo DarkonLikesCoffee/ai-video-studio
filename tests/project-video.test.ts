@@ -869,7 +869,7 @@ test("KINETIC visual showcase exercises global captions across all five scenes",
     await readFile(new URL("../projects/showcase-transitions/scene.json", import.meta.url), "utf8")
   ) as VideoProject;
   assert.deepEqual(validateProjectDefinition(project), []);
-  assert.equal(project.subtitles?.length, 5);\n  assert.equal(project.audioTracks?.length, 7);\n  assert.equal(project.audioTracks?.filter((track) => track.role === "sfx").length, 6);
+  assert.equal(project.subtitles?.length, 5);
   assert.ok(project.subtitles?.every((cue) => cue.speaker === "NARRATOR"));
   assert.ok(project.subtitles?.every((cue) => cue.startInFrames + cue.durationInFrames <= getProjectDurationInFrames(project)));
   const firstCutFrame = project.scenes[0]!.durationInFrames;
@@ -887,6 +887,8 @@ test("PULSE editorial showcase is a distinct five-scene, twenty-second motion be
   assert.equal(project.scenes.length, 5);
   assert.equal(getProjectDurationInFrames(project), 600);
   assert.equal(project.subtitles?.length, 5);
+  assert.equal(project.audioTracks?.length, 7);
+  assert.equal(project.audioTracks?.filter((track) => track.role === "sfx").length, 6);
   assert.ok(project.scenes.every((scene) => (scene.graphics?.length ?? 0) >= 4));
   assert.ok(project.scenes.every((scene) => (scene.particleSystems?.length ?? 0) === 1));
   assert.ok(project.scenes.slice(1).every((scene) => scene.transitionIn !== undefined));
