@@ -1,35 +1,43 @@
 import { AbsoluteFill, Img, OffthreadVideo, Series, interpolate, staticFile, useCurrentFrame } from "remotion";
 import type { CSSProperties, FC } from "react";
 import type { SceneMedia, VideoProject, VideoScene } from "../project";
+import { isRemoteMediaUrl } from "../project";
 
 type SceneCardProps = {
   scene: VideoScene;
   index: number;
 };
 
-const resolveMediaSource = (media: SceneMedia): string =>
-  media.source === "public" ? staticFile(media.src) : media.src;
+const SceneMediaLayer: FC<{ media: SceneMedia }> = ({ media }) => {
+  const source = isRemoteMediaUrl(media.src) ? media.src : staticFile(media.src);
+  const placement = media.placement ?? "background";
+  const isBackground = placement === "background";
 
-const SceneMediaLayer: FC<{ media: SceneMedia; title: string }> = ({ media, title }) => {
-  const src = resolveMediaSource(media);
-  const mediaStyle: CSSProperties = {
-    width: "100%",
+  const style: CSSProperties = {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: placement === "left" || isBackground ? 0 : undefined,
+    right: placement === "right" || isBackground ? 0 : undefined,
+    width: isBackground ? "100%" : "43%",
     height: "100%",
     objectFit: media.fit ?? "cover",
     objectPosition: media.position ?? "center",
+    opacity: media.opacity ?? 1,
   };
 
   if (media.type === "image") {
-    return <Img src={src} alt={media.alt ?? title} style={mediaStyle} />;
+    return <Img src={source} style={style} />;
   }
 
   return (
     <OffthreadVideo
-      src={src}
-      muted={media.muted ?? true}
-      loop={media.loop ?? false}
+      src={source}
+      style={style}
+      trimBefore={media.trimBefore}
       playbackRate={media.playbackRate ?? 1}
-      style={mediaStyle}
+      muted={media.muted ?? true}
+      volume={media.volume ?? 1}
     />
   );
 };
@@ -52,11 +60,13 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
   });
   const accent = scene.accentColor ?? "#8B5CF6";
   const background = scene.backgroundColor ?? "#0B1020";
-  const isContent = scene.type === "content";
+  const mediaPlacement = scene.media?.placement ?? "background";
+  const hasSideMedia = Boolean(scene.media && mediaPlacement !== "background");
+  const textAlign = mediaPlacement === "left" ? "right" : scene.type === "content" || mediaPlacement === "right" ? "left" : "center";
   const eyebrow = scene.eyebrow ?? (scene.type === "title" ? "A SHORT EXPLAINER" : scene.type === "outro" ? "THE BIG PICTURE" : `CHAPTER ${String(index + 1).padStart(2, "0")}`);
 
   const titleStyle: CSSProperties = {
-    fontSize: isContent ? 82 : 104,
+    fontSize: hasSideMedia ? 72 : scene.type === "content" ? 82 : 104,
     lineHeight: 1.06,
     fontWeight: 760,
     letterSpacing: -4,
@@ -64,27 +74,28 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
     margin: 0,
   };
 
+  const textWidth = hasSideMedia ? "53%" : "100%";
+  const textSide = mediaPlacement === "left" ? "flex-end" : "flex-start";
+
   return (
     <AbsoluteFill
       style={{
         background: `radial-gradient(circle at 78% 22%, ${accent}25, transparent 34%), ${background}`,
         color: "#F8FAFC",
         justifyContent: "center",
-        alignItems: isContent ? "flex-start" : "center",
+        alignItems: hasSideMedia ? textSide : scene.type === "content" ? "flex-start" : "center",
         padding: "0 13%",
         boxSizing: "border-box",
         overflow: "hidden",
       }}
     >
-      {scene.media ? (
-        <AbsoluteFill>
-          <SceneMediaLayer media={scene.media} title={scene.title} />
-          <AbsoluteFill
-            style={{
-              background: "linear-gradient(90deg, rgba(5, 8, 18, 0.78), rgba(5, 8, 18, 0.3) 72%), linear-gradient(0deg, rgba(5, 8, 18, 0.55), transparent 52%)",
-            }}
-          />
-        </AbsoluteFill>
+      {scene.media ? <SceneMediaLayer media={scene.media} /> : null}
+      {scene.media && mediaPlacement === "background" ? (
+        <AbsoluteFill
+          style={{
+            background: "linear-gradient(90deg, rgba(5, 8, 20, 0.82), rgba(5, 8, 20, 0.38))",
+          }}
+        />
       ) : null}
       <div
         style={{
@@ -102,11 +113,12 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
       <div
         style={{
           position: "relative",
-          width: "100%",
+          width: textWidth,
           maxWidth: 1320,
           opacity,
           transform: `translateY(${rise}px)`,
-          textAlign: isContent ? "left" : "center",
+          textAlign,
+          zIndex: 1,
         }}
       >
         <div
@@ -125,10 +137,10 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
         {scene.body ? (
           <p
             style={{
-              maxWidth: isContent ? 1120 : 1080,
-              margin: isContent ? "32px 0 0" : "34px auto 0",
+              maxWidth: hasSideMedia ? 900 : scene.type === "content" ? 1120 : 1080,
+              margin: textAlign === "center" ? "34px auto 0" : "32px 0 0",
               color: "#C7CBD7",
-              fontSize: 38,
+              fontSize: hasSideMedia ? 30 : 38,
               lineHeight: 1.45,
               fontWeight: 400,
             }}
@@ -140,7 +152,7 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
           style={{
             width: 112,
             height: 5,
-            margin: isContent ? "46px 0 0" : "46px auto 0",
+            margin: textAlign === "center" ? "46px auto 0" : "46px 0 0",
             borderRadius: 99,
             background: accent,
           }}
@@ -158,6 +170,7 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
           fontSize: 17,
           letterSpacing: 3,
           textTransform: "uppercase",
+          zIndex: 2,
         }}
       >
         <span>AI VIDEO STUDIO</span>
