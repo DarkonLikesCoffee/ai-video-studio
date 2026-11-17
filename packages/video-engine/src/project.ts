@@ -505,7 +505,8 @@ const validateSceneMedia = (value: unknown, prefix: string, sceneDuration: numbe
 const audioExtensions = new Set([".mp3", ".wav", ".m4a", ".aac", ".ogg", ".opus", ".flac"]);
 
 const validateAudioEffects = (value: unknown, prefix: string): string[] => {
-  const effects = isRecord(value) ? value : {};
+  if (!isRecord(value)) return [`${prefix} must be an object`];
+  const effects = value;
   const errors: string[] = [];
 
   if (effects.highPassHz !== undefined &&
@@ -578,7 +579,8 @@ const validateAudioEffects = (value: unknown, prefix: string): string[] => {
 };
 
 const validateAudioDucking = (value: unknown, prefix: string, role: unknown): string[] => {
-  const ducking = isRecord(value) ? value : {};
+  if (!isRecord(value)) return [`${prefix} must be an object`];
+  const ducking = value;
   const errors: string[] = [];
 
   if (role !== "music") errors.push(`${prefix} is only supported on music tracks`);
@@ -611,7 +613,8 @@ const validateAudioDucking = (value: unknown, prefix: string, role: unknown): st
 };
 
 const validateAudioMastering = (value: unknown): string[] => {
-  const mastering = isRecord(value) ? value : {};
+  if (!isRecord(value)) return ["audioMastering must be an object"];
+  const mastering = value;
   const errors: string[] = [];
   if (mastering.integratedLufs !== undefined &&
       (!isFiniteNumber(mastering.integratedLufs) || mastering.integratedLufs < -24 || mastering.integratedLufs > -8)) {
