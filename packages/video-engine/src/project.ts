@@ -1087,13 +1087,14 @@ export const validateProjectDefinition = (value: unknown): string[] => {
   }
 
   if (compositionId === "ProjectVideo") {
-    if (!Array.isArray(value.scenes) || value.scenes.length < 1 || value.scenes.length > 20) {
+    const scenes = value.scenes;
+    if (!Array.isArray(scenes) || scenes.length < 1 || scenes.length > 20) {
       errors.push("ProjectVideo must contain between 1 and 20 scenes");
     } else {
       const ids = new Set<string>();
       let totalFrames = 0;
 
-      value.scenes.forEach((entry, index) => {
+      scenes.forEach((entry, index) => {
         const scene = isRecord(entry) ? entry : {};
         const prefix = `scenes[${index}]`;
 
@@ -1218,10 +1219,10 @@ export const validateProjectDefinition = (value: unknown): string[] => {
         }
       });
 
-      value.scenes.forEach((entry, index) => {
+      scenes.forEach((entry, index) => {
         const scene = isRecord(entry) ? entry : {};
-        const nextScene = index + 1 < value.scenes.length && isRecord(value.scenes[index + 1])
-          ? value.scenes[index + 1] as JsonRecord
+        const nextScene = index + 1 < scenes.length && isRecord(scenes[index + 1])
+          ? scenes[index + 1] as JsonRecord
           : undefined;
         if (!isInteger(scene.durationInFrames)) return;
 
