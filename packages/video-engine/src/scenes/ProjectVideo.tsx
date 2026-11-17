@@ -73,6 +73,9 @@ const AnimatedText: FC<AnimatedTextProps> = ({ animation, children, style }) => 
   const x = evaluateAnimationTrack(frame, animation?.x, 0);
   const y = evaluateAnimationTrack(frame, animation?.y, 0);
   const width = evaluateAnimationTrack(frame, animation?.width, 100);
+  const height = animation?.height
+    ? evaluateAnimationTrack(frame, animation.height, 100)
+    : undefined;
   const opacity = evaluateAnimationTrack(frame, animation?.opacity, 1);
   const rotation = evaluateAnimationTrack(frame, animation?.rotation, 0);
   const scaleX = evaluateAnimationTrack(frame, animation?.scaleX, 1);
@@ -83,6 +86,7 @@ const AnimatedText: FC<AnimatedTextProps> = ({ animation, children, style }) => 
       style={{
         ...style,
         width: `${width}%`,
+        ...(height === undefined ? {} : { height: `${height}%` }),
         opacity,
         transform: `translate(${x}%, ${y}%) scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`,
         transformOrigin: "center center",
