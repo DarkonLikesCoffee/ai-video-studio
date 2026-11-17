@@ -212,8 +212,7 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
   const lifeInFrames = system.lifeInFrames;
   const opacity = system.opacity ?? 0.8;
   const gravity = system.gravity ?? 0;
-  const systemDuration = system.durationInFrames ?? Number.POSITIVE_INFINITY;
-  const isActive = frame >= 0 && frame < systemDuration;
+  const isActive = frame >= 0;
 
   // Keep the emitter bounded to its own timeline window. Sequence supplies a
   // local frame, so the field starts deterministically at age zero every render.
