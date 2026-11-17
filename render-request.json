@@ -1,0 +1,7 @@
+{
+  "provider": "github-actions",
+  "projectPath": "projects/demo/scene.json",
+  "compositionId": "DemoVideo",
+  "outputName": "m2-render-smoke-test",
+  "requestId": "m2-20261117-smoke-01"
+}
