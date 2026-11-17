@@ -207,15 +207,22 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
   }, [system, fps]);
 
   const lifeInFrames = system.lifeInFrames;
+  const lifeInFrames = system.lifeInFrames;
   const opacity = system.opacity ?? 0.8;
   const gravity = system.gravity ?? 0;
+  const systemStart = system.startInFrames ?? 0;
+  const systemDuration = system.durationInFrames ?? Number.POSITIVE_INFINITY;
+  const isActive = frame < systemDuration;
+
+  // Keep the emitter bounded to its own timeline window. Sequence supplies a
+  // local frame, so the field starts deterministically at age zero every render.
+  if (!isActive || frame < 0) return null;
 
   return (
     <AbsoluteFill
       style={{
         overflow: "hidden",
         pointerEvents: "none",
-        zIndex: 15,
         mixBlendMode: system.blendMode ?? "screen",
       }}
     >
@@ -225,13 +232,13 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
         const ageSeconds = ageFrames / fps;
         const fade = Math.sin(Math.PI * ageFrames / lifeInFrames);
         const travel = particle.speed * ageSeconds;
-        const xRaw = (system.originX + particle.offsetX) +
+        const xRaw = system.originX + particle.offsetX +
           Math.cos(particle.angleRadians) * travel;
-        const yRaw = (system.originY + particle.offsetY) +
+        const yRaw = system.originY + particle.offsetY +
           Math.sin(particle.angleRadians) * travel +
           0.5 * gravity * ageSeconds * ageSeconds;
-        const x = ((xRaw % 110) + 110) % 110 - 5;
-        const y = ((yRaw % 110) + 110) % 110 - 5;
+        const x = Math.max(-5, Math.min(105, xRaw));
+        const y = Math.max(-5, Math.min(105, yRaw));
         const shapeStyle: CSSProperties = {
           position: "absolute",
           left: `${x}%`,
@@ -240,7 +247,7 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
           height: particle.size,
           backgroundColor: particle.color,
           opacity: opacity * fade,
-          borderRadius: system.shape === "square" ? 2 : system.shape === "diamond" ? 2 : "50%",
+          borderRadius: system.shape === "square" ? 2 : "50%",
           transform: `translate(-50%, -50%) rotate(${particle.rotation + ageFrames * 1.8}deg)${system.shape === "diamond" ? " rotate(45deg)" : ""}`,
           boxShadow: system.blendMode === "screen" ? `0 0 ${particle.size * 2}px ${particle.color}` : undefined,
         };
@@ -340,11 +347,13 @@ const AnimatedText: FC<AnimatedTextProps> = ({ animation, children, style }) => 
 const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps }) => {
   const frame = useCurrentFrame();
   const duration = scene.durationInFrames;
-  const fadeIn = interpolate(frame, [0, 14], [0, 1], {
+  // Adjacent scenes use short, overlapping fades at their sequence boundaries.
+  // This avoids every cut dipping to black while preserving the opening fade.
+  const fadeIn = interpolate(frame, [0, 12], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const fadeOut = interpolate(frame, [duration - 14, duration], [1, 0], {
+  const fadeOut = interpolate(frame, [duration - 12, duration], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
