@@ -173,11 +173,10 @@ for (let index = 0; index < tracks.length; index += 1) {
     outputPath,
   ]);
 
+  const { effects: _effects, ducking: _ducking, ...renderTrack } = track;
   processedTracks[index] = {
-    ...track,
+    ...renderTrack,
     src: outputRelative,
-    effects: undefined,
-    ducking: undefined,
   };
   processedCount += 1;
   console.log(`Processed audio track: ${track.id}`);
