@@ -61,11 +61,26 @@ The request file is intentionally separate from the renderer. Every request must
 
 Do not commit tokens or place them in `render-request.json`. GitHub Actions reads the secrets and sends only the render parameters to CircleCI.
 
+### Checking a CircleCI render
+
+Use this request shape in `circleci-status-request.json` (the `requestId` must be unique each time):
+
+```json
+{
+  "pipelineId": "the-pipeline-uuid-from-the-render-dispatch-log",
+  "requestId": "status-check-unique-id"
+}
+```
+
+A push that changes only this file starts a short GitHub Actions status check. It reports whether the CircleCI job is queued, running, successful, or failed, and lists the artifact URL when the MP4 is ready. This check uses the existing `CIRCLECI_TOKEN` and `CIRCLECI_PROJECT_SLUG` secrets.
+
 ### Current limitations
 
 - Only the registered `DemoVideo` composition can be rendered. The project path is validated against its composition ID.
 - CircleCI rendering cannot start until the one-time CircleCI connection and three GitHub repository secrets are configured.
-- The dispatcher confirms that CircleCI accepted the pipeline request. The actual render result and MP4 are available in the CircleCI pipeline's Artifacts tab.
+- The dispatcher prints the CircleCI pipeline ID and link in the GitHub Actions job log and summary.
+- To check a CircleCI render later, ChatGPT creates or updates `circleci-status-request.json` with that pipeline ID and a fresh `requestId`. This triggers `.github/workflows/circleci-status.yml`, which queries the workflow/job state and lists MP4 artifact URLs in its GitHub Actions log and summary. It does not keep a GitHub runner waiting while CircleCI renders.
+- Artifact links are served by CircleCI and may require an authenticated CircleCI session.
 - YouTube publishing and permanent video storage are not implemented yet.
 
 ## CI
