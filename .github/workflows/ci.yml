@@ -38,6 +38,6 @@ jobs:
       - name: Validate data-driven example
         run: npm run validate:project -- projects/examples/three-scene-story/scene.json
       - name: Resolve Remotion compositions with project props
-        run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/examples/three-scene-story/scene.json
+        run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/examples/three-scene-story/scene.json --public-dir=projects/examples/three-scene-story
       - name: Build studio
         run: npm run build
