@@ -24,6 +24,21 @@ const quoteNumber = (value: number): string => {
   return String(Number(value.toFixed(5)));
 };
 
+const buildAtempoFilters = (playbackRate: number): string[] => {
+  const filters: string[] = [];
+  let remaining = playbackRate;
+  while (remaining < 0.5) {
+    filters.push("atempo=0.5");
+    remaining /= 0.5;
+  }
+  while (remaining > 2) {
+    filters.push("atempo=2");
+    remaining /= 2;
+  }
+  if (Math.abs(remaining - 1) > 0.00001) filters.push(`atempo=${quoteNumber(remaining)}`);
+  return filters;
+};
+
 const runFfmpeg = async (args: string[]): Promise<void> => {
   await new Promise<void>((resolvePromise, reject) => {
     const child = spawn(ffmpeg, ["-hide_banner", "-loglevel", "warning", ...args], {
@@ -99,7 +114,7 @@ for (let index = 0; index < tracks.length; index += 1) {
       ];
       if (trimSeconds > 0) preFilters.push(`atrim=start=${quoteNumber(trimSeconds)}`, "asetpts=PTS-STARTPTS");
       if (sidechain.playbackRate && sidechain.playbackRate !== 1) {
-        preFilters.push(`atempo=${quoteNumber(sidechain.playbackRate)}`);
+        preFilters.push(...buildAtempoFilters(sidechain.playbackRate));
       }
       if (delayMs > 0) preFilters.push(`adelay=${delayMs}|${delayMs}`);
       filters.push(`[${inputIndex}:a]${preFilters.join(",")}[${label}]`);
