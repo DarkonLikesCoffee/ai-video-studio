@@ -1,7 +1,7 @@
 import { Audio } from "@remotion/media";
 import { AbsoluteFill, Img, OffthreadVideo, Sequence, Series, interpolate, staticFile, useCurrentFrame } from "remotion";
 import type { CSSProperties, FC, ReactNode } from "react";
-import type { AnimationTrack, AnimationTracks, AudioTrack, SceneMedia, VideoProject, VideoScene } from "../project";
+import type { AnimationTracks, AudioTrack, SceneMedia, VideoProject, VideoScene } from "../project";
 import { isRemoteMediaUrl } from "../project";
 import { evaluateAnimationTrack } from "../animation";
 
