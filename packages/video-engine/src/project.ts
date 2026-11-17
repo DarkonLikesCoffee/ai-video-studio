@@ -700,6 +700,10 @@ const validateAudioTrack = (value: unknown, prefix: string, projectDuration: num
       effectiveDuration
     ));
   }
+  if ((track.effects !== undefined || track.ducking !== undefined) &&
+      typeof track.src === "string" && isRemoteMediaUrl(track.src)) {
+    errors.push(`${prefix} with effects or ducking must use a local assets/ audio file`);
+  }
   if (track.effects !== undefined) {
     errors.push(...validateAudioEffects(track.effects, `${prefix}.effects`));
   }
@@ -871,9 +875,11 @@ export const validateProjectDefinition = (value: unknown): string[] => {
 
   if (Array.isArray(value.audioTracks)) {
     const trackIds = new Map<string, string>();
+    const trackSources = new Map<string, string>();
     for (const [index, entry] of value.audioTracks.entries()) {
       if (isRecord(entry) && typeof entry.id === "string") {
         trackIds.set(entry.id, String(entry.role));
+        if (typeof entry.src === "string") trackSources.set(entry.id, entry.src);
       }
     }
     for (const [index, entry] of value.audioTracks.entries()) {
@@ -883,6 +889,11 @@ export const validateProjectDefinition = (value: unknown): string[] => {
         if (targetId === entry.id) errors.push(`audioTracks[${index}].ducking cannot reference itself`);
         else if (trackIds.get(targetId) !== "voiceover") {
           errors.push(`audioTracks[${index}].ducking can only reference existing voiceover tracks`);
+        } else {
+          const source = trackSources.get(targetId);
+          if (source && isRemoteMediaUrl(source)) {
+            errors.push(`audioTracks[${index}].ducking sidechain tracks must use local assets/ files`);
+          }
         }
       }
     }
