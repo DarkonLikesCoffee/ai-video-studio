@@ -2,7 +2,7 @@ import { Audio } from "@remotion/media";
 import { AbsoluteFill, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { useMemo } from "react";
 import type { CSSProperties, FC, ReactNode } from "react";
-import type { AnimationTracks, AudioTrack, GraphicElement, ParticleSystem, SceneMedia, SceneTransition, VideoProject, VideoScene } from "../project";
+import type { AnimationTracks, AudioTrack, GraphicElement, ParticleSystem, SceneMedia, SceneTransition, SubtitleCue, VideoProject, VideoScene } from "../project";
 import { isRemoteMediaUrl } from "../project";
 import { evaluateAnimationTrack, evaluateSvgPathMorph } from "../animation";
 import { getSceneTransitionStyle } from "../transitions";
@@ -65,6 +65,89 @@ const AudioTrackLayer: FC<AudioTrackLayerProps> = ({ track, projectDurationInFra
       muted={track.muted ?? false}
       loop={track.loop ?? false}
     />
+  );
+};
+
+type SubtitleCueLayerProps = {
+  cue: SubtitleCue;
+};
+
+const SubtitleCueLayer: FC<SubtitleCueLayerProps> = ({ cue }) => {
+  const frame = useCurrentFrame();
+  const duration = cue.durationInFrames;
+  const defaultFade = Math.min(6, Math.floor(duration / 5));
+  const fadeInFrames = cue.fadeInFrames ?? defaultFade;
+  const fadeOutFrames = cue.fadeOutFrames ?? defaultFade;
+  const fadeIn = fadeInFrames > 0
+    ? interpolate(frame, [0, fadeInFrames], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    : 1;
+  const fadeOut = fadeOutFrames > 0
+    ? interpolate(frame, [duration - fadeOutFrames, duration], [1, 0], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    : 1;
+  const position = cue.position ?? "bottom";
+  const alignment = cue.alignment ?? "center";
+  const fontSize = cue.fontSize ?? 38;
+  const alignItems = alignment === "left" ? "flex-start" : alignment === "right" ? "flex-end" : "center";
+
+  return (
+    <AbsoluteFill
+      style={{
+        display: "flex",
+        alignItems,
+        justifyContent: position === "top" ? "flex-start" : position === "center" ? "center" : "flex-end",
+        padding: position === "top" ? "7% 8% 0" : position === "center" ? "0 8%" : "0 8% 8%",
+        boxSizing: "border-box",
+        opacity: fadeIn * fadeOut,
+        pointerEvents: "none",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems,
+          justifyContent: "center",
+          textAlign: alignment,
+          maxWidth: "84%",
+          padding: "15px 30px",
+          borderRadius: 14,
+          border: "1px solid rgba(255,255,255,0.14)",
+          backgroundColor: "rgba(4, 9, 22, " + (cue.backgroundOpacity ?? 0.78) + ")",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+          color: cue.color ?? "#FFFFFF",
+          fontFamily: cue.fontFamily ?? "Arial, sans-serif",
+          fontSize,
+          fontWeight: cue.fontWeight ?? 600,
+          lineHeight: 1.32,
+          whiteSpace: "pre-wrap",
+          overflowWrap: "anywhere",
+        }}
+      >
+        {cue.speaker ? (
+          <span
+            style={{
+              alignSelf: alignItems,
+              marginBottom: 5,
+              color: cue.color ?? "#8DEBFF",
+              fontSize: Math.max(16, Math.round(fontSize * 0.58)),
+              fontWeight: 800,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+            }}
+          >
+            {cue.speaker}
+          </span>
+        ) : null}
+        <span>{cue.text}</span>
+      </div>
+    </AbsoluteFill>
   );
 };
 
@@ -584,7 +667,7 @@ const SceneCard: FC<SceneCardProps> = ({
   );
 };
 
-export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], composition }) => {
+export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], subtitles = [], composition }) => {
   const projectDurationInFrames = scenes.reduce((total, scene) => total + scene.durationInFrames, 0);
   let nextSceneStartInFrames = 0;
 
@@ -631,6 +714,17 @@ export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], compo
         />
       ))}
       {sceneSequences}
+      {subtitles.map((cue) => (
+        <Sequence
+          key={cue.id}
+          from={cue.startInFrames}
+          durationInFrames={cue.durationInFrames}
+          name={"subtitle-" + cue.id}
+          style={{ zIndex: 1000 }}
+        >
+          <SubtitleCueLayer cue={cue} />
+        </Sequence>
+      ))}
     </AbsoluteFill>
   );
 };

@@ -43,6 +43,25 @@ export type AnimationTrack = {
 
 export type AnimationTracks = Partial<Record<AnimationProperty, AnimationTrack>>;
 
+export type SubtitleCue = {
+  id: string;
+  /** Start and duration are measured in frames on the complete project timeline. */
+  startInFrames: number;
+  durationInFrames: number;
+  text: string;
+  speaker?: string;
+  position?: "top" | "center" | "bottom";
+  alignment?: "left" | "center" | "right";
+  fontSize?: number;
+  fontWeight?: 400 | 500 | 600 | 700 | 800 | 900;
+  fontFamily?: string;
+  color?: string;
+  /** Opacity of the dark readability panel behind the caption. */
+  backgroundOpacity?: number;
+  fadeInFrames?: number;
+  fadeOutFrames?: number;
+};
+
 export type AudioTrackRole = "music" | "voiceover" | "sfx" | "ambience";
 
 export type AudioEqBand = {
@@ -268,6 +287,8 @@ export type VideoProject = {
     fps: number;
   };
   scenes: VideoScene[];
+  /** Optional caption/subtitle cues on the complete video timeline, independent of scene cuts. */
+  subtitles?: SubtitleCue[];
   /** Up to 16 simultaneous music, voice, effects, or ambience tracks. */
   audioTracks?: AudioTrack[];
   /** Optional final loudness target applied to the mixed master. */
@@ -1048,6 +1069,77 @@ const validateAudioMastering = (value: unknown): string[] => {
   return errors;
 };
 
+const validateSubtitleCue = (
+  value: unknown,
+  prefix: string,
+  projectDuration: number
+): string[] => {
+  const cue = isRecord(value) ? value : {};
+  const errors: string[] = [];
+
+  if (!isNonEmptyString(cue.id) || !/^[A-Za-z0-9_-]{1,40}$/.test(cue.id)) {
+    errors.push(prefix + ".id must contain 1-40 letters, numbers, underscores, or hyphens");
+  }
+  if (!isNonEmptyString(cue.text) || cue.text.length > 500) {
+    errors.push(prefix + ".text is required and must be at most 500 characters");
+  }
+  if (cue.speaker !== undefined && (!isNonEmptyString(cue.speaker) || cue.speaker.length > 60)) {
+    errors.push(prefix + ".speaker must be non-empty text of at most 60 characters");
+  }
+
+  const start = cue.startInFrames;
+  const duration = cue.durationInFrames;
+  if (!isInteger(start) || start < 0 || start >= projectDuration) {
+    errors.push(prefix + ".startInFrames must be between 0 and the last frame of the project");
+  }
+  if (!isInteger(duration) || duration < 1) {
+    errors.push(prefix + ".durationInFrames must be a positive integer");
+  } else if (isInteger(start) && start >= 0 && start + duration > projectDuration) {
+    errors.push(prefix + " timeline window cannot extend beyond the project");
+  }
+
+  if (cue.position !== undefined && !["top", "center", "bottom"].includes(String(cue.position))) {
+    errors.push(prefix + ".position must be top, center, or bottom");
+  }
+  if (cue.alignment !== undefined && !["left", "center", "right"].includes(String(cue.alignment))) {
+    errors.push(prefix + ".alignment must be left, center, or right");
+  }
+  if (cue.fontSize !== undefined && (!isFiniteNumber(cue.fontSize) || cue.fontSize < 18 || cue.fontSize > 96)) {
+    errors.push(prefix + ".fontSize must be between 18 and 96 pixels");
+  }
+  if (cue.fontWeight !== undefined &&
+      (!isInteger(cue.fontWeight) || ![400, 500, 600, 700, 800, 900].includes(cue.fontWeight))) {
+    errors.push(prefix + ".fontWeight must be 400, 500, 600, 700, 800, or 900");
+  }
+  if (cue.fontFamily !== undefined &&
+      (typeof cue.fontFamily !== "string" || cue.fontFamily.length > 80 ||
+       !/^[A-Za-z0-9 ,'\"_-]+$/.test(cue.fontFamily))) {
+    errors.push(prefix + ".fontFamily contains unsupported characters");
+  }
+  if (cue.color !== undefined && !isHexColor(cue.color)) {
+    errors.push(prefix + ".color must be a six-digit hex color");
+  }
+  if (cue.backgroundOpacity !== undefined &&
+      (!isFiniteNumber(cue.backgroundOpacity) || cue.backgroundOpacity < 0 || cue.backgroundOpacity > 0.95)) {
+    errors.push(prefix + ".backgroundOpacity must be between 0 and 0.95");
+  }
+
+  const effectiveDuration = isInteger(duration) ? duration : 0;
+  for (const field of ["fadeInFrames", "fadeOutFrames"] as const) {
+    if (cue[field] !== undefined &&
+        (!isInteger(cue[field]) || cue[field] < 0 || cue[field] > effectiveDuration)) {
+      errors.push(prefix + "." + field + " must be between 0 and the cue duration");
+    }
+  }
+  const fadeIn = isInteger(cue.fadeInFrames) ? cue.fadeInFrames : 0;
+  const fadeOut = isInteger(cue.fadeOutFrames) ? cue.fadeOutFrames : 0;
+  if (fadeIn + fadeOut >= effectiveDuration && (fadeIn > 0 || fadeOut > 0)) {
+    errors.push(prefix + " fadeInFrames and fadeOutFrames must leave at least one fully visible frame");
+  }
+
+  return errors;
+};
+
 const validateAudioTrack = (value: unknown, prefix: string, projectDuration: number): string[] => {
   const errors: string[] = [];
   const track = isRecord(value) ? value : {};
@@ -1322,6 +1414,33 @@ export const validateProjectDefinition = (value: unknown): string[] => {
       });
 
       if (totalFrames > 1800) errors.push("total scene duration must not exceed 1800 frames (60 seconds at 30 FPS)");
+    }
+  }
+
+  if (value.subtitles !== undefined) {
+    const projectDuration = Array.isArray(value.scenes)
+      ? value.scenes.reduce((total, entry) => {
+          if (!isRecord(entry) || !isInteger(entry.durationInFrames) || entry.durationInFrames < 0) return total;
+          return total + entry.durationInFrames;
+        }, 0)
+      : 0;
+
+    if (compositionId !== "ProjectVideo") {
+      errors.push("subtitles are only supported for ProjectVideo compositions");
+    }
+    if (!Array.isArray(value.subtitles) || value.subtitles.length > 200) {
+      errors.push("subtitles must be an array containing at most 200 cues");
+    } else {
+      const cueIds = new Set<string>();
+      value.subtitles.forEach((entry, index) => {
+        const prefix = "subtitles[" + index + "]";
+        const cue = isRecord(entry) ? entry : {};
+        if (typeof cue.id === "string") {
+          if (cueIds.has(cue.id)) errors.push(prefix + ".id must be unique");
+          cueIds.add(cue.id);
+        }
+        errors.push(...validateSubtitleCue(entry, prefix, projectDuration));
+      });
     }
   }
 

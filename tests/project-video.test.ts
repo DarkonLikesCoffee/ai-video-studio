@@ -10,6 +10,7 @@ import {
   isSafeProjectAssetPath,
   validateProjectDefinition,
   type GraphicElement,
+  type SubtitleCue,
   type VideoProject
 } from "../packages/video-engine/src/project";
 
@@ -775,3 +776,105 @@ test("project validation accepts scene transitions and rejects invalid or overla
   assert.ok(errors.some((error) => error.includes("transitionIn.type must be cut, fade")));
   assert.ok(errors.some((error) => error.includes("transitionIn.durationInFrames must be an integer between 0 and 90")));
 });
+
+
+test("project subtitles use a global frame timeline and accept styled overlapping caption cues", async () => {
+  const project = await readExample();
+  project.subtitles = [
+    {
+      id: "caption-one",
+      startInFrames: 70,
+      durationInFrames: 60,
+      text: "The first caption crosses a scene boundary.",
+      speaker: "NARRATOR",
+      position: "bottom",
+      alignment: "center",
+      fontSize: 34,
+      fontWeight: 700,
+      fontFamily: "Arial, sans-serif",
+      color: "#FFFFFF",
+      backgroundOpacity: 0.78,
+      fadeInFrames: 6,
+      fadeOutFrames: 8,
+    },
+    {
+      id: "caption-two",
+      startInFrames: 60,
+      durationInFrames: 60,
+      text: "Two speakers may overlap in time.",
+      speaker: "HOST",
+      position: "top",
+      alignment: "left",
+      color: "#8DEBFF",
+    },
+  ];
+  assert.deepEqual(validateProjectDefinition(project), []);
+});
+
+test("subtitle validation rejects duplicate IDs, invalid text, styles and timeline windows", async () => {
+  const project = await readExample();
+  project.subtitles = [
+    {
+      id: "duplicate-caption",
+      startInFrames: -1,
+      durationInFrames: 400,
+      text: "   ",
+      position: "side" as never,
+      alignment: "justify" as never,
+      fontSize: 120,
+      color: "red",
+      backgroundOpacity: 1,
+      fadeInFrames: 300,
+      fadeOutFrames: 300,
+      fontFamily: "url(javascript:alert(1))",
+    },
+    {
+      id: "duplicate-caption",
+      startInFrames: 0,
+      durationInFrames: 1,
+      text: "x".repeat(501),
+    },
+    {
+      id: "late-caption",
+      startInFrames: 280,
+      durationInFrames: 50,
+      text: "This cue extends beyond the end of the video.",
+    },
+  ] as unknown as SubtitleCue[];
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("id must be unique")));
+  assert.ok(errors.some((error) => error.includes("startInFrames must be between")));
+  assert.ok(errors.some((error) => error.includes("timeline window cannot extend beyond")));
+  assert.ok(errors.some((error) => error.includes("text is required and must be at most 500 characters")));
+  assert.ok(errors.some((error) => error.includes("position must be top, center, or bottom")));
+  assert.ok(errors.some((error) => error.includes("alignment must be left, center, or right")));
+  assert.ok(errors.some((error) => error.includes("fontSize must be between 18 and 96 pixels")));
+  assert.ok(errors.some((error) => error.includes("color must be a six-digit hex color")));
+  assert.ok(errors.some((error) => error.includes("backgroundOpacity must be between 0 and 0.95")));
+  assert.ok(errors.some((error) => error.includes("fadeInFrames and fadeOutFrames must leave at least one fully visible frame")));
+  assert.ok(errors.some((error) => error.includes("fontFamily contains unsupported characters")));
+});
+
+test("subtitle renderer overlays the full project timeline above scene transitions", async () => {
+  const source = await readFile(new URL("../packages/video-engine/src/scenes/ProjectVideo.tsx", import.meta.url), "utf8");
+  assert.ok(source.includes("subtitles.map((cue) =>"));
+  assert.ok(source.includes("from={cue.startInFrames}"));
+  assert.ok(source.includes("durationInFrames={cue.durationInFrames}"));
+  assert.ok(source.includes("name={\"subtitle-\" + cue.id}"));
+  assert.ok(source.includes("zIndex: 1000"));
+});
+ 
+test("KINETIC visual showcase exercises global captions across all five scenes", async () => {
+  const project = JSON.parse(
+    await readFile(new URL("../projects/showcase-transitions/scene.json", import.meta.url), "utf8")
+  ) as VideoProject;
+  assert.deepEqual(validateProjectDefinition(project), []);
+  assert.equal(project.subtitles?.length, 5);
+  assert.ok(project.subtitles?.every((cue) => cue.speaker === "NARRATOR"));
+  assert.ok(project.subtitles?.every((cue) => cue.startInFrames + cue.durationInFrames <= getProjectDurationInFrames(project)));
+  const firstCutFrame = project.scenes[0]!.durationInFrames;
+  assert.ok(project.subtitles?.some((cue) =>
+    cue.startInFrames < firstCutFrame && cue.startInFrames + cue.durationInFrames > firstCutFrame
+  ));
+});
+
