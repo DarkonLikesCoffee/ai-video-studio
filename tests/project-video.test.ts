@@ -579,10 +579,11 @@ test("project validation accepts compatible SVG morphs and rejects topology or t
     },
     stroke: "#FFFFFF",
   }];
+  const graphics = project.scenes[0]!.graphics!;
   assert.deepEqual(validateProjectDefinition(project), []);
 
-  project.scenes[0]!.graphics[0] = {
-    ...project.scenes[0]!.graphics[0]!,
+  graphics[0] = {
+    ...graphics[0]!,
     pathMorph: {
       keyframes: [
         { frame: 0, d: from },
@@ -592,8 +593,8 @@ test("project validation accepts compatible SVG morphs and rejects topology or t
   };
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("same command topology")));
 
-  project.scenes[0]!.graphics[0] = {
-    ...project.scenes[0]!.graphics[0]!,
+  graphics[0] = {
+    ...graphics[0]!,
     pathMorph: {
       keyframes: [
         { frame: 1, d: from },
@@ -603,8 +604,8 @@ test("project validation accepts compatible SVG morphs and rejects topology or t
   };
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("keyframes[0].frame must be 0")));
 
-  project.scenes[0]!.graphics[0] = {
-    ...project.scenes[0]!.graphics[0]!,
+  graphics[0] = {
+    ...graphics[0]!,
     pathMorph: {
       keyframes: [
         { frame: 0, d: from },
@@ -614,7 +615,6 @@ test("project validation accepts compatible SVG morphs and rejects topology or t
   };
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("pathMorph.keyframes[1].frame")));
 });
-
 
 test("particle systems accept seeded emitters with bounded motion and color palettes", async () => {
   const project = await readExample();
