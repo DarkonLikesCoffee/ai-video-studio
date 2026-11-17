@@ -29,6 +29,52 @@ export type AnimationTracks = Partial<Record<AnimationProperty, AnimationTrack>>
 
 export type AudioTrackRole = "music" | "voiceover" | "sfx" | "ambience";
 
+export type AudioEqBand = {
+  frequency: number;
+  gainDb: number;
+  q?: number;
+};
+
+export type AudioCompressorSettings = {
+  thresholdDb: number;
+  ratio: number;
+  attackMs?: number;
+  releaseMs?: number;
+  makeupGainDb?: number;
+};
+
+export type AudioReverbSettings = {
+  /** Algorithmic echo/reverb amount. */
+  wet: number;
+  /** Room size control from 0 (small) to 1 (large). */
+  roomSize: number;
+};
+
+export type AudioEffects = {
+  highPassHz?: number;
+  lowPassHz?: number;
+  eqBands?: AudioEqBand[];
+  compressor?: AudioCompressorSettings;
+  reverb?: AudioReverbSettings;
+  /** -1 = hard left, 0 = centre, 1 = hard right. */
+  pan?: number;
+};
+
+export type AudioDucking = {
+  /** Voice-over track IDs that trigger gain reduction on this music track. */
+  sidechainTrackIds: string[];
+  thresholdDb?: number;
+  ratio?: number;
+  attackMs?: number;
+  releaseMs?: number;
+};
+
+export type AudioMastering = {
+  integratedLufs?: number;
+  truePeakDb?: number;
+  loudnessRange?: number;
+};
+
 export type AudioTrack = {
   id: string;
   role: AudioTrackRole;
@@ -48,6 +94,10 @@ export type AudioTrack = {
   fadeOutFrames?: number;
   /** Optional 0–1 volume multiplier keyframes relative to the track start. */
   volumeAutomation?: AnimationTrack;
+  /** Optional offline FFmpeg processing. Advanced effects require a local project asset. */
+  effects?: AudioEffects;
+  /** Sidechain compression, typically on music tracks keyed by voice-over. */
+  ducking?: AudioDucking;
 };
 
 export type SceneMedia = {
@@ -112,6 +162,8 @@ export type VideoProject = {
   scenes: VideoScene[];
   /** Up to 16 simultaneous music, voice, effects, or ambience tracks. */
   audioTracks?: AudioTrack[];
+  /** Optional final loudness target applied to the mixed master. */
+  audioMastering?: AudioMastering;
   output: {
     format: "mp4";
     codec: "h264";
@@ -452,6 +504,130 @@ const validateSceneMedia = (value: unknown, prefix: string, sceneDuration: numbe
 
 const audioExtensions = new Set([".mp3", ".wav", ".m4a", ".aac", ".ogg", ".opus", ".flac"]);
 
+const validateAudioEffects = (value: unknown, prefix: string): string[] => {
+  const effects = isRecord(value) ? value : {};
+  const errors: string[] = [];
+
+  if (effects.highPassHz !== undefined &&
+      (!isFiniteNumber(effects.highPassHz) || effects.highPassHz < 20 || effects.highPassHz > 1000)) {
+    errors.push(`${prefix}.highPassHz must be between 20 and 1000 Hz`);
+  }
+  if (effects.lowPassHz !== undefined &&
+      (!isFiniteNumber(effects.lowPassHz) || effects.lowPassHz < 1000 || effects.lowPassHz > 20000)) {
+    errors.push(`${prefix}.lowPassHz must be between 1000 and 20000 Hz`);
+  }
+  if (isFiniteNumber(effects.highPassHz) && isFiniteNumber(effects.lowPassHz) &&
+      effects.highPassHz >= effects.lowPassHz) {
+    errors.push(`${prefix}.highPassHz must be lower than lowPassHz`);
+  }
+  if (effects.eqBands !== undefined) {
+    if (!Array.isArray(effects.eqBands) || effects.eqBands.length > 8) {
+      errors.push(`${prefix}.eqBands must contain at most 8 bands`);
+    } else {
+      effects.eqBands.forEach((entry, index) => {
+        const band = isRecord(entry) ? entry : {};
+        const path = `${prefix}.eqBands[${index}]`;
+        if (!isFiniteNumber(band.frequency) || band.frequency < 20 || band.frequency > 20000) {
+          errors.push(`${path}.frequency must be between 20 and 20000 Hz`);
+        }
+        if (!isFiniteNumber(band.gainDb) || band.gainDb < -12 || band.gainDb > 12) {
+          errors.push(`${path}.gainDb must be between -12 and 12 dB`);
+        }
+        if (band.q !== undefined && (!isFiniteNumber(band.q) || band.q < 0.1 || band.q > 10)) {
+          errors.push(`${path}.q must be between 0.1 and 10`);
+        }
+      });
+    }
+  }
+  if (effects.compressor !== undefined) {
+    const compressor = isRecord(effects.compressor) ? effects.compressor : {};
+    const path = `${prefix}.compressor`;
+    if (!isFiniteNumber(compressor.thresholdDb) || compressor.thresholdDb < -60 || compressor.thresholdDb > 0) {
+      errors.push(`${path}.thresholdDb must be between -60 and 0 dB`);
+    }
+    if (!isFiniteNumber(compressor.ratio) || compressor.ratio < 1 || compressor.ratio > 20) {
+      errors.push(`${path}.ratio must be between 1 and 20`);
+    }
+    if (compressor.attackMs !== undefined &&
+        (!isFiniteNumber(compressor.attackMs) || compressor.attackMs < 0.1 || compressor.attackMs > 2000)) {
+      errors.push(`${path}.attackMs must be between 0.1 and 2000 ms`);
+    }
+    if (compressor.releaseMs !== undefined &&
+        (!isFiniteNumber(compressor.releaseMs) || compressor.releaseMs < 1 || compressor.releaseMs > 9000)) {
+      errors.push(`${path}.releaseMs must be between 1 and 9000 ms`);
+    }
+    if (compressor.makeupGainDb !== undefined &&
+        (!isFiniteNumber(compressor.makeupGainDb) || compressor.makeupGainDb < -12 || compressor.makeupGainDb > 24)) {
+      errors.push(`${path}.makeupGainDb must be between -12 and 24 dB`);
+    }
+  }
+  if (effects.reverb !== undefined) {
+    const reverb = isRecord(effects.reverb) ? effects.reverb : {};
+    if (!isFiniteNumber(reverb.wet) || reverb.wet < 0 || reverb.wet > 1) {
+      errors.push(`${prefix}.reverb.wet must be between 0 and 1`);
+    }
+    if (!isFiniteNumber(reverb.roomSize) || reverb.roomSize < 0 || reverb.roomSize > 1) {
+      errors.push(`${prefix}.reverb.roomSize must be between 0 and 1`);
+    }
+  }
+  if (effects.pan !== undefined && (!isFiniteNumber(effects.pan) || effects.pan < -1 || effects.pan > 1)) {
+    errors.push(`${prefix}.pan must be between -1 and 1`);
+  }
+
+  return errors;
+};
+
+const validateAudioDucking = (value: unknown, prefix: string, role: unknown): string[] => {
+  const ducking = isRecord(value) ? value : {};
+  const errors: string[] = [];
+
+  if (role !== "music") errors.push(`${prefix} is only supported on music tracks`);
+  if (!Array.isArray(ducking.sidechainTrackIds) ||
+      ducking.sidechainTrackIds.length < 1 ||
+      ducking.sidechainTrackIds.length > 8 ||
+      ducking.sidechainTrackIds.some((id) => !isNonEmptyString(id))) {
+    errors.push(`${prefix}.sidechainTrackIds must contain 1–8 voice-over track IDs`);
+  } else if (new Set(ducking.sidechainTrackIds).size !== ducking.sidechainTrackIds.length) {
+    errors.push(`${prefix}.sidechainTrackIds must be unique`);
+  }
+
+  if (ducking.thresholdDb !== undefined &&
+      (!isFiniteNumber(ducking.thresholdDb) || ducking.thresholdDb < -60 || ducking.thresholdDb > 0)) {
+    errors.push(`${prefix}.thresholdDb must be between -60 and 0 dB`);
+  }
+  if (ducking.ratio !== undefined && (!isFiniteNumber(ducking.ratio) || ducking.ratio < 1 || ducking.ratio > 20)) {
+    errors.push(`${prefix}.ratio must be between 1 and 20`);
+  }
+  if (ducking.attackMs !== undefined &&
+      (!isFiniteNumber(ducking.attackMs) || ducking.attackMs < 0.1 || ducking.attackMs > 2000)) {
+    errors.push(`${prefix}.attackMs must be between 0.1 and 2000 ms`);
+  }
+  if (ducking.releaseMs !== undefined &&
+      (!isFiniteNumber(ducking.releaseMs) || ducking.releaseMs < 1 || ducking.releaseMs > 9000)) {
+    errors.push(`${prefix}.releaseMs must be between 1 and 9000 ms`);
+  }
+
+  return errors;
+};
+
+const validateAudioMastering = (value: unknown): string[] => {
+  const mastering = isRecord(value) ? value : {};
+  const errors: string[] = [];
+  if (mastering.integratedLufs !== undefined &&
+      (!isFiniteNumber(mastering.integratedLufs) || mastering.integratedLufs < -24 || mastering.integratedLufs > -8)) {
+    errors.push("audioMastering.integratedLufs must be between -24 and -8 LUFS");
+  }
+  if (mastering.truePeakDb !== undefined &&
+      (!isFiniteNumber(mastering.truePeakDb) || mastering.truePeakDb < -9 || mastering.truePeakDb > 0)) {
+    errors.push("audioMastering.truePeakDb must be between -9 and 0 dBTP");
+  }
+  if (mastering.loudnessRange !== undefined &&
+      (!isFiniteNumber(mastering.loudnessRange) || mastering.loudnessRange < 1 || mastering.loudnessRange > 20)) {
+    errors.push("audioMastering.loudnessRange must be between 1 and 20 LU");
+  }
+  return errors;
+};
+
 const validateAudioTrack = (value: unknown, prefix: string, projectDuration: number): string[] => {
   const errors: string[] = [];
   const track = isRecord(value) ? value : {};
@@ -523,6 +699,12 @@ const validateAudioTrack = (value: unknown, prefix: string, projectDuration: num
       `${prefix}.volumeAutomation`,
       effectiveDuration
     ));
+  }
+  if (track.effects !== undefined) {
+    errors.push(...validateAudioEffects(track.effects, `${prefix}.effects`));
+  }
+  if (track.ducking !== undefined) {
+    errors.push(...validateAudioDucking(track.ducking, `${prefix}.ducking`, track.role));
   }
 
   return errors;
@@ -680,6 +862,29 @@ export const validateProjectDefinition = (value: unknown): string[] => {
         }
         errors.push(...validateAudioTrack(entry, prefix, projectDuration));
       });
+    }
+  }
+
+  if (value.audioMastering !== undefined) {
+    errors.push(...validateAudioMastering(value.audioMastering));
+  }
+
+  if (Array.isArray(value.audioTracks)) {
+    const trackIds = new Map<string, string>();
+    for (const [index, entry] of value.audioTracks.entries()) {
+      if (isRecord(entry) && typeof entry.id === "string") {
+        trackIds.set(entry.id, String(entry.role));
+      }
+    }
+    for (const [index, entry] of value.audioTracks.entries()) {
+      if (!isRecord(entry) || !isRecord(entry.ducking) || !Array.isArray(entry.ducking.sidechainTrackIds)) continue;
+      for (const targetId of entry.ducking.sidechainTrackIds) {
+        if (typeof targetId !== "string") continue;
+        if (targetId === entry.id) errors.push(`audioTracks[${index}].ducking cannot reference itself`);
+        else if (trackIds.get(targetId) !== "voiceover") {
+          errors.push(`audioTracks[${index}].ducking can only reference existing voiceover tracks`);
+        }
+      }
     }
   }
 
