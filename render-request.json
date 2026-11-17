@@ -1,7 +1,7 @@
 {
-  "provider": "circleci",
-  "projectPath": "projects/demo/scene.json",
-  "compositionId": "DemoVideo",
-  "outputName": "m2-circleci-e2e-test",
-  "requestId": "m2-circleci-e2e-20261117-02"
+  "provider": "github-actions",
+  "projectPath": "projects/examples/three-scene-story/scene.json",
+  "compositionId": "ProjectVideo",
+  "outputName": "m3-projectvideo-github-actions-test",
+  "requestId": "m3-projectvideo-e2e-20261117-01"
 }
