@@ -641,8 +641,9 @@ test("scene transition styles produce deterministic progress for fades and pushe
   const slide = { type: "slide-left", durationInFrames: 20 } as const;
   assert.equal(getSceneTransitionStyle(0, 90, slide).transform, "translateX(100%)");
   assert.equal(getSceneTransitionStyle(20, 90, slide).transform, "translateX(0%)");
-  assert.equal(getSceneTransitionStyle(100, 90, undefined, slide).transform, "translateX(0%)");
-  assert.equal(getSceneTransitionStyle(110, 90, undefined, slide).transform, "translateX(-50%)");
+  assert.equal(getSceneTransitionStyle(90, 90, undefined, slide).transform, "translateX(0%)");
+  assert.equal(getSceneTransitionStyle(100, 90, undefined, slide).transform, "translateX(-50%)");
+  assert.equal(getSceneTransitionStyle(110, 90, undefined, slide).transform, "translateX(-100%)");
 });
 
 test("wipe and zoom transitions use clipping and scale without non-deterministic timing", () => {
