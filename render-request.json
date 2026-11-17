@@ -1,7 +1,7 @@
 {
-  "provider": "github-actions",
+  "provider": "circleci",
   "projectPath": "projects/demo/scene.json",
   "compositionId": "DemoVideo",
-  "outputName": "m2-render-smoke-test",
-  "requestId": "m2-20261117-smoke-01"
+  "outputName": "m2-circleci-smoke-test",
+  "requestId": "m2-circleci-20261117-01"
 }
