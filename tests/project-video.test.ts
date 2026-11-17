@@ -58,7 +58,7 @@ test("local media paths must stay below the project assets directory", () => {
   assert.equal(isSafeProjectAssetPath("../secret.png"), false);
   assert.equal(isSafeProjectAssetPath("assets/../../secret.png"), false);
   assert.equal(isSafeProjectAssetPath("/assets/photo.png"), false);
-  assert.equal(isSafeProjectAssetPath("assets\\photo.png"), false);
+  assert.equal(isSafeProjectAssetPath(String.raw`assets\\photo.png`), false);
 });
 
 test("remote media sources must use HTTPS and have no embedded credentials", () => {
