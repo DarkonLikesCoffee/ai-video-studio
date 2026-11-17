@@ -1,47 +1,55 @@
 import { AbsoluteFill, Img, OffthreadVideo, Sequence, Series, interpolate, staticFile, useCurrentFrame } from "remotion";
-import type { CSSProperties, FC } from "react";
-import type { SceneMedia, VideoProject, VideoScene } from "../project";
+import type { CSSProperties, FC, ReactNode } from "react";
+import type { AnimationTracks, SceneMedia, VideoProject, VideoScene } from "../project";
 import { isRemoteMediaUrl } from "../project";
+import { evaluateAnimationTrack } from "../animation";
 
 type SceneCardProps = {
   scene: VideoScene;
   index: number;
 };
 
-const SceneMediaLayer: FC<{ media: SceneMedia; sceneDuration: number; index: number }> = ({
-  media,
-  sceneDuration,
-  index,
-}) => {
-  const source = isRemoteMediaUrl(media.src) ? media.src : staticFile(media.src);
+type AnimatedMediaProps = {
+  media: SceneMedia;
+  index: number;
+};
+
+const AnimatedMedia: FC<AnimatedMediaProps> = ({ media, index }) => {
+  const frame = useCurrentFrame();
   const placement = media.placement ?? "background";
-  const hasCustomGeometry = [media.x, media.y, media.width, media.height].some((value) => value !== undefined);
-  const startInFrames = media.startInFrames ?? 0;
-  const durationInFrames = media.durationInFrames ?? sceneDuration - startInFrames;
+  const defaultX = media.x ?? (placement === "right" ? 57 : 0);
+  const defaultY = media.y ?? 0;
+  const defaultWidth = media.width ?? (placement === "background" ? 100 : 43);
+  const defaultHeight = media.height ?? 100;
+  const x = evaluateAnimationTrack(frame, media.animations?.x, defaultX);
+  const y = evaluateAnimationTrack(frame, media.animations?.y, defaultY);
+  const width = evaluateAnimationTrack(frame, media.animations?.width, defaultWidth);
+  const height = evaluateAnimationTrack(frame, media.animations?.height, defaultHeight);
+  const opacity = evaluateAnimationTrack(frame, media.animations?.opacity, media.opacity ?? 1);
+  const rotation = evaluateAnimationTrack(frame, media.animations?.rotation, media.rotation ?? 0);
+  const scaleX = evaluateAnimationTrack(frame, media.animations?.scaleX, 1);
+  const scaleY = evaluateAnimationTrack(frame, media.animations?.scaleY, 1);
+  const source = isRemoteMediaUrl(media.src) ? media.src : staticFile(media.src);
 
   const style: CSSProperties = {
     position: "absolute",
-    top: hasCustomGeometry ? `${media.y ?? 0}%` : 0,
-    bottom: hasCustomGeometry ? "auto" : 0,
-    left: hasCustomGeometry
-      ? `${media.x ?? 0}%`
-      : placement === "left" || placement === "background" ? 0 : "auto",
-    right: hasCustomGeometry
-      ? "auto"
-      : placement === "right" || placement === "background" ? 0 : "auto",
-    width: hasCustomGeometry ? `${media.width ?? 100}%` : placement === "background" ? "100%" : "43%",
-    height: hasCustomGeometry ? `${media.height ?? 100}%` : "100%",
+    top: `${y}%`,
+    left: `${x}%`,
+    width: `${width}%`,
+    height: `${height}%`,
     objectFit: media.fit ?? "cover",
     objectPosition: media.position ?? "center",
-    opacity: media.opacity ?? 1,
+    opacity,
     zIndex: media.zIndex ?? index,
-    transform: media.rotation ? `rotate(${media.rotation}deg)` : undefined,
+    transform: `scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`,
     transformOrigin: "center center",
   };
 
-  const mediaElement = media.type === "image" ? (
-    <Img src={source} style={{ ...style, objectFit: media.fit ?? "cover" }} />
-  ) : (
+  if (media.type === "image") {
+    return <Img src={source} style={style} />;
+  }
+
+  return (
     <OffthreadVideo
       src={source}
       style={style}
@@ -51,16 +59,37 @@ const SceneMediaLayer: FC<{ media: SceneMedia; sceneDuration: number; index: num
       volume={media.volume ?? 1}
     />
   );
+};
+
+type AnimatedTextProps = {
+  animation?: AnimationTracks;
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+};
+
+const AnimatedText: FC<AnimatedTextProps> = ({ animation, children, style }) => {
+  const frame = useCurrentFrame();
+  const x = evaluateAnimationTrack(frame, animation?.x, 0);
+  const y = evaluateAnimationTrack(frame, animation?.y, 0);
+  const width = evaluateAnimationTrack(frame, animation?.width, 100);
+  const opacity = evaluateAnimationTrack(frame, animation?.opacity, 1);
+  const rotation = evaluateAnimationTrack(frame, animation?.rotation, 0);
+  const scaleX = evaluateAnimationTrack(frame, animation?.scaleX, 1);
+  const scaleY = evaluateAnimationTrack(frame, animation?.scaleY, 1);
 
   return (
-    <Sequence
-      from={startInFrames}
-      durationInFrames={durationInFrames}
-      name={media.id ?? `media-layer-${index + 1}`}
-      style={{ zIndex: media.zIndex ?? index }}
+    <div
+      style={{
+        ...style,
+        width: `${width}%`,
+        opacity,
+        transform: `translate(${x}%, ${y}%) scale(${scaleX}, ${scaleY}) rotate(${rotation}deg)`,
+        transformOrigin: "center center",
+      }}
     >
-      {mediaElement}
-    </Sequence>
+      {children}
+    </div>
   );
 };
 
@@ -116,14 +145,21 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
         overflow: "hidden",
       }}
     >
-      {mediaLayers.map((media, layerIndex) => (
-        <SceneMediaLayer
-          key={media.id ?? `${media.src}-${layerIndex}`}
-          media={media}
-          sceneDuration={duration}
-          index={layerIndex}
-        />
-      ))}
+      {mediaLayers.map((media, layerIndex) => {
+        const startInFrames = media.startInFrames ?? 0;
+        const durationInFrames = media.durationInFrames ?? duration - startInFrames;
+        return (
+          <Sequence
+            key={media.id ?? `${media.src}-${layerIndex}`}
+            from={startInFrames}
+            durationInFrames={durationInFrames}
+            name={media.id ?? `media-layer-${layerIndex + 1}`}
+            style={{ zIndex: media.zIndex ?? layerIndex }}
+          >
+            <AnimatedMedia media={media} index={layerIndex} />
+          </Sequence>
+        );
+      })}
       {hasLegacyBackground ? (
         <AbsoluteFill
           style={{
@@ -158,7 +194,8 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
           zIndex: 50,
         }}
       >
-        <div
+        <AnimatedText
+          animation={scene.eyebrowAnimation}
           style={{
             color: accent,
             fontSize: 22,
@@ -169,12 +206,14 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
           }}
         >
           {eyebrow}
-        </div>
-        <h1 style={titleStyle}>{scene.title}</h1>
+        </AnimatedText>
+        <AnimatedText animation={scene.titleAnimation}>
+          <h1 style={titleStyle}>{scene.title}</h1>
+        </AnimatedText>
         {scene.body ? (
-          <p
+          <AnimatedText
+            animation={scene.bodyAnimation}
             style={{
-              maxWidth: hasSideMedia ? 900 : scene.type === "content" ? 1120 : 1080,
               margin: textAlign === "center" ? "34px auto 0" : "32px 0 0",
               color: "#C7CBD7",
               fontSize: hasSideMedia ? 30 : 38,
@@ -182,8 +221,8 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
               fontWeight: 400,
             }}
           >
-            {scene.body}
-          </p>
+            <p style={{ margin: 0 }}>{scene.body}</p>
+          </AnimatedText>
         ) : null}
         <div
           style={{
