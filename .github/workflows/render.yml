@@ -42,8 +42,8 @@ jobs:
               !/^[A-Za-z0-9][A-Za-z0-9-]{0,59}$/.test(request.outputName)) {
             throw new Error("outputName must contain 1-60 letters, numbers, or hyphens");
           }
-          if (request.compositionId !== "DemoVideo") {
-            throw new Error("Only the registered DemoVideo composition is supported at this stage");
+          if (request.compositionId !== "DemoVideo" && request.compositionId !== "ProjectVideo") {
+            throw new Error("compositionId must be DemoVideo or ProjectVideo");
           }
           if (typeof request.requestId !== "string" ||
               !/^[A-Za-z0-9._-]{1,80}$/.test(request.requestId)) {
@@ -81,7 +81,7 @@ jobs:
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
         run: |
           mkdir -p render-output
-          npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
+          npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH"
 
       - name: Upload MP4 artifact
         if: steps.request.outputs.provider == 'github-actions'
