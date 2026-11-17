@@ -78,7 +78,7 @@ const getExtension = (path: string): string => {
 
 const isNonPublicIpv4 = (hostname: string): boolean => {
   const parts = hostname.split(".");
-  if (parts.length !== 4 || parts.some((part) => !/^\\d+$/.test(part))) return false;
+  if (parts.length !== 4 || parts.some((part) => !/^\d+$/.test(part))) return false;
 
   const [first, second, third] = parts.map(Number);
   if (first === undefined || second === undefined || third === undefined) return false;
@@ -100,7 +100,7 @@ const isNonPublicIpv4 = (hostname: string): boolean => {
 };
 
 const isNonPublicHostname = (hostname: string): boolean => {
-  const host = hostname.toLowerCase().replace(/\\.$/, "").replace(/^\\[|\\]$/g, "");
+  const host = hostname.toLowerCase().replace(/\.$/, "").replace(/^\[|\]$/g, "");
   if (
     host === "localhost" ||
     host.endsWith(".localhost") ||
