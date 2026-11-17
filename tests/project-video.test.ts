@@ -834,6 +834,12 @@ test("subtitle validation rejects duplicate IDs, invalid text, styles and timeli
       durationInFrames: 1,
       text: "x".repeat(501),
     },
+    {
+      id: "late-caption",
+      startInFrames: 280,
+      durationInFrames: 50,
+      text: "This cue extends beyond the end of the video.",
+    },
   ] as unknown as SubtitleCue[];
   const errors = validateProjectDefinition(project);
   assert.ok(errors.some((error) => error.includes("id must be unique")));
