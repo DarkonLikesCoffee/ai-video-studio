@@ -16,6 +16,18 @@ export type SceneMedia = {
   playbackRate?: number;
   muted?: boolean;
   volume?: number;
+  /** Optional explicit layer ID. */
+  id?: string;
+  /** Optional normalized position and size, expressed as percentages of the scene. */
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  rotation?: number;
+  zIndex?: number;
+  /** Timeline visibility window relative to the start of the scene. */
+  startInFrames?: number;
+  durationInFrames?: number;
 };
 
 export type VideoScene = {
@@ -27,7 +39,10 @@ export type VideoScene = {
   body?: string;
   backgroundColor?: string;
   accentColor?: string;
+  /** Legacy single-layer property. Kept for backwards compatibility. */
   media?: SceneMedia;
+  /** Up to eight simultaneous composited image/video layers. */
+  mediaLayers?: SceneMedia[];
 };
 
 export type VideoProject = {
@@ -155,6 +170,126 @@ export const isSafeProjectAssetPath = (src: string): boolean => {
     /^[A-Za-z0-9._/-]+$/.test(src);
 };
 
+
+const validateSceneMedia = (value: unknown, prefix: string, sceneDuration: number): string[] => {
+  const errors: string[] = [];
+  const media = isRecord(value) ? value : {};
+
+  if (media.type !== "image" && media.type !== "video") {
+    errors.push(`${prefix}.type must be image or video`);
+  }
+
+  if (!isNonEmptyString(media.src)) {
+    errors.push(`${prefix}.src is required`);
+  } else {
+    const remote = isRemoteMediaUrl(media.src);
+    const local = isSafeProjectAssetPath(media.src);
+    if (!remote && !local) {
+      errors.push(`${prefix}.src must be an HTTPS URL or a safe path under assets/`);
+    } else {
+      const extension = getExtension(media.src);
+      const allowed = media.type === "image" ? imageExtensions : videoExtensions;
+      if (!allowed.has(extension)) {
+        errors.push(`${prefix}.src has an unsupported extension for ${String(media.type)} media`);
+      }
+    }
+  }
+
+  if (media.id !== undefined &&
+      (typeof media.id !== "string" || !/^[A-Za-z0-9_-]{1,40}$/.test(media.id))) {
+    errors.push(`${prefix}.id must contain 1-40 letters, numbers, underscores, or hyphens`);
+  }
+  if (media.placement !== undefined &&
+      media.placement !== "background" &&
+      media.placement !== "left" &&
+      media.placement !== "right") {
+    errors.push(`${prefix}.placement must be background, left, or right`);
+  }
+  if (media.fit !== undefined && media.fit !== "cover" && media.fit !== "contain") {
+    errors.push(`${prefix}.fit must be cover or contain`);
+  }
+  if (media.position !== undefined &&
+      (typeof media.position !== "string" ||
+       media.position.length > 40 ||
+       !/^[A-Za-z0-9% ._-]+$/.test(media.position))) {
+    errors.push(`${prefix}.position must be a short CSS object-position value`);
+  }
+  if (media.opacity !== undefined &&
+      (!isFiniteNumber(media.opacity) || media.opacity < 0 || media.opacity > 1)) {
+    errors.push(`${prefix}.opacity must be between 0 and 1`);
+  }
+
+  const geometryFields = ["x", "y", "width", "height"] as const;
+  const hasGeometry = geometryFields.some((field) => media[field] !== undefined);
+  if (hasGeometry) {
+    for (const field of geometryFields) {
+      const value = media[field];
+      if (!isFiniteNumber(value) || value < 0 || value > 100) {
+        errors.push(`${prefix}.${field} must be between 0 and 100 when custom geometry is used`);
+      }
+    }
+    if (isFiniteNumber(media.width) && media.width <= 0) {
+      errors.push(`${prefix}.width must be greater than 0`);
+    }
+    if (isFiniteNumber(media.height) && media.height <= 0) {
+      errors.push(`${prefix}.height must be greater than 0`);
+    }
+    if (isFiniteNumber(media.x) && isFiniteNumber(media.width) && media.x + media.width > 100) {
+      errors.push(`${prefix}.x + width cannot exceed 100`);
+    }
+    if (isFiniteNumber(media.y) && isFiniteNumber(media.height) && media.y + media.height > 100) {
+      errors.push(`${prefix}.y + height cannot exceed 100`);
+    }
+  }
+
+  if (media.rotation !== undefined &&
+      (!isFiniteNumber(media.rotation) || media.rotation < -360 || media.rotation > 360)) {
+    errors.push(`${prefix}.rotation must be between -360 and 360 degrees`);
+  }
+  if (media.zIndex !== undefined &&
+      (!isInteger(media.zIndex) || media.zIndex < -20 || media.zIndex > 20)) {
+    errors.push(`${prefix}.zIndex must be an integer between -20 and 20`);
+  }
+
+  const start = media.startInFrames === undefined ? 0 : media.startInFrames;
+  const duration = media.durationInFrames === undefined ? sceneDuration - (isInteger(start) ? start : 0) : media.durationInFrames;
+  if (!isInteger(start) || start < 0 || start >= sceneDuration) {
+    errors.push(`${prefix}.startInFrames must be between 0 and the last frame of the scene`);
+  }
+  if (!isInteger(duration) || duration < 1) {
+    errors.push(`${prefix}.durationInFrames must be a positive integer`);
+  } else if (isInteger(start) && start >= 0 && start + duration > sceneDuration) {
+    errors.push(`${prefix} timeline window cannot extend beyond its scene`);
+  }
+
+  if (media.type === "video") {
+    if (media.trimBefore !== undefined &&
+        (!isInteger(media.trimBefore) || media.trimBefore < 0 || media.trimBefore > 18000)) {
+      errors.push(`${prefix}.trimBefore must be an integer between 0 and 18000`);
+    }
+    if (media.playbackRate !== undefined &&
+        (!isFiniteNumber(media.playbackRate) || media.playbackRate < 0.25 || media.playbackRate > 4)) {
+      errors.push(`${prefix}.playbackRate must be between 0.25 and 4`);
+    }
+    if (media.muted !== undefined && typeof media.muted !== "boolean") {
+      errors.push(`${prefix}.muted must be a boolean`);
+    }
+    if (media.volume !== undefined &&
+        (!isFiniteNumber(media.volume) || media.volume < 0 || media.volume > 1)) {
+      errors.push(`${prefix}.volume must be between 0 and 1`);
+    }
+  } else if (
+    media.trimBefore !== undefined ||
+    media.playbackRate !== undefined ||
+    media.muted !== undefined ||
+    media.volume !== undefined
+  ) {
+    errors.push(`${prefix} video playback options are only valid for video media`);
+  }
+
+  return errors;
+};
+
 export const getProjectDurationInFrames = (project: Pick<VideoProject, "scenes">): number =>
   project.scenes.reduce((total, scene) => total + scene.durationInFrames, 0);
 
@@ -239,69 +374,33 @@ export const validateProjectDefinition = (value: unknown): string[] => {
           }
         }
 
-        if (scene.media !== undefined) {
-          const media = isRecord(scene.media) ? scene.media : {};
-          if (media.type !== "image" && media.type !== "video") {
-            errors.push(`${prefix}.media.type must be image or video`);
-          }
-          if (!isNonEmptyString(media.src)) {
-            errors.push(`${prefix}.media.src is required`);
+        const hasLegacyMedia = scene.media !== undefined;
+        const hasMediaLayers = scene.mediaLayers !== undefined;
+
+        if (hasLegacyMedia && hasMediaLayers) {
+          errors.push(`${prefix} cannot define both media and mediaLayers`);
+        }
+        if (hasMediaLayers) {
+          if (!Array.isArray(scene.mediaLayers) || scene.mediaLayers.length < 1 || scene.mediaLayers.length > 8) {
+            errors.push(`${prefix}.mediaLayers must contain between 1 and 8 layers`);
           } else {
-            const remote = isRemoteMediaUrl(media.src);
-            const local = isSafeProjectAssetPath(media.src);
-            if (!remote && !local) {
-              errors.push(`${prefix}.media.src must be an HTTPS URL or a safe path under assets/`);
-            } else {
-              const extension = getExtension(media.src);
-              const allowed = media.type === "image" ? imageExtensions : videoExtensions;
-              if (!allowed.has(extension)) {
-                errors.push(`${prefix}.media.src has an unsupported extension for ${String(media.type)} media`);
+            const layerIds = new Set<string>();
+            scene.mediaLayers.forEach((layer, layerIndex) => {
+              const layerPrefix = `${prefix}.mediaLayers[${layerIndex}]`;
+              const layerRecord = isRecord(layer) ? layer : {};
+              if (typeof layerRecord.id === "string") {
+                if (layerIds.has(layerRecord.id)) errors.push(`${layerPrefix}.id must be unique within the scene`);
+                layerIds.add(layerRecord.id);
               }
-            }
+              errors.push(...validateSceneMedia(layer, layerPrefix, isInteger(scene.durationInFrames) ? scene.durationInFrames : 0));
+            });
           }
-          if (media.placement !== undefined &&
-              media.placement !== "background" &&
-              media.placement !== "left" &&
-              media.placement !== "right") {
-            errors.push(`${prefix}.media.placement must be background, left, or right`);
-          }
-          if (media.fit !== undefined && media.fit !== "cover" && media.fit !== "contain") {
-            errors.push(`${prefix}.media.fit must be cover or contain`);
-          }
-          if (media.position !== undefined &&
-              (typeof media.position !== "string" ||
-               media.position.length > 40 ||
-               !/^[A-Za-z0-9% ._-]+$/.test(media.position))) {
-            errors.push(`${prefix}.media.position must be a short CSS object-position value`);
-          }
-          if (media.opacity !== undefined &&
-              (!isFiniteNumber(media.opacity) || media.opacity < 0 || media.opacity > 1)) {
-            errors.push(`${prefix}.media.opacity must be between 0 and 1`);
-          }
-          if (media.type === "video") {
-            if (media.trimBefore !== undefined &&
-                (!isInteger(media.trimBefore) || media.trimBefore < 0 || media.trimBefore > 18000)) {
-              errors.push(`${prefix}.media.trimBefore must be an integer between 0 and 18000`);
-            }
-            if (media.playbackRate !== undefined &&
-                (!isFiniteNumber(media.playbackRate) || media.playbackRate < 0.25 || media.playbackRate > 4)) {
-              errors.push(`${prefix}.media.playbackRate must be between 0.25 and 4`);
-            }
-            if (media.muted !== undefined && typeof media.muted !== "boolean") {
-              errors.push(`${prefix}.media.muted must be a boolean`);
-            }
-            if (media.volume !== undefined &&
-                (!isFiniteNumber(media.volume) || media.volume < 0 || media.volume > 1)) {
-              errors.push(`${prefix}.media.volume must be between 0 and 1`);
-            }
-          } else if (
-            media.trimBefore !== undefined ||
-            media.playbackRate !== undefined ||
-            media.muted !== undefined ||
-            media.volume !== undefined
-          ) {
-            errors.push(`${prefix}.media video playback options are only valid for video media`);
-          }
+        } else if (hasLegacyMedia) {
+          errors.push(...validateSceneMedia(
+            scene.media,
+            `${prefix}.media`,
+            isInteger(scene.durationInFrames) ? scene.durationInFrames : 0
+          ));
         }
       });
 
