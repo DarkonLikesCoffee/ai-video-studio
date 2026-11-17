@@ -618,8 +618,11 @@ test("particle fields respect scene bounds and do not create an opaque stacking 
   assert.match(source, /Math\.max\(-5, Math\.min\(105, yRaw\)\)/);
 });
 
-test("adjacent scene transitions use a short edge fade instead of fading both cuts fully to black", async () => {
+test("only the film's first and last scenes fade to black, not internal scene cuts", async () => {
   const source = await readFile(new URL("../packages/video-engine/src/scenes/ProjectVideo.tsx", import.meta.url), "utf8");
   assert.match(source, /interpolate\(frame, \[0, 12\], \[0, 1\]/);
   assert.match(source, /interpolate\(frame, \[duration - 12, duration\], \[1, 0\]/);
+  assert.match(source, /\(isFirstScene \? fadeIn : 1\) \* \(isLastScene \? fadeOut : 1\)/);
+  assert.match(source, /isFirstScene=\{index === 0\}/);
+  assert.match(source, /isLastScene=\{index === scenes\.length - 1\}/);
 });
