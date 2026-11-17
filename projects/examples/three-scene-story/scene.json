@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "internet-explainer",
+  "id": "internet-explainer-with-media",
   "title": "How the Internet Connects Us",
-  "description": "A short three-scene motion-graphics explainer demonstrating data-driven video projects.",
+  "description": "A three-scene explainer demonstrating text, a local SVG image, and an MP4 video clip.",
   "composition": {
     "id": "ProjectVideo",
     "width": 1920,
@@ -18,7 +18,14 @@
       "title": "The Internet Connects Us",
       "body": "Every message, page, and video starts with a connection.",
       "backgroundColor": "#0B1020",
-      "accentColor": "#67E8F9"
+      "accentColor": "#67E8F9",
+      "media": {
+        "type": "image",
+        "src": "assets/connection-map.svg",
+        "placement": "right",
+        "fit": "contain",
+        "opacity": 1
+      }
     },
     {
       "id": "journey",
@@ -28,7 +35,17 @@
       "title": "How information travels",
       "body": "Your device sends a request through networks to a server. The server responds, and the information travels back to you.",
       "backgroundColor": "#101426",
-      "accentColor": "#A78BFA"
+      "accentColor": "#A78BFA",
+      "media": {
+        "type": "video",
+        "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+        "placement": "background",
+        "fit": "cover",
+        "position": "center",
+        "opacity": 0.7,
+        "muted": true,
+        "playbackRate": 1
+      }
     },
     {
       "id": "ending",

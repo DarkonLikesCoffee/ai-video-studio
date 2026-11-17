@@ -4,24 +4,32 @@ Prompt-driven video production system. GitHub stores projects and source code; C
 
 ## Engine capabilities
 
-Two Remotion compositions are currently registered:
+Two Remotion compositions are registered:
 
 - `DemoVideo`: the original fixed M1 pipeline demonstration.
-- `ProjectVideo`: a data-driven composition that reads a project JSON file and renders a sequence of configurable scenes.
+- `ProjectVideo`: a data-driven composition that reads a project JSON file and renders consecutive scenes.
 
 A `ProjectVideo` project can define:
-- 1–20 consecutive scenes, each with a type (`title`, `content`, or `outro`).
-- Per-scene title, eyebrow, body text, duration, background color, and accent color.
-- Composition width, height, and frame rate.
+- 1–20 scenes of type `title`, `content`, or `outro`.
+- Per-scene text, duration, background and accent colors.
+- Local image assets (`png`, `jpg`, `jpeg`, `webp`, `svg`, `avif`) or remote HTTPS images.
+- Local video clips (`mp4`, `mov`, `m4v`, `webm`, `mkv`) or remote HTTPS clips.
+- Media placement (`background`, `left`, `right`), fit (`cover` or `contain`), object position and opacity.
+- Video trim point, playback rate, mute state and volume.
+- Composition width, height and frame rate.
 - MP4/H.264 output.
 
-The current validator limits a project to 1,800 total frames, with each scene between 30 and 900 frames. Images, source video clips, voice-over, music, subtitles, and automatic prompt-to-project generation are not implemented yet.
+The current validator limits projects to 1,800 total frames, with each scene between 30 and 900 frames. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses.
 
 ## Example project
 
-The repository includes [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json), a three-scene explainer about how the internet works. The entire video is described by this JSON file; the shared `ProjectVideo` component renders it.
+The repository includes [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json). It demonstrates a local SVG illustration in the opening scene and a short CC0 MP4 clip in the second scene. The SVG is stored at [projects/examples/three-scene-story/assets/connection-map.svg](projects/examples/three-scene-story/assets/connection-map.svg).
 
-To render it locally from the repository root:
+Remote video sample source: [MDN CC0 flower video](https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4).
+
+### Local rendering
+
+Requirements: Node.js 22+ and npm.
 
 ```bash
 npm install
@@ -29,10 +37,10 @@ npm run typecheck
 npm test
 npm run validate:project -- projects/examples/three-scene-story/scene.json
 mkdir -p render-output
-npm run render:custom -- ProjectVideo ../../render-output/internet-explainer.mp4 --props=../../projects/examples/three-scene-story/scene.json
+npm run render:custom -- ProjectVideo ../../render-output/internet-explainer.mp4 --props=../../projects/examples/three-scene-story/scene.json --public-dir=../../projects/examples/three-scene-story
 ```
 
-Requirements: Node.js 22+ and npm. The default `npm run render` command remains the original M1 `DemoVideo` render.
+The renderer uses the folder containing the selected project JSON as Remotion's public directory. That makes the project's `assets/` paths resolve consistently in local renders, GitHub Actions and CircleCI. The default `npm run render` command remains the original M1 `DemoVideo` render.
 
 ## Project format
 
@@ -54,11 +62,28 @@ A minimal `ProjectVideo` project looks like this:
       "id": "opening",
       "type": "title",
       "durationInFrames": 90,
-      "eyebrow": "INTRODUCTION",
       "title": "A new idea",
-      "body": "A short supporting sentence.",
-      "backgroundColor": "#0B1020",
-      "accentColor": "#67E8F9"
+      "media": {
+        "type": "image",
+        "src": "assets/hero.webp",
+        "placement": "right",
+        "fit": "cover"
+      }
+    },
+    {
+      "id": "clip",
+      "type": "content",
+      "durationInFrames": 120,
+      "title": "A moving picture",
+      "media": {
+        "type": "video",
+        "src": "assets/clip.mp4",
+        "placement": "background",
+        "fit": "cover",
+        "muted": true,
+        "trimBefore": 30,
+        "playbackRate": 1
+      }
     }
   ],
   "output": {
@@ -68,7 +93,7 @@ A minimal `ProjectVideo` project looks like this:
 }
 ```
 
-Each scene has a unique ID and a required title. Colors must use six-digit hex notation. The project validator checks the schema before either render provider is started.
+For local media, `src` is relative to the project folder and must begin with `assets/`. For remote media, use an HTTPS URL. Images default to full-frame backgrounds; use `placement: "left"` or `"right"` to reserve the other side for text. Media opacity defaults to 1. Video is muted by default; set `muted: false` and optionally `volume` (0–1) to keep its embedded audio. A video that ends before its scene finishes holds its final frame; looping is not included in this milestone.
 
 ## Prompt-driven cloud rendering
 
@@ -91,7 +116,7 @@ Supported providers:
 - `github-actions`: GitHub Actions renders the MP4 and stores it as an artifact for 3 days.
 - `circleci`: a small GitHub Actions dispatcher calls the CircleCI API; CircleCI performs the same Remotion render and stores the MP4 as a CircleCI artifact.
 
-The render request must use a new `requestId` each time. The selected scene file is passed to Remotion through its `--props` option, so scene content and timing come from the project JSON rather than a hardcoded component.
+The render request must use a new `requestId` each time. The selected project JSON is passed to Remotion through `--props`; for `ProjectVideo`, the project folder is also passed as `--public-dir` so its assets load in both providers.
 
 ### One-time CircleCI setup
 
@@ -119,14 +144,15 @@ Use this request shape in `circleci-status-request.json` (the `requestId` must b
 
 A push that changes only this file starts a short GitHub Actions status check. It reports whether the CircleCI job is queued, running, successful, or failed, and lists the artifact URL when the MP4 is ready. It does not keep a GitHub runner waiting while CircleCI renders.
 
-### Current limitations
+## Current limitations
 
-- The registered compositions are currently `DemoVideo` and `ProjectVideo`.
-- `ProjectVideo` currently supports text-based motion-graphics scenes only; media assets and audio are future work.
+- `ProjectVideo` supports one image or video layer per scene, behind or beside the text.
+- Video looping, multiple media layers per scene, audio-only tracks, voice-over, subtitles and automatic prompt-to-project generation are not implemented yet.
+- Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
 - YouTube publishing and permanent video storage are not implemented yet.
 
 ## CI
 
-GitHub Actions runs type-checking, tests, project validation, Remotion composition discovery using the example project props, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
+GitHub Actions runs type-checking, tests, demo and project validation, Remotion composition discovery with the example project's props and local public directory, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
