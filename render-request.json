@@ -1,7 +1,7 @@
 {
   "provider": "github-actions",
-  "projectPath": "projects/examples/three-scene-story/scene.json",
+  "projectPath": "projects/showcase-motion/scene.json",
   "compositionId": "ProjectVideo",
-  "outputName": "m3-media-assets-e2e-test",
-  "requestId": "m3-media-assets-e2e-20261117-01"
+  "outputName": "aether-motion-showcase",
+  "requestId": "m3-6-aether-showcase-20261117-01"
 }
