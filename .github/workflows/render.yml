@@ -159,5 +159,7 @@ jobs:
             exit 1
           fi
 
-          echo "CircleCI accepted render request $REQUEST_ID (pipeline $pipeline_id)." >> "$GITHUB_STEP_SUMMARY"
-          echo "Open the [CircleCI project](https://app.circleci.com/pipelines/$CIRCLECI_PROJECT_SLUG) to follow the render and retrieve its MP4 artifact." >> "$GITHUB_STEP_SUMMARY"
+          pipeline_url="https://app.circleci.com/pipelines/$CIRCLECI_PROJECT_SLUG/$pipeline_id"
+          echo "CircleCI accepted render request $REQUEST_ID (pipeline $pipeline_id)." | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "Pipeline URL: $pipeline_url" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "To check this render later, update circleci-status-request.json with this pipeline ID." | tee -a "$GITHUB_STEP_SUMMARY"
