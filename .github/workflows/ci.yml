@@ -21,7 +21,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,5 +39,16 @@ jobs:
         run: npm run validate:project -- projects/examples/three-scene-story/scene.json
       - name: Resolve Remotion compositions with project props
         run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/examples/three-scene-story/scene.json --public-dir="$GITHUB_WORKSPACE/projects/examples/three-scene-story"
+      - name: Render image and video media smoke test
+        run: |
+          mkdir -p render-output
+          npm run render:custom -- ProjectVideo ../../render-output/m3-media-assets-smoke-test.mp4 --props=../../projects/examples/three-scene-story/scene.json --public-dir=../../projects/examples/three-scene-story
       - name: Build studio
         run: npm run build
+      - name: Upload media smoke test video
+        uses: actions/upload-artifact@v4
+        with:
+          name: m3-media-assets-smoke-test
+          path: render-output/m3-media-assets-smoke-test.mp4
+          if-no-files-found: error
+          retention-days: 3
