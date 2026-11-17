@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
-  "workspaces": ["apps/*", "packages/*"],
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm run dev --workspace @ai-video-studio/studio",
     "build": "npm run build --workspace @ai-video-studio/studio",
@@ -13,7 +18,8 @@
     "validate:demo": "tsx scripts/validate-project.ts projects/demo/scene.json",
     "validate:project": "tsx scripts/validate-project.ts",
     "render": "npm run render --workspace @ai-video-studio/video-engine",
-    "render:custom": "npm run render:custom --workspace @ai-video-studio/video-engine --"
+    "render:custom": "npm run render:custom --workspace @ai-video-studio/video-engine --",
+    "assets:audio": "tsx scripts/generate-audio-fixtures.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.6",
