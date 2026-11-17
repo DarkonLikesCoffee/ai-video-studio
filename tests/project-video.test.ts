@@ -878,3 +878,25 @@ test("KINETIC visual showcase exercises global captions across all five scenes",
   ));
 });
 
+
+ 
+test("PULSE editorial showcase is a distinct five-scene, twenty-second motion benchmark", async () => {
+  const project = JSON.parse(
+    await readFile(new URL("../projects/showcase-pulse/scene.json", import.meta.url), "utf8")
+  ) as VideoProject;
+  assert.deepEqual(validateProjectDefinition(project), []);
+  assert.equal(project.id, "pulse-editorial-film");
+  assert.equal(project.scenes.length, 5);
+  assert.equal(getProjectDurationInFrames(project), 600);
+  assert.equal(project.subtitles?.length, 5);
+  assert.ok(project.scenes.every((scene) => (scene.graphics?.length ?? 0) >= 4));
+  assert.ok(project.scenes.every((scene) => (scene.particleSystems?.length ?? 0) === 1));
+  assert.ok(project.scenes.slice(1).every((scene) => scene.transitionIn !== undefined));
+  assert.ok(project.scenes.some((scene) => scene.graphics?.some((graphic) => graphic.pathMorph !== undefined)));
+  for (let index = 1; index < project.scenes.length; index += 1) {
+    const boundary = project.scenes.slice(0, index).reduce((sum, scene) => sum + scene.durationInFrames, 0);
+    assert.ok(project.subtitles?.some((cue) =>
+      cue.startInFrames < boundary && cue.startInFrames + cue.durationInFrames > boundary
+    ));
+  }
+});
