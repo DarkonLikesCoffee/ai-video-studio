@@ -57,6 +57,7 @@ const SceneMediaLayer: FC<{ media: SceneMedia; sceneDuration: number; index: num
       from={startInFrames}
       durationInFrames={durationInFrames}
       name={media.id ?? `media-layer-${index + 1}`}
+      style={{ zIndex: media.zIndex ?? index }}
     >
       {mediaElement}
     </Sequence>
