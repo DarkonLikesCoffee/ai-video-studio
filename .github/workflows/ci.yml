@@ -55,6 +55,8 @@ jobs:
         run: npm run validate:project -- projects/examples/three-scene-story/scene.json
       - name: Validate Aether motion showcase
         run: npm run validate:project -- projects/showcase-motion/scene.json
+      - name: Validate cinematic transition showcase
+        run: npm run validate:project -- projects/showcase-transitions/scene.json
       - name: Prepare track DSP and sidechain processing
         run: npm run audio:prepare -- projects/showcase-motion/scene.json
       - name: Resolve Remotion composition with Aether project props
@@ -65,6 +67,11 @@ jobs:
           npm run render:custom -- ProjectVideo ../../render-output/aether-motion-showcase.mp4 --props=../../projects/showcase-motion/.render-project.json --public-dir=../../projects/showcase-motion
       - name: Master final audio
         run: npm run audio:master -- render-output/aether-motion-showcase.mp4 projects/showcase-motion/scene.json
+      - name: Resolve Remotion composition for transition showcase
+        run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/showcase-transitions/scene.json --public-dir="$GITHUB_WORKSPACE/projects/showcase-transitions"
+      - name: Render cinematic transition showcase
+        run: |
+          npm run render:custom -- ProjectVideo ../../render-output/cinematic-transitions-showcase.mp4 --props=../../projects/showcase-transitions/scene.json --public-dir=../../projects/showcase-transitions
       - name: Build studio
         run: npm run build
       - name: Upload Aether showcase video
@@ -72,5 +79,12 @@ jobs:
         with:
           name: aether-motion-showcase
           path: render-output/aether-motion-showcase.mp4
+          if-no-files-found: error
+          retention-days: 3
+      - name: Upload cinematic transition showcase
+        uses: actions/upload-artifact@v4
+        with:
+          name: cinematic-transitions-showcase
+          path: render-output/cinematic-transitions-showcase.mp4
           if-no-files-found: error
           retention-days: 3
