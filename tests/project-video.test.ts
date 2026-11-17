@@ -783,7 +783,7 @@ test("project subtitles use a global frame timeline and accept styled overlappin
   project.subtitles = [
     {
       id: "caption-one",
-      startInFrames: 12,
+      startInFrames: 70,
       durationInFrames: 60,
       text: "The first caption crosses a scene boundary.",
       speaker: "NARRATOR",
