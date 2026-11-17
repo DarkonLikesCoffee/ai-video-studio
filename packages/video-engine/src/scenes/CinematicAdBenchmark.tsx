@@ -55,11 +55,12 @@ const SpeakerProduct: FC = () => {
     ...clamp,
     easing: Easing.inOut(Easing.cubic),
   });
-  const rotationY = interpolate(frame, [0, 180, 360, 600], [-0.22, 0.26, -0.12, 0.18], clamp);
+  const rotationY = interpolate(frame, [0, 120, 240, 360, 480, 600], [-0.58, 0.52, -0.42, 0.68, -0.62, 0.44], clamp);
+  const rotationX = interpolate(frame, [0, 150, 300, 450, 600], [0.08, -0.16, 0.12, -0.1, 0.06], clamp);
   const bob = Math.sin(frame / 34) * 0.035;
 
   return (
-    <group scale={entrance} position={[0, bob, 0]} rotation={[0.025, rotationY, 0]}>
+    <group scale={entrance} position={[0, bob, 0]} rotation={[rotationX, rotationY, 0]}>
       {/* Main anodized-aluminium enclosure */}
       <mesh position={[0, 0, 0]}>
         <cylinderGeometry args={[0.82, 0.82, 2.52, 96, 1, false]} />
@@ -163,11 +164,11 @@ const StudioEnvironment: FC = () => {
     <>
       <color attach="background" args={["#050912"]} />
       <fog attach="fog" args={["#050912", 8, 20]} />
-      <ambientLight intensity={0.58} />
-      <directionalLight position={[4, 5, 7]} intensity={2.2} color="#d6e8ff" />
-      <spotLight position={[-4 + sweep, 3, 5]} angle={0.46} penumbra={0.8} intensity={85} color="#5ad8dc" />
-      <pointLight position={[4, 1, 2]} intensity={42} color="#638aff" />
-      <pointLight position={[-3, -2, -3]} intensity={30} color="#b17bff" />
+      <ambientLight intensity={0.82} />
+      <directionalLight position={[4, 5, 7]} intensity={3.1} color="#e5f2ff" />
+      <spotLight position={[-4 + sweep, 3, 5]} angle={0.46} penumbra={0.8} intensity={105} color="#5ad8dc" />
+      <pointLight position={[4, 1, 2]} intensity={58} color="#638aff" />
+      <pointLight position={[-3, -2, -3]} intensity={38} color="#b17bff" />
       <pointLight position={[0, 4, -4]} intensity={22} color="#c6e7ff" />
       <mesh position={[0, -2.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[40, 40]} />
@@ -230,9 +231,9 @@ const Chapter: FC<ChapterProps> = ({ frame, start, end, kicker, title, body, ali
 export const CinematicAdBenchmark: FC = () => {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
-  const cameraX = interpolate(frame, [0, 120, 240, 360, 480, 600], [0.2, -0.35, 0.55, -0.3, 0.8, -1.05], clamp);
-  const cameraY = interpolate(frame, [0, 150, 300, 450, 600], [0.1, 0.25, -0.08, 0.18, 0.12], clamp);
-  const cameraZ = interpolate(frame, [0, 120, 240, 360, 480, 600], [8.6, 6.4, 7.2, 6.7, 7.4, 7.1], clamp);
+  const cameraX = interpolate(frame, [0, 120, 240, 360, 480, 600], [1.15, -1.35, 1.55, -1.2, 1.7, -1.45], clamp);
+  const cameraY = interpolate(frame, [0, 150, 300, 450, 600], [0.55, 1.05, -0.48, 0.72, -0.28], clamp);
+  const cameraZ = interpolate(frame, [0, 120, 240, 360, 480, 600], [9.2, 6.1, 7.5, 6.25, 7.7, 6.65], clamp);
   const cameraRoll = Math.sin(frame / 125) * 0.035;
   const heroOpacity = phaseOpacity(frame, 478, 600);
   const wipe = Math.max(
@@ -300,7 +301,7 @@ export const CinematicAdBenchmark: FC = () => {
         <div style={{ position: "absolute", bottom: 38, left: "8%", right: "8%", height: 2, background: "rgba(188,216,226,.18)" }}>
           <div style={{ width: `${progress}%`, height: "100%", background: "#8de8e1" }} />
         </div>
-        <AbsoluteFill style={{ backgroundColor: "#d8ffff", opacity: wipe, mixBlendMode: "screen" }} />
+        <AbsoluteFill style={{ backgroundColor: "#b8f5f2", opacity: wipe * 0.2, mixBlendMode: "screen" }} />
       </AbsoluteFill>
     </AbsoluteFill>
   );
