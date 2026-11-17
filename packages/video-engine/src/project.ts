@@ -148,8 +148,11 @@ export type GraphicBase = {
 
 export type GraphicElement =
   | (GraphicBase & {
-      type: "rect" | "ellipse";
+      type: "rect";
       radius?: number;
+    })
+  | (GraphicBase & {
+      type: "ellipse";
     })
   | (GraphicBase & {
       type: "path";
