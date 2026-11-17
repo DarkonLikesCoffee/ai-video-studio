@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
 
 type Plan = {
   schemaVersion?: unknown;
@@ -131,23 +132,26 @@ export const validateProductionPlan = (value: unknown): string[] => {
   return errors;
 };
 
-const inputPath = process.argv[2];
-if (!inputPath) {
-  process.stderr.write("Usage: npm run validate:plan -- <production-plan.json>\n");
-  process.exitCode = 2;
-} else {
-  try {
-    const raw = await readFile(inputPath, "utf8");
-    const plan: unknown = JSON.parse(raw);
-    const errors = validateProductionPlan(plan);
-    if (errors.length > 0) {
-      process.stderr.write(errors.map((error) => `- ${error}`).join("\n") + "\n");
+// Keep imports side-effect free so tests and other tools can reuse the validator.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const inputPath = process.argv[2];
+  if (!inputPath) {
+    process.stderr.write("Usage: npm run validate:plan -- <production-plan.json>\n");
+    process.exitCode = 2;
+  } else {
+    try {
+      const raw = await readFile(inputPath, "utf8");
+      const plan: unknown = JSON.parse(raw);
+      const errors = validateProductionPlan(plan);
+      if (errors.length > 0) {
+        process.stderr.write(errors.map((error) => `- ${error}`).join("\n") + "\n");
+        process.exitCode = 1;
+      } else {
+        process.stdout.write(`Production plan valid: ${inputPath}\n`);
+      }
+    } catch (error) {
+      process.stderr.write(`Could not validate production plan: ${error instanceof Error ? error.message : String(error)}\n`);
       process.exitCode = 1;
-    } else {
-      process.stdout.write(`Production plan valid: ${inputPath}\n`);
     }
-  } catch (error) {
-    process.stderr.write(`Could not validate production plan: ${error instanceof Error ? error.message : String(error)}\n`);
-    process.exitCode = 1;
   }
 }
