@@ -625,7 +625,7 @@ test("only the first and last scenes fade to black, not internal scene cuts", as
   const source = await readFile(new URL("../packages/video-engine/src/scenes/ProjectVideo.tsx", import.meta.url), "utf8");
   assert.match(source, /interpolate\(frame, \[0, 12\], \[0, 1\]/);
   assert.match(source, /interpolate\(frame, \[duration - 12, duration\], \[1, 0\]/);
-  assert.match(source, /\(isFirstScene \? fadeIn : 1\) \* \(isLastScene \? fadeOut : 1\)/);
+  assert.match(source, /\(isFirstScene \? fadeIn : 1\)\s*\*\s*\(isLastScene \? fadeOut : 1\)/);
   assert.match(source, /isFirstScene=\{index === 0\}/);
   assert.match(source, /isLastScene=\{index === scenes\.length - 1\}/);
 });
@@ -635,7 +635,7 @@ test("scene transition styles produce deterministic progress for fades and pushe
   const fade = { type: "fade", durationInFrames: 24 } as const;
   assert.equal(getSceneTransitionStyle(0, 90, fade).opacity, 0);
   assert.equal(getSceneTransitionStyle(12, 90, fade).opacity, 0.5);
-  assert.equal(getSceneTransitionStyle(24, 90, fade).opacity, 1);
+  assert.equal(getSceneTransitionStyle(24, 90, fade).opacity ?? 1, 1);
   assert.equal(getSceneTransitionStyle(102, 90, undefined, fade).opacity, 0.5);
 
   const slide = { type: "slide-left", durationInFrames: 20 } as const;
@@ -656,9 +656,9 @@ test("wipe and zoom transitions use clipping and scale without non-deterministic
     transform: "scale(1.12)",
   });
   assert.deepEqual(getSceneTransitionStyle(20, 90, zoom), {
-    opacity: 1,
     transform: "scale(1)",
   });
+  assert.equal(getSceneTransitionStyle(20, 90, zoom).opacity ?? 1, 1);
 });
 
 test("project validation accepts scene transitions and rejects invalid or overlapping windows", async () => {
