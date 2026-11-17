@@ -72,13 +72,17 @@ jobs:
       - name: Render cinematic transition showcase
         run: |
           npm run render:custom -- ProjectVideo ../../render-output/cinematic-transitions-showcase.mp4 --props=../../projects/showcase-transitions/scene.json --public-dir=../../projects/showcase-transitions
+      - name: Prepare PULSE soundtrack and transition effects
+        run: npm run audio:prepare -- projects/showcase-pulse/scene.json
       - name: Validate PULSE editorial showcase
         run: npm run validate:project -- projects/showcase-pulse/scene.json
       - name: Resolve Remotion composition for PULSE showcase
-        run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/showcase-pulse/scene.json
+        run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/showcase-pulse/.render-project.json --public-dir="$GITHUB_WORKSPACE/projects/showcase-pulse"
       - name: Render PULSE editorial motion film
         run: |
-          npm run render:custom -- ProjectVideo ../../render-output/pulse-editorial-film.mp4 --props=../../projects/showcase-pulse/scene.json
+          npm run render:custom -- ProjectVideo ../../render-output/pulse-editorial-film.mp4 --props=../../projects/showcase-pulse/.render-project.json --public-dir=../../projects/showcase-pulse
+      - name: Master PULSE final audio
+        run: npm run audio:master -- render-output/pulse-editorial-film.mp4 projects/showcase-pulse/scene.json
       - name: Build studio
         run: npm run build
       - name: Upload PULSE editorial motion film
