@@ -29,7 +29,7 @@ const SpeakerGrille: FC = () => {
     const radius = 0.27 + ring * 0.13;
     return {
       key: index,
-      position: [Math.cos(angle) * radius, Math.sin(angle) * radius, 0.835] as [number, number, number],
+      position: [Math.cos(angle) * radius, Math.sin(angle) * radius, 0.185] as [number, number, number],
     };
   });
 
@@ -84,7 +84,7 @@ const SpeakerProduct: FC = () => {
 
       {/* Precision-machined front driver */}
       <group position={[0, 0, 0.79 + explode * 0.28]}>
-        <mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.69, 0.69, 0.055, 96]} />
           <meshStandardMaterial color="#0d1621" metalness={0.76} roughness={0.3} />
         </mesh>
@@ -108,7 +108,7 @@ const SpeakerProduct: FC = () => {
       </group>
 
       {/* Rear acoustic chamber and floating internal ring */}
-      <mesh position={[0, 0, -0.68 - explode * 0.42]}>
+      <mesh position={[0, 0, -0.68 - explode * 0.42]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.58, 0.58, 0.16, 64]} />
         <meshStandardMaterial color="#0c1722" metalness={0.72} roughness={0.34} />
       </mesh>
