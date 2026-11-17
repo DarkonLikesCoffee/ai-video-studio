@@ -63,27 +63,67 @@ A minimal `ProjectVideo` project looks like this:
       "type": "title",
       "durationInFrames": 90,
       "title": "A new idea",
-      "media": {
-        "type": "image",
-        "src": "assets/hero.webp",
-        "placement": "right",
-        "fit": "cover"
-      }
+      "mediaLayers": [
+        {
+          "id": "background-image",
+          "type": "image",
+          "src": "assets/hero.webp",
+          "x": 52,
+          "y": 8,
+          "width": 45,
+          "height": 84,
+          "fit": "contain",
+          "zIndex": 1
+        },
+        {
+          "id": "logo-overlay",
+          "type": "image",
+          "src": "assets/logo.webp",
+          "x": 78,
+          "y": 72,
+          "width": 12,
+          "height": 18,
+          "rotation": -5,
+          "startInFrames": 12,
+          "durationInFrames": 60,
+          "zIndex": 3
+        }
+      ]
     },
     {
       "id": "clip",
       "type": "content",
       "durationInFrames": 120,
       "title": "A moving picture",
-      "media": {
-        "type": "video",
-        "src": "assets/clip.mp4",
-        "placement": "background",
-        "fit": "cover",
-        "muted": true,
-        "trimBefore": 30,
-        "playbackRate": 1
-      }
+      "mediaLayers": [
+        {
+          "id": "background-video",
+          "type": "video",
+          "src": "assets/clip.mp4",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "fit": "cover",
+          "muted": true,
+          "trimBefore": 30,
+          "playbackRate": 1,
+          "zIndex": 0
+        },
+        {
+          "id": "picture-in-picture",
+          "type": "image",
+          "src": "assets/overlay.webp",
+          "x": 68,
+          "y": 56,
+          "width": 26,
+          "height": 36,
+          "opacity": 0.9,
+          "startInFrames": 24,
+          "durationInFrames": 84,
+          "zIndex": 5
+        }
+      ]
     }
   ],
   "output": {
@@ -94,6 +134,20 @@ A minimal `ProjectVideo` project looks like this:
 ```
 
 For local media, `src` is relative to the project folder and must begin with `assets/`. For remote media, use an HTTPS URL. Images default to full-frame backgrounds; use `placement: "left"` or `"right"` to reserve the other side for text. Media opacity defaults to 1. Video is muted by default; set `muted: false` and optionally `volume` (0–1) to keep its embedded audio. A video that ends before its scene finishes holds its final frame; looping is not included in this milestone.
+
+### Multiple layers and timing
+
+Use `mediaLayers` instead of the legacy `media` property to compose up to eight image/video layers in one scene. Each layer can define:
+
+- `x`, `y`, `width`, `height`: normalized percentages of the scene canvas (0–100).
+- `zIndex`: stacking order; larger values render above smaller values.
+- `opacity`: transparency from 0 to 1, and `rotation`: degrees from -360 to 360.
+- `startInFrames` and `durationInFrames`: when the layer appears and how long it remains visible within the scene.
+- Existing media properties such as `fit`, `position`, `trimBefore`, `playbackRate`, `muted`, and `volume`.
+
+When custom geometry is provided, it overrides `placement`. The validator ensures a layer remains within the canvas and its timeline window stays inside its scene. The old single `media` property remains supported for existing projects; do not define both properties on the same scene.
+
+The scene title/body and existing graphic accents are rendered above media layers. Dedicated independently positioned text layers, shape primitives, and keyframe animation are later milestones.
 
 ## Prompt-driven cloud rendering
 
@@ -146,8 +200,8 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 ## Current limitations
 
-- `ProjectVideo` supports one image or video layer per scene, behind or beside the text.
-- Video looping, multiple media layers per scene, audio-only tracks, voice-over, subtitles and automatic prompt-to-project generation are not implemented yet.
+- `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
+- Dedicated text layers, shape primitives, keyframe animation, video looping, audio-only tracks, voice-over, subtitles and automatic prompt-to-project generation are not implemented yet.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
