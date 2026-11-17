@@ -28,7 +28,7 @@ test("validator rejects duplicate scene IDs", async () => {
 
 test("validator rejects unsupported scene types and invalid colors", async () => {
   const project = await readExample();
-  const scene = project.scenes[0] as VideoProject["scenes"][number] & { type: string; accentColor: string };
+  const scene = project.scenes[0] as unknown as { type: string; accentColor: string };
   scene.type = "video";
   scene.accentColor = "purple";
   const errors = validateProjectDefinition(project);
