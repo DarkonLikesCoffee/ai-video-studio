@@ -349,9 +349,9 @@ Example request:
 ```json
 {
   "provider": "github-actions",
-  "projectPath": "projects/examples/three-scene-story/scene.json",
+  "projectPath": "projects/showcase-motion/scene.json",
   "compositionId": "ProjectVideo",
-  "outputName": "internet-explainer",
+  "outputName": "aether-motion-showcase",
   "requestId": "replace-with-a-unique-id"
 }
 ```
@@ -401,4 +401,4 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 ## CI
 
-GitHub Actions runs type-checking, tests, demo and project validation, Remotion composition discovery with the example project's props and local public directory, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
+GitHub Actions runs type-checking, tests, legacy-project validation, the Aether project and local-asset validation, FFmpeg audio preparation (including sidechain DSP), Remotion composition discovery, a full MP4 render, final loudness mastering, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
