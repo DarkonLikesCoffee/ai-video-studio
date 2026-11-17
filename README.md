@@ -16,10 +16,11 @@ A `ProjectVideo` project can define:
 - Local video clips (`mp4`, `mov`, `m4v`, `webm`, `mkv`) or remote HTTPS clips.
 - Media placement (`background`, `left`, `right`), fit (`cover` or `contain`), object position and opacity.
 - Video trim point, playback rate, mute state and volume.
+- Up to 16 overlapping global audio tracks for music, voice-over, sound effects and ambience.
 - Composition width, height and frame rate.
 - MP4/H.264 output.
 
-The current validator limits projects to 1,800 total frames, with each scene between 30 and 900 frames. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses.
+The current validator limits projects to 1,800 total frames, with each scene between 30 and 900 frames. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses. Remote audio hosts must also allow cross-origin access; local project assets are more reliable for repeatable renders.
 
 ## Example project
 
@@ -35,6 +36,7 @@ Requirements: Node.js 22+ and npm.
 npm install
 npm run typecheck
 npm test
+npm run assets:audio
 npm run validate:project -- projects/examples/three-scene-story/scene.json
 mkdir -p render-output
 npm run render:custom -- ProjectVideo ../../render-output/internet-explainer.mp4 --props=../../projects/examples/three-scene-story/scene.json --public-dir=../../projects/examples/three-scene-story
@@ -203,6 +205,81 @@ Text elements use `titleAnimation`, `bodyAnimation`, and `eyebrowAnimation` at t
 
 The animation evaluator uses Remotion's deterministic frame-based `interpolate()` and easing primitives, including physics-style spring easing. This makes the same project render consistently in GitHub Actions, CircleCI, and local renders.
 
+### Audio tracks and mixing
+
+Audio is a project-level timeline, independent of scene cuts. This lets background music continue across scenes while voice-over, sound effects, and ambience enter at their own frame positions. A project can contain up to 16 overlapping tracks. Supported roles are `music`, `voiceover`, `sfx`, and `ambience`.
+
+Example:
+
+```json
+{
+  "audioTracks": [
+    {
+      "id": "background-score",
+      "role": "music",
+      "src": "assets/audio/music.mp3",
+      "startInFrames": 0,
+      "durationInFrames": 900,
+      "volume": 0.55,
+      "fadeInFrames": 45,
+      "fadeOutFrames": 90,
+      "loop": true,
+      "volumeAutomation": {
+        "keyframes": [
+          { "frame": 0, "value": 1 },
+          { "frame": 300, "value": 0.45, "easing": "ease-out" },
+          { "frame": 480, "value": 1, "easing": "ease-in" }
+        ]
+      }
+    },
+    {
+      "id": "narration-intro",
+      "role": "voiceover",
+      "src": "assets/audio/narration.mp3",
+      "startInFrames": 30,
+      "trimBefore": 15,
+      "playbackRate": 1,
+      "preservePitch": true,
+      "volume": 1
+    },
+    {
+      "id": "transition-whoosh",
+      "role": "sfx",
+      "src": "assets/audio/whoosh.wav",
+      "startInFrames": 285,
+      "durationInFrames": 60,
+      "volume": 0.7,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 24
+    }
+  ]
+}
+```
+
+Track timing is measured in composition frames. `startInFrames` places the track on the full-project timeline; `durationInFrames` limits its timeline window; `trimBefore` skips the beginning of the source. The validator rejects tracks that extend past the video duration.
+
+- `volume`: base gain from 0 (silent) to 1 (full level).
+- `fadeInFrames` / `fadeOutFrames`: linear fades at the edges of the track.
+- `volumeAutomation.keyframes`: an optional 0–1 gain multiplier, with the same easing presets and custom curves as visual animation.
+- `playbackRate`: speed multiplier from 0.25× to 4×.
+- `preservePitch`: keep the original pitch when changing playback speed.
+- `loop`: repeat the selected audio range for the track's timeline window.
+- `muted`: keep the track in the timeline but silence it.
+
+Local audio files belong under the project folder's `assets/` directory. Supported formats are MP3, WAV, M4A, AAC, OGG, Opus, and FLAC. Remote sources must use public HTTPS URLs and need a host that permits cross-origin audio fetching. Prefer local audio assets for dependable cloud rendering.
+
+The renderer uses Remotion's `<Audio>` component from `@remotion/media`. Multiple instances are mixed together on the same composition timeline; audio remains synchronized to the video frame clock. The project uses matching Remotion package versions to avoid API incompatibilities.
+
+The sample project's audio assets are generated deterministically and are original synthesized fixtures, not third-party music. Generate them before validating or rendering the sample:
+
+```bash
+npm run assets:audio
+npm run validate:project -- projects/examples/three-scene-story/scene.json
+```
+
+The current audio engine handles track placement, trimming, looping, speed, gain, fades, and keyframed volume. It does not yet synthesize speech, generate music, perform automatic dialogue/music ducking, provide EQ/compression/reverb, pan tracks, or master loudness. A `voiceover` track currently means adding an existing voice recording; text-to-speech is a separate future feature.
+
+
 
 The scene title/body and existing graphic accents are rendered above media layers.
 
@@ -258,7 +335,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 ## Current limitations
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
-- Dedicated arbitrary text layers, shape primitives, SVG path morphing, video looping, audio-only tracks, voice-over, subtitles and automatic prompt-to-project generation are not implemented yet. Keyframe animation currently supports numeric transforms and opacity for media layers and the built-in text elements.
+- Dedicated arbitrary text layers, shape primitives, SVG path morphing, video looping, subtitles and automatic prompt-to-project generation are not implemented yet. Keyframe animation currently supports numeric transforms and opacity for media layers and the built-in text elements. Audio synthesis, text-to-speech, audio effects processing and automatic mixing are future work.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.

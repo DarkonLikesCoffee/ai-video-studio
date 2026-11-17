@@ -22,6 +22,9 @@ test("three-scene example is a valid ProjectVideo project with image and video m
   assert.equal(project.scenes[1]!.mediaLayers?.length, 2);
   assert.equal(project.scenes[0]!.mediaLayers?.[0]?.type, "image");
   assert.equal(project.scenes[1]!.mediaLayers?.[0]?.type, "video");
+  assert.equal(project.audioTracks?.length, 2);
+  assert.deepEqual(project.audioTracks?.map((track) => track.role), ["music", "sfx"]);
+  assert.deepEqual(validateProjectDefinition(project), []);
 });
 
 test("project duration is derived from all scene durations", async () => {
@@ -204,4 +207,82 @@ test("validator allows off-canvas movement but rejects extreme animated position
     x: { keyframes: [{ frame: 0, value: -201 }, { frame: 20, value: 0 }] },
   };
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("between -200 and 200")));
+});
+
+test("audio tracks support music, voiceover, sound effects and ambience roles", async () => {
+  const project = await readExample();
+  project.audioTracks = [
+    { id: "music", role: "music", src: "assets/audio/ambient-bed.wav", startInFrames: 0 },
+    { id: "voice", role: "voiceover", src: "assets/audio/ambient-bed.wav", startInFrames: 0 },
+    { id: "sfx", role: "sfx", src: "assets/audio/transition-chime.wav", startInFrames: 30 },
+    { id: "room-tone", role: "ambience", src: "assets/audio/ambient-bed.wav", startInFrames: 0 },
+  ];
+  assert.deepEqual(validateProjectDefinition(project), []);
+});
+
+test("audio volume automation and fades are validated against track duration", async () => {
+  const project = await readExample();
+  project.audioTracks![0]!.volumeAutomation = {
+    keyframes: [
+      { frame: 0, value: 1, easing: "ease-in" },
+      { frame: 88, value: 0.4, easing: "ease-out" },
+      { frame: 160, value: 1 },
+    ],
+  };
+  project.audioTracks![0]!.fadeInFrames = 30;
+  project.audioTracks![0]!.fadeOutFrames = 45;
+  assert.deepEqual(validateProjectDefinition(project), []);
+
+  project.audioTracks![0]!.volumeAutomation = {
+    keyframes: [{ frame: 0, value: 1.2 }],
+  };
+  project.audioTracks![0]!.fadeOutFrames = 301;
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("opacity must be between 0 and 1")));
+  assert.ok(errors.some((error) => error.includes("fadeOutFrames must be between 0 and the track duration")));
+});
+
+test("audio tracks reject insecure remote URLs and unsupported extensions", async () => {
+  const project = await readExample();
+  project.audioTracks![0]!.src = "http://example.com/music.mp3";
+  project.audioTracks![1]!.src = "assets/audio/clip.mp4";
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("public HTTPS URL or a safe path under assets/")));
+  assert.ok(errors.some((error) => error.includes("supported audio extension")));
+});
+
+test("audio tracks must remain inside the project timeline", async () => {
+  const project = await readExample();
+  project.audioTracks![0]!.startInFrames = 290;
+  project.audioTracks![0]!.durationInFrames = 20;
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("timeline window cannot extend beyond the project")));
+});
+
+test("audio track IDs must be unique and projects support at most 16 tracks", async () => {
+  const project = await readExample();
+  project.audioTracks![1]!.id = project.audioTracks![0]!.id;
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("id must be unique")));
+
+  project.audioTracks = Array.from({ length: 17 }, (_, index) => ({
+    id: `audio-${index}`,
+    role: "sfx" as const,
+    src: "assets/audio/transition-chime.wav",
+    startInFrames: 0,
+  }));
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("at most 16 tracks")));
+});
+
+test("audio fades, playback rate, volume and boolean flags are range checked", async () => {
+  const project = await readExample();
+  const track = project.audioTracks![0] as unknown as Record<string, unknown>;
+  track.volume = 2;
+  track.playbackRate = 8;
+  track.loop = "yes";
+  track.preservePitch = "yes";
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("volume must be between 0 and 1")));
+  assert.ok(errors.some((error) => error.includes("playbackRate must be between 0.25 and 4")));
+  assert.ok(errors.some((error) => error.includes("loop must be a boolean")));
+  assert.ok(errors.some((error) => error.includes("preservePitch must be a boolean")));
 });

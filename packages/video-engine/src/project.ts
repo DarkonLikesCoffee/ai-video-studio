@@ -27,6 +27,29 @@ export type AnimationTrack = {
 
 export type AnimationTracks = Partial<Record<AnimationProperty, AnimationTrack>>;
 
+export type AudioTrackRole = "music" | "voiceover" | "sfx" | "ambience";
+
+export type AudioTrack = {
+  id: string;
+  role: AudioTrackRole;
+  /** Local audio path under the project's assets/ directory or a public HTTPS URL. */
+  src: string;
+  /** Start and duration are measured in composition frames. */
+  startInFrames: number;
+  durationInFrames?: number;
+  /** Source trim in frames and playback speed multiplier. */
+  trimBefore?: number;
+  playbackRate?: number;
+  preservePitch?: boolean;
+  volume?: number;
+  muted?: boolean;
+  loop?: boolean;
+  fadeInFrames?: number;
+  fadeOutFrames?: number;
+  /** Optional 0–1 volume multiplier keyframes relative to the track start. */
+  volumeAutomation?: AnimationTrack;
+};
+
 export type SceneMedia = {
   type: MediaType;
   /** Local paths must be inside the project's assets/ folder. HTTPS URLs are also supported. */
@@ -87,6 +110,8 @@ export type VideoProject = {
     fps: number;
   };
   scenes: VideoScene[];
+  /** Up to 16 simultaneous music, voice, effects, or ambience tracks. */
+  audioTracks?: AudioTrack[];
   output: {
     format: "mp4";
     codec: "h264";
@@ -425,6 +450,84 @@ const validateSceneMedia = (value: unknown, prefix: string, sceneDuration: numbe
   return errors;
 };
 
+const audioExtensions = new Set([".mp3", ".wav", ".m4a", ".aac", ".ogg", ".opus", ".flac"]);
+
+const validateAudioTrack = (value: unknown, prefix: string, projectDuration: number): string[] => {
+  const errors: string[] = [];
+  const track = isRecord(value) ? value : {};
+
+  if (!isNonEmptyString(track.id) || !/^[A-Za-z0-9_-]{1,40}$/.test(track.id)) {
+    errors.push(`${prefix}.id must contain 1-40 letters, numbers, underscores, or hyphens`);
+  }
+  if (!["music", "voiceover", "sfx", "ambience"].includes(String(track.role))) {
+    errors.push(`${prefix}.role must be music, voiceover, sfx, or ambience`);
+  }
+
+  if (!isNonEmptyString(track.src) || track.src.length > 2048) {
+    errors.push(`${prefix}.src is required and must be at most 2048 characters`);
+  } else {
+    const remote = isRemoteMediaUrl(track.src);
+    const local = isSafeProjectAssetPath(track.src);
+    if (!remote && !local) {
+      errors.push(`${prefix}.src must be a public HTTPS URL or a safe path under assets/`);
+    } else if (!audioExtensions.has(getExtension(track.src))) {
+      errors.push(`${prefix}.src must use a supported audio extension (mp3, wav, m4a, aac, ogg, opus, flac)`);
+    }
+  }
+
+  const start = track.startInFrames;
+  if (!isInteger(start) || start < 0 || start >= projectDuration) {
+    errors.push(`${prefix}.startInFrames must be between 0 and the last frame of the project`);
+  }
+
+  const duration = track.durationInFrames === undefined
+    ? projectDuration - (isInteger(start) ? start : 0)
+    : track.durationInFrames;
+  if (!isInteger(duration) || duration < 1) {
+    errors.push(`${prefix}.durationInFrames must be a positive integer`);
+  } else if (isInteger(start) && start >= 0 && start + duration > projectDuration) {
+    errors.push(`${prefix} timeline window cannot extend beyond the project`);
+  }
+
+  for (const field of ["trimBefore"] as const) {
+    if (track[field] !== undefined &&
+        (!isInteger(track[field]) || track[field] < 0 || track[field] > 18000)) {
+      errors.push(`${prefix}.${field} must be an integer between 0 and 18000`);
+    }
+  }
+  if (track.playbackRate !== undefined &&
+      (!isFiniteNumber(track.playbackRate) || track.playbackRate < 0.25 || track.playbackRate > 4)) {
+    errors.push(`${prefix}.playbackRate must be between 0.25 and 4`);
+  }
+  if (track.volume !== undefined &&
+      (!isFiniteNumber(track.volume) || track.volume < 0 || track.volume > 1)) {
+    errors.push(`${prefix}.volume must be between 0 and 1`);
+  }
+  for (const field of ["muted", "loop", "preservePitch"] as const) {
+    if (track[field] !== undefined && typeof track[field] !== "boolean") {
+      errors.push(`${prefix}.${field} must be a boolean`);
+    }
+  }
+
+  const effectiveDuration = isInteger(duration) ? duration : 0;
+  for (const field of ["fadeInFrames", "fadeOutFrames"] as const) {
+    if (track[field] !== undefined &&
+        (!isInteger(track[field]) || track[field] < 0 || track[field] > effectiveDuration)) {
+      errors.push(`${prefix}.${field} must be between 0 and the track duration`);
+    }
+  }
+
+  if (track.volumeAutomation !== undefined) {
+    errors.push(...validateAnimationTracks(
+      { opacity: track.volumeAutomation },
+      `${prefix}.volumeAutomation`,
+      effectiveDuration
+    ));
+  }
+
+  return errors;
+};
+
 export const getProjectDurationInFrames = (project: Pick<VideoProject, "scenes">): number =>
   project.scenes.reduce((total, scene) => total + scene.durationInFrames, 0);
 
@@ -550,6 +653,33 @@ export const validateProjectDefinition = (value: unknown): string[] => {
       });
 
       if (totalFrames > 1800) errors.push("total scene duration must not exceed 1800 frames (60 seconds at 30 FPS)");
+    }
+  }
+
+  if (value.audioTracks !== undefined) {
+    const projectDuration = Array.isArray(value.scenes)
+      ? value.scenes.reduce((total, entry) => {
+          if (!isRecord(entry) || !isInteger(entry.durationInFrames) || entry.durationInFrames < 0) return total;
+          return total + entry.durationInFrames;
+        }, 0)
+      : 0;
+
+    if (compositionId !== "ProjectVideo") {
+      errors.push("audioTracks are only supported for ProjectVideo compositions");
+    }
+    if (!Array.isArray(value.audioTracks) || value.audioTracks.length > 16) {
+      errors.push("audioTracks must be an array containing at most 16 tracks");
+    } else {
+      const trackIds = new Set<string>();
+      value.audioTracks.forEach((entry, index) => {
+        const prefix = `audioTracks[${index}]`;
+        const track = isRecord(entry) ? entry : {};
+        if (typeof track.id === "string") {
+          if (trackIds.has(track.id)) errors.push(`${prefix}.id must be unique`);
+          trackIds.add(track.id);
+        }
+        errors.push(...validateAudioTrack(entry, prefix, projectDuration));
+      });
     }
   }
 

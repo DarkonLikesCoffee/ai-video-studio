@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "internet-explainer-with-media",
   "title": "How the Internet Connects Us",
-  "description": "A motion-graphics explainer demonstrating media layers and keyframe-based entrance, movement, scaling, and opacity animations.",
+  "description": "A motion-graphics explainer with animated media layers, a generated ambient music bed, and a timed transition chime.",
   "composition": {
     "id": "ProjectVideo",
     "width": 1920,
@@ -451,5 +451,51 @@
   "output": {
     "format": "mp4",
     "codec": "h264"
-  }
+  },
+  "audioTracks": [
+    {
+      "id": "ambient-bed",
+      "role": "music",
+      "src": "assets/audio/ambient-bed.wav",
+      "startInFrames": 0,
+      "durationInFrames": 300,
+      "volume": 0.72,
+      "fadeInFrames": 42,
+      "fadeOutFrames": 48,
+      "volumeAutomation": {
+        "keyframes": [
+          {
+            "frame": 0,
+            "value": 0.9,
+            "easing": "ease-in"
+          },
+          {
+            "frame": 88,
+            "value": 0.58,
+            "easing": "ease-out"
+          },
+          {
+            "frame": 150,
+            "value": 0.9,
+            "easing": "ease-in-out"
+          },
+          {
+            "frame": 280,
+            "value": 0.9
+          }
+        ]
+      }
+    },
+    {
+      "id": "chapter-transition",
+      "role": "sfx",
+      "src": "assets/audio/transition-chime.wav",
+      "startInFrames": 88,
+      "durationInFrames": 48,
+      "volume": 0.58,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 24,
+      "preservePitch": true
+    }
+  ]
 }

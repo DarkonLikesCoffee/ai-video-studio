@@ -8,9 +8,10 @@
     "render:custom": "remotion render src/index.ts"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.398",
+    "@remotion/cli": "4.0.544",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "remotion": "^4.0.398"
+    "remotion": "4.0.544",
+    "@remotion/media": "4.0.544"
   }
 }
