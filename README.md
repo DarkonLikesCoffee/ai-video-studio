@@ -16,6 +16,9 @@ A `ProjectVideo` project can define:
 - Local video clips (`mp4`, `mov`, `m4v`, `webm`, `mkv`) or remote HTTPS clips.
 - Media placement (`background`, `left`, `right`), fit (`cover` or `contain`), object position and opacity.
 - Video trim point, playback rate, mute state and volume.
+- Up to 80 vector graphic elements per scene: rectangles, ellipses, SVG paths and free-positioned text.
+- SVG path draw-on animation and keyframed transforms, opacity and scale.
+- Up to six deterministic particle systems per scene, with a combined limit of 360 particles.
 - Up to 16 overlapping global audio tracks for music, voice-over, sound effects and ambience.
 - Per-track high/low-pass filters, parametric EQ, compression, algorithmic echo/reverb and stereo panning.
 - Sidechain compression to duck music under voice-over, plus final EBU R128 loudness mastering.
@@ -28,7 +31,7 @@ The current validator limits projects to 1,800 total frames, with each scene bet
 
 The repository keeps [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json) as a compatibility sample for local SVG and remote MP4 assets.
 
-The current visual test is [AETHER — Motion Design Showcase](projects/showcase-motion/scene.json): a 16-second, four-scene motion-design film with original orbital artwork, flowing vector fields, spectrum graphics, keyframed movement and an original soundtrack. Its SVG source art lives under [projects/showcase-motion/assets](projects/showcase-motion/assets).
+The current visual test is [AETHER — Motion Design Showcase](projects/showcase-motion/scene.json): a 16-second, four-scene motion-design film with original orbital artwork, flowing vector fields, spectrum graphics, vector path reveals, deterministic particle fields, keyframed movement and an original soundtrack. Its SVG source art lives under [projects/showcase-motion/assets](projects/showcase-motion/assets).
 
 ### Local rendering
 
@@ -208,6 +211,115 @@ Example media animation:
 Text elements use `titleAnimation`, `bodyAnimation`, and `eyebrowAnimation` at the scene level. Their keyframe frames are relative to the start of the scene. Media keyframes are relative to the start of that media layer's own visibility window. Keyframes must be strictly increasing and stay inside the relevant timeline duration; each property supports up to 30 keyframes.
 
 The animation evaluator uses Remotion's deterministic frame-based `interpolate()` and easing primitives, including physics-style spring easing. This makes the same project render consistently in GitHub Actions, CircleCI, and local renders.
+
+### Vector graphics and VFX
+
+Use a scene's optional `graphics` array to place vector elements above image/video media. Graphics use percentage-based `x`, `y`, `width` and `height` geometry and the same local-frame animation tracks as media layers.
+
+Supported element types:
+
+- `rect`: filled or outlined rectangle, with an optional corner `radius`.
+- `ellipse`: filled or outlined ellipse.
+- `path`: SVG path data in a local 0–100 coordinate system, with `stroke`, `strokeWidth` and optional `lineCap`.
+- `text`: independent text content with font family, size, weight, letter spacing and alignment.
+
+All graphics can use `fill`, `stroke`, `strokeWidth`, `opacity`, `rotation`, `zIndex`, `startInFrames`, `durationInFrames` and keyframe `animations`. SVG paths additionally support `pathProgress` from 0 to 1 to animate a stroke being drawn. Each scene supports up to 80 vector elements.
+
+Example:
+
+```json
+{
+  "graphics": [
+    {
+      "id": "orbit-ring",
+      "type": "ellipse",
+      "x": 58,
+      "y": 12,
+      "width": 34,
+      "height": 76,
+      "stroke": "#7DEBFF",
+      "strokeWidth": 2,
+      "opacity": 0.7,
+      "animations": {
+        "rotation": {
+          "keyframes": [
+            { "frame": 0, "value": -18 },
+            { "frame": 90, "value": 18 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "draw-on-trail",
+      "type": "path",
+      "x": 8,
+      "y": 16,
+      "width": 84,
+      "height": 68,
+      "d": "M0 80 C20 0 80 100 100 20",
+      "stroke": "#B9F5FF",
+      "strokeWidth": 2,
+      "animations": {
+        "pathProgress": {
+          "keyframes": [
+            { "frame": 0, "value": 0, "easing": "ease-out" },
+            { "frame": 60, "value": 1 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "chapter-label",
+      "type": "text",
+      "x": 8,
+      "y": 84,
+      "width": 50,
+      "height": 8,
+      "text": "VECTOR SYSTEM",
+      "fill": "#FFFFFF",
+      "fontSize": 30,
+      "fontWeight": 700,
+      "textAnchor": "start",
+      "letterSpacing": 3
+    }
+  ]
+}
+```
+
+The `particleSystems` array adds deterministic emitters. Each system uses a numeric `seed`, a `count`, an origin and spread, a particle lifetime, angle and speed ranges, optional gravity, size range, opacity and a palette of up to eight colors. Particles can be circles, squares or diamonds and use normal, screen or lighten blending. The same seed and project settings produce the same particles on every render.
+
+Example:
+
+```json
+{
+  "particleSystems": [
+    {
+      "id": "stardust",
+      "count": 90,
+      "seed": 4217,
+      "originX": 50,
+      "originY": 52,
+      "spreadX": 90,
+      "spreadY": 80,
+      "lifeInFrames": 100,
+      "angleMinDeg": 0,
+      "angleMaxDeg": 360,
+      "speedMin": 0.3,
+      "speedMax": 3.5,
+      "gravity": 0,
+      "sizeMin": 1,
+      "sizeMax": 5,
+      "opacity": 0.75,
+      "colors": ["#FFFFFF", "#8DEBFF", "#A992FF"],
+      "shape": "circle",
+      "blendMode": "screen"
+    }
+  ]
+}
+```
+
+Particle speed is measured in canvas percentage per second; gravity is percentage per second squared. A scene can contain up to six systems and 360 particles total. Emitters use deterministic motion rather than runtime randomness, so frame-by-frame renders remain reproducible.
+
 
 ### Audio tracks and mixing
 
@@ -393,7 +505,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
 - Audio DSP uses local FFmpeg binaries. Tracks that need EQ, compression, reverb, panning or sidechain processing must use local assets; remote audio can still be used for unprocessed playback.
-- Dedicated arbitrary text layers, shape primitives, SVG path morphing, video looping, subtitles and automatic prompt-to-project generation are not implemented yet. Keyframe animation currently supports numeric transforms and opacity for media layers and built-in text elements. Audio synthesis, text-to-speech, convolution reverb, multiband processing and advanced mastering are future work.
+- SVG path morphing, video looping, subtitles, 3D scenes, shader-based effects and automatic prompt-to-project generation are not implemented yet. The current vector system supports rectangles, ellipses, paths, text and deterministic particle fields; it is a 2D compositor, not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
