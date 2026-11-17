@@ -281,8 +281,8 @@ export const validateAnimationTracks = (
                  (keyframe.value <= 0 || keyframe.value > 100)) {
         errors.push(`${keyframePrefix}.value for ${property} must be greater than 0 and at most 100`);
       } else if ((property === "x" || property === "y") &&
-                 (keyframe.value < 0 || keyframe.value > 100)) {
-        errors.push(`${keyframePrefix}.value for ${property} must be between 0 and 100`);
+                 (keyframe.value < -200 || keyframe.value > 200)) {
+        errors.push(`${keyframePrefix}.value for ${property} must be between -200 and 200`);
       } else if (property === "rotation" && (keyframe.value < -3600 || keyframe.value > 3600)) {
         errors.push(`${keyframePrefix}.value for rotation must be between -3600 and 3600`);
       } else if ((property === "scaleX" || property === "scaleY") &&
