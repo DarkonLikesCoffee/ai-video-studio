@@ -4,7 +4,12 @@ import { getProjectDurationInFrames, type VideoProject } from "./project";
 import { DemoVideo } from "./scenes/DemoVideo";
 import { ProjectVideo } from "./scenes/ProjectVideo";
 
-const defaultProject = projectExample as unknown as VideoProject;
+// Remotion merges partial --props over defaultProps. Do not leak the example
+// project's soundtrack into projects that intentionally omit audioTracks.
+const defaultProject = {
+  ...(projectExample as unknown as VideoProject),
+  audioTracks: [],
+};
 
 export const RemotionRoot = () => (
   <>
