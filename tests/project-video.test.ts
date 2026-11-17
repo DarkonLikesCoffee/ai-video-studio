@@ -594,3 +594,37 @@ test("particle validation enforces per-system limits and scene-wide budgets", as
   assert.ok(errors.some((error) => error.includes("colors must contain 1-8 six-digit hex colors")));
   assert.ok(errors.some((error) => error.includes("shape must be circle, square, or diamond")));
 });
+
+test("particle fields stay bounded, preserve particle shape semantics and avoid a forced stacking layer", async () => {
+  const project = await readExample();
+  project.scenes[0]!.particleSystems = [{
+    id: "bounded-stars",
+    count: 12,
+    seed: 314,
+    originX: 50,
+    originY: 50,
+    spreadX: 60,
+    spreadY: 60,
+    lifeInFrames: 48,
+    colors: ["#FFFFFF"],
+    shape: "diamond",
+    blendMode: "screen",
+  }];
+  assert.deepEqual(validateProjectDefinition(project), []);
+
+  const source = await readFile(new URL("../packages/video-engine/src/scenes/ProjectVideo.tsx", import.meta.url), "utf8");
+  assert.match(source, /mixBlendMode: system\.blendMode \?\? "screen"/);
+  assert.doesNotMatch(source, /zIndex: 15,\s*mixBlendMode/);
+  assert.match(source, /Math\.max\(-5, Math\.min\(105, xRaw\)\)/);
+  assert.match(source, /Math\.max\(-5, Math\.min\(105, yRaw\)\)/);
+  assert.match(source, /borderRadius: system\.shape === "circle" \? "50%" : 2/);
+});
+
+test("only the first and last scenes fade to black, not internal scene cuts", async () => {
+  const source = await readFile(new URL("../packages/video-engine/src/scenes/ProjectVideo.tsx", import.meta.url), "utf8");
+  assert.match(source, /interpolate\(frame, \[0, 12\], \[0, 1\]/);
+  assert.match(source, /interpolate\(frame, \[duration - 12, duration\], \[1, 0\]/);
+  assert.match(source, /\(isFirstScene \? fadeIn : 1\) \* \(isLastScene \? fadeOut : 1\)/);
+  assert.match(source, /isFirstScene=\{index === 0\}/);
+  assert.match(source, /isLastScene=\{index === scenes\.length - 1\}/);
+});
