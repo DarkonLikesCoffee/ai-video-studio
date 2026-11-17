@@ -15,7 +15,7 @@
       "type": "title",
       "durationInFrames": 90,
       "eyebrow": "NORTH ATLANTIC / 04:17",
-      "title": "THE LAST\\nSIGNAL",
+      "title": "THE LAST\nSIGNAL",
       "body": "Somewhere, someone is still listening.",
       "backgroundColor": "#08111f",
       "accentColor": "#ffd59b",
@@ -393,7 +393,7 @@
         "easing": "ease-in-out"
       },
       "eyebrow": "A RESPONSE / 04:18",
-      "title": "It was never\\nmeant for us.",
+      "title": "It was never\nmeant for us.",
       "body": "The signal came from beyond the horizon.",
       "backgroundColor": "#0a1728",
       "accentColor": "#f6c18d",
@@ -655,7 +655,7 @@
       "position": "bottom",
       "alignment": "left",
       "fontSize": 28,
-      "backgroundOpacity": 0.45
+      "backgroundOpacity": 0.72
     },
     {
       "id": "line-2",
@@ -665,7 +665,7 @@
       "position": "bottom",
       "alignment": "left",
       "fontSize": 28,
-      "backgroundOpacity": 0.45
+      "backgroundOpacity": 0.72
     },
     {
       "id": "line-3",
@@ -675,7 +675,7 @@
       "position": "bottom",
       "alignment": "left",
       "fontSize": 28,
-      "backgroundOpacity": 0.45
+      "backgroundOpacity": 0.72
     }
   ],
   "output": {
