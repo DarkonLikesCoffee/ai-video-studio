@@ -4,6 +4,7 @@ import { getProjectDurationInFrames, type VideoProject } from "./project";
 import { DemoVideo } from "./scenes/DemoVideo";
 import { ProjectVideo } from "./scenes/ProjectVideo";
 import { ThreeDShowcase } from "./scenes/ThreeDShowcase";
+import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
 
 // Remotion merges partial --props over defaultProps. Do not leak the example
 // project's soundtrack into projects that intentionally omit audioTracks.
@@ -41,6 +42,14 @@ export const RemotionRoot = () => (
       id="ThreeDShowcase"
       component={ThreeDShowcase}
       durationInFrames={300}
+      fps={30}
+      width={1920}
+      height={1080}
+    />
+    <Composition
+      id="CinematicAdBenchmark"
+      component={CinematicAdBenchmark}
+      durationInFrames={600}
       fps={30}
       width={1920}
       height={1080}
