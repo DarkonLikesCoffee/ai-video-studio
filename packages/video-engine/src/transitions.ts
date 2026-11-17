@@ -72,6 +72,8 @@ const getSingleTransitionStyle = (
       return entering
         ? { clipPath: `inset(0 ${percent(remaining * 100)} 0 0)` }
         : {};
+    default:
+      return {};
   }
 };
 
