@@ -1,5 +1,5 @@
 import { AbsoluteFill, Series, interpolate, useCurrentFrame } from "remotion";
-import type { CSSProperties } from "react";
+import type { CSSProperties, FC } from "react";
 import type { VideoProject, VideoScene } from "../project";
 
 type SceneCardProps = {
@@ -7,7 +7,7 @@ type SceneCardProps = {
   index: number;
 };
 
-const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
+const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
   const frame = useCurrentFrame();
   const duration = scene.durationInFrames;
   const fadeIn = interpolate(frame, [0, 14], [0, 1], {
@@ -130,7 +130,7 @@ const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
   );
 };
 
-export const ProjectVideo: React.FC<VideoProject> = ({ scenes }) => (
+export const ProjectVideo: FC<VideoProject> = ({ scenes }) => (
   <AbsoluteFill>
     <Series>
       {scenes.map((scene, index) => (
