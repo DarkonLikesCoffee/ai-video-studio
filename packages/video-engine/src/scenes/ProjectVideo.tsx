@@ -1,10 +1,37 @@
-import { AbsoluteFill, Series, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, OffthreadVideo, Series, interpolate, staticFile, useCurrentFrame } from "remotion";
 import type { CSSProperties, FC } from "react";
-import type { VideoProject, VideoScene } from "../project";
+import type { SceneMedia, VideoProject, VideoScene } from "../project";
 
 type SceneCardProps = {
   scene: VideoScene;
   index: number;
+};
+
+const resolveMediaSource = (media: SceneMedia): string =>
+  media.source === "public" ? staticFile(media.src) : media.src;
+
+const SceneMediaLayer: FC<{ media: SceneMedia; title: string }> = ({ media, title }) => {
+  const src = resolveMediaSource(media);
+  const mediaStyle: CSSProperties = {
+    width: "100%",
+    height: "100%",
+    objectFit: media.fit ?? "cover",
+    objectPosition: media.position ?? "center",
+  };
+
+  if (media.type === "image") {
+    return <Img src={src} alt={media.alt ?? title} style={mediaStyle} />;
+  }
+
+  return (
+    <OffthreadVideo
+      src={src}
+      muted={media.muted ?? true}
+      loop={media.loop ?? false}
+      playbackRate={media.playbackRate ?? 1}
+      style={mediaStyle}
+    />
+  );
 };
 
 const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
@@ -49,6 +76,16 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
         overflow: "hidden",
       }}
     >
+      {scene.media ? (
+        <AbsoluteFill>
+          <SceneMediaLayer media={scene.media} title={scene.title} />
+          <AbsoluteFill
+            style={{
+              background: "linear-gradient(90deg, rgba(5, 8, 18, 0.78), rgba(5, 8, 18, 0.3) 72%), linear-gradient(0deg, rgba(5, 8, 18, 0.55), transparent 52%)",
+            }}
+          />
+        </AbsoluteFill>
+      ) : null}
       <div
         style={{
           position: "absolute",
