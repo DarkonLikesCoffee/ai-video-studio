@@ -2,6 +2,6 @@
   "provider": "circleci",
   "projectPath": "projects/demo/scene.json",
   "compositionId": "DemoVideo",
-  "outputName": "m2-circleci-smoke-test",
-  "requestId": "m2-circleci-20261117-01"
+  "outputName": "m2-circleci-e2e-test",
+  "requestId": "m2-circleci-e2e-20261117-02"
 }
