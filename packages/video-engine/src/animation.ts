@@ -1,5 +1,6 @@
 import { Easing, interpolate } from "remotion";
-import type { AnimationEasing, AnimationKeyframe, AnimationTrack, AnimationTracks } from "./project";
+import type { AnimationEasing, AnimationKeyframe, AnimationTrack, AnimationTracks, SvgPathMorphTrack } from "./project";
+import { interpolateMorphableSvgPaths } from "./svg-path";
 
 const easingPresets = {
   linear: Easing.linear,
@@ -71,4 +72,37 @@ export const evaluateAnimationTracks = (
   }
 
   return values;
+};
+
+
+/**
+ * Evaluate a compatible SVG path morph on a local graphic frame. The easing
+ * on each morph keyframe controls interpolation toward the following shape.
+ */
+export const evaluateSvgPathMorph = (
+  frame: number,
+  fallback: string,
+  track: SvgPathMorphTrack | undefined
+): string => {
+  if (!track || track.keyframes.length < 2) return fallback;
+
+  const progressTrack: AnimationTrack = {
+    keyframes: track.keyframes.map((keyframe, index) => ({
+      frame: keyframe.frame,
+      value: index,
+      ...(keyframe.easing === undefined ? {} : { easing: keyframe.easing }),
+    })),
+  };
+  const progress = evaluateAnimationTrack(frame, progressTrack, 0);
+  const boundedProgress = Math.max(0, Math.min(track.keyframes.length - 1, progress));
+  if (boundedProgress <= 0) return track.keyframes[0]!.d;
+  if (boundedProgress >= track.keyframes.length - 1) return track.keyframes[track.keyframes.length - 1]!.d;
+
+  const fromIndex = Math.floor(boundedProgress);
+  const amount = boundedProgress - fromIndex;
+  return interpolateMorphableSvgPaths(
+    track.keyframes[fromIndex]!.d,
+    track.keyframes[fromIndex + 1]!.d,
+    amount
+  ) ?? fallback;
 };

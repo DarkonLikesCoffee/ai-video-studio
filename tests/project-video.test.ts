@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { evaluateSvgPathMorph } from "../packages/video-engine/src/animation";
+import { interpolateMorphableSvgPaths, parseMorphableSvgPath } from "../packages/video-engine/src/svg-path";
 import { getSceneTransitionStyle } from "../packages/video-engine/src/transitions";
 import {
   getProjectDurationInFrames,
@@ -527,6 +529,91 @@ test("path progress keyframes must stay between zero and one", async () => {
     },
   }];
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("pathProgress must be between 0 and 1")));
+});
+
+test("SVG path morph interpolates corresponding absolute path points deterministically", () => {
+  const from = "M 0 0 L 100 100";
+  const to = "M 100 0 L 0 100";
+  const track = {
+    keyframes: [
+      { frame: 0, d: from, easing: "ease-in-out" as const },
+      { frame: 40, d: to },
+    ],
+  };
+
+  assert.ok(parseMorphableSvgPath(from));
+  assert.equal(evaluateSvgPathMorph(0, from, track), from);
+  assert.equal(evaluateSvgPathMorph(20, from, track), "M 50 0 L 50 100");
+  assert.equal(evaluateSvgPathMorph(40, from, track), to);
+  assert.equal(evaluateSvgPathMorph(80, from, track), to);
+});
+
+test("SVG path morph parsing rejects incompatible or ambiguous path syntax", () => {
+  assert.equal(parseMorphableSvgPath("m 0 0 l 100 100"), null);
+  assert.equal(parseMorphableSvgPath("M 0 0 A 20 20 0 0 1 100 100"), null);
+  assert.equal(parseMorphableSvgPath("M 0 0 L 100 100 C 20 20"), null);
+  assert.equal(interpolateMorphableSvgPaths(
+    "M 0 0 L 100 100",
+    "M 100 0 C 0 0 100 100 50 100",
+    0.5
+  ), null);
+});
+
+test("project validation accepts compatible SVG morphs and rejects topology or timeline mismatches", async () => {
+  const project = await readExample();
+  const from = "M 0 0 L 100 100";
+  const to = "M 100 0 L 0 100";
+  project.scenes[0]!.graphics = [{
+    id: "morph-line",
+    type: "path",
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    d: from,
+    pathMorph: {
+      keyframes: [
+        { frame: 0, d: from },
+        { frame: 60, d: to, easing: "ease-in-out" },
+      ],
+    },
+    stroke: "#FFFFFF",
+  }];
+  const graphics = project.scenes[0]!.graphics!;
+  assert.deepEqual(validateProjectDefinition(project), []);
+
+  graphics[0] = {
+    ...graphics[0]!,
+    pathMorph: {
+      keyframes: [
+        { frame: 0, d: from },
+        { frame: 60, d: "M 100 0 C 0 0 100 100 50 100" },
+      ],
+    },
+  };
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("same command topology")));
+
+  graphics[0] = {
+    ...graphics[0]!,
+    pathMorph: {
+      keyframes: [
+        { frame: 1, d: from },
+        { frame: 60, d: to },
+      ],
+    },
+  };
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("keyframes[0].frame must be 0")));
+
+  graphics[0] = {
+    ...graphics[0]!,
+    pathMorph: {
+      keyframes: [
+        { frame: 0, d: from },
+        { frame: 90, d: to },
+      ],
+    },
+  };
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("pathMorph.keyframes[1].frame")));
 });
 
 test("particle systems accept seeded emitters with bounded motion and color palettes", async () => {

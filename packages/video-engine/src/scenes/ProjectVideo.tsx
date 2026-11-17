@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import type { CSSProperties, FC, ReactNode } from "react";
 import type { AnimationTracks, AudioTrack, GraphicElement, ParticleSystem, SceneMedia, SceneTransition, VideoProject, VideoScene } from "../project";
 import { isRemoteMediaUrl } from "../project";
-import { evaluateAnimationTrack } from "../animation";
+import { evaluateAnimationTrack, evaluateSvgPathMorph } from "../animation";
 import { getSceneTransitionStyle } from "../transitions";
 
 type SceneCardProps = {
@@ -153,7 +153,7 @@ const AnimatedGraphic: FC<AnimatedGraphicProps> = ({ graphic }) => {
         />
       ) : (
         <path
-          d={graphic.d}
+          d={graphic.pathMorph ? evaluateSvgPathMorph(frame, graphic.d, graphic.pathMorph) : graphic.d}
           pathLength={1}
           strokeDasharray="1 1"
           strokeDashoffset={1 - evaluateAnimationTrack(frame, graphic.animations?.pathProgress, 1)}
