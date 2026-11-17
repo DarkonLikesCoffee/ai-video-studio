@@ -17,8 +17,8 @@ const SceneMediaLayer: FC<{ media: SceneMedia }> = ({ media }) => {
     position: "absolute",
     top: 0,
     bottom: 0,
-    left: placement === "left" || isBackground ? 0 : undefined,
-    right: placement === "right" || isBackground ? 0 : undefined,
+    left: placement === "left" || isBackground ? 0 : "auto",
+    right: placement === "right" || isBackground ? 0 : "auto",
     width: isBackground ? "100%" : "43%",
     height: "100%",
     objectFit: media.fit ?? "cover",
@@ -34,7 +34,7 @@ const SceneMediaLayer: FC<{ media: SceneMedia }> = ({ media }) => {
     <OffthreadVideo
       src={source}
       style={style}
-      trimBefore={media.trimBefore}
+      {...(media.trimBefore === undefined ? {} : { trimBefore: media.trimBefore })}
       playbackRate={media.playbackRate ?? 1}
       muted={media.muted ?? true}
       volume={media.volume ?? 1}
