@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "internet-explainer",
+  "title": "How the Internet Connects Us",
+  "description": "A short three-scene motion-graphics explainer demonstrating data-driven video projects.",
+  "composition": {
+    "id": "ProjectVideo",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "type": "title",
+      "durationInFrames": 90,
+      "eyebrow": "A CONNECTED WORLD",
+      "title": "The Internet Connects Us",
+      "body": "Every message, page, and video starts with a connection.",
+      "backgroundColor": "#0B1020",
+      "accentColor": "#67E8F9"
+    },
+    {
+      "id": "journey",
+      "type": "content",
+      "durationInFrames": 120,
+      "eyebrow": "FOLLOW THE DATA",
+      "title": "How information travels",
+      "body": "Your device sends a request through networks to a server. The server responds, and the information travels back to you.",
+      "backgroundColor": "#101426",
+      "accentColor": "#A78BFA"
+    },
+    {
+      "id": "ending",
+      "type": "outro",
+      "durationInFrames": 90,
+      "eyebrow": "ONE GLOBAL NETWORK",
+      "title": "A world of possibilities",
+      "body": "That is the internet: billions of connected devices sharing information.",
+      "backgroundColor": "#111827",
+      "accentColor": "#34D399"
+    }
+  ],
+  "output": {
+    "format": "mp4",
+    "codec": "h264"
+  }
+}

@@ -1,42 +1,87 @@
 # AI Video Studio
 
-Prompt-driven video production system. GitHub stores the projects and source code; ChatGPT prepares render requests; GitHub Actions or CircleCI executes the same Remotion renderer.
+Prompt-driven video production system. GitHub stores projects and source code; ChatGPT prepares project files and render requests; GitHub Actions or CircleCI executes the same Remotion engine. No separate web application is required for the prompt-driven workflow.
 
-## Current engine scope
+## Engine capabilities
 
-M1 currently registers one Remotion composition: `DemoVideo`. Its demo project is `projects/demo/scene.json` (1920×1080, 30 FPS, 10 seconds).
+Two Remotion compositions are currently registered:
 
-## Local development
+- `DemoVideo`: the original fixed M1 pipeline demonstration.
+- `ProjectVideo`: a data-driven composition that reads a project JSON file and renders a sequence of configurable scenes.
 
-Requirements: Node.js 22+ and npm.
+A `ProjectVideo` project can define:
+- 1–20 consecutive scenes, each with a type (`title`, `content`, or `outro`).
+- Per-scene title, eyebrow, body text, duration, background color, and accent color.
+- Composition width, height, and frame rate.
+- MP4/H.264 output.
+
+The current validator limits a project to 1,800 total frames, with each scene between 30 and 900 frames. Images, source video clips, voice-over, music, subtitles, and automatic prompt-to-project generation are not implemented yet.
+
+## Example project
+
+The repository includes [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json), a three-scene explainer about how the internet works. The entire video is described by this JSON file; the shared `ProjectVideo` component renders it.
+
+To render it locally from the repository root:
 
 ```bash
 npm install
 npm run typecheck
 npm test
-npm run validate:demo
-npm run render
-```
-
-The default local render command remains `npm run render`. To select an explicit composition and output path:
-
-```bash
+npm run validate:project -- projects/examples/three-scene-story/scene.json
 mkdir -p render-output
-npm run render:custom -- DemoVideo ../../render-output/my-video.mp4
+npm run render:custom -- ProjectVideo ../../render-output/internet-explainer.mp4 --props=../../projects/examples/three-scene-story/scene.json
 ```
+
+Requirements: Node.js 22+ and npm. The default `npm run render` command remains the original M1 `DemoVideo` render.
+
+## Project format
+
+A minimal `ProjectVideo` project looks like this:
+
+```json
+{
+  "schemaVersion": 1,
+  "id": "my-video",
+  "title": "My video",
+  "composition": {
+    "id": "ProjectVideo",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "type": "title",
+      "durationInFrames": 90,
+      "eyebrow": "INTRODUCTION",
+      "title": "A new idea",
+      "body": "A short supporting sentence.",
+      "backgroundColor": "#0B1020",
+      "accentColor": "#67E8F9"
+    }
+  ],
+  "output": {
+    "format": "mp4",
+    "codec": "h264"
+  }
+}
+```
+
+Each scene has a unique ID and a required title. Colors must use six-digit hex notation. The project validator checks the schema before either render provider is started.
 
 ## Prompt-driven cloud rendering
 
-A render request is represented by `render-request.json`. ChatGPT can create or update this file in the repository after you specify the provider in your prompt.
+A render request is represented by `render-request.json`. In a ChatGPT conversation, specify the project file, provider, and output name; ChatGPT can create or update this request in the repository.
 
 Example request:
 
 ```json
 {
   "provider": "github-actions",
-  "projectPath": "projects/demo/scene.json",
-  "compositionId": "DemoVideo",
-  "outputName": "my-video",
+  "projectPath": "projects/examples/three-scene-story/scene.json",
+  "compositionId": "ProjectVideo",
+  "outputName": "internet-explainer",
   "requestId": "replace-with-a-unique-id"
 }
 ```
@@ -44,9 +89,9 @@ Example request:
 Supported providers:
 
 - `github-actions`: GitHub Actions renders the MP4 and stores it as an artifact for 3 days.
-- `circleci`: a small GitHub Actions dispatcher calls the CircleCI API; CircleCI performs the render and stores the MP4 as an artifact (30 days by default).
+- `circleci`: a small GitHub Actions dispatcher calls the CircleCI API; CircleCI performs the same Remotion render and stores the MP4 as a CircleCI artifact.
 
-The request file is intentionally separate from the renderer. Every request must use a new `requestId`, so repeating the same render settings still creates a new commit and starts a new render.
+The render request must use a new `requestId` each time. The selected scene file is passed to Remotion through its `--props` option, so scene content and timing come from the project JSON rather than a hardcoded component.
 
 ### One-time CircleCI setup
 
@@ -72,17 +117,16 @@ Use this request shape in `circleci-status-request.json` (the `requestId` must b
 }
 ```
 
-A push that changes only this file starts a short GitHub Actions status check. It reports whether the CircleCI job is queued, running, successful, or failed, and lists the artifact URL when the MP4 is ready. This check uses the existing `CIRCLECI_TOKEN` and `CIRCLECI_PROJECT_SLUG` secrets.
+A push that changes only this file starts a short GitHub Actions status check. It reports whether the CircleCI job is queued, running, successful, or failed, and lists the artifact URL when the MP4 is ready. It does not keep a GitHub runner waiting while CircleCI renders.
 
 ### Current limitations
 
-- Only the registered `DemoVideo` composition can be rendered. The project path is validated against its composition ID.
-- CircleCI rendering cannot start until the one-time CircleCI connection and three GitHub repository secrets are configured.
-- The dispatcher prints the CircleCI pipeline ID and link in the GitHub Actions job log and summary.
-- To check a CircleCI render later, ChatGPT creates or updates `circleci-status-request.json` with that pipeline ID and a fresh `requestId`. This triggers `.github/workflows/circleci-status.yml`, which queries the workflow/job state and lists MP4 artifact URLs in its GitHub Actions log and summary. It does not keep a GitHub runner waiting while CircleCI renders.
-- Artifact links are served by CircleCI and may require an authenticated CircleCI session.
+- The registered compositions are currently `DemoVideo` and `ProjectVideo`.
+- `ProjectVideo` currently supports text-based motion-graphics scenes only; media assets and audio are future work.
+- CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
+- Artifact links are served by the selected provider and may require an authenticated session.
 - YouTube publishing and permanent video storage are not implemented yet.
 
 ## CI
 
-GitHub Actions runs type-checking, tests, demo validation, and the studio build for code changes. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
+GitHub Actions runs type-checking, tests, project validation, Remotion composition discovery using the example project props, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
