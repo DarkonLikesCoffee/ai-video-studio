@@ -1,3 +1,5 @@
+import { haveSameMorphableSvgCoordinates, haveSameMorphableSvgTopology, parseMorphableSvgPath } from "./svg-path";
+
 export type SceneType = "title" | "content" | "outro";
 export type MediaType = "image" | "video";
 export type MediaPlacement = "background" | "left" | "right";
@@ -19,6 +21,20 @@ export type AnimationKeyframe = {
   value: number;
   /** Easing applied from this keyframe to the next keyframe. */
   easing?: AnimationEasing;
+};
+
+export type SvgPathMorphKeyframe = {
+  /** Frame relative to the start of the path graphic's own timeline. */
+  frame: number;
+  /** Absolute SVG path using explicit M, L, C, Q and Z commands. */
+  d: string;
+  /** Easing applied from this shape to the next shape. */
+  easing?: AnimationEasing;
+};
+
+export type SvgPathMorphTrack = {
+  /** Morphs require 2–12 shapes with identical command topology. */
+  keyframes: SvgPathMorphKeyframe[];
 };
 
 export type AnimationTrack = {
@@ -158,6 +174,8 @@ export type GraphicElement =
       type: "path";
       /** SVG path data in a local 0–100 coordinate system. */
       d: string;
+      /** Optional point-to-point shape morph. Every keyframe must share the same path topology. */
+      pathMorph?: SvgPathMorphTrack;
       lineCap?: "butt" | "round" | "square";
     })
   | (GraphicBase & {
@@ -597,6 +615,66 @@ const validateSceneMedia = (value: unknown, prefix: string, sceneDuration: numbe
   return errors;
 };
 
+const validateSvgPathMorph = (
+  value: unknown,
+  prefix: string,
+  basePath: string,
+  maxFrames: number
+): string[] => {
+  if (!isRecord(value)) return [`${prefix} must be an object`];
+  const errors: string[] = [];
+  const track = value;
+
+  if (!Array.isArray(track.keyframes) || track.keyframes.length < 2 || track.keyframes.length > 12) {
+    return [`${prefix}.keyframes must contain between 2 and 12 keyframes`];
+  }
+
+  const base = parseMorphableSvgPath(basePath);
+  if (!base) {
+    errors.push(`${prefix} requires an initial path using explicit absolute M, L, C, Q, and Z commands`);
+  }
+
+  let previousFrame = -1;
+  track.keyframes.forEach((entry, index) => {
+    const keyframe = isRecord(entry) ? entry : {};
+    const keyframePrefix = `${prefix}.keyframes[${index}]`;
+
+    if (!isInteger(keyframe.frame) || keyframe.frame < 0 || keyframe.frame >= maxFrames) {
+      errors.push(`${keyframePrefix}.frame must be between 0 and ${Math.max(0, maxFrames - 1)}`);
+    } else {
+      if (keyframe.frame <= previousFrame) {
+        errors.push(`${keyframePrefix}.frame must be strictly greater than the previous frame`);
+      }
+      if (index === 0 && keyframe.frame !== 0) {
+        errors.push(`${prefix}.keyframes[0].frame must be 0`);
+      }
+      previousFrame = keyframe.frame;
+    }
+
+    if (typeof keyframe.d !== "string" || keyframe.d.length < 1 || keyframe.d.length > 4000) {
+      errors.push(`${keyframePrefix}.d must be SVG path data of at most 4000 characters`);
+      return;
+    }
+
+    const parsed = parseMorphableSvgPath(keyframe.d);
+    if (!parsed) {
+      errors.push(`${keyframePrefix}.d must use explicit absolute M, L, C, Q, and Z commands`);
+    } else if (base && !haveSameMorphableSvgTopology(base, parsed)) {
+      errors.push(`${keyframePrefix}.d must have the same command topology as the initial path`);
+    }
+
+    if (index === 0 && base && parsed && !haveSameMorphableSvgCoordinates(base, parsed)) {
+      errors.push(`${keyframePrefix}.d must match the graphic's initial d path`);
+    }
+
+    if (keyframe.easing !== undefined) {
+      errors.push(...validateEasing(keyframe.easing, `${keyframePrefix}.easing`));
+    }
+  });
+
+  return errors;
+};
+
 const validateGraphicElement = (value: unknown, prefix: string, sceneDuration: number): string[] => {
   const errors: string[] = [];
   const graphic = isRecord(value) ? value : {};
@@ -663,8 +741,8 @@ const validateGraphicElement = (value: unknown, prefix: string, sceneDuration: n
     if (graphic.lineCap !== undefined && !["butt", "round", "square"].includes(String(graphic.lineCap))) {
       errors.push(`${prefix}.lineCap must be butt, round, or square`);
     }
-  } else if (graphic.d !== undefined || graphic.lineCap !== undefined) {
-    errors.push(`${prefix}.d and lineCap are only valid for path elements`);
+  } else if (graphic.d !== undefined || graphic.lineCap !== undefined || graphic.pathMorph !== undefined) {
+    errors.push(`${prefix}.d, pathMorph, and lineCap are only valid for path elements`);
   }
 
   if (graphic.type === "text") {
@@ -707,9 +785,17 @@ const validateGraphicElement = (value: unknown, prefix: string, sceneDuration: n
   } else if (isInteger(start) && start >= 0 && start + duration > sceneDuration) {
     errors.push(`${prefix} timeline window cannot extend beyond its scene`);
   }
+  const effectiveDuration = isInteger(duration) ? duration : 0;
   if (graphic.animations !== undefined) {
-    const effectiveDuration = isInteger(duration) ? duration : 0;
     errors.push(...validateAnimationTracks(graphic.animations, `${prefix}.animations`, effectiveDuration));
+  }
+  if (graphic.pathMorph !== undefined && graphic.type === "path" && typeof graphic.d === "string") {
+    errors.push(...validateSvgPathMorph(
+      graphic.pathMorph,
+      `${prefix}.pathMorph`,
+      graphic.d,
+      effectiveDuration
+    ));
   }
 
   return errors;
