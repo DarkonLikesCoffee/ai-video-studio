@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "internet-explainer-with-media",
   "title": "How the Internet Connects Us",
-  "description": "A three-scene explainer demonstrating text, a local SVG image, and a remote video clip.",
+  "description": "A three-scene explainer demonstrating text, a local SVG image, and an MP4 video clip.",
   "composition": {
     "id": "ProjectVideo",
     "width": 1920,
@@ -21,11 +21,10 @@
       "accentColor": "#67E8F9",
       "media": {
         "type": "image",
-        "source": "public",
-        "src": "assets/network-orbit.svg",
-        "fit": "cover",
-        "position": "center",
-        "alt": "Abstract network illustration with connected nodes and a globe"
+        "src": "assets/connection-map.svg",
+        "placement": "right",
+        "fit": "contain",
+        "opacity": 1
       }
     },
     {
@@ -39,12 +38,12 @@
       "accentColor": "#A78BFA",
       "media": {
         "type": "video",
-        "source": "remote",
-        "src": "https://remotion.media/video-5s.mp4",
+        "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+        "placement": "background",
         "fit": "cover",
         "position": "center",
+        "opacity": 0.7,
         "muted": true,
-        "loop": false,
         "playbackRate": 1
       }
     },
