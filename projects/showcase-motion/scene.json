@@ -492,60 +492,6 @@
               ]
             }
           }
-        },
-        {
-          "id": "orbital-detail",
-          "type": "image",
-          "src": "assets/closing-orbit.svg",
-          "x": 61,
-          "y": 12,
-          "width": 34,
-          "height": 72,
-          "fit": "contain",
-          "opacity": 0.78,
-          "zIndex": 5,
-          "startInFrames": 18,
-          "durationInFrames": 102,
-          "animations": {
-            "x": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 100,
-                  "easing": "back"
-                },
-                {
-                  "frame": 45,
-                  "value": 61
-                }
-              ]
-            },
-            "rotation": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 18,
-                  "easing": "ease-out"
-                },
-                {
-                  "frame": 70,
-                  "value": 0
-                }
-              ]
-            },
-            "opacity": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 0
-                },
-                {
-                  "frame": 28,
-                  "value": 0.78
-                }
-              ]
-            }
-          }
         }
       ],
       "titleAnimation": {
@@ -749,6 +695,83 @@
           "text": "VELOCITY / FIELD 02",
           "opacity": 0.72,
           "zIndex": 24
+        },
+        {
+          "id": "velocity-orbit",
+          "type": "ellipse",
+          "x": 66,
+          "y": 18,
+          "width": 27,
+          "height": 65,
+          "stroke": "#C8A6FF",
+          "strokeWidth": 1.3,
+          "opacity": 0.55,
+          "zIndex": 21,
+          "animations": {
+            "rotation": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 24
+                },
+                {
+                  "frame": 119,
+                  "value": -24
+                }
+              ]
+            },
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.8,
+                  "easing": "ease-out"
+                },
+                {
+                  "frame": 80,
+                  "value": 1.08
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "velocity-orbit-inner",
+          "type": "ellipse",
+          "x": 72,
+          "y": 30,
+          "width": 15,
+          "height": 42,
+          "stroke": "#74E9FF",
+          "strokeWidth": 1,
+          "opacity": 0.48,
+          "zIndex": 22,
+          "animations": {
+            "rotation": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": -36
+                },
+                {
+                  "frame": 119,
+                  "value": 36
+                }
+              ]
+            },
+            "opacity": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 30,
+                  "value": 0.48
+                }
+              ]
+            }
+          }
         }
       ],
       "particleSystems": [
@@ -787,7 +810,7 @@
       "durationInFrames": 150,
       "eyebrow": "02 / SOUND BECOMES STRUCTURE",
       "title": "See the rhythm.",
-      "body": "A pulse becomes a pattern. A pattern becomes an experience.",
+      "body": "Pulses become patterns. Patterns become motion.",
       "backgroundColor": "#090A1B",
       "accentColor": "#C6A5FF",
       "mediaLayers": [
@@ -956,9 +979,9 @@
         {
           "id": "spectrum-bar-1",
           "type": "rect",
-          "x": 23,
+          "x": 56,
           "y": 53,
-          "width": 1.15,
+          "width": 1.3,
           "height": 18,
           "fill": "#C8A6FF",
           "stroke": "#FFFFFF",
@@ -1004,9 +1027,9 @@
         {
           "id": "spectrum-bar-2",
           "type": "rect",
-          "x": 26.9,
+          "x": 58.8,
           "y": 48,
-          "width": 1.15,
+          "width": 1.3,
           "height": 28,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1052,9 +1075,9 @@
         {
           "id": "spectrum-bar-3",
           "type": "rect",
-          "x": 30.8,
+          "x": 61.6,
           "y": 43,
-          "width": 1.15,
+          "width": 1.3,
           "height": 38,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1100,9 +1123,9 @@
         {
           "id": "spectrum-bar-4",
           "type": "rect",
-          "x": 34.7,
+          "x": 64.4,
           "y": 51,
-          "width": 1.15,
+          "width": 1.3,
           "height": 22,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1148,9 +1171,9 @@
         {
           "id": "spectrum-bar-5",
           "type": "rect",
-          "x": 38.6,
+          "x": 67.2,
           "y": 40,
-          "width": 1.15,
+          "width": 1.3,
           "height": 44,
           "fill": "#C8A6FF",
           "stroke": "#FFFFFF",
@@ -1196,9 +1219,9 @@
         {
           "id": "spectrum-bar-6",
           "type": "rect",
-          "x": 42.5,
+          "x": 70,
           "y": 46.5,
-          "width": 1.15,
+          "width": 1.3,
           "height": 31,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1244,9 +1267,9 @@
         {
           "id": "spectrum-bar-7",
           "type": "rect",
-          "x": 46.4,
+          "x": 72.8,
           "y": 37.5,
-          "width": 1.15,
+          "width": 1.3,
           "height": 49,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1292,9 +1315,9 @@
         {
           "id": "spectrum-bar-8",
           "type": "rect",
-          "x": 50.3,
+          "x": 75.6,
           "y": 48.5,
-          "width": 1.15,
+          "width": 1.3,
           "height": 27,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1340,9 +1363,9 @@
         {
           "id": "spectrum-bar-9",
           "type": "rect",
-          "x": 54.2,
+          "x": 78.4,
           "y": 42,
-          "width": 1.15,
+          "width": 1.3,
           "height": 40,
           "fill": "#C8A6FF",
           "stroke": "#FFFFFF",
@@ -1388,9 +1411,9 @@
         {
           "id": "spectrum-bar-10",
           "type": "rect",
-          "x": 58.1,
+          "x": 81.2,
           "y": 50,
-          "width": 1.15,
+          "width": 1.3,
           "height": 24,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1436,9 +1459,9 @@
         {
           "id": "spectrum-bar-11",
           "type": "rect",
-          "x": 62,
+          "x": 84,
           "y": 44,
-          "width": 1.15,
+          "width": 1.3,
           "height": 36,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1484,9 +1507,9 @@
         {
           "id": "spectrum-bar-12",
           "type": "rect",
-          "x": 65.9,
+          "x": 86.8,
           "y": 51.5,
-          "width": 1.15,
+          "width": 1.3,
           "height": 21,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1532,9 +1555,9 @@
         {
           "id": "spectrum-bar-13",
           "type": "rect",
-          "x": 69.8,
+          "x": 89.6,
           "y": 47,
-          "width": 1.15,
+          "width": 1.3,
           "height": 30,
           "fill": "#C8A6FF",
           "stroke": "#FFFFFF",
@@ -1580,9 +1603,9 @@
         {
           "id": "spectrum-bar-14",
           "type": "rect",
-          "x": 73.69999999999999,
+          "x": 92.4,
           "y": 53.5,
-          "width": 1.15,
+          "width": 1.3,
           "height": 17,
           "fill": "#71E7FF",
           "stroke": "#FFFFFF",
@@ -1628,9 +1651,9 @@
         {
           "id": "spectrum-baseline",
           "type": "path",
-          "x": 18,
+          "x": 54,
           "y": 62,
-          "width": 64,
+          "width": 40,
           "height": 1,
           "stroke": "#C7B1FF",
           "strokeWidth": 1,
