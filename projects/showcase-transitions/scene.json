@@ -1042,5 +1042,77 @@
     "format": "mp4",
     "codec": "h264"
   },
-  "audioTracks": []
+  "audioTracks": [],
+  "subtitles": [
+    {
+      "id": "kinetic-signal-caption",
+      "startInFrames": 12,
+      "durationInFrames": 64,
+      "text": "A visual story begins with a single shift.",
+      "speaker": "NARRATOR",
+      "position": "bottom",
+      "alignment": "center",
+      "fontSize": 34,
+      "color": "#FFFFFF",
+      "backgroundOpacity": 0.78,
+      "fadeInFrames": 6,
+      "fadeOutFrames": 8
+    },
+    {
+      "id": "kinetic-arrival-caption",
+      "startInFrames": 102,
+      "durationInFrames": 64,
+      "text": "Let the next idea arrive without breaking its momentum.",
+      "speaker": "NARRATOR",
+      "position": "bottom",
+      "alignment": "center",
+      "fontSize": 34,
+      "color": "#FFFFFF",
+      "backgroundOpacity": 0.78,
+      "fadeInFrames": 6,
+      "fadeOutFrames": 8
+    },
+    {
+      "id": "kinetic-direction-caption",
+      "startInFrames": 192,
+      "durationInFrames": 64,
+      "text": "Direction turns a hard cut into a deliberate move.",
+      "speaker": "NARRATOR",
+      "position": "bottom",
+      "alignment": "center",
+      "fontSize": 34,
+      "color": "#FFFFFF",
+      "backgroundOpacity": 0.78,
+      "fadeInFrames": 6,
+      "fadeOutFrames": 8
+    },
+    {
+      "id": "kinetic-impact-caption",
+      "startInFrames": 282,
+      "durationInFrames": 64,
+      "text": "A subtle push-in can change what matters.",
+      "speaker": "NARRATOR",
+      "position": "bottom",
+      "alignment": "center",
+      "fontSize": 34,
+      "color": "#FFFFFF",
+      "backgroundOpacity": 0.78,
+      "fadeInFrames": 6,
+      "fadeOutFrames": 8
+    },
+    {
+      "id": "kinetic-reveal-caption",
+      "startInFrames": 372,
+      "durationInFrames": 64,
+      "text": "The transition is part of the story, not a pause between scenes.",
+      "speaker": "NARRATOR",
+      "position": "bottom",
+      "alignment": "center",
+      "fontSize": 34,
+      "color": "#FFFFFF",
+      "backgroundOpacity": 0.78,
+      "fadeInFrames": 6,
+      "fadeOutFrames": 8
+    }
+  ]
 }
