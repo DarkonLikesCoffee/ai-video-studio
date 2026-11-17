@@ -302,7 +302,7 @@
         {
           "id": "orbital-detail",
           "type": "image",
-          "src": "assets/aurora-core.svg",
+          "src": "assets/closing-orbit.svg",
           "x": 61,
           "y": 12,
           "width": 34,
