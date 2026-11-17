@@ -1,7 +1,7 @@
 {
   "provider": "github-actions",
-  "projectPath": "projects/last-signal/scene.json",
+  "projectPath": "projects/sora/scene.json",
   "compositionId": "ProjectVideo",
-  "outputName": "the-last-signal-cinematic-benchmark",
-  "requestId": "last-signal-20261117-03"
+  "outputName": "sora-product-film-benchmark",
+  "requestId": "sora-product-film-20261117-01"
 }
