@@ -78,7 +78,7 @@
     {
       "id": "control",
       "startSeconds": 6,
-      "durationSeconds": 9,
+      "durationSeconds": 3,
       "purpose": "Give the viewer a tactile detail to remember.",
       "visual": "Tight close-up of the earcup control and cushion seam, with a single orange control accent.",
       "framing": "Tight asymmetric close-up, shallow-angle graphic crop.",
@@ -94,7 +94,7 @@
     {
       "id": "hero",
       "startSeconds": 9,
-      "durationSeconds": 12,
+      "durationSeconds": 3,
       "purpose": "Resolve the reveal with a clean, iconic product frame.",
       "visual": "The headphones settle into a balanced hero composition on graphite; the wordmark sits in a clean safe area.",
       "framing": "Wide centred hero with generous negative space.",
