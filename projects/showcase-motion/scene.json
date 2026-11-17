@@ -913,7 +913,7 @@
           "id": "spectrum-bar-1",
           "type": "rect",
           "x": 56,
-          "y": 53,
+          "y": 61,
           "width": 1.3,
           "height": 18,
           "fill": "#C8A6FF",
@@ -926,20 +926,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.35,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 28,
-                  "value": 1.1
+                  "frame": 24,
+                  "value": 1.08
                 },
                 {
-                  "frame": 68,
-                  "value": 0.62
+                  "frame": 62,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -961,7 +961,7 @@
           "id": "spectrum-bar-2",
           "type": "rect",
           "x": 58.8,
-          "y": 48,
+          "y": 51,
           "width": 1.3,
           "height": 28,
           "fill": "#71E7FF",
@@ -974,20 +974,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.47,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 31,
-                  "value": 1.1
+                  "frame": 28,
+                  "value": 1.08
                 },
                 {
-                  "frame": 70,
-                  "value": 0.62
+                  "frame": 65,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1009,7 +1009,7 @@
           "id": "spectrum-bar-3",
           "type": "rect",
           "x": 61.6,
-          "y": 43,
+          "y": 41,
           "width": 1.3,
           "height": 38,
           "fill": "#71E7FF",
@@ -1022,20 +1022,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.59,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 34,
-                  "value": 1.1
+                  "frame": 32,
+                  "value": 1.08
                 },
                 {
-                  "frame": 72,
-                  "value": 0.62
+                  "frame": 68,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1057,7 +1057,7 @@
           "id": "spectrum-bar-4",
           "type": "rect",
           "x": 64.4,
-          "y": 51,
+          "y": 57,
           "width": 1.3,
           "height": 22,
           "fill": "#71E7FF",
@@ -1070,20 +1070,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.35,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 37,
-                  "value": 1.1
+                  "frame": 36,
+                  "value": 1.08
                 },
                 {
-                  "frame": 74,
-                  "value": 0.62
+                  "frame": 71,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1105,7 +1105,7 @@
           "id": "spectrum-bar-5",
           "type": "rect",
           "x": 67.2,
-          "y": 40,
+          "y": 35,
           "width": 1.3,
           "height": 44,
           "fill": "#C8A6FF",
@@ -1118,20 +1118,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.47,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 28,
-                  "value": 1.1
+                  "frame": 24,
+                  "value": 1.08
                 },
                 {
-                  "frame": 76,
-                  "value": 0.62
+                  "frame": 74,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1153,7 +1153,7 @@
           "id": "spectrum-bar-6",
           "type": "rect",
           "x": 70,
-          "y": 46.5,
+          "y": 48,
           "width": 1.3,
           "height": 31,
           "fill": "#71E7FF",
@@ -1166,20 +1166,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.59,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 31,
-                  "value": 1.1
+                  "frame": 28,
+                  "value": 1.08
                 },
                 {
-                  "frame": 68,
-                  "value": 0.62
+                  "frame": 62,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1201,7 +1201,7 @@
           "id": "spectrum-bar-7",
           "type": "rect",
           "x": 72.8,
-          "y": 37.5,
+          "y": 30,
           "width": 1.3,
           "height": 49,
           "fill": "#71E7FF",
@@ -1214,20 +1214,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.35,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 34,
-                  "value": 1.1
+                  "frame": 32,
+                  "value": 1.08
                 },
                 {
-                  "frame": 70,
-                  "value": 0.62
+                  "frame": 65,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1249,7 +1249,7 @@
           "id": "spectrum-bar-8",
           "type": "rect",
           "x": 75.6,
-          "y": 48.5,
+          "y": 52,
           "width": 1.3,
           "height": 27,
           "fill": "#71E7FF",
@@ -1262,20 +1262,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.47,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 37,
-                  "value": 1.1
+                  "frame": 36,
+                  "value": 1.08
                 },
                 {
-                  "frame": 72,
-                  "value": 0.62
+                  "frame": 68,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1297,7 +1297,7 @@
           "id": "spectrum-bar-9",
           "type": "rect",
           "x": 78.4,
-          "y": 42,
+          "y": 39,
           "width": 1.3,
           "height": 40,
           "fill": "#C8A6FF",
@@ -1310,20 +1310,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.59,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 28,
-                  "value": 1.1
+                  "frame": 24,
+                  "value": 1.08
                 },
                 {
-                  "frame": 74,
-                  "value": 0.62
+                  "frame": 71,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1345,7 +1345,7 @@
           "id": "spectrum-bar-10",
           "type": "rect",
           "x": 81.2,
-          "y": 50,
+          "y": 55,
           "width": 1.3,
           "height": 24,
           "fill": "#71E7FF",
@@ -1358,20 +1358,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.35,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 31,
-                  "value": 1.1
+                  "frame": 28,
+                  "value": 1.08
                 },
                 {
-                  "frame": 76,
-                  "value": 0.62
+                  "frame": 74,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1393,7 +1393,7 @@
           "id": "spectrum-bar-11",
           "type": "rect",
           "x": 84,
-          "y": 44,
+          "y": 43,
           "width": 1.3,
           "height": 36,
           "fill": "#71E7FF",
@@ -1406,20 +1406,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.47,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 34,
-                  "value": 1.1
+                  "frame": 32,
+                  "value": 1.08
                 },
                 {
-                  "frame": 68,
-                  "value": 0.62
+                  "frame": 62,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1441,7 +1441,7 @@
           "id": "spectrum-bar-12",
           "type": "rect",
           "x": 86.8,
-          "y": 51.5,
+          "y": 58,
           "width": 1.3,
           "height": 21,
           "fill": "#71E7FF",
@@ -1454,20 +1454,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.59,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 37,
-                  "value": 1.1
+                  "frame": 36,
+                  "value": 1.08
                 },
                 {
-                  "frame": 70,
-                  "value": 0.62
+                  "frame": 65,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1489,7 +1489,7 @@
           "id": "spectrum-bar-13",
           "type": "rect",
           "x": 89.6,
-          "y": 47,
+          "y": 49,
           "width": 1.3,
           "height": 30,
           "fill": "#C8A6FF",
@@ -1502,20 +1502,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.35,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 28,
-                  "value": 1.1
+                  "frame": 24,
+                  "value": 1.08
                 },
                 {
-                  "frame": 72,
-                  "value": 0.62
+                  "frame": 68,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1537,7 +1537,7 @@
           "id": "spectrum-bar-14",
           "type": "rect",
           "x": 92.4,
-          "y": 53.5,
+          "y": 62,
           "width": 1.3,
           "height": 17,
           "fill": "#71E7FF",
@@ -1550,20 +1550,20 @@
               "keyframes": [
                 {
                   "frame": 0,
-                  "value": 0.47,
+                  "value": 0.52,
                   "easing": "ease-out"
                 },
                 {
-                  "frame": 31,
-                  "value": 1.1
+                  "frame": 28,
+                  "value": 1.08
                 },
                 {
-                  "frame": 74,
-                  "value": 0.62
+                  "frame": 71,
+                  "value": 0.72
                 },
                 {
-                  "frame": 118,
-                  "value": 0.9
+                  "frame": 112,
+                  "value": 0.94
                 }
               ]
             },
@@ -1584,14 +1584,14 @@
         {
           "id": "spectrum-baseline",
           "type": "path",
-          "x": 54,
-          "y": 62,
-          "width": 40,
+          "x": 56,
+          "y": 79,
+          "width": 39,
           "height": 1,
           "stroke": "#C7B1FF",
           "strokeWidth": 1,
           "opacity": 0.65,
-          "zIndex": 22,
+          "zIndex": 23,
           "d": "M0 50 L100 50",
           "animations": {
             "pathProgress": {
@@ -1627,14 +1627,14 @@
         {
           "id": "spectrum-orbit-outer",
           "type": "ellipse",
-          "x": 57,
-          "y": 12,
-          "width": 38,
-          "height": 76,
+          "x": 65,
+          "y": 24,
+          "width": 25,
+          "height": 48,
           "stroke": "#B99AFF",
           "strokeWidth": 1,
           "opacity": 0.42,
-          "zIndex": 21,
+          "zIndex": 10,
           "animations": {
             "rotation": {
               "keyframes": [
@@ -1665,14 +1665,14 @@
         {
           "id": "spectrum-orbit-inner",
           "type": "ellipse",
-          "x": 65,
-          "y": 23,
-          "width": 22,
-          "height": 53,
+          "x": 69,
+          "y": 31,
+          "width": 17,
+          "height": 34,
           "stroke": "#71E7FF",
           "strokeWidth": 0.9,
           "opacity": 0.36,
-          "zIndex": 22,
+          "zIndex": 11,
           "animations": {
             "rotation": {
               "keyframes": [

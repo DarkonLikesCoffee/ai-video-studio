@@ -10,6 +10,8 @@ type SceneCardProps = {
   scene: VideoScene;
   index: number;
   compositionFps: number;
+  isFirstScene: boolean;
+  isLastScene: boolean;
 };
 
 type AudioTrackLayerProps = {
@@ -215,7 +217,6 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
       style={{
         overflow: "hidden",
         pointerEvents: "none",
-        zIndex: 15,
         mixBlendMode: system.blendMode ?? "screen",
       }}
     >
@@ -230,8 +231,10 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
         const yRaw = (system.originY + particle.offsetY) +
           Math.sin(particle.angleRadians) * travel +
           0.5 * gravity * ageSeconds * ageSeconds;
-        const x = ((xRaw % 110) + 110) % 110 - 5;
-        const y = ((yRaw % 110) + 110) % 110 - 5;
+        // Clamp to a small off-canvas margin; wrapping would teleport particles
+        // from one edge to the opposite edge and create visible discontinuities.
+        const x = Math.max(-5, Math.min(105, xRaw));
+        const y = Math.max(-5, Math.min(105, yRaw));
         const shapeStyle: CSSProperties = {
           position: "absolute",
           left: `${x}%`,
@@ -240,7 +243,7 @@ const ParticleField: FC<ParticleFieldProps> = ({ system, fps }) => {
           height: particle.size,
           backgroundColor: particle.color,
           opacity: opacity * fade,
-          borderRadius: system.shape === "square" ? 2 : system.shape === "diamond" ? 2 : "50%",
+          borderRadius: system.shape === "circle" ? "50%" : 2,
           transform: `translate(-50%, -50%) rotate(${particle.rotation + ageFrames * 1.8}deg)${system.shape === "diamond" ? " rotate(45deg)" : ""}`,
           boxShadow: system.blendMode === "screen" ? `0 0 ${particle.size * 2}px ${particle.color}` : undefined,
         };
@@ -337,18 +340,19 @@ const AnimatedText: FC<AnimatedTextProps> = ({ animation, children, style }) => 
   );
 };
 
-const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps }) => {
+const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps, isFirstScene, isLastScene }) => {
   const frame = useCurrentFrame();
   const duration = scene.durationInFrames;
-  const fadeIn = interpolate(frame, [0, 14], [0, 1], {
+  // Fade the film at its outer edges only. Internal scene cuts stay fully visible.
+  const fadeIn = interpolate(frame, [0, 12], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const fadeOut = interpolate(frame, [duration - 14, duration], [1, 0], {
+  const fadeOut = interpolate(frame, [duration - 12, duration], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const opacity = Math.min(fadeIn, fadeOut);
+  const opacity = (isFirstScene ? fadeIn : 1) * (isLastScene ? fadeOut : 1);
   const rise = interpolate(frame, [0, 20], [36, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -543,7 +547,13 @@ export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], compo
       <Series>
         {scenes.map((scene, index) => (
           <Series.Sequence key={scene.id} durationInFrames={scene.durationInFrames}>
-            <SceneCard scene={scene} index={index} compositionFps={composition.fps} />
+            <SceneCard
+              scene={scene}
+              index={index}
+              compositionFps={composition.fps}
+              isFirstScene={index === 0}
+              isLastScene={index === scenes.length - 1}
+            />
           </Series.Sequence>
         ))}
       </Series>
