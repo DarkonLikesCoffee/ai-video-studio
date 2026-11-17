@@ -245,7 +245,7 @@ export const CinematicAdBenchmark: FC = () => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#050912", color: "#f4f7fb", fontFamily: "Arial, Helvetica, sans-serif" }}>
-      <Audio src={staticFile("assets/audio/benchmark-score.wav")} volume={0.54} />
+      <Audio src={staticFile("assets/audio/score.wav")} volume={0.54} />
       {[114, 234, 354, 474].map((start) => (
         <Sequence key={start} from={start} durationInFrames={42}>
           <Audio src={staticFile("assets/audio/transition-whoosh.wav")} volume={0.42} />
