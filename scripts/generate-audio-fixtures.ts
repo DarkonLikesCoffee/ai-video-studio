@@ -129,4 +129,53 @@ await writeMonoWav(resolve(showcaseDirectory, "ducking-key.wav"), showcaseDurati
   return syllable * pulse * 0.34;
 });
 
-console.log("Generated legacy samples and original Aether showcase audio fixtures.");
+const pulseDirectory = resolve("projects/showcase-pulse/assets/audio");
+const pulseDuration = 20;
+const pulseChords = [
+  [82.41, 123.47, 164.81, 207.65],
+  [73.42, 110, 146.83, 185],
+  [98, 146.83, 196, 246.94],
+  [87.31, 130.81, 174.61, 220],
+];
+
+await writeMonoWav(resolve(pulseDirectory, "score.wav"), pulseDuration, (time) => {
+  const fadeIn = Math.min(1, time / 0.8);
+  const fadeOut = Math.min(1, (pulseDuration - time) / 1.4);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const chord = pulseChords[Math.min(3, Math.floor(time / 5))]!;
+  const pad = chord.reduce((sum, frequency, index) =>
+    sum + Math.sin(2 * Math.PI * frequency * time) * (0.12 - index * 0.015), 0
+  );
+  const beatLength = 60 / 112;
+  const beat = time % beatLength;
+  const kick = Math.sin(2 * Math.PI * (52 + 38 * Math.exp(-beat * 20)) * beat) *
+    Math.exp(-beat * 24) * 0.24;
+  const offBeat = (time + beatLength / 2) % beatLength;
+  const snap = Math.sin(2 * Math.PI * 1650 * time) * Math.exp(-offBeat * 55) * 0.045;
+  const arpeggioNotes = [329.63, 392, 493.88, 587.33, 493.88, 392, 293.66, 392];
+  const step = Math.floor(time / (beatLength / 2)) % arpeggioNotes.length;
+  const notePhase = (time % (beatLength / 2)) / (beatLength / 2);
+  const pluck = Math.sin(2 * Math.PI * arpeggioNotes[step]! * time) *
+    Math.exp(-notePhase * 4) * 0.07;
+  const texture = Math.sin(2 * Math.PI * 880 * time) * 0.012 +
+    Math.sin(2 * Math.PI * 1320 * time + Math.sin(time * 0.7)) * 0.009;
+  return (pad + kick + snap + pluck + texture) * envelope * 0.82;
+});
+
+await writeMonoWav(resolve(pulseDirectory, "transition-whoosh.wav"), 1.25, (time) => {
+  const envelope = Math.pow(Math.sin(Math.PI * time / 1.25), 1.4);
+  const noise = Math.sin(time * 1511.3) * 0.34 +
+    Math.sin(time * 2387.1) * 0.28 +
+    Math.sin(time * 3319.7) * 0.2;
+  const sweep = Math.sin(2 * Math.PI * (120 + 1100 * time) * time) * 0.28;
+  return (noise + sweep) * envelope * 0.3;
+});
+
+await writeMonoWav(resolve(pulseDirectory, "impact.wav"), 0.95, (time) => {
+  const envelope = Math.exp(-time * 5.1);
+  const sub = Math.sin(2 * Math.PI * (72 - 18 * time) * time) * 0.72;
+  const transient = Math.sin(2 * Math.PI * 1900 * time) * Math.exp(-time * 48) * 0.28;
+  return (sub + transient) * envelope * 0.52;
+});
+
+console.log("Generated legacy samples, original Aether audio, and original PULSE soundtrack fixtures.");
