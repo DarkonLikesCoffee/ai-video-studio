@@ -532,6 +532,18 @@ Example:
 ```
 
 The validator limits a project to 200 cues, requires every cue to remain inside the complete video timeline, and checks IDs, text lengths, style values and fade durations. This is a timed overlay system; it does not generate speech or automatically transcribe audio.
+## Agent-led production workflow
+
+The repository includes an agent production playbook under [`agent/`](agent/README.md), focused skills for creative direction, storyboarding, asset production, Remotion implementation, audio design and visual QA, plus a separate [production-plan schema](schemas/production-plan.schema.json). A production plan is not a renderable project; it is the planning artifact used before creating `projects/<slug>/scene.json`.
+
+Read [the full production workflow](docs/agent-production-workflow.md) and validate a plan with:
+
+```bash
+npm run validate:plan -- projects/examples/production-plan.json
+```
+
+This is an orchestration contract for an AI agent, not a hosted LLM service. The repository does not autonomously call a model or generate assets by itself; the connected agent performs those steps using the available tools.
+
 ## Prompt-driven cloud rendering
 
 A render request is represented by `render-request.json`. In a ChatGPT conversation, specify the project file, provider, and output name; ChatGPT can create or update this request in the repository.
@@ -585,7 +597,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
 - Audio DSP uses local FFmpeg binaries. Tracks that need EQ, compression, reverb, panning or sidechain processing must use local assets; remote audio can still be used for unprocessed playback.
-- Video looping, 3D scenes, shader-based effects and automatic prompt-to-project generation are not implemented yet. Timed subtitle overlays are supported, but automatic transcription and text-to-speech are not implemented. SVG path morphing is supported for compatible absolute M/L/C/Q/Z path topologies. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
+- Video looping and shader-based effects are not implemented in the data-driven `ProjectVideo` schema. Bespoke 3D work requires a custom Remotion composition. The repository now defines an agent production workflow and validates pre-production plans, but it does not host an autonomous LLM agent or an automatic asset-generation service. Timed subtitle overlays are supported, but automatic transcription and text-to-speech are not implemented. SVG path morphing is supported for compatible absolute M/L/C/Q/Z path topologies. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
@@ -593,4 +605,4 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 ## CI
 
-GitHub Actions runs type-checking, tests, legacy-project validation, the Aether and KINETIC transition projects, FFmpeg audio preparation (including sidechain DSP), Remotion composition discovery, full MP4 renders for both showcases, final AETHER loudness mastering, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
+GitHub Actions runs type-checking, tests, production-plan validation, legacy-project validation, FFmpeg audio preparation (including sidechain DSP), and the studio build. Video rendering is intentionally separated into the on-demand render workflow so ordinary code changes do not generate benchmark videos or accumulate render artifacts. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
