@@ -178,4 +178,31 @@ await writeMonoWav(resolve(pulseDirectory, "impact.wav"), 0.95, (time) => {
   return (sub + transient) * envelope * 0.52;
 });
 
-console.log("Generated legacy samples, original Aether audio, and original PULSE soundtrack fixtures.");
+
+const soraDirectory = resolve("projects/sora/assets/audio");
+const soraDuration = 12;
+const soraChords = [
+  [130.81, 164.81, 196, 261.63],
+  [110, 146.83, 174.61, 220],
+  [123.47, 155.56, 185, 246.94],
+  [130.81, 164.81, 196, 261.63],
+];
+await writeMonoWav(resolve(soraDirectory, "score.wav"), soraDuration, (time) => {
+  const fadeIn = Math.min(1, time / 1.4);
+  const fadeOut = Math.min(1, (soraDuration - time) / 1.8);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const chord = soraChords[Math.min(3, Math.floor(time / 3))]!;
+  const warmPad = chord.reduce((sum, frequency, index) =>
+    sum + Math.sin(2 * Math.PI * frequency * time + Math.sin(time * 0.23 + index) * 0.08) * (0.12 - index * 0.018), 0
+  );
+  const beatLength = 60 / 86;
+  const beat = time % beatLength;
+  const lowPulse = Math.sin(2 * Math.PI * (48 + 18 * Math.exp(-beat * 8)) * beat) * Math.exp(-beat * 15) * 0.13;
+  const tickPhase = (time + beatLength / 2) % beatLength;
+  const softTick = Math.sin(2 * Math.PI * 1850 * time) * Math.exp(-tickPhase * 42) * 0.018;
+  const airy = Math.sin(2 * Math.PI * 659.25 * time + Math.sin(time * 0.4)) * 0.018 +
+    Math.sin(2 * Math.PI * 987.77 * time) * 0.009;
+  return (warmPad + lowPulse + softTick + airy) * envelope * 0.56;
+});
+
+console.log("Generated legacy samples, original Aether, PULSE, and SORA audio fixtures.");
