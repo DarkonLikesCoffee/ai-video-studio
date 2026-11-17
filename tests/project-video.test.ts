@@ -380,6 +380,7 @@ test("sidechain ducking must reference existing voiceover tracks and local asset
     src: "https://cdn.example.com/narration.wav",
     startInFrames: 0,
   });
+  project.audioTracks[0]!.ducking!.sidechainTrackIds = ["voice"];
   const errors = validateProjectDefinition(project);
   assert.ok(errors.some((error) => error.includes("sidechain tracks must use local assets/ files")));
 });
