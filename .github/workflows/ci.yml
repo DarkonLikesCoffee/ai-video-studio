@@ -86,7 +86,7 @@ jobs:
       - name: Resolve 3D showcase composition
         run: npx remotion compositions packages/video-engine/src/index.ts
       - name: Render deterministic 3D showcase
-        run: npx remotion render packages/video-engine/src/index.ts ThreeDShowcase render-output/three-d-showcase.mp4 --gl=angle
+        run: npx remotion render packages/video-engine/src/index.ts ThreeDShowcase render-output/three-d-showcase.mp4 --gl=swangle
       - name: Build studio
         run: npm run build
       - name: Upload PULSE editorial motion film
