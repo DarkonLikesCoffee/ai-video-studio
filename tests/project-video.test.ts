@@ -6,6 +6,7 @@ import {
   isRemoteMediaUrl,
   isSafeProjectAssetPath,
   validateProjectDefinition,
+  type GraphicElement,
   type VideoProject
 } from "../packages/video-engine/src/project";
 
@@ -481,7 +482,7 @@ test("vector graphic validation rejects malformed geometry, path data and text s
       d: "M0 0 onload=alert(1)",
       stroke: "red",
       strokeWidth: 40,
-    } as unknown as VideoProject["scenes"][number]["graphics"][number],
+    } as unknown as GraphicElement,
     {
       id: "bad-text",
       type: "text",
@@ -496,7 +497,7 @@ test("vector graphic validation rejects malformed geometry, path data and text s
       fontFamily: "url(javascript:alert(1))",
       textAnchor: "side",
       letterSpacing: 50,
-    } as unknown as VideoProject["scenes"][number]["graphics"][number],
+    } as unknown as GraphicElement,
   ];
   const errors = validateProjectDefinition(project);
   assert.ok(errors.some((error) => error.includes("x + width cannot exceed 100")));
@@ -580,8 +581,8 @@ test("particle validation enforces per-system limits and scene-wide budgets", as
     sizeMin: 12,
     sizeMax: 4,
     colors: ["not-a-color"],
-    shape: "triangle" as "circle",
-    blendMode: "multiply" as "normal",
+    shape: "triangle" as never,
+    blendMode: "multiply" as never,
   }];
   const errors = validateProjectDefinition(project);
   assert.ok(errors.some((error) => error.includes("count must be an integer between 1 and 160")));
