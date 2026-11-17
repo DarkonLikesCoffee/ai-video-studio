@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { getSceneTransitionStyle } from "../packages/video-engine/src/transitions";
 import {
   getProjectDurationInFrames,
   isRemoteMediaUrl,
@@ -627,4 +628,62 @@ test("only the first and last scenes fade to black, not internal scene cuts", as
   assert.match(source, /\(isFirstScene \? fadeIn : 1\) \* \(isLastScene \? fadeOut : 1\)/);
   assert.match(source, /isFirstScene=\{index === 0\}/);
   assert.match(source, /isLastScene=\{index === scenes\.length - 1\}/);
+});
+
+
+test("scene transition styles produce deterministic progress for fades and pushes", () => {
+  const fade = { type: "fade", durationInFrames: 24 } as const;
+  assert.equal(getSceneTransitionStyle(0, 90, fade).opacity, 0);
+  assert.equal(getSceneTransitionStyle(12, 90, fade).opacity, 0.5);
+  assert.equal(getSceneTransitionStyle(24, 90, fade).opacity, 1);
+  assert.equal(getSceneTransitionStyle(102, 90, undefined, fade).opacity, 0.5);
+
+  const slide = { type: "slide-left", durationInFrames: 20 } as const;
+  assert.equal(getSceneTransitionStyle(0, 90, slide).transform, "translateX(100%)");
+  assert.equal(getSceneTransitionStyle(20, 90, slide).transform, "translateX(0%)");
+  assert.equal(getSceneTransitionStyle(100, 90, undefined, slide).transform, "translateX(0%)");
+  assert.equal(getSceneTransitionStyle(110, 90, undefined, slide).transform, "translateX(-50%)");
+});
+
+test("wipe and zoom transitions use clipping and scale without non-deterministic timing", () => {
+  const wipe = { type: "wipe-right", durationInFrames: 20 } as const;
+  assert.equal(getSceneTransitionStyle(0, 90, wipe).clipPath, "inset(0 100% 0 0)");
+  assert.equal(getSceneTransitionStyle(20, 90, wipe).clipPath, "inset(0 0% 0 0)");
+
+  const zoom = { type: "zoom", durationInFrames: 20 } as const;
+  assert.deepEqual(getSceneTransitionStyle(0, 90, zoom), {
+    opacity: 0,
+    transform: "scale(1.12)",
+  });
+  assert.deepEqual(getSceneTransitionStyle(20, 90, zoom), {
+    opacity: 1,
+    transform: "scale(1)",
+  });
+});
+
+test("project validation accepts scene transitions and rejects invalid or overlapping windows", async () => {
+  const project = await readExample();
+  project.scenes[1]!.transitionIn = {
+    type: "fade",
+    durationInFrames: 18,
+    easing: "ease-out",
+  };
+  project.scenes[2]!.transitionIn = {
+    type: "wipe-right",
+    durationInFrames: 20,
+    easing: { type: "bezier", x1: 0.4, y1: 0, x2: 0.2, y2: 1 },
+  };
+  assert.deepEqual(validateProjectDefinition(project), []);
+
+  project.scenes[1]!.durationInFrames = 30;
+  project.scenes[1]!.transitionIn = { type: "fade", durationInFrames: 16 };
+  project.scenes[2]!.transitionIn = { type: "slide-left", durationInFrames: 16 };
+  assert.ok(validateProjectDefinition(project).some((error) =>
+    error.includes("incoming and outgoing transitions must leave at least one frame")
+  ));
+
+  project.scenes[1]!.transitionIn = { type: "teleport" as never, durationInFrames: 91 };
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("transitionIn.type must be cut, fade")));
+  assert.ok(errors.some((error) => error.includes("transitionIn.durationInFrames must be an integer between 0 and 90")));
 });
