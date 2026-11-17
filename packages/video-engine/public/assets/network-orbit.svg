@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none">
+  <defs>
+    <radialGradient id="space" cx="50%" cy="50%" r="70%">
+      <stop offset="0" stop-color="#183A59"/>
+      <stop offset="0.55" stop-color="#101B32"/>
+      <stop offset="1" stop-color="#080D19"/>
+    </radialGradient>
+    <radialGradient id="planet" cx="30%" cy="25%" r="75%">
+      <stop offset="0" stop-color="#8AE6F0"/>
+      <stop offset="0.45" stop-color="#317FA5"/>
+      <stop offset="1" stop-color="#122C50"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#67E8F9" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#A78BFA" stop-opacity=".15"/>
+    </linearGradient>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#space)"/>
+  <g opacity=".5" stroke="#8CCBDD" stroke-width="1">
+    <path d="M0 185H1920M0 895H1920M220 0V1080M1695 0V1080" opacity=".15"/>
+    <path d="M0 540H1920" opacity=".1"/>
+  </g>
+  <g stroke="url(#line)" stroke-width="3">
+    <path d="M230 255L680 380L1020 170L1480 345L1710 720"/>
+    <path d="M175 785L550 620L935 810L1390 635L1780 865"/>
+    <path d="M680 380L550 620M1020 170L935 810M1480 345L1390 635"/>
+    <path d="M230 255L175 785M1710 720L1780 865"/>
+  </g>
+  <g fill="#67E8F9" filter="url(#glow)">
+    <circle cx="230" cy="255" r="9"/><circle cx="680" cy="380" r="12"/>
+    <circle cx="1020" cy="170" r="10"/><circle cx="1480" cy="345" r="12"/>
+    <circle cx="1710" cy="720" r="9"/><circle cx="175" cy="785" r="8"/>
+    <circle cx="550" cy="620" r="11"/><circle cx="935" cy="810" r="9"/>
+    <circle cx="1390" cy="635" r="12"/><circle cx="1780" cy="865" r="8"/>
+  </g>
+  <circle cx="1050" cy="540" r="235" fill="#38BDF8" opacity=".16" filter="url(#glow)"/>
+  <circle cx="1050" cy="540" r="184" fill="url(#planet)" stroke="#A5F3FC" stroke-opacity=".7" stroke-width="3"/>
+  <ellipse cx="1050" cy="540" rx="184" ry="68" stroke="#A5F3FC" stroke-opacity=".7" stroke-width="3"/>
+  <ellipse cx="1050" cy="540" rx="80" ry="184" stroke="#A5F3FC" stroke-opacity=".55" stroke-width="3"/>
+  <path d="M885 470C955 505 1145 505 1215 470M885 610C955 575 1145 575 1215 610" stroke="#A5F3FC" stroke-opacity=".55" stroke-width="3"/>
+  <g fill="#E0F2FE" opacity=".8">
+    <circle cx="340" cy="110" r="3"/><circle cx="1490" cy="150" r="4"/><circle cx="1580" cy="930" r="3"/>
+    <circle cx="770" cy="940" r="3"/><circle cx="1280" cy="90" r="2"/><circle cx="90" cy="640" r="2"/>
+  </g>
+</svg>
