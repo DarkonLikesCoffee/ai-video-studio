@@ -42,6 +42,8 @@ jobs:
         run: npm test
       - name: Validate example production plan
         run: npm run validate:plan -- projects/examples/production-plan.json
+      - name: Validate SORA production plan
+        run: npm run validate:plan -- projects/sora/production/production-plan.json
       - name: Ensure FFmpeg is available
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1; then
@@ -59,6 +61,8 @@ jobs:
         run: npm run validate:project -- projects/showcase-motion/scene.json
       - name: Validate cinematic transition showcase
         run: npm run validate:project -- projects/showcase-transitions/scene.json
+      - name: Validate SORA product film
+        run: npm run validate:project -- projects/sora/scene.json
       - name: Prepare track DSP and sidechain processing
         run: npm run audio:prepare -- projects/showcase-motion/scene.json
       - name: Build studio
