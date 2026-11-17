@@ -9,6 +9,7 @@ import { evaluateAnimationTrack } from "../animation";
 type SceneCardProps = {
   scene: VideoScene;
   index: number;
+  compositionFps: number;
 };
 
 type AudioTrackLayerProps = {
@@ -336,7 +337,7 @@ const AnimatedText: FC<AnimatedTextProps> = ({ animation, children, style }) => 
   );
 };
 
-const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
+const SceneCard: FC<SceneCardProps> = ({ scene, index, compositionFps }) => {
   const frame = useCurrentFrame();
   const duration = scene.durationInFrames;
   const fadeIn = interpolate(frame, [0, 14], [0, 1], {
@@ -427,7 +428,7 @@ const SceneCard: FC<SceneCardProps> = ({ scene, index }) => {
             durationInFrames={durationInFrames}
             name={`particles-${system.id}`}
           >
-            <ParticleField system={system} fps={composition.fps} />
+            <ParticleField system={system} fps={compositionFps} />
           </Sequence>
         );
       })}
@@ -542,7 +543,7 @@ export const ProjectVideo: FC<VideoProject> = ({ scenes, audioTracks = [], compo
       <Series>
         {scenes.map((scene, index) => (
           <Series.Sequence key={scene.id} durationInFrames={scene.durationInFrames}>
-            <SceneCard scene={scene} index={index} />
+            <SceneCard scene={scene} index={index} compositionFps={composition.fps} />
           </Series.Sequence>
         ))}
       </Series>
