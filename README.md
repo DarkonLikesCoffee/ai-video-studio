@@ -35,7 +35,7 @@ The repository keeps [projects/examples/three-scene-story/scene.json](projects/e
 
 The audio/VFX test is [AETHER — Motion Design Showcase](projects/showcase-motion/scene.json): a 16-second, four-scene film with original orbital artwork, flowing vector fields, spectrum graphics, vector path reveals, deterministic particles, keyframed movement and an original soundtrack. Its SVG source art lives under [projects/showcase-motion/assets](projects/showcase-motion/assets).
 
-The separate [KINETIC — Scene Transition Showcase](projects/showcase-transitions/scene.json) is a 15-second, five-scene visual test dedicated to fade, slide, zoom and wipe transitions. It gives CI a different composition to render so transition regressions are not hidden by the AETHER layout.
+The separate [KINETIC — Scene Transition Showcase](projects/showcase-transitions/scene.json) is a 15-second, five-scene visual test dedicated to fade, slide, zoom and wipe transitions. It also exercises timed captions, including a cue that stays visible across the first scene cut.
 
 ### Local rendering
 
