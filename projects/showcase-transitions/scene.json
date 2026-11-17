@@ -586,7 +586,7 @@
           "spreadY": 48,
           "lifeInFrames": 80,
           "angleMinDeg": 340,
-          "angleMaxDeg": 380,
+          "angleMaxDeg": 360,
           "speedMin": 0.3,
           "speedMax": 2,
           "gravity": 0,
