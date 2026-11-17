@@ -82,3 +82,12 @@ test("validator rejects video playback controls on image media", async () => {
   media.volume = 0.5;
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("video playback options")));
 });
+
+test("remote media URLs reject loopback and private network addresses", () => {
+  assert.equal(isRemoteMediaUrl("https://127.0.0.1/video.mp4"), false);
+  assert.equal(isRemoteMediaUrl("https://10.0.0.5/video.mp4"), false);
+  assert.equal(isRemoteMediaUrl("https://192.168.1.10/video.mp4"), false);
+  assert.equal(isRemoteMediaUrl("https://172.16.0.1/video.mp4"), false);
+  assert.equal(isRemoteMediaUrl("https://169.254.169.254/latest/meta-data"), false);
+  assert.equal(isRemoteMediaUrl("https://media.example.com/video.mp4"), true);
+});
