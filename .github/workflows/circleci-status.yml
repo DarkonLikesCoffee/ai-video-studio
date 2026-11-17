@@ -75,9 +75,9 @@ jobs:
           {
             echo "## CircleCI render status"
             echo ""
-            echo "- Request: `$REQUEST_ID`"
+            printf -- '- Request: `%s`\n' "$REQUEST_ID"
             echo "- Pipeline: [$PIPELINE_ID]($pipeline_url)"
-            echo "- Workflow: `$workflow_status`"
+            printf -- '- Workflow: `%s`\n' "$workflow_status"
             echo "- Job ($job_name): **$job_status**"
           } >> "$GITHUB_STEP_SUMMARY"
 
