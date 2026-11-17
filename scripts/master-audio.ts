@@ -55,6 +55,15 @@ await new Promise<void>((resolvePromise, reject) => {
   });
 });
 
-await rm(videoPath, { force: true });
-await rename(temporaryPath, videoPath);
+const backupPath = `${videoPath}.pre-master.bak`;
+await rm(backupPath, { force: true });
+await rename(videoPath, backupPath);
+try {
+  await rename(temporaryPath, videoPath);
+  await rm(backupPath, { force: true });
+} catch (error) {
+  await rename(backupPath, videoPath);
+  await rm(temporaryPath, { force: true });
+  throw error;
+}
 console.log(`Mastered audio to ${integratedLufs} LUFS / ${truePeakDb} dBTP (LRA ${loudnessRange} LU).`);
