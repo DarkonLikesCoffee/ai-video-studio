@@ -66,7 +66,7 @@ const isHexColor = (value: unknown): value is string =>
   typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
 
 const sceneTypes = new Set<SceneType>(["title", "content", "outro"]);
-const imageExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".avif"]);
+const imageExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".svg", ".avif"]);
 const videoExtensions = new Set([".mp4", ".mov", ".m4v", ".webm", ".mkv"]);
 
 const getExtension = (path: string): string => {
