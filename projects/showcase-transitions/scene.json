@@ -1023,5 +1023,6 @@
   "output": {
     "format": "mp4",
     "codec": "h264"
-  }
+  },
+  "audioTracks": []
 }
