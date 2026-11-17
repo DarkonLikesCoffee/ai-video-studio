@@ -35,7 +35,9 @@ The repository keeps [projects/examples/three-scene-story/scene.json](projects/e
 
 The audio/VFX test is [AETHER — Motion Design Showcase](projects/showcase-motion/scene.json): a 16-second, four-scene film with original orbital artwork, flowing vector fields, spectrum graphics, vector path reveals, deterministic particles, keyframed movement and an original soundtrack. Its SVG source art lives under [projects/showcase-motion/assets](projects/showcase-motion/assets).
 
-The separate [KINETIC — Scene Transition Showcase](projects/showcase-transitions/scene.json) is a 15-second, five-scene visual test dedicated to fade, slide, zoom and wipe transitions. It also exercises timed captions, including a cue that stays visible across the first scene cut.\n\nThe [PULSE — Editorial Motion Film](projects/showcase-pulse/scene.json) is a 20-second, five-scene benchmark with a deliberately different art direction: bold editorial typography, contrasting palettes, geometric layouts, animated SVG morphs, particle fields and captions that cross every scene boundary. It is rendered separately in CI so the engine is tested against more than one abstract orbital design.
+The separate [KINETIC — Scene Transition Showcase](projects/showcase-transitions/scene.json) is a 15-second, five-scene visual test dedicated to fade, slide, zoom and wipe transitions. It also exercises timed captions, including a cue that stays visible across the first scene cut.
+
+The [PULSE — Editorial Motion Film](projects/showcase-pulse/scene.json) is a 20-second, five-scene benchmark with a deliberately different art direction: bold editorial typography, contrasting palettes, geometric layouts, animated SVG morphs, particle fields and captions that cross every scene boundary. It is rendered separately in CI so the engine is tested against more than one abstract orbital design.
 
 ### Local rendering
 
