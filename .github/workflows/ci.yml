@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths-ignore:
       - render-request.json
+      - circleci-status-request.json
   pull_request:
     branches: [main]
     paths-ignore:
