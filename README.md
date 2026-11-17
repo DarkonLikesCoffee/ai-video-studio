@@ -12,14 +12,16 @@ Two Remotion compositions are currently registered:
 A `ProjectVideo` project can define:
 - 1–20 consecutive scenes, each with a type (`title`, `content`, or `outro`).
 - Per-scene title, eyebrow, body text, duration, background color, and accent color.
+- An optional full-frame image or video background for each scene.
+- Local media stored in the repository or public HTTPS media URLs.
 - Composition width, height, and frame rate.
 - MP4/H.264 output.
 
-The current validator limits a project to 1,800 total frames, with each scene between 30 and 900 frames. Images, source video clips, voice-over, music, subtitles, and automatic prompt-to-project generation are not implemented yet.
+The current validator limits a project to 1,800 total frames, with each scene between 30 and 900 frames. Audio tracks, narration, subtitles, transitions between scenes, and automatic prompt-to-project generation are not implemented yet.
 
 ## Example project
 
-The repository includes [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json), a three-scene explainer about how the internet works. The entire video is described by this JSON file; the shared `ProjectVideo` component renders it.
+The repository includes [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json), a three-scene explainer about how the internet works. It demonstrates a local SVG image in the opening scene and a remote MP4 clip in the second scene.
 
 To render it locally from the repository root:
 
@@ -58,7 +60,31 @@ A minimal `ProjectVideo` project looks like this:
       "title": "A new idea",
       "body": "A short supporting sentence.",
       "backgroundColor": "#0B1020",
-      "accentColor": "#67E8F9"
+      "accentColor": "#67E8F9",
+      "media": {
+        "type": "image",
+        "source": "public",
+        "src": "assets/network-orbit.svg",
+        "fit": "cover",
+        "position": "center",
+        "alt": "An abstract network globe"
+      }
+    },
+    {
+      "id": "footage",
+      "type": "content",
+      "durationInFrames": 120,
+      "title": "The world in motion",
+      "body": "Supporting text can be layered above the footage.",
+      "media": {
+        "type": "video",
+        "source": "remote",
+        "src": "https://remotion.media/video-5s.mp4",
+        "fit": "cover",
+        "muted": true,
+        "loop": false,
+        "playbackRate": 1
+      }
     }
   ],
   "output": {
@@ -69,6 +95,31 @@ A minimal `ProjectVideo` project looks like this:
 ```
 
 Each scene has a unique ID and a required title. Colors must use six-digit hex notation. The project validator checks the schema before either render provider is started.
+
+### Media sources
+
+**Local repository files**
+
+Place assets under `packages/video-engine/public/assets/`. Reference them with `source: "public"` and a path relative to the public folder, for example `assets/intro.png`. The renderer uses Remotion's `staticFile()` helper. The project validator checks that local references exist before rendering.
+
+Supported local image formats: PNG, JPG, JPEG, WebP, SVG.
+
+Supported local video formats: MP4, WebM, MOV.
+
+**Remote media**
+
+Use `source: "remote"` with a direct, public HTTPS URL. The media host must allow the render worker to retrieve the file without sign-in, cookies, or embedded credentials. Private URLs, local network addresses, and plain HTTP are rejected. Remote rendering requires network access; for repeatable projects, prefer local assets checked into the repository.
+
+**Media options**
+
+- `fit`: `cover` or `contain`.
+- `position`: `center`, `top`, `bottom`, `left`, `right`, or a supported corner.
+- Image `alt`: optional descriptive text.
+- Video `muted`: defaults to `true` to avoid unexpected audio.
+- Video `loop`: defaults to `false`.
+- Video `playbackRate`: defaults to `1`; allowed range is 0.25×–4×.
+
+Media fills the scene background. The title, body text, and other scene graphics are drawn above it.
 
 ## Prompt-driven cloud rendering
 
@@ -122,11 +173,12 @@ A push that changes only this file starts a short GitHub Actions status check. I
 ### Current limitations
 
 - The registered compositions are currently `DemoVideo` and `ProjectVideo`.
-- `ProjectVideo` currently supports text-based motion-graphics scenes only; media assets and audio are future work.
+- Each scene supports one full-frame image or video layer; multiple simultaneous media tracks, compositing, and keyframe controls are future work.
+- Remote media must remain available at the same public URL when rendering.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
 - YouTube publishing and permanent video storage are not implemented yet.
 
 ## CI
 
-GitHub Actions runs type-checking, tests, project validation, Remotion composition discovery using the example project props, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
+GitHub Actions runs type-checking, tests, project validation (including checks that local media assets exist), Remotion composition discovery using the example project props, and the studio build. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
