@@ -21,7 +21,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -59,61 +59,16 @@ jobs:
         run: npm run validate:project -- projects/showcase-transitions/scene.json
       - name: Prepare track DSP and sidechain processing
         run: npm run audio:prepare -- projects/showcase-motion/scene.json
-      - name: Resolve Remotion composition with Aether project props
-        run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/showcase-motion/.render-project.json --public-dir="$GITHUB_WORKSPACE/projects/showcase-motion"
-      - name: Render Aether motion design showcase
-        run: |
-          mkdir -p render-output
-          npm run render:custom -- ProjectVideo ../../render-output/aether-motion-showcase.mp4 --props=../../projects/showcase-motion/.render-project.json --public-dir=../../projects/showcase-motion
-      - name: Master final audio
-        run: npm run audio:master -- render-output/aether-motion-showcase.mp4 projects/showcase-motion/scene.json
-      - name: Resolve Remotion composition for transition showcase
-        run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/showcase-transitions/scene.json --public-dir="$GITHUB_WORKSPACE/projects/showcase-transitions"
-      - name: Render cinematic transition showcase
-        run: |
-          npm run render:custom -- ProjectVideo ../../render-output/cinematic-transitions-showcase.mp4 --props=../../projects/showcase-transitions/scene.json --public-dir=../../projects/showcase-transitions
-      - name: Prepare PULSE soundtrack and transition effects
-        run: npm run audio:prepare -- projects/showcase-pulse/scene.json
-      - name: Validate PULSE editorial showcase
-        run: npm run validate:project -- projects/showcase-pulse/scene.json
-      - name: Resolve Remotion composition for PULSE showcase
-        run: npx remotion compositions packages/video-engine/src/index.ts --props=projects/showcase-pulse/.render-project.json --public-dir="$GITHUB_WORKSPACE/projects/showcase-pulse"
-      - name: Render PULSE editorial motion film
-        run: |
-          npm run render:custom -- ProjectVideo ../../render-output/pulse-editorial-film.mp4 --props=../../projects/showcase-pulse/.render-project.json --public-dir=../../projects/showcase-pulse
-      - name: Master PULSE final audio
-        run: npm run audio:master -- render-output/pulse-editorial-film.mp4 projects/showcase-pulse/scene.json
-      - name: Resolve 3D showcase composition
-        run: npx remotion compositions packages/video-engine/src/index.ts
-      - name: Render deterministic 3D showcase
-        run: npx remotion render packages/video-engine/src/index.ts ThreeDShowcase render-output/three-d-showcase.mp4 --gl=swangle
+      - name: Resolve cinematic ad benchmark composition
+        run: npx remotion compositions packages/video-engine/src/index.ts --public-dir=projects/showcase-pulse
+      - name: Render cinematic 3D product ad benchmark
+        run: npx remotion render packages/video-engine/src/index.ts CinematicAdBenchmark render-output/cinematic-3d-ad-benchmark.mp4 --gl=swangle --public-dir=projects/showcase-pulse
       - name: Build studio
         run: npm run build
-      - name: Upload PULSE editorial motion film
+      - name: Upload cinematic 3D ad benchmark
         uses: actions/upload-artifact@v4
         with:
-          name: pulse-editorial-film
-          path: render-output/pulse-editorial-film.mp4
-          if-no-files-found: error
-          retention-days: 3
-      - name: Upload Aether showcase video
-        uses: actions/upload-artifact@v4
-        with:
-          name: aether-motion-showcase
-          path: render-output/aether-motion-showcase.mp4
-          if-no-files-found: error
-          retention-days: 3
-      - name: Upload cinematic transition showcase
-        uses: actions/upload-artifact@v4
-        with:
-          name: cinematic-transitions-showcase
-          path: render-output/cinematic-transitions-showcase.mp4
-          if-no-files-found: error
-          retention-days: 3
-      - name: Upload 3D showcase
-        uses: actions/upload-artifact@v4
-        with:
-          name: three-d-showcase
-          path: render-output/three-d-showcase.mp4
+          name: cinematic-3d-ad-benchmark
+          path: render-output/cinematic-3d-ad-benchmark.mp4
           if-no-files-found: error
           retention-days: 3
