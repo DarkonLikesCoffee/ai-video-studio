@@ -18,8 +18,10 @@ test("three-scene example is a valid ProjectVideo project with image and video m
   assert.equal(project.composition.id, "ProjectVideo");
   assert.equal(project.scenes.length, 3);
   assert.equal(getProjectDurationInFrames(project), 300);
-  assert.equal(project.scenes[0]!.media?.type, "image");
-  assert.equal(project.scenes[1]!.media?.type, "video");
+  assert.equal(project.scenes[0]!.mediaLayers?.length, 2);
+  assert.equal(project.scenes[1]!.mediaLayers?.length, 2);
+  assert.equal(project.scenes[0]!.mediaLayers?.[0]?.type, "image");
+  assert.equal(project.scenes[1]!.mediaLayers?.[0]?.type, "video");
 });
 
 test("project duration is derived from all scene durations", async () => {
@@ -69,8 +71,8 @@ test("remote media sources must use HTTPS and have no embedded credentials", () 
 
 test("validator rejects media with unsafe paths or mismatched file types", async () => {
   const project = await readExample();
-  project.scenes[0]!.media!.src = "assets/../../outside.svg";
-  project.scenes[1]!.media!.src = "https://example.com/poster.png";
+  project.scenes[0]!.mediaLayers![0]!.src = "assets/../../outside.svg";
+  project.scenes[1]!.mediaLayers![0]!.src = "https://example.com/poster.png";
   const errors = validateProjectDefinition(project);
   assert.ok(errors.some((error) => error.includes("safe path under assets/")));
   assert.ok(errors.some((error) => error.includes("unsupported extension for video media")));
@@ -78,7 +80,7 @@ test("validator rejects media with unsafe paths or mismatched file types", async
 
 test("validator rejects video playback controls on image media", async () => {
   const project = await readExample();
-  const media = project.scenes[0]!.media as unknown as { volume: number };
+  const media = project.scenes[0]!.mediaLayers![0] as unknown as { volume: number };
   media.volume = 0.5;
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("video playback options")));
 });
@@ -90,4 +92,50 @@ test("remote media URLs reject loopback and private network addresses", () => {
   assert.equal(isRemoteMediaUrl("https://172.16.0.1/video.mp4"), false);
   assert.equal(isRemoteMediaUrl("https://169.254.169.254/latest/meta-data"), false);
   assert.equal(isRemoteMediaUrl("https://media.example.com/video.mp4"), true);
+});
+
+test("legacy single media remains supported", async () => {
+  const project = await readExample();
+  const firstScene = project.scenes[0]!;
+  firstScene.media = firstScene.mediaLayers![0]!;
+  delete firstScene.mediaLayers;
+  assert.deepEqual(validateProjectDefinition(project), []);
+});
+
+test("validator enforces media layer count and unique IDs", async () => {
+  const project = await readExample();
+  const scene = project.scenes[0]!;
+  scene.mediaLayers = Array.from({ length: 9 }, (_, index) => ({
+    id: `layer-${index}`,
+    type: "image" as const,
+    src: "assets/connection-map.svg",
+  }));
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("between 1 and 8 layers")));
+
+  scene.mediaLayers = [
+    { id: "duplicate", type: "image", src: "assets/connection-map.svg" },
+    { id: "duplicate", type: "image", src: "assets/connection-map.svg" },
+  ];
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("id must be unique")));
+});
+
+test("validator enforces layer geometry and timeline bounds", async () => {
+  const project = await readExample();
+  const layer = project.scenes[0]!.mediaLayers![0]!;
+  layer.x = 80;
+  layer.width = 30;
+  layer.y = 0;
+  layer.height = 50;
+  layer.startInFrames = 80;
+  layer.durationInFrames = 20;
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("x + width cannot exceed 100")));
+  assert.ok(errors.some((error) => error.includes("timeline window cannot extend beyond its scene")));
+});
+
+test("validator rejects simultaneous legacy media and mediaLayers", async () => {
+  const project = await readExample();
+  const scene = project.scenes[0]!;
+  scene.media = { type: "image", src: "assets/connection-map.svg" };
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("cannot define both media and mediaLayers")));
 });

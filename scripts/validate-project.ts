@@ -26,7 +26,7 @@ if (errors.length > 0) {
 const metadata = project as {
   title: string;
   composition: { id: string; durationInFrames?: number };
-  scenes?: Array<{ durationInFrames: number; media?: { src: string } }>;
+  scenes?: Array<{ durationInFrames: number; media?: { src: string }; mediaLayers?: Array<{ src: string }> }>;
 };
 const durationInFrames = metadata.composition.id === "ProjectVideo"
   ? metadata.scenes?.reduce((total, scene) => total + scene.durationInFrames, 0) ?? 0
@@ -35,19 +35,23 @@ const durationInFrames = metadata.composition.id === "ProjectVideo"
 if (metadata.composition.id === "ProjectVideo") {
   const projectDirectory = await realpath(dirname(projectPath));
   for (const [index, scene] of (metadata.scenes ?? []).entries()) {
-    const source = scene.media?.src;
-    if (!source || isRemoteMediaUrl(source)) continue;
+    const mediaItems = scene.mediaLayers ?? (scene.media ? [scene.media] : []);
+    for (const [layerIndex, media] of mediaItems.entries()) {
+      const source = media.src;
+      if (!source || isRemoteMediaUrl(source)) continue;
 
-    try {
-      const assetPath = await realpath(resolve(projectDirectory, source));
-      if (!assetPath.startsWith(projectDirectory + sep)) {
-        throw new Error("asset resolves outside the project directory");
+      try {
+        const assetPath = await realpath(resolve(projectDirectory, source));
+        if (!assetPath.startsWith(projectDirectory + sep)) {
+          throw new Error("asset resolves outside the project directory");
+        }
+        const assetInfo = await stat(assetPath);
+        if (!assetInfo.isFile()) throw new Error("asset is not a file");
+      } catch (error) {
+        const mediaLabel = scene.mediaLayers ? `mediaLayers[${layerIndex}].src` : "media.src";
+        console.error(`Project asset validation failed for scenes[${index}].${mediaLabel} (${source}):`, error);
+        process.exit(1);
       }
-      const assetInfo = await stat(assetPath);
-      if (!assetInfo.isFile()) throw new Error("asset is not a file");
-    } catch (error) {
-      console.error(`Project asset validation failed for scenes[${index}].media.src (${source}):`, error);
-      process.exit(1);
     }
   }
 }
