@@ -194,6 +194,25 @@ export type ParticleSystem = {
   blendMode?: "normal" | "screen" | "lighten";
 };
 
+export type SceneTransitionType =
+  | "cut"
+  | "fade"
+  | "slide-left"
+  | "slide-right"
+  | "slide-up"
+  | "slide-down"
+  | "zoom"
+  | "wipe-left"
+  | "wipe-right";
+
+export type SceneTransition = {
+  type: SceneTransitionType;
+  /** Transition length in composition frames. Use 0 for a hard cut. */
+  durationInFrames: number;
+  /** Optional easing curve; uses the same presets and custom curves as keyframes. */
+  easing?: AnimationEasing;
+};
+
 export type VideoScene = {
   id: string;
   type: SceneType;
@@ -203,6 +222,8 @@ export type VideoScene = {
   body?: string;
   backgroundColor?: string;
   accentColor?: string;
+  /** How this scene enters over the end of the previous scene. Omit for a hard cut. */
+  transitionIn?: SceneTransition;
   /** Legacy single-layer property. Kept for backwards compatibility. */
   media?: SceneMedia;
   /** Up to eight simultaneous composited image/video layers. */
@@ -257,6 +278,9 @@ const isHexColor = (value: unknown): value is string =>
   typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
 
 const sceneTypes = new Set<SceneType>(["title", "content", "outro"]);
+const transitionTypes = new Set<SceneTransitionType>([
+  "cut", "fade", "slide-left", "slide-right", "slide-up", "slide-down", "zoom", "wipe-left", "wipe-right"
+]);
 const imageExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".svg", ".avif"]);
 const videoExtensions = new Set([".mp4", ".mov", ".m4v", ".webm", ".mkv"]);
 
@@ -777,6 +801,38 @@ const validateParticleSystem = (value: unknown, prefix: string, sceneDuration: n
   return errors;
 };
 
+const validateSceneTransition = (value: unknown, prefix: string, sceneDuration: number): string[] => {
+  if (!isRecord(value)) return [`${prefix} must be an object`];
+  const transition = value;
+  const errors: string[] = [];
+
+  if (typeof transition.type !== "string" || !transitionTypes.has(transition.type as SceneTransitionType)) {
+    errors.push(`${prefix}.type must be cut, fade, slide-left, slide-right, slide-up, slide-down, zoom, wipe-left, or wipe-right`);
+  }
+
+  const duration = transition.durationInFrames;
+  if (!isInteger(duration) || duration < 0 || duration > 90) {
+    errors.push(`${prefix}.durationInFrames must be an integer between 0 and 90`);
+  } else if (transition.type === "cut" && duration !== 0) {
+    errors.push(`${prefix}.durationInFrames must be 0 for a cut transition`);
+  } else if (transition.type !== "cut" && duration < 1) {
+    errors.push(`${prefix}.durationInFrames must be at least 1 for an animated transition`);
+  } else if (transition.type !== "cut" && duration >= sceneDuration) {
+    errors.push(`${prefix}.durationInFrames must be shorter than its scene`);
+  }
+
+  if (transition.easing !== undefined) {
+    errors.push(...validateEasing(transition.easing, `${prefix}.easing`));
+  }
+
+  return errors;
+};
+
+const getSceneTransitionFrames = (value: unknown): number => {
+  if (!isRecord(value) || value.type === "cut" || !isInteger(value.durationInFrames)) return 0;
+  return Math.max(0, value.durationInFrames);
+};
+
 const audioExtensions = new Set([".mp3", ".wav", ".m4a", ".aac", ".ogg", ".opus", ".flac"]);
 
 const validateAudioEffects = (value: unknown, prefix: string): string[] => {
@@ -1031,13 +1087,14 @@ export const validateProjectDefinition = (value: unknown): string[] => {
   }
 
   if (compositionId === "ProjectVideo") {
-    if (!Array.isArray(value.scenes) || value.scenes.length < 1 || value.scenes.length > 20) {
+    const scenes = value.scenes;
+    if (!Array.isArray(scenes) || scenes.length < 1 || scenes.length > 20) {
       errors.push("ProjectVideo must contain between 1 and 20 scenes");
     } else {
       const ids = new Set<string>();
       let totalFrames = 0;
 
-      value.scenes.forEach((entry, index) => {
+      scenes.forEach((entry, index) => {
         const scene = isRecord(entry) ? entry : {};
         const prefix = `scenes[${index}]`;
 
@@ -1074,6 +1131,13 @@ export const validateProjectDefinition = (value: unknown): string[] => {
           if (color !== undefined && !isHexColor(color)) {
             errors.push(`${prefix}.${field} must be a six-digit hex color`);
           }
+        }
+        if (scene.transitionIn !== undefined) {
+          errors.push(...validateSceneTransition(
+            scene.transitionIn,
+            `${prefix}.transitionIn`,
+            isInteger(scene.durationInFrames) ? scene.durationInFrames : 0
+          ));
         }
 
         for (const field of ["eyebrowAnimation", "titleAnimation", "bodyAnimation"] as const) {
@@ -1152,6 +1216,22 @@ export const validateProjectDefinition = (value: unknown): string[] => {
             `${prefix}.media`,
             isInteger(scene.durationInFrames) ? scene.durationInFrames : 0
           ));
+        }
+      });
+
+      scenes.forEach((entry, index) => {
+        const scene = isRecord(entry) ? entry : {};
+        const nextScene = index + 1 < scenes.length && isRecord(scenes[index + 1])
+          ? scenes[index + 1] as JsonRecord
+          : undefined;
+        if (!isInteger(scene.durationInFrames)) return;
+
+        // A scene can be entering and leaving at the same time only if there is
+        // enough room for both windows without visual overlap.
+        const incomingFrames = index === 0 ? 0 : getSceneTransitionFrames(scene.transitionIn);
+        const outgoingFrames = nextScene ? getSceneTransitionFrames(nextScene.transitionIn) : 0;
+        if (incomingFrames + outgoingFrames >= scene.durationInFrames) {
+          errors.push(`scenes[${index}] incoming and outgoing transitions must leave at least one frame between them`);
         }
       });
 
