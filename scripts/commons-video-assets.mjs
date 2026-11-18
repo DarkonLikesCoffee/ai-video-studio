@@ -24,11 +24,26 @@ export const getHttpRetryDelayMs = (retryAfter, attempt, now = Date.now()) => {
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 export const fetchWithRetries = async (url, options = {}, fetchImpl = fetch, pause = sleep) => {
+  const { signal: callerSignal, ...requestOptions } = options;
   for (let attempt = 0; ; attempt += 1) {
-    const response = await fetchImpl(url, options);
+    const timeoutSignal = AbortSignal.timeout(TIMEOUT);
+    const signal = callerSignal
+      ? AbortSignal.any([callerSignal, timeoutSignal])
+      : timeoutSignal;
+    let response;
+    try {
+      response = await fetchImpl(url, { ...requestOptions, signal });
+    } catch (error) {
+      if (callerSignal?.aborted || attempt >= MAX_DOWNLOAD_RETRIES) throw error;
+      const delay = getHttpRetryDelayMs(null, attempt);
+      process.stderr.write("Wikimedia request failed (" + (error instanceof Error ? error.message : String(error)) +
+        "); retrying in " + delay + " ms (" + (attempt + 1) + "/" + MAX_DOWNLOAD_RETRIES + ").\\n");
+      await pause(delay);
+      continue;
+    }
     if (response.ok || !RETRYABLE_HTTP_STATUSES.has(response.status) || attempt >= MAX_DOWNLOAD_RETRIES) return response;
     const delay = getHttpRetryDelayMs(response.headers.get("retry-after"), attempt);
-    process.stderr.write("Wikimedia download returned HTTP " + response.status + "; retrying in " + delay + " ms (" + (attempt + 1) + "/" + MAX_DOWNLOAD_RETRIES + ").\n");
+    process.stderr.write("Wikimedia download returned HTTP " + response.status + "; retrying in " + delay + " ms (" + (attempt + 1) + "/" + MAX_DOWNLOAD_RETRIES + ").\\n");
     await pause(delay);
   }
 };
@@ -157,7 +172,6 @@ const downloadSelection = async (selectionPath, projectPath) => {
           "User-Agent": "AI-Video-Studio/0.1 (Wikimedia Commons media downloader)",
         },
         redirect: "follow",
-        signal: AbortSignal.timeout(TIMEOUT),
       });
       if (!response.ok) throw new Error("HTTP " + response.status);
       safeMediaUrl(response.url);
