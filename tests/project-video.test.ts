@@ -168,6 +168,21 @@ test("validator rejects simultaneous legacy media and mediaLayers", async () => 
   assert.ok(validateProjectDefinition(project).some((error) => error.includes("cannot define both media and mediaLayers")));
 });
 
+test("camera motion accepts subtle per-scene Ken Burns moves", async () => {
+  const project = await readExample();
+  project.scenes[0]!.cameraMotion = { zoom: 1.055, panX: -1.1, panY: 0.25 };
+  assert.deepEqual(validateProjectDefinition(project), []);
+});
+
+test("camera motion rejects extreme zoom and pan values", async () => {
+  const project = await readExample();
+  project.scenes[0]!.cameraMotion = { zoom: 1.5, panX: 12, panY: -11 };
+  const errors = validateProjectDefinition(project);
+  assert.ok(errors.some((error) => error.includes("cameraMotion.zoom must be between 1 and 1.2")));
+  assert.ok(errors.some((error) => error.includes("cameraMotion.panX must be between -10 and 10")));
+  assert.ok(errors.some((error) => error.includes("cameraMotion.panY must be between -10 and 10")));
+});
+
 test("validator accepts valid media and text animation tracks", async () => {
   const project = await readExample();
   project.scenes[0]!.mediaLayers![0]!.animations = {
