@@ -3,6 +3,6 @@
   "projectPath": "projects/examples/narrated-explainer/composition.json",
   "narrationPath": "projects/examples/narrated-explainer/production/narration.json",
   "compositionId": "NarratedSkyExplainer",
-  "outputName": "narrated-sky-nasa-library-hybrid",
-  "requestId": "narrated-sky-nasa-library-hybrid-20261118"
+  "outputName": "narrated-sky-nasa-bounded-rendition",
+  "requestId": "narrated-sky-nasa-bounded-rendition-20261118"
 }
