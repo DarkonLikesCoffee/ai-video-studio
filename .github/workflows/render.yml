@@ -74,6 +74,16 @@ jobs:
             echo "No approved NASA footage selection found; rendering the existing 3D-only composition." | tee -a "$GITHUB_STEP_SUMMARY"
           fi
 
+      - name: Extract user-owned VALORANT gameplay clips
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'ProjectVideo' && steps.request.outputs.project_path == 'projects/valorant-immortal-decision-making/scene.json'
+        run: |
+          PROJECT_DIR="$(dirname "${{ steps.request.outputs.project_path }}")"
+          ARCHIVE="$PROJECT_DIR/assets/valorant-gameplay-selected.zip"
+          test -f "$ARCHIVE"
+          mkdir -p "$PROJECT_DIR/assets"
+          unzip -jo "$ARCHIVE" 'valorant_selected/*.mp4' -d "$PROJECT_DIR/assets"
+          echo "Extracted $(find "$PROJECT_DIR/assets" -maxdepth 1 -name 'gameplay-*.mp4' | wc -l) user-owned gameplay clips."
+
       - name: Generate optional narration and word alignment
         id: narration
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.narration_path != ''

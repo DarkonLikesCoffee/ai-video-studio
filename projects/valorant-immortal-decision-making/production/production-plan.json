@@ -14,7 +14,7 @@
   "creativeDirection": {
     "objective": "Explain why high-elo VALORANT performance depends on round-winning decisions, not aim alone.",
     "audience": "Competitive VALORANT players from Diamond aiming to improve toward Immortal.",
-    "concept": "A dark esports documentary built around a visual contrast: the isolated duel versus the coordinated round. Tactical maps and motion graphics explain the decisions without pretending to be real gameplay.",
+    "concept": "A dark esports documentary combining authentic user-recorded VALORANT ACE/multikill footage with original tactical motion graphics to explain the contrast between isolated duels and coordinated round-winning decisions.",
     "emotionalArc": [
       "Pressure and frustration",
       "Mechanical confidence",
@@ -39,13 +39,14 @@
     "motionLanguage": "Every chapter contains moving paths, shifting target geometry, animated markers, pulsing zones or kinetic type. Use hard match cuts and short whoosh accents; no static slide sequence. Tactical graphics are explicitly illustrative, never presented as captured VALORANT gameplay.",
     "soundDirection": "Confident English narration from the built-in US English Kokoro voice, original rhythmic electronic score, music ducked beneath speech, restrained transition sweeps, low impact accents on the mistake and successful execution, and a final tonal resolve.",
     "assumptions": [
-      "No user-supplied VALORANT gameplay clips were attached, so the video uses original abstract tactical visualizations rather than fabricated gameplay footage.",
-      "The built-in US English voice is used; the exact voice timbre will be judged from the rendered audio."
+      "The built-in US English voice is used; the exact voice timbre will be judged from the rendered audio.",
+      "Seven user-owned VALORANT ACE/multikill clips are supplied and mapped across the six chapters; their footage is used as authentic gameplay, while explanatory tactical graphics remain illustrative."
     ],
     "rightsAndFactualConstraints": [
       "Do not use VALORANT gameplay, agent models, official logos, game UI or third-party music without supplied or verified rights.",
       "Label all map, reticle and team-position graphics as explanatory visualizations, not authentic match footage.",
-      "Use only original vector artwork and the repository's generated audio fixtures."
+      "Use only original vector artwork and the repository's generated audio fixtures.",
+      "User-owned gameplay clips are recorded by the project owner and are not represented as third-party licensed footage."
     ]
   },
   "shots": [
