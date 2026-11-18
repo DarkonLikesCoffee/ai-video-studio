@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import type { AudioTrack, VideoProject } from "../packages/video-engine/src/project";
 import { getProjectDurationInFrames, validateProjectDefinition } from "../packages/video-engine/src/project";
 import { buildNarrationSubtitles, type NarrationAlignedWord, type NarrationSubtitleOptions } from "../packages/video-engine/src/narration";
+import { buildNarratedFootageTimeline } from "../packages/video-engine/src/footage";
 
 const projectArg = process.argv[2];
 const configArg = process.argv[3];
@@ -72,6 +73,24 @@ if (compositionId === "NarratedSkyExplainer") {
       ...(config.speaker ? { speaker: config.speaker } : {}),
     },
   );
+  const storyboardPath = resolve(projectDirectory, "production/production-plan.json");
+  const assetManifestPath = resolve(projectDirectory, "production/asset-manifest.json");
+  const hasStoryboard = await access(storyboardPath).then(() => true).catch(() => false);
+  const hasAssetManifest = await access(assetManifestPath).then(() => true).catch(() => false);
+  if (hasAssetManifest && !hasStoryboard) {
+    throw new Error("Narrated footage asset manifest requires production/production-plan.json.");
+  }
+  const footageClips = hasStoryboard && hasAssetManifest
+    ? buildNarratedFootageTimeline(
+        JSON.parse(await readFile(assetManifestPath, "utf8")) as unknown,
+        JSON.parse(await readFile(storyboardPath, "utf8")) as unknown,
+        metadata.composition.fps,
+      )
+    : [];
+  for (const clip of footageClips) {
+    await access(resolve(projectDirectory, clip.src));
+  }
+
   const customProps = {
     title: metadata.title,
     durationInFrames,
@@ -79,10 +98,12 @@ if (compositionId === "NarratedSkyExplainer") {
     musicAudioSrc: "assets/audio/score.wav",
     transitionAudioSrc: "assets/audio/transition-whoosh.wav",
     subtitleCues,
+    ...(footageClips.length > 0 ? { footageClips } : {}),
   };
   const outputPath = resolve(projectDirectory, ".narrated-project.json");
   await writeFile(outputPath, JSON.stringify(customProps, null, 2) + "\n", "utf8");
   console.log(`Applied generated voice-over and ${subtitleCues.length} timed caption cues to NarratedSkyExplainer.`);
+  console.log(`Added ${footageClips.length} storyboard-matched footage clips.`);
   console.log(`Custom composition props: ${outputPath}`);
   process.exit(0);
 }
