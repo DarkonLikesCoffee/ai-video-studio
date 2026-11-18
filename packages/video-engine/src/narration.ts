@@ -126,9 +126,16 @@ export const buildNarrationSubtitles = (
       Math.max(startInFrames + 1, Math.ceil(group.at(-1)!.endSeconds * fps)),
     );
     const durationInFrames = endInFrames - startInFrames;
+    let previousWordEnd = 0;
     const wordTimings: SubtitleWordTiming[] = group.map((word) => {
-      const start = Math.max(0, Math.floor(word.startSeconds * fps) - startInFrames);
-      const end = Math.min(durationInFrames, Math.max(start + 1, Math.ceil(word.endSeconds * fps) - startInFrames));
+      const roundedStart = Math.max(0, Math.round(word.startSeconds * fps) - startInFrames);
+      const start = Math.max(previousWordEnd, roundedStart);
+      const roundedEnd = Math.round(word.endSeconds * fps) - startInFrames;
+      const end = Math.min(durationInFrames, Math.max(start + 1, roundedEnd));
+      if (end > durationInFrames || start >= durationInFrames) {
+        throw new Error(`Word "${word.text}" cannot fit inside its subtitle cue at the selected FPS.`);
+      }
+      previousWordEnd = end;
       return { text: word.text, startInFrames: start, endInFrames: end };
     });
     return {
