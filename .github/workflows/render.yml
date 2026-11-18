@@ -69,6 +69,9 @@ jobs:
           NARRATION_PATH: ${{ steps.request.outputs.narration_path }}
         run: |
           PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+          mkdir -p "$PROJECT_DIR/assets/audio"
+          cp projects/sora/assets/audio/score.wav "$PROJECT_DIR/assets/audio/score.wav"
+          cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
           python scripts/generate-narration.py \
             --config "$NARRATION_PATH" \
             --project-dir "$PROJECT_DIR" \
@@ -112,6 +115,17 @@ jobs:
           PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
         run: npm run audio:master -- "render-output/$OUTPUT_NAME.mp4" "$PROJECT_PATH"
+
+      - name: Master final custom narrated composition audio
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
+        env:
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+        run: |
+          ffmpeg -y -i "render-output/$OUTPUT_NAME.mp4" \
+            -af "loudnorm=I=-16:TP=-1.5:LRA=11" \
+            -c:v copy -c:a aac -b:a 192k -movflags +faststart \
+            "render-output/$OUTPUT_NAME.mastered.mp4"
+          mv "render-output/$OUTPUT_NAME.mastered.mp4" "render-output/$OUTPUT_NAME.mp4"
 
       - name: Upload MP4 artifact
         if: steps.request.outputs.provider == 'github-actions'
