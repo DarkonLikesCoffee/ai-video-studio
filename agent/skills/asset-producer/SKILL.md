@@ -24,8 +24,8 @@ Create or source a coherent set of visual and audio assets that makes the storyb
    - Select only CC0, Public Domain or CC BY 2.0/3.0/4.0 assets, add the relevant `shotIds`, and download with `node scripts/commons-video-assets.mjs download --selection selection.json --project projects/<slug>`.
    - Only HTTPS files hosted on upload.wikimedia.org and supported MP4/WebM/QuickTime/Ogg videos are accepted; downloads are capped at 150 MiB and recorded in the shared asset manifest. Check the final clip's actual duration and codec before editing.
 7. Save approved assets under `projects/<slug>/assets/`. Use descriptive, stable filenames. Avoid remote URLs in final renders unless there is a compelling reason.
-7. Create an asset manifest containing filename, type, intended shot IDs, source/provenance, license/permission, generation prompt or source URL, dimensions/duration and any limitations.
-8. Check every file exists, opens, has the expected dimensions/codec and matches the storyboard. Replace broken or mismatched assets before rendering.
+8. Create an asset manifest containing filename, type, intended shot IDs, source/provenance, license/permission, generation prompt or source URL, dimensions/duration and any limitations.
+9. Check every file exists, opens, has the expected dimensions/codec and matches the storyboard. Replace broken or mismatched assets before rendering.
 
 ## Image/video continuity
 
