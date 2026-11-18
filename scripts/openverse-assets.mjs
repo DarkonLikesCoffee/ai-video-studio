@@ -5,7 +5,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 const API_BASE = "https://api.openverse.org/v1/images/";
-const ALLOWED_LICENSES = new Set(["cc0", "pdm", "by", "by-sa"]);
+const ALLOWED_LICENSES = new Set(["cc0", "pdm", "by"]);
 const EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "avif"]);
 const MIME_EXTENSIONS = new Map([
   ["image/jpeg", "jpg"],
