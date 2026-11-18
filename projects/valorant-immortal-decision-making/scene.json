@@ -256,7 +256,12 @@
           "shape": "diamond",
           "blendMode": "screen"
         }
-      ]
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": -1.1,
+        "panY": 0.25
+      }
     },
     {
       "id": "aim-isnt-everything",
@@ -537,7 +542,12 @@
           "shape": "diamond",
           "blendMode": "screen"
         }
-      ]
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": 1.1,
+        "panY": -0.25
+      }
     },
     {
       "id": "read-the-round",
@@ -914,7 +924,12 @@
           "shape": "diamond",
           "blendMode": "screen"
         }
-      ]
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": -1.1,
+        "panY": 0.25
+      }
     },
     {
       "id": "the-ego-peek",
@@ -1210,7 +1225,12 @@
           "shape": "diamond",
           "blendMode": "screen"
         }
-      ]
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": 1.1,
+        "panY": -0.25
+      }
     },
     {
       "id": "the-better-play",
@@ -1622,7 +1642,12 @@
           "shape": "diamond",
           "blendMode": "screen"
         }
-      ]
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": -1.1,
+        "panY": 0.25
+      }
     },
     {
       "id": "play-smarter",
@@ -1841,7 +1866,12 @@
           "shape": "diamond",
           "blendMode": "screen"
         }
-      ]
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": 1.1,
+        "panY": -0.25
+      }
     }
   ],
   "audioTracks": [
