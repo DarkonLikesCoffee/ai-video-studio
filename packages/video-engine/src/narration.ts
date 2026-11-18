@@ -132,7 +132,7 @@ export const buildNarrationSubtitles = (
       return { text: word.text, startInFrames: start, endInFrames: end };
     });
     return {
-      id: `narration-${String(index + 1).padStart(3, "0")}`,
+      id: `generated-vo-${String(index + 1).padStart(3, "0")}`,
       startInFrames,
       durationInFrames,
       text: group.map((word) => word.text).join(" "),
