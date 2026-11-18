@@ -75,8 +75,7 @@ export const buildNarratedFootageTimeline = (
     });
   }
 
-  const assignedShots = new Set<string>();
-  const clips: NarratedFootageTimelineClip[] = [];
+  const assetsByShotId = new Map<string, Array<{ assetIndex: number; file: string; trimSeconds: number }>>();
   for (const [assetIndex, value] of manifestValue.assets.entries()) {
     if (!isRecord(value) || !isSafeFootageFilename(value.file) ||
         !(isAllowedFootageLicense(value.license) || hasExplicitUserRights(value)) ||
@@ -84,27 +83,42 @@ export const buildNarratedFootageTimeline = (
       continue;
     }
     for (const shotId of value.shotIds) {
-      if (typeof shotId !== "string" || assignedShots.has(shotId)) continue;
-      const shot = shots.get(shotId);
-      if (!shot) continue;
-      const startInFrames = Math.round(shot.startSeconds * fps);
-      const durationInFrames = Math.round(shot.durationSeconds * fps);
+      if (typeof shotId !== "string" || !shots.has(shotId)) continue;
       const trimSeconds = isRecord(value.trimBeforeSecondsByShotId)
         ? value.trimBeforeSecondsByShotId[shotId]
         : 0;
       if (typeof trimSeconds !== "number" || !Number.isFinite(trimSeconds) || trimSeconds < 0) continue;
-      const trimBefore = Math.round(trimSeconds * fps);
-      if (durationInFrames < 1) continue;
+      const assets = assetsByShotId.get(shotId) ?? [];
+      assets.push({ assetIndex, file: value.file, trimSeconds });
+      assetsByShotId.set(shotId, assets);
+    }
+  }
+
+  const clips: NarratedFootageTimelineClip[] = [];
+  for (const [shotId, assets] of assetsByShotId) {
+    const shot = shots.get(shotId);
+    if (!shot || assets.length === 0) continue;
+    const shotStartInFrames = Math.round(shot.startSeconds * fps);
+    const shotDurationInFrames = Math.round(shot.durationSeconds * fps);
+    if (shotDurationInFrames < assets.length) continue;
+
+    // Multiple manifest assets assigned to one shot are intentional edit cuts.
+    // Divide the storyboard window evenly so every selected source gets screen time.
+    assets.forEach((asset, clipIndex) => {
+      const startOffset = Math.floor(clipIndex * shotDurationInFrames / assets.length);
+      const endOffset = Math.floor((clipIndex + 1) * shotDurationInFrames / assets.length);
+      const durationInFrames = endOffset - startOffset;
+      const trimBefore = Math.round(asset.trimSeconds * fps);
+      if (durationInFrames < 1) return;
       clips.push({
-        id: "footage-" + shot.id + "-" + assetIndex,
+        id: "footage-" + shot.id + "-" + asset.assetIndex,
         shotId: shot.id,
-        src: "assets/" + value.file,
-        startInFrames,
+        src: "assets/" + asset.file,
+        startInFrames: shotStartInFrames + startOffset,
         durationInFrames,
         ...(trimBefore > 0 ? { trimBefore } : {}),
       });
-      assignedShots.add(shotId);
-    }
+    });
   }
   return clips.sort((a, b) => a.startInFrames - b.startInFrames);
 };
@@ -125,28 +139,42 @@ export const applyNarratedFootageToProject = (
     planValue,
     project.composition.fps,
   );
-  const clipsByShotId = new Map(clips.map((clip) => [clip.shotId, clip]));
+  const clipsByShotId = new Map<string, NarratedFootageTimelineClip[]>();
+  const shotsStartSeconds = new Map<string, number>();
+  if (isRecord(planValue) && Array.isArray(planValue.shots)) {
+    for (const shot of planValue.shots) {
+      if (isRecord(shot) && typeof shot.id === "string" && typeof shot.startSeconds === "number") {
+        shotsStartSeconds.set(shot.id, shot.startSeconds);
+      }
+    }
+  }
+  for (const clip of clips) {
+    const shotClips = clipsByShotId.get(clip.shotId) ?? [];
+    shotClips.push(clip);
+    clipsByShotId.set(clip.shotId, shotClips);
+  }
   return {
     ...project,
     scenes: project.scenes.map((scene) => {
-      const clip = clipsByShotId.get(scene.id);
-      if (!clip) return scene;
+      const shotClips = clipsByShotId.get(scene.id);
+      if (!shotClips?.length) return scene;
       const { media: _legacyMedia, ...sceneWithoutLegacyMedia } = scene;
+      const shotStartInFrames = Math.round((shotsStartSeconds.get(scene.id) ?? 0) * project.composition.fps);
       return {
         ...sceneWithoutLegacyMedia,
-        mediaLayers: [{
+        mediaLayers: shotClips.map((clip, index) => ({
           id: clip.id,
-          type: "video",
+          type: "video" as const,
           src: clip.src,
-          placement: "background",
-          fit: "cover",
+          placement: "background" as const,
+          fit: "cover" as const,
           opacity: 0.82,
           muted: true,
-          zIndex: 0,
-          startInFrames: 0,
-          durationInFrames: scene.durationInFrames,
+          zIndex: index,
+          startInFrames: clip.startInFrames - shotStartInFrames,
+          durationInFrames: clip.durationInFrames,
           ...(clip.trimBefore === undefined ? {} : { trimBefore: clip.trimBefore }),
-        }],
+        })),
       };
     }),
   };
