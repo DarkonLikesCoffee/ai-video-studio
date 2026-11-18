@@ -83,8 +83,15 @@ jobs:
         run: |
           PROJECT_DIR="$(dirname "$PROJECT_PATH")"
           mkdir -p "$PROJECT_DIR/assets/audio"
-          cp projects/sora/assets/audio/score.wav "$PROJECT_DIR/assets/audio/score.wav"
-          cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
+          if [[ "$PROJECT_PATH" == "projects/valorant-immortal-decision-making/scene.json" ]]; then
+            cp projects/showcase-pulse/assets/audio/score.wav "$PROJECT_DIR/assets/audio/score.wav"
+            cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
+            cp projects/showcase-motion/assets/audio/impact.wav "$PROJECT_DIR/assets/audio/impact.wav"
+            cp projects/showcase-motion/assets/audio/transition-chime.wav "$PROJECT_DIR/assets/audio/transition-chime.wav"
+          else
+            cp projects/sora/assets/audio/score.wav "$PROJECT_DIR/assets/audio/score.wav"
+            cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
+          fi
           python scripts/generate-narration.py \
             --config "$NARRATION_PATH" \
             --project-dir "$PROJECT_DIR" \
