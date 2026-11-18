@@ -1,14 +1,13 @@
-# AI Video Studio — Progress Log
+## 2026-11-18 — v6 audio fix verified; cinematic camera motion in PR #57
 
-This file is the durable record of project decisions and session handoffs. Append new dated entries; do not silently rewrite history. Keep the newest entry at the top.
-
-## 2026-11-18 — Sidechain fix CI passed; VALORANT v6 rendering
-
-- Corrected the strict optional-property typing issue by passing `track.loop ?? false` to the helper.
-- Fresh CI run #44384134279 passed: typecheck, all tests, all production-plan validations, VALORANT audio preparation, DSP/sidechain processing and studio build.
-- Triggered a full branch render v6 from commit `366d5767cc12cde45d6e914dc00a8ed19caabc36`; workflow run #44383766685 is in progress. It includes the updated sidechain audio-preparation code.
-- PR #56 remains open and unmerged until the v6 artifact is downloaded and QA proves the late gaps are gone.
-- Next: inspect v6 QA report and audio tail; if clean, merge PR #56 and rerun on main. Then address visual repetition/freeze: the v5 contact sheet confirms the same SVG/tactical-map compositions repeat for long intervals and QA reported nine frozen intervals.
+- PR #56 merged into main as 338b55a2bf45e39e096ac722a740f73b9562a5f1 (fix(audio): preserve looped music through narration tail).
+- Main CI run #44385444014 passed.
+- Downloaded actual render artifact #14466045811 from v6 render #44383766685. QA confirms 60.1s, 1920x1080, 30fps, H.264/AAC stereo, integrated loudness -16.8 LUFS, zero silence intervals and zero black-frame intervals.
+- Audio issue is considered fixed based on this full production render; v6 is not accepted as a finished video because nine freeze intervals remain and the visuals are still dominated by original vector diagrams rather than authentic VALORANT gameplay.
+- Inspected source: scenes last 300 frames, but many media/graphic animation tracks clamp at frames 70–190. The composition then holds almost static for the rest of each scene. The existing outer decorative ring movement is too subtle and mostly outside the frame.
+- Created PR #57: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/57. Adds optional per-scene cameraMotion (zoom/pan), validation bounds, media/graphics/particle camera movement while keeping typography stationary, and alternating camera moves across the six VALORANT scenes. Added schema regression tests.
+- CI run #44385753034 is running. Do not merge until green CI and a fresh v7 render confirms the camera movement is visible, reduces freeze warnings and does not crop important content.
+- Next: inspect PR #57 CI; fix any type/test/render issues; render v7 and inspect the actual artifact. Then prioritize authentic licensed motion footage and shot-level visual diversity.
 
 ## 2026-11-18 — Sidechain fix strict-type correction
 

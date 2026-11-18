@@ -3,7 +3,7 @@
 **Last verified:** 2026-11-18  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `8804c66264f2243378424836c3d74fddb24617ab` — “test(render): run VALORANT with media QA report v5”
+**Last verified main commit:** `338b55a2bf45e39e096ac722a740f73b9562a5f1` — “fix(audio): preserve looped music through narration tail”
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -99,14 +99,22 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 6. Latest GitHub state snapshot
 
-At the time of verification:
-- `main` points to `8e2049f`; PR #54 merged after CI run #44380704836 passed (typecheck, tests, all project validation and build). The render workflow now runs `npm run qa:media` on the final MP4 and uploads the sidecar JSON alongside the artifact. VALORANT v5 render #44381103388 completed successfully and produced artifact #14462663601 (MP4 + QA JSON). QA confirmed the three late silence intervals remain and identified nine frozen-video intervals. PR #55 (`fix/sidechain-music-tail`) is open with a proposed fix; it is not merged or CI-verified yet.
-- PR #52 was merged. PR #51 was confirmed obsolete and closed without merging.
-- PR #54 was merged by squash into `8e2049f`. CI #44380704836 passed. PR #51 was closed as obsolete without merge. PR #55 was superseded and closed; PR #56 is the active sidechain fix.
-- Successful render artifact run #44360142074 had artifact ID `14453909935`; GitHub reported expiry on 2026-11-21. Artifacts are temporary; preserve important final videos elsewhere if needed.
-- `render-request.json` is a mutable request file and currently relates to a specific example/project. Never assume it is a generic default.
+Verified on 2026-11-18:
+- main is 338b55a2bf45e39e096ac722a740f73b9562a5f1, the squash merge of PR #56.
+- PR #56 (looped music/sidechain tail fix) is merged. Main CI run #44385444014 passed.
+- Actual VALORANT v6 render run #44383766685 succeeded on the PR #56 code. Artifact #14466045811 contains the MP4 and QA JSON (temporary artifact; expires 2026-11-21).
+- Downloaded v6 QA: 60.1s, 1920x1080, 30fps, H.264/AAC stereo, -16.8 LUFS, zero silence intervals and zero black-frame intervals. Nine freeze intervals remain, so the video is still not creatively accepted.
+- Source diagnosis: multiple 300-frame scenes have media/graphic keyframes that end around frames 70–190. Their values clamp for the remainder of the scene, producing long near-static holds. The existing decorative ring motion is too subtle/off-canvas to provide meaningful shot motion.
+- PR #57 (feat/cinematic-motion-qa) adds validated per-scene camera motion and restrained alternating Ken Burns moves to the VALORANT project. CI run #44385753034 is in progress at this snapshot. Do not merge until CI passes and a fresh rendered MP4 is inspected; compare freeze warnings and actual motion.
+- V5 is rejected; v6 validates the audio fix only. Neither is accepted as a cinematic explainer. Authentic licensed gameplay footage remains absent.
 
 ## 7. Immediate development direction
+
+1. Verify PR #57 and render its VALORANT project; continuous camera motion should reduce static holds but is not a substitute for real gameplay.
+2. Build a repeatable shot/asset workflow that can source verified licensed moving footage when the brief requires real-world or gameplay action.
+3. Improve semantic visual QA to judge shot relevance, meaningful motion, repetition and storytelling, not just technical freeze/silence signals.
+4. Keep the release gate strict: inspect the actual artifact, not just CI. Do not call a project finished while it still resembles a slideshow.
+
 
 The biggest gap is not basic rendering. It is the **production intelligence and audiovisual quality** between a user's prompt and the final edit.
 

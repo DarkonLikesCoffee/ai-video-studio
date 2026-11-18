@@ -469,6 +469,11 @@ const SceneCard: FC<SceneCardProps> = ({
 }) => {
   const frame = useCurrentFrame();
   const duration = scene.durationInFrames;
+  const cameraProgress = interpolate(frame, [0, Math.max(1, duration - 1)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cameraMotion = scene.cameraMotion;
+  const cameraTransform = cameraMotion
+    ? `translate(${(cameraMotion.panX ?? 0) * cameraProgress}%, ${(cameraMotion.panY ?? 0) * cameraProgress}%) scale(${1 + ((cameraMotion.zoom ?? 1) - 1) * cameraProgress})`
+    : undefined;
   // Fade the film at its outer edges only. Internal scene cuts stay fully visible.
   const fadeIn = interpolate(frame, [0, 12], [0, 1], {
     extrapolateLeft: "clamp",
@@ -534,6 +539,9 @@ const SceneCard: FC<SceneCardProps> = ({
           : {}),
       }}
     >
+      <AbsoluteFill
+        style={cameraTransform ? { transform: cameraTransform, transformOrigin: "center center", willChange: "transform" } : undefined}
+      >
       {mediaLayers.map((media, layerIndex) => {
         const startInFrames = media.startInFrames ?? 0;
         const durationInFrames = getTransitionExtendedDuration(
@@ -592,6 +600,7 @@ const SceneCard: FC<SceneCardProps> = ({
           </Sequence>
         );
       })}
+      </AbsoluteFill>
       {hasLegacyBackground ? (
         <AbsoluteFill
           style={{

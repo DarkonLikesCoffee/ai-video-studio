@@ -116,3 +116,10 @@ Do not mark a milestone complete until:
 - Audio is listened to when possible; otherwise clearly state that only technical measurements were performed.
 - The result is judged against the original brief and the acceptance criteria.
 - Any known defects and limitations are documented.
+
+
+## Current implementation focus — visual motion after v6
+
+- [ ] Verify PR #57's per-scene camera motion in a fresh rendered VALORANT artifact; require visible movement, no unintended crop and a lower freeze-warning count.
+- [ ] Add real licensed moving footage for briefs that demand authentic action; camera motion over static SVGs is an incremental improvement, not a substitute.
+- [ ] Review shot variety, action relevance and pacing across the complete rendered timeline before accepting the video.

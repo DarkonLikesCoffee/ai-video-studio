@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import type { AudioTrack, VideoProject } from "../packages/video-engine/src/project";
 import { getProjectDurationInFrames, validateProjectDefinition } from "../packages/video-engine/src/project";
 import { buildNarrationSubtitles, type NarrationAlignedWord, type NarrationSubtitleOptions } from "../packages/video-engine/src/narration";
+import { retimeProjectToDuration } from "../packages/video-engine/src/narration-timeline";
 import { buildNarratedFootageTimeline } from "../packages/video-engine/src/footage";
 
 const projectArg = process.argv[2];
@@ -114,16 +115,21 @@ if (compositionId !== "ProjectVideo") {
 
 const narrationAsset = resolve(projectDirectory, "assets/audio/narration.wav");
 await access(narrationAsset);
-const videoProject = project as VideoProject;
-const fps = videoProject.composition.fps;
-const projectDurationInFrames = getProjectDurationInFrames(videoProject);
+const originalProject = project as VideoProject;
+const fps = originalProject.composition.fps;
+const originalDurationInFrames = getProjectDurationInFrames(originalProject);
 const narrationDurationInFrames = Math.ceil(alignment.durationSeconds! * fps);
-if (narrationDurationInFrames > projectDurationInFrames) {
-  throw new Error(
-    `Narration is ${alignment.durationSeconds!.toFixed(2)}s but the project is only ${(projectDurationInFrames / fps).toFixed(2)}s. ` +
-    "Extend the storyboard; the narration will not be sped up or cut off automatically."
-  );
-}
+// Keep a short visual/music landing after the final spoken word, then retime
+// every scene and its internal events together instead of leaving a long
+// un-narrated visual tail.
+const visualTailFrames = Math.round(fps * 0.4);
+const targetDurationInFrames = narrationDurationInFrames + visualTailFrames;
+const videoProject = retimeProjectToDuration(originalProject, targetDurationInFrames);
+const projectDurationInFrames = getProjectDurationInFrames(videoProject);
+console.log(
+  `Retimed storyboard from ${(originalDurationInFrames / fps).toFixed(2)}s to ${(projectDurationInFrames / fps).toFixed(2)}s ` +
+  `to follow the ${alignment.durationSeconds!.toFixed(2)}s narration, with a ${(visualTailFrames / fps).toFixed(2)}s visual landing.`
+);
 
 const existingTracks = videoProject.audioTracks ?? [];
 if (existingTracks.some((track) => track.role === "voiceover")) {
