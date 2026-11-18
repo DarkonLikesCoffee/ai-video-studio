@@ -5,6 +5,7 @@ import { DemoVideo } from "./scenes/DemoVideo";
 import { ProjectVideo } from "./scenes/ProjectVideo";
 import { ThreeDShowcase } from "./scenes/ThreeDShowcase";
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
+import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
 
 // Remotion merges partial --props over defaultProps. Do not leak the example
 // project's soundtrack into projects that intentionally omit audioTracks.
@@ -53,6 +54,22 @@ export const RemotionRoot = () => (
       fps={30}
       width={1920}
       height={1080}
+    />
+    <Composition
+      id="NarratedSkyExplainer"
+      component={NarratedSkyExplainer}
+      durationInFrames={600}
+      fps={30}
+      width={1920}
+      height={1080}
+      defaultProps={{
+        title: "Por qué el cielo es azul",
+        durationInFrames: 600,
+        narrationAudioSrc: "assets/audio/narration.wav",
+        musicAudioSrc: "assets/audio/score.wav",
+        transitionAudioSrc: "assets/audio/transition-whoosh.wav",
+        subtitleCues: [],
+      } satisfies NarratedSkyExplainerProps}
     />
   </>
 );
