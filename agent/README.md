@@ -26,6 +26,7 @@ Use these skill files as focused playbooks. Apply all relevant skills; do not tr
 - `skills/visual-qa/SKILL.md`
 - `skills/narrated-video-producer/SKILL.md` — mandatory for explainers, educational videos, stories and short-form videos with narration.
 - `EXTERNAL_SKILLS.md` — reviewed upstream skill references, installation guidance and license notes.
+- `.claude/skills/video-engine/` — vendored MIT video-engine skill and repository-specific integration notes, automatically discoverable by Claude Code.
 
 ## Source of truth and boundaries
 
