@@ -15,7 +15,7 @@ Create or source a coherent set of visual and audio assets that makes the storyb
    - Review candidate titles, previews/source pages, creator, license and composition against the shot. Openverse is a search index; verify the original source page and current license before use.
    - Create a selection JSON containing only approved result objects under `assets`, adding the `shotIds` array to each selected object. Keep the original Openverse fields intact.
    - Download: `node scripts/openverse-assets.mjs download --selection /path/to/selection.json --project projects/<slug>`.
-   - The helper allows CC0, PDM, CC BY and CC BY-SA only; it rejects non-commercial/no-derivatives licenses, non-HTTPS URLs, unsupported formats and oversized files. It downloads raster images locally and merges provenance into `production/asset-manifest.json`.
+   - The helper allows CC0, PDM and CC BY only; it rejects non-commercial/no-derivatives licenses, non-HTTPS URLs, unsupported formats and oversized files. It downloads raster images locally and merges provenance into `production/asset-manifest.json`.
    - Openverse currently provides image/audio discovery here, not generated video footage. Treat stills as B-roll plates for deliberate parallax, camera moves and compositing; do not describe them as video clips.
 6. Save approved assets under `projects/<slug>/assets/`. Use descriptive, stable filenames. Avoid remote URLs in final renders unless there is a compelling reason.
 7. Create an asset manifest containing filename, type, intended shot IDs, source/provenance, license/permission, generation prompt or source URL, dimensions/duration and any limitations.
