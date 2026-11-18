@@ -1,8 +1,8 @@
 {
   "provider": "github-actions",
-  "projectPath": "projects/examples/narrated-explainer/scene.json",
+  "projectPath": "projects/examples/narrated-explainer/composition.json",
   "narrationPath": "projects/examples/narrated-explainer/production/narration.json",
-  "compositionId": "ProjectVideo",
-  "outputName": "narrated-sky-explainer",
-  "requestId": "narrated-sky-v1-20261118"
+  "compositionId": "NarratedSkyExplainer",
+  "outputName": "narrated-sky-custom-3d",
+  "requestId": "narrated-sky-custom-v1-20261118"
 }
