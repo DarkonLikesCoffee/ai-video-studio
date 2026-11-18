@@ -52,6 +52,8 @@ jobs:
         run: npm run validate:plan -- projects/examples/narrated-explainer/production/production-plan.json
       - name: Validate SORA production plan
         run: npm run validate:plan -- projects/sora/production/production-plan.json
+      - name: Validate VALORANT explainer production plan
+        run: npm run validate:plan -- projects/valorant-immortal-decision-making/production/production-plan.json
       - name: Ensure FFmpeg is available
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1; then
@@ -73,6 +75,8 @@ jobs:
         run: npm run validate:project -- projects/sora/scene.json
       - name: Validate narrated explainer project
         run: npm run validate:project -- projects/examples/narrated-explainer/scene.json
+      - name: Validate VALORANT explainer project
+        run: npm run validate:project -- projects/valorant-immortal-decision-making/scene.json
       - name: Validate narrated custom composition metadata
         run: node -e 'const p = JSON.parse(require("node:fs").readFileSync("projects/examples/narrated-explainer/composition.json", "utf8")); if (p.schemaVersion !== 1 || p.composition.id !== "NarratedSkyExplainer" || p.composition.width !== 1920 || p.composition.height !== 1080 || p.composition.fps !== 30 || p.composition.durationInFrames !== 600) throw new Error("Invalid NarratedSkyExplainer metadata");'
       - name: Prepare track DSP and sidechain processing
