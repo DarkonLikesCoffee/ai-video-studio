@@ -53,6 +53,17 @@ node scripts/openverse-assets.mjs download --selection /path/to/selection.json -
 
 The helper accepts CC0, Public Domain Mark and CC BY assets; rejects non-commercial/no-derivatives licenses, unsafe URLs, unsupported formats and files over 25 MiB; and records creator, source page, license, attribution, dimensions and SHA-256. Openverse is a discovery index, not a guarantee that source metadata is correct: verify each original source page before approval. This workflow discovers still images and is not a video-generation or stock-footage API.
 
+To generate candidate searches directly from a storyboard, run one query per shot and keep the results grouped by shot ID:
+
+```bash
+node scripts/openverse-assets.mjs storyboard-search \
+  --plan projects/<slug>/production/production-plan.json \
+  --max-shots 12 --limit 8 \
+  --output /tmp/storyboard-assets.json
+```
+
+The output keeps candidates separate per shot and includes thumbnail URLs for visual review. The agent should compare the candidate image against the shot's subject, framing and continuity before selecting it; no image is auto-approved.
+
 ## Example project
 
 The repository keeps [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json) as a compatibility sample for local SVG and remote MP4 assets.
