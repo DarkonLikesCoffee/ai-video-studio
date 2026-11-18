@@ -15,7 +15,7 @@ export const validateRenderRequest = (value) => {
   if (!isRecord(value)) return { errors: ["Render request must be a JSON object."] };
 
   const errors = [];
-  const { provider, compositionId, outputName, requestId, projectPath } = value;
+  const { provider, compositionId, outputName, requestId, projectPath, narrationPath } = value;
 
   if (provider !== "github-actions" && provider !== "circleci") {
     errors.push("provider must be github-actions or circleci.");
@@ -45,6 +45,14 @@ export const validateRenderRequest = (value) => {
     errors.push("ProjectVideo requires projectPath.");
   }
 
+  if (narrationPath !== undefined &&
+      (typeof narrationPath !== "string" || !isProjectPath(narrationPath))) {
+    errors.push("narrationPath, when supplied, must point to a JSON file inside projects/.");
+  }
+  if (narrationPath !== undefined && compositionId !== "ProjectVideo") {
+    errors.push("narrationPath is currently supported only for ProjectVideo.");
+  }
+
   if (errors.length > 0) return { errors };
 
   return {
@@ -55,6 +63,7 @@ export const validateRenderRequest = (value) => {
       outputName,
       requestId,
       ...(typeof projectPath === "string" ? { projectPath } : {}),
+      ...(typeof narrationPath === "string" ? { narrationPath } : {}),
     },
   };
 };
@@ -90,11 +99,25 @@ const run = async () => {
     }
   }
 
+  if (request.narrationPath) {
+    let narration;
+    try {
+      narration = JSON.parse(await readFile(request.narrationPath, "utf8"));
+    } catch (error) {
+      throw new Error(`Could not read narration config ${request.narrationPath}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if (!isRecord(narration) || narration.schemaVersion !== 1 ||
+        typeof narration.text !== "string" || !narration.text.trim()) {
+      throw new Error("Narration config must have schemaVersion: 1 and non-empty text.");
+    }
+  }
+
   const output = process.env.GITHUB_OUTPUT;
   if (output) {
     await appendFile(output, [
       `provider=${request.provider}`,
       `project_path=${request.projectPath ?? ""}`,
+      `narration_path=${request.narrationPath ?? ""}`,
       `composition_id=${request.compositionId}`,
       `output_name=${request.outputName}`,
       `request_id=${request.requestId}`,
