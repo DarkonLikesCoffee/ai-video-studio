@@ -62,7 +62,7 @@ def map_words(kokoro: Any, text: str, language: str, timings: list[Any]) -> list
     alignment, retain the model's actual timings, and reject poor alignments
     rather than fabricating subtitle positions.
     """
-    words = re.findall(r"\\S+", text)
+    words = re.findall(r"\S+", text)
     timed_phonemes = [item for item in timings if not str(item.phoneme).isspace()]
     if not words or not timed_phonemes:
         raise RuntimeError("Kokoro did not return usable word timing data.")
