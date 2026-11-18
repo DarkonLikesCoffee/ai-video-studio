@@ -5,6 +5,7 @@ export type OpenverseAsset = {
   creatorUrl: string | null;
   source: string;
   sourcePage: string | null;
+  thumbnail: string | null;
   url: string | null;
   license: string;
   licenseVersion: string | null;
@@ -17,6 +18,7 @@ export type OpenverseAsset = {
 };
 export function isAllowedLicense(license: string): boolean;
 export function buildSearchUrl(query: string, limit?: number): URL;
+export function buildShotQueries(plan: { shots: Array<Record<string, unknown>> }, maxShots?: number): Array<{ shotId: string; query: string }>;
 export function normalizeCandidate(item: Record<string, unknown>): OpenverseAsset;
 export function detectImageExtension(bytes: Uint8Array, contentType?: string): string | null;
 export function validateSelection(selection: { assets: Array<Record<string, unknown>> }): Array<OpenverseAsset & { shotIds: string[] }>;
