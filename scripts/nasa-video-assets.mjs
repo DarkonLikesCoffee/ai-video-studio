@@ -67,13 +67,13 @@ export const fetchNasaVideoWithRetries = async (
     } catch (error) {
       if (attempt >= MAX_RETRIES) throw error;
       const delay = getNasaRetryDelayMs(null, attempt);
-      process.stderr.write("NASA SVS request failed; retrying in " + delay + " ms (" + (attempt + 1) + "/" + MAX_RETRIES + ").\n");
+      process.stderr.write("NASA media request failed; retrying in " + delay + " ms (" + (attempt + 1) + "/" + MAX_RETRIES + ").\n");
       await pause(delay);
       continue;
     }
     if (response.ok || !RETRYABLE.has(response.status) || attempt >= MAX_RETRIES) return response;
     const delay = getNasaRetryDelayMs(response.headers.get("retry-after"), attempt);
-    process.stderr.write("NASA SVS returned HTTP " + response.status + "; retrying in " + delay + " ms (" + (attempt + 1) + "/" + MAX_RETRIES + ").\n");
+    process.stderr.write("NASA media returned HTTP " + response.status + "; retrying in " + delay + " ms (" + (attempt + 1) + "/" + MAX_RETRIES + ").\n");
     await pause(delay);
   }
 };
