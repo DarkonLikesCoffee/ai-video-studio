@@ -33,19 +33,15 @@ The current validator limits projects to 1,800 total frames, with each scene bet
 
 ## Narrated footage workflow
 
-The `projects/examples/narrated-explainer` sample includes a five-shot storyboard. Discover candidates with:
+The `projects/examples/narrated-explainer` sample uses selected NASA Scientific Visualization Studio (SVS) clips. NASA SVS states that its visualizations are public domain unless an individual item notes an exception; check each source page and use without embedded source audio.
+
+The selection is stored in `production/nasa-asset-selection.json`. Download it locally with:
 
 ```bash
-npm run assets:commons-video -- storyboard-search --plan projects/examples/narrated-explainer/production/production-plan.json
+npm run assets:nasa-video -- download --selection projects/examples/narrated-explainer/production/nasa-asset-selection.json --project projects/examples/narrated-explainer
 ```
 
-Review each original Wikimedia Commons file page and its attribution requirements. Put only approved results in `projects/examples/narrated-explainer/production/asset-selection.json`, preserving their source and license fields and adding the matching `shotIds`. Download locally for a manual preview with:
-
-```bash
-npm run assets:commons-video -- download --selection projects/examples/narrated-explainer/production/asset-selection.json --project projects/examples/narrated-explainer
-```
-
-When a `NarratedSkyExplainer` render request runs, GitHub Actions downloads that reviewed selection, writes the asset manifest and supplies the matching clips to Remotion. Without a selection file, the original 3D-only render remains unchanged. The repository stores the selection and provenance, not the large video binaries.
+The render workflow downloads only these explicitly selected NASA SVS files, merges their source-page and creator details into the project asset manifest, and passes the matching clips to Remotion. The render artifact includes the attribution sidecar. Large video files are not committed to Git.
 
 ## Agent production workflow
 
