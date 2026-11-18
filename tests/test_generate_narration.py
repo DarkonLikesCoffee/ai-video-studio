@@ -22,7 +22,7 @@ class FakeTokenizer:
         self.phonemized_words = phonemized_words or {}
 
     def phonemize(self, word, language):
-        return self.phonemized_words.get(word, "phone")
+        return self.phonemized_words.get(word, word.rstrip(".,!?;:"))
 
 
 class FakeKokoro:
@@ -50,6 +50,22 @@ class NarrationAlignmentTests(unittest.TestCase):
         self.assertEqual([word["text"] for word in words], ["Hola", "mundo."])
         self.assertAlmostEqual(words[0]["startSeconds"], 0.0, places=3)
         self.assertGreater(words[1]["startSeconds"], words[0]["endSeconds"])
+
+    def test_maps_compound_word_when_sentence_context_collapses_phoneme_spaces(self):
+        timed, _ = group("abcdef", 0.0)
+
+        words = MODULE.map_words(
+            FakeKokoro({"alpha": "ab cd", "beta": "ef"}),
+            "alpha beta",
+            "en-us",
+            timed,
+        )
+
+        self.assertEqual([word["text"] for word in words], ["alpha", "beta"])
+        self.assertAlmostEqual(words[0]["startSeconds"], timed[0].start, places=3)
+        self.assertAlmostEqual(words[0]["endSeconds"], timed[3].end, places=3)
+        self.assertAlmostEqual(words[1]["startSeconds"], timed[4].start, places=3)
+        self.assertAlmostEqual(words[1]["endSeconds"], timed[5].end, places=3)
 
     def test_merges_expanded_numerals_back_into_one_written_word(self):
         groups = []
