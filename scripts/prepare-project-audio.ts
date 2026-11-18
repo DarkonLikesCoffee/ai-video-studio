@@ -2,7 +2,7 @@ import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { spawn } from "node:child_process";
 import type { AudioTrack, VideoProject } from "../packages/video-engine/src/project";
-import { buildAudioInputArgs, buildMainAudioFilter, buildSidechainTailFilter, getSidechainTailSeconds } from "./audio-processing";
+import { buildAudioInputArgs, buildMainAudioFilter, buildSidechainTailFilter } from "./audio-processing";
 import { isSafeProjectAssetPath, isRemoteMediaUrl, validateProjectDefinition } from "../packages/video-engine/src/project";
 
 const ffmpeg = process.env.FFMPEG_PATH || "ffmpeg";
@@ -121,8 +121,9 @@ for (let index = 0; index < tracks.length; index += 1) {
         preFilters.push(...buildAtempoFilters(sidechain.playbackRate));
       }
       if (delayMs > 0) preFilters.push(`adelay=${delayMs}|${delayMs}`);
-      const sidechainTailSeconds = getSidechainTailSeconds(trackDurationInFrames, delayMs, fps);
-      preFilters.push(...buildSidechainTailFilter(Math.max(sidechainTailSeconds, 0.001)));
+      // sidechaincompress stops at its shortest input. Pad after timeline delay so the
+      // sidechain bus spans the complete music-track window, including the post-voice tail.
+      preFilters.push(...buildSidechainTailFilter(trackDurationSeconds));
       filters.push(`[${inputIndex}:a]${preFilters.join(",")}[${label}]`);
       sidechainLabels.push(`[${label}]`);
     });
