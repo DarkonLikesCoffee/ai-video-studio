@@ -2,7 +2,7 @@ name: Render video
 
 on:
   push:
-    branches: [main]
+    branches: [main, "fix/**"]
     paths:
       - render-request.json
 

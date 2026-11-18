@@ -54,62 +54,124 @@ def download_once(url: str, destination: Path, expected_sha256: str) -> None:
         temporary.unlink(missing_ok=True)
 
 
-def phoneme_groups(timings: list[Any]) -> list[list[Any]]:
-    """Split per-phoneme timestamps at spaces while retaining punctuation."""
-    groups: list[list[Any]] = []
-    current: list[Any] = []
-    for item in timings:
-        phoneme = str(item.phoneme)
-        if phoneme.isspace():
-            if current:
-                groups.append(current)
-                current = []
-        else:
-            current.append(item)
-    if current:
-        groups.append(current)
-    return groups
-
-
 def map_words(kokoro: Any, text: str, language: str, timings: list[Any]) -> list[dict[str, Any]]:
+    """Align isolated written-word phonemes to the sentence-level timed stream.
+
+    eSpeak can change phoneme spellings/counts with sentence context, so a
+    character-for-character allocation is not reliable. Use a global edit
+    alignment, retain the model's actual timings, and reject poor alignments
+    rather than fabricating subtitle positions.
+    """
     words = re.findall(r"\S+", text)
-    groups = phoneme_groups(timings)
-    if not words or not groups:
+    timed_phonemes = [item for item in timings if not str(item.phoneme).isspace()]
+    if not words or not timed_phonemes:
         raise RuntimeError("Kokoro did not return usable word timing data.")
 
-    if len(groups) == len(words):
-        allocation = [1] * len(words)
-    else:
-        # eSpeak may expand numerals and abbreviations into multiple spoken groups.
-        allocation = []
-        for word in words:
-            phonemes = kokoro.tokenizer.phonemize(word, language)
-            allocation.append(max(1, len(phonemes.split())))
-        if sum(allocation) != len(groups):
-            raise RuntimeError(
-                "Could not map Kokoro's phoneme timings back to the original words "
-                f"({len(words)} written words, {len(groups)} phoneme groups). "
-                "Spell out numbers or abbreviations and retry; timestamps will not be guessed."
-            )
+    expected: list[str] = []
+    expected_word: list[int] = []
+    for word_index, word in enumerate(words):
+        phonemes = kokoro.tokenizer.phonemize(word, language)
+        characters = [character for character in phonemes if not character.isspace()]
+        if not characters:
+            raise RuntimeError(f"Kokoro produced no phonemes for written word {word!r}.")
+        expected.extend(characters)
+        expected_word.extend([word_index] * len(characters))
+
+    actual = [str(item.phoneme) for item in timed_phonemes]
+    n, m = len(expected), len(actual)
+    # Needleman-Wunsch / Levenshtein alignment. A substitution, insertion,
+    # or deletion costs one; exact phoneme matches cost zero.
+    costs = [[0] * (m + 1) for _ in range(n + 1)]
+    moves = [bytearray(m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        costs[i][0] = i
+        moves[i][0] = 1  # expected phoneme absent from timed stream
+    for j in range(1, m + 1):
+        costs[0][j] = j
+        moves[0][j] = 2  # timed phoneme absent from isolated-word stream
+
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            diagonal = costs[i - 1][j - 1] + (expected[i - 1] != actual[j - 1])
+            deletion = costs[i - 1][j] + 1
+            insertion = costs[i][j - 1] + 1
+            best = min(diagonal, deletion, insertion)
+            costs[i][j] = best
+            moves[i][j] = 0 if diagonal == best else (1 if deletion == best else 2)
+
+    distance = costs[n][m]
+    error_ratio = distance / max(n, m)
+    if error_ratio > 0.18:
+        raise RuntimeError(
+            "Kokoro's sentence pronunciation differs too much from isolated-word "
+            f"phonemization to align safely ({n} expected, {m} timed phonemes, "
+            f"{distance} edits; {error_ratio:.1%} mismatch). "
+            "No subtitle timings were guessed."
+        )
+
+    actual_word: list[int | None] = [None] * m
+    i, j = n, m
+    while i or j:
+        move = moves[i][j]
+        if i and j and move == 0:
+            actual_word[j - 1] = expected_word[i - 1]
+            i -= 1
+            j -= 1
+        elif i and (j == 0 or move == 1):
+            i -= 1
+        else:
+            j -= 1
+
+    # Assign inserted sentence-context phonemes to the nearest aligned word.
+    previous_position: list[int | None] = [None] * m
+    following_position: list[int | None] = [None] * m
+    last_position: int | None = None
+    for index, word_index in enumerate(actual_word):
+        if word_index is not None:
+            last_position = index
+        previous_position[index] = last_position
+    last_position = None
+    for index in range(m - 1, -1, -1):
+        if actual_word[index] is not None:
+            last_position = index
+        following_position[index] = last_position
+    for index, word_index in enumerate(actual_word):
+        if word_index is None:
+            before_position = previous_position[index]
+            after_position = following_position[index]
+            if before_position is None and after_position is None:
+                raise RuntimeError("Kokoro's phoneme alignment contains no usable word anchors.")
+            if before_position is None:
+                actual_word[index] = actual_word[after_position]
+            elif after_position is None:
+                actual_word[index] = actual_word[before_position]
+            elif index - before_position <= after_position - index:
+                actual_word[index] = actual_word[before_position]
+            else:
+                actual_word[index] = actual_word[after_position]
 
     aligned: list[dict[str, Any]] = []
-    cursor = 0
-    for index, (word, count) in enumerate(zip(words, allocation, strict=True)):
-        word_groups = groups[cursor : cursor + count]
-        cursor += count
-        word_timings = [item for group in word_groups for item in group]
+    for word_index, word in enumerate(words):
+        word_timings = [
+            timed_phonemes[index] for index, mapped_word in enumerate(actual_word)
+            if mapped_word == word_index
+        ]
+        if not word_timings:
+            raise RuntimeError(
+                f"Kokoro's phoneme alignment could not locate written word {word!r}; "
+                "refusing to invent its subtitle timing."
+            )
         start = min(float(item.start) for item in word_timings)
         end = max(float(item.end) for item in word_timings)
         if start < 0 or end <= start:
             raise RuntimeError(f"Kokoro returned an invalid time span for word {word!r}.")
         aligned.append({
-            "index": index,
+            "index": word_index,
             "text": word,
             "startSeconds": round(start, 4),
             "endSeconds": round(end, 4),
         })
     return aligned
-
 
 def main() -> int:
     parser = argparse.ArgumentParser()
