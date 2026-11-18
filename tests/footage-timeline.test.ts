@@ -13,13 +13,13 @@ const plan = {
 test("maps reviewed local footage assets to exact storyboard frame ranges", () => {
   const manifest = {
     assets: [
-      { file: "sunrise-12345678.mp4", license: "CC BY 4.0", shotIds: ["opening", "middle"] },
+      { file: "sunrise-12345678.mp4", license: "CC BY 4.0", shotIds: ["opening", "middle"], trimBeforeSecondsByShotId: { opening: 0, middle: 12.5 } },
       { file: "horizon-abcd1234.webm", license: "CC0", shotIds: ["closing"] },
     ],
   };
   assert.deepEqual(buildNarratedFootageTimeline(manifest, plan, 30), [
     { id: "footage-opening-0", src: "assets/sunrise-12345678.mp4", startInFrames: 0, durationInFrames: 120 },
-    { id: "footage-middle-0", src: "assets/sunrise-12345678.mp4", startInFrames: 120, durationInFrames: 105 },
+    { id: "footage-middle-0", src: "assets/sunrise-12345678.mp4", startInFrames: 120, durationInFrames: 105, trimBefore: 375 },
     { id: "footage-closing-1", src: "assets/horizon-abcd1234.webm", startInFrames: 225, durationInFrames: 75 },
   ]);
 });
@@ -54,4 +54,17 @@ test("rejects invalid frame rates and malformed inputs", () => {
   assert.throws(() => buildNarratedFootageTimeline({ assets: [] }, plan, 0), /fps/);
   assert.throws(() => buildNarratedFootageTimeline({}, plan, 30), /assets array/);
   assert.throws(() => buildNarratedFootageTimeline({ assets: [] }, {}, 30), /shots array/);
+});
+
+test("maps per-shot source trim offsets from the selected NASA clip", () => {
+  const manifest = {
+    assets: [{
+      file: "Earth-Views.mp4",
+      license: "Public domain",
+      shotIds: ["opening", "middle"],
+      trimBeforeSecondsByShotId: { opening: 12, middle: 48.5 },
+    }],
+  };
+  const clips = buildNarratedFootageTimeline(manifest, plan, 30);
+  assert.deepEqual(clips.map((clip) => clip.trimBefore ?? 0), [360, 1455]);
 });
