@@ -71,3 +71,27 @@ test("rejects malformed provider, output and request identifiers", () => {
   });
   assert.equal(result.errors.length, 3);
 });
+
+test("accepts an optional narration request for ProjectVideo", () => {
+  const result = validateRenderRequest({
+    ...validProjectRequest,
+    narrationPath: "projects/demo/production/narration.json",
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.request?.narrationPath, "projects/demo/production/narration.json");
+});
+
+test("rejects narration for custom compositions and unsafe config paths", () => {
+  const customComposition = validateRenderRequest({
+    ...validProjectRequest,
+    compositionId: "CinematicAdBenchmark",
+    narrationPath: "projects/demo/production/narration.json",
+  });
+  assert.ok(customComposition.errors.includes("narrationPath is currently supported only for ProjectVideo."));
+
+  const unsafePath = validateRenderRequest({
+    ...validProjectRequest,
+    narrationPath: "projects/../private.json",
+  });
+  assert.ok(unsafePath.errors.some((error) => error.startsWith("narrationPath")));
+});

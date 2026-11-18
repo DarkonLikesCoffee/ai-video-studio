@@ -43,6 +43,13 @@ export type AnimationTrack = {
 
 export type AnimationTracks = Partial<Record<AnimationProperty, AnimationTrack>>;
 
+export type SubtitleWordTiming = {
+  text: string;
+  /** Word timing is relative to the beginning of its parent subtitle cue. */
+  startInFrames: number;
+  endInFrames: number;
+};
+
 export type SubtitleCue = {
   id: string;
   /** Start and duration are measured in frames on the complete project timeline. */
@@ -50,6 +57,9 @@ export type SubtitleCue = {
   durationInFrames: number;
   text: string;
   speaker?: string;
+  /** Optional word timings for speech-synchronized, per-word caption highlighting. */
+  wordTimings?: SubtitleWordTiming[];
+  activeWordColor?: string;
   position?: "top" | "center" | "bottom";
   alignment?: "left" | "center" | "right";
   fontSize?: number;
@@ -1089,6 +1099,7 @@ const validateSubtitleCue = (
 
   const start = cue.startInFrames;
   const duration = cue.durationInFrames;
+  const effectiveDuration = isInteger(duration) ? duration : 0;
   if (!isInteger(start) || start < 0 || start >= projectDuration) {
     errors.push(prefix + ".startInFrames must be between 0 and the last frame of the project");
   }
@@ -1119,12 +1130,48 @@ const validateSubtitleCue = (
   if (cue.color !== undefined && !isHexColor(cue.color)) {
     errors.push(prefix + ".color must be a six-digit hex color");
   }
+  if (cue.activeWordColor !== undefined && !isHexColor(cue.activeWordColor)) {
+    errors.push(prefix + ".activeWordColor must be a six-digit hex color");
+  }
+  if (cue.activeWordColor !== undefined && cue.wordTimings === undefined) {
+    errors.push(prefix + ".activeWordColor requires wordTimings");
+  }
+  if (cue.wordTimings !== undefined) {
+    if (!Array.isArray(cue.wordTimings) || cue.wordTimings.length < 1 || cue.wordTimings.length > 40) {
+      errors.push(prefix + ".wordTimings must contain between 1 and 40 words");
+    } else {
+      let previousStart = -1;
+      let previousEnd = -1;
+      cue.wordTimings.forEach((entry, index) => {
+        const word = isRecord(entry) ? entry : {};
+        const wordPrefix = prefix + ".wordTimings[" + index + "]";
+        if (!isNonEmptyString(word.text) || word.text.length > 80) {
+          errors.push(wordPrefix + ".text is required and must be at most 80 characters");
+        }
+        if (!isInteger(word.startInFrames) || word.startInFrames < 0 || word.startInFrames >= effectiveDuration) {
+          errors.push(wordPrefix + ".startInFrames must be within the subtitle cue");
+        }
+        if (!isInteger(word.endInFrames) || !isInteger(word.startInFrames) ||
+            word.endInFrames <= word.startInFrames || word.endInFrames > effectiveDuration) {
+          errors.push(wordPrefix + ".endInFrames must be after its start and within the subtitle cue");
+        }
+        if (isInteger(word.startInFrames) && word.startInFrames < previousStart) {
+          errors.push(wordPrefix + ".startInFrames must be ordered");
+        }
+        if (isInteger(word.startInFrames) && isInteger(word.endInFrames) &&
+            word.startInFrames < previousEnd) {
+          errors.push(wordPrefix + " must not overlap the previous word");
+        }
+        if (isInteger(word.startInFrames)) previousStart = word.startInFrames;
+        if (isInteger(word.endInFrames)) previousEnd = word.endInFrames;
+      });
+    }
+  }
   if (cue.backgroundOpacity !== undefined &&
       (!isFiniteNumber(cue.backgroundOpacity) || cue.backgroundOpacity < 0 || cue.backgroundOpacity > 0.95)) {
     errors.push(prefix + ".backgroundOpacity must be between 0 and 0.95");
   }
 
-  const effectiveDuration = isInteger(duration) ? duration : 0;
   for (const field of ["fadeInFrames", "fadeOutFrames"] as const) {
     if (cue[field] !== undefined &&
         (!isInteger(cue[field]) || cue[field] < 0 || cue[field] > effectiveDuration)) {

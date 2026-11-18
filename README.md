@@ -617,3 +617,23 @@ GitHub Actions runs type-checking, tests, production-plan validation, legacy-pro
 ## Custom Remotion compositions
 
 The cloud render request can target any composition registered in `packages/video-engine/src/root.tsx`; Remotion rejects IDs that are not registered. Use `ProjectVideo` with a validated `projectPath` for schema-driven projects. For a custom React composition, set `compositionId` to its registered ID and optionally provide `projectPath` to a JSON props file under `projects/`. The request file may omit `projectPath` when the composition uses only its own defaults and bundled assets. When a custom composition receives `projectPath`, the render worker passes that JSON file as props and uses its folder as the public asset directory.
+
+
+## Generated narration and word-synced captions
+
+A ProjectVideo render can request an optional generated voice-over by adding `narrationPath` to `render-request.json`:
+
+```json
+{
+  "provider": "github-actions",
+  "projectPath": "projects/examples/narrated-explainer/scene.json",
+  "narrationPath": "projects/examples/narrated-explainer/production/narration.json",
+  "compositionId": "ProjectVideo",
+  "outputName": "narrated-sky-explainer",
+  "requestId": "narrated-sky-v1"
+}
+```
+
+The narration config uses `schemaVersion: 1`, a `text` field, and optional `language`, `voice`, `speed`, `speaker`, and `subtitle` settings. The initial Kokoro ONNX adapter supports Spanish (`es`: `ef_dora`, `em_alex`, `em_santa`) and US English (`en-us`: `af_heart`, `af_sarah`). Its MIT runtime and Apache-2.0 model run on the render worker; no hosted TTS account or API key is used. Model files are cached between GitHub Actions runs. The Spanish voice choices are experimental and should be listened to before commercial use.
+
+The pipeline writes `assets/audio/narration.wav` and `production/narration-alignment.json`, derives word timings from the model's phoneme durations, and builds short phrase captions with per-word highlighting. It inserts a voice-over track, applies sidechain ducking to music tracks, and leaves the original project JSON untouched. When narration is requested, the storyboards must be long enough for the generated speech; the pipeline deliberately fails instead of speeding up or clipping a longer voice-over. Do not include an existing voice-over track in the same project when requesting generated narration.

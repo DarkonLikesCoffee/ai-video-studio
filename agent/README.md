@@ -7,7 +7,7 @@ This directory defines the operating procedure for an AI agent producing complet
 1. **Brief** — extract objective, audience, platform, duration, format, constraints and success criteria.
 2. **Creative direction** — choose one coherent concept, visual language, narrative arc and emotional progression.
 3. **Storyboard** — plan every shot with purpose, duration, composition, camera/motion, transitions, text and sound.
-4. **Asset production** — generate or source the required footage, images, illustrations, 3D elements, voice and sound; record provenance.
+4. **Asset production** — generate or source the required footage, images, illustrations, 3D elements, voice and sound; record provenance. For supported Spanish/US English narration, a Kokoro ONNX adapter can generate speech and phoneme-derived word timings on the render worker.
 5. **Build** — translate the approved plan into a valid `VideoProject` (`projects/<slug>/scene.json`) and local assets.
 6. **Render** — submit a unique `render-request.json` and wait for the selected provider.
 7. **Visual QA** — inspect the actual MP4, not only CI status; review a contact sheet, keyframes, motion, pacing, audio and technical metadata.
@@ -34,6 +34,7 @@ Use these skill files as focused playbooks. Apply all relevant skills; do not tr
 - Read `README.md` before building. Do not invent engine capabilities or silently add unsupported fields to `scene.json`.
 - A storyboard is a production plan, not a renderable project. Keep it separate from `scene.json`.
 - Keep source assets inside each project's `assets/` directory. Prefer local, reproducible assets over remote URLs.
+- Request generated narration by adding a `narrationPath` pointing to a version-1 narration config under `projects/`. This adapter currently supports Spanish and US English; see the root README. Do not add an existing voice-over track to the same request.
 - Never claim an asset was generated, licensed, downloaded, rendered or inspected unless that action actually succeeded.
 - Do not use copyrighted characters, logos, music or footage as if they were cleared. Record source, creator, license/permission and any restrictions.
 - Never expose API keys, tokens or private user data in project files, prompts, logs or artifacts.
