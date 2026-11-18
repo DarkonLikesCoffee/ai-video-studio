@@ -24,10 +24,12 @@ Use these skill files as focused playbooks. Apply all relevant skills; do not tr
 - `skills/remotion-producer/SKILL.md`
 - `skills/audio-designer/SKILL.md`
 - `skills/visual-qa/SKILL.md`
+- `skills/narrated-video-producer/SKILL.md` — mandatory for explainers, educational videos, stories and short-form videos with narration.
+- `EXTERNAL_SKILLS.md` — reviewed upstream skill references, installation guidance and license notes.
 
 ## Source of truth and boundaries
 
-- The existing Remotion project schema and validator in `packages/video-engine/src/project.ts` are authoritative for what `ProjectVideo` can render.
+- The existing Remotion project schema and validator in `packages/video-engine/src/project.ts` are authoritative for what `ProjectVideo` can render. `ProjectVideo` is a compatibility renderer, not the creative ceiling: use a custom Remotion composition when the brief needs richer camera work, kinetic typography, layered footage, complex motion or narration-synchronized scenes.
 - Read `README.md` before building. Do not invent engine capabilities or silently add unsupported fields to `scene.json`.
 - A storyboard is a production plan, not a renderable project. Keep it separate from `scene.json`.
 - Keep source assets inside each project's `assets/` directory. Prefer local, reproducible assets over remote URLs.
@@ -43,4 +45,4 @@ Do not ask the user whether to merge a PR. Merge only after required tests pass 
 
 ## Quality principle
 
-A successful render is not necessarily a successful video. CI proves reproducibility and technical validity; visual QA proves whether the result communicates, looks and sounds intentional. Optimize for the brief and audience, not for the number of effects, scenes or technologies used.
+A successful render is not necessarily a successful video. CI proves reproducibility and technical validity; visual QA proves whether the result communicates, looks and sounds intentional. For narrated work, the voice track is the timing master: align the actual spoken audio first, then build shots, captions and SFX around it. Do not ship slide-like sequences, repeated static title cards or music-only output when narration is part of the brief. Optimize for the brief and audience, not for the number of effects, scenes or technologies used.
