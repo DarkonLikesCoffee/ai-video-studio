@@ -95,7 +95,7 @@ for (let index = 0; index < tracks.length; index += 1) {
   const trackDurationInFrames = track.durationInFrames ??
     project.scenes.reduce((total, scene) => total + scene.durationInFrames, 0) - track.startInFrames;
   const trackDurationSeconds = trackDurationInFrames / fps;
-  const args = ["-y", ...buildAudioInputArgs({ src: inputPath, loop: track.loop })];
+  const args = ["-y", ...buildAudioInputArgs({ src: inputPath, loop: track.loop ?? false })];
   for (const path of sidechainPaths) args.push("-i", path);
 
   const filters: string[] = [];
