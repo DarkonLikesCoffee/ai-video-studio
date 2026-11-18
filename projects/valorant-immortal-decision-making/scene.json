@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "valorant-immortal-decision-making",
   "title": "The Difference Between Diamond and Immortal",
-  "description": "A 75-second narrated competitive explainer. All tactical visuals are original motion-graphic diagrams, not authentic VALORANT gameplay.",
+  "description": "A 60-second narrated competitive explainer. All tactical visuals are original motion-graphic diagrams, not authentic VALORANT gameplay.",
   "composition": {
     "id": "ProjectVideo",
     "width": 1920,
@@ -13,7 +13,7 @@
     {
       "id": "the-hook",
       "type": "content",
-      "durationInFrames": 375,
+      "durationInFrames": 300,
       "eyebrow": "VALORANT COMPETITIVE / THE DIAMOND PLATEAU",
       "title": "WHY DO GOOD\nPLAYERS GET STUCK?",
       "body": "Winning the duel is not the same as winning the round.",
@@ -90,7 +90,6 @@
           "width": 39,
           "height": 76,
           "d": "M0 0 L48 48 L100 0",
-          "fill": "none",
           "stroke": "#FF4655",
           "strokeWidth": 2.8,
           "opacity": 0.75,
@@ -119,7 +118,6 @@
           "width": 39,
           "height": 76,
           "d": "M0 100 L48 48 L100 100",
-          "fill": "none",
           "stroke": "#FF4655",
           "strokeWidth": 2.8,
           "opacity": 0.65,
@@ -263,7 +261,7 @@
     {
       "id": "aim-isnt-everything",
       "type": "content",
-      "durationInFrames": 375,
+      "durationInFrames": 300,
       "eyebrow": "01 / MECHANICS",
       "title": "AIM WINS FIGHTS.\nNOT GAMES.",
       "body": "Mechanics get you the kill. Decisions create the advantage.",
@@ -451,7 +449,6 @@
           "width": 28,
           "height": 22,
           "d": "M0 100 L100 0",
-          "fill": "none",
           "stroke": "#FFFFFF",
           "strokeWidth": 2.8,
           "opacity": 0.55,
@@ -545,7 +542,7 @@
     {
       "id": "read-the-round",
       "type": "content",
-      "durationInFrames": 375,
+      "durationInFrames": 300,
       "eyebrow": "02 / GAME SENSE",
       "title": "IMMORTAL PLAYERS\nREAD THE ROUND.",
       "body": "Position. Timing. Information. Risk.",
@@ -622,7 +619,6 @@
           "width": 38,
           "height": 60,
           "d": "M5 85 C25 82 30 35 54 48 S78 30 98 15",
-          "fill": "none",
           "stroke": "#6AD9FF",
           "strokeWidth": 2.8,
           "opacity": 0.9,
@@ -651,7 +647,6 @@
           "width": 35,
           "height": 55,
           "d": "M0 12 C24 18 40 50 60 40 S82 28 100 50",
-          "fill": "none",
           "stroke": "#FFFFFF",
           "strokeWidth": 2.8,
           "opacity": 0.65,
@@ -924,7 +919,7 @@
     {
       "id": "the-ego-peek",
       "type": "content",
-      "durationInFrames": 375,
+      "durationInFrames": 300,
       "eyebrow": "03 / THE THROW",
       "title": "THE EGO PEEK.",
       "body": "One unnecessary fight gives away numbers, space and information.",
@@ -1001,7 +996,6 @@
           "width": 34,
           "height": 50,
           "d": "M0 90 C28 82 35 60 58 48 S78 25 100 10",
-          "fill": "none",
           "stroke": "#6AD9FF",
           "strokeWidth": 2.8,
           "opacity": 0.9,
@@ -1043,7 +1037,7 @@
                   "value": 0.16
                 },
                 {
-                  "frame": 375,
+                  "frame": 299,
                   "value": 0.16
                 }
               ]
@@ -1221,7 +1215,7 @@
     {
       "id": "the-better-play",
       "type": "content",
-      "durationInFrames": 375,
+      "durationInFrames": 300,
       "eyebrow": "04 / THE BETTER PLAY",
       "title": "MAKE THE ROUND\nEASY TO WIN.",
       "body": "Clear together. Trade the contact. Keep the advantage.",
@@ -1298,7 +1292,6 @@
           "width": 36,
           "height": 54,
           "d": "M0 90 C18 86 26 68 40 60 S65 46 80 25 S92 14 100 10",
-          "fill": "none",
           "stroke": "#6AD9FF",
           "strokeWidth": 2.8,
           "opacity": 1,
@@ -1327,7 +1320,6 @@
           "width": 38,
           "height": 55,
           "d": "M0 10 C22 14 28 30 46 42 S70 64 100 78",
-          "fill": "none",
           "stroke": "#FFFFFF",
           "strokeWidth": 2.8,
           "opacity": 0.78,
@@ -1635,7 +1627,7 @@
     {
       "id": "play-smarter",
       "type": "outro",
-      "durationInFrames": 375,
+      "durationInFrames": 300,
       "eyebrow": "THE DIFFERENCE IS THE DECISION",
       "title": "PLAY SMARTER.\nWIN MORE.",
       "body": "Don't chase a highlight. Build a round your team can win.",
@@ -1722,7 +1714,7 @@
                   "value": -18
                 },
                 {
-                  "frame": 375,
+                  "frame": 299,
                   "value": 18
                 }
               ]
@@ -1773,7 +1765,7 @@
                   "value": 30
                 },
                 {
-                  "frame": 375,
+                  "frame": 299,
                   "value": -30
                 }
               ]
@@ -1858,7 +1850,7 @@
       "role": "music",
       "src": "assets/audio/score.wav",
       "startInFrames": 0,
-      "durationInFrames": 2250,
+      "durationInFrames": 1800,
       "volume": 0.34,
       "fadeInFrames": 45,
       "fadeOutFrames": 110,
@@ -1874,15 +1866,6 @@
           "releaseMs": 280,
           "makeupGainDb": 1
         }
-      },
-      "ducking": {
-        "sidechainTrackIds": [
-          "generated-narration"
-        ],
-        "thresholdDb": -30,
-        "ratio": 6,
-        "attackMs": 25,
-        "releaseMs": 380
       }
     },
     {
@@ -1899,7 +1882,7 @@
       "id": "transition-1",
       "role": "sfx",
       "src": "assets/audio/transition-whoosh.wav",
-      "startInFrames": 375,
+      "startInFrames": 300,
       "durationInFrames": 40,
       "volume": 0.34,
       "fadeInFrames": 2,
@@ -1909,7 +1892,7 @@
       "id": "transition-2",
       "role": "sfx",
       "src": "assets/audio/transition-whoosh.wav",
-      "startInFrames": 750,
+      "startInFrames": 600,
       "durationInFrames": 40,
       "volume": 0.34,
       "fadeInFrames": 2,
@@ -1919,7 +1902,7 @@
       "id": "transition-3",
       "role": "sfx",
       "src": "assets/audio/transition-whoosh.wav",
-      "startInFrames": 1125,
+      "startInFrames": 900,
       "durationInFrames": 40,
       "volume": 0.34,
       "fadeInFrames": 2,
@@ -1929,7 +1912,7 @@
       "id": "transition-4",
       "role": "sfx",
       "src": "assets/audio/transition-whoosh.wav",
-      "startInFrames": 1500,
+      "startInFrames": 1200,
       "durationInFrames": 40,
       "volume": 0.34,
       "fadeInFrames": 2,
@@ -1939,7 +1922,7 @@
       "id": "transition-5",
       "role": "sfx",
       "src": "assets/audio/transition-whoosh.wav",
-      "startInFrames": 1875,
+      "startInFrames": 1500,
       "durationInFrames": 40,
       "volume": 0.34,
       "fadeInFrames": 2,
@@ -1949,7 +1932,7 @@
       "id": "mistake-impact",
       "role": "sfx",
       "src": "assets/audio/impact.wav",
-      "startInFrames": 1160,
+      "startInFrames": 930,
       "durationInFrames": 33,
       "volume": 0.74,
       "fadeOutFrames": 18
@@ -1958,7 +1941,7 @@
       "id": "execution-impact",
       "role": "sfx",
       "src": "assets/audio/impact.wav",
-      "startInFrames": 1585,
+      "startInFrames": 1270,
       "durationInFrames": 33,
       "volume": 0.56,
       "fadeOutFrames": 18
@@ -1967,7 +1950,7 @@
       "id": "final-chime",
       "role": "sfx",
       "src": "assets/audio/transition-chime.wav",
-      "startInFrames": 2110,
+      "startInFrames": 1680,
       "durationInFrames": 47,
       "volume": 0.48,
       "fadeInFrames": 2,
