@@ -2,6 +2,6 @@
   "provider": "github-actions",
   "projectPath": "projects/sora/scene.json",
   "compositionId": "ProjectVideo",
-  "outputName": "sora-product-film-benchmark-v2",
-  "requestId": "sora-product-film-20261117-02"
+  "outputName": "sora-product-film-benchmark-v3",
+  "requestId": "sora-product-film-20261118-03"
 }
