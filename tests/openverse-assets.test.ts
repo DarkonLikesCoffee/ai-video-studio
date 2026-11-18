@@ -15,7 +15,7 @@ test("Openverse search is anonymous, bounded and limited to reusable image licen
   assert.equal(url.searchParams.get("page_size"), "20");
   assert.equal(url.searchParams.get("mature"), "false");
   assert.equal(url.searchParams.get("filter_dead"), "true");
-  assert.deepEqual(url.searchParams.get("license").split(","), ["cc0", "pdm", "by", "by-sa"]);
+  assert.deepEqual(url.searchParams.get("license").split(","), ["cc0", "pdm", "by"]);
 });
 
 test("search rejects empty queries", () => {
@@ -23,8 +23,8 @@ test("search rejects empty queries", () => {
 });
 
 test("only public-domain and attribution-based commercial licenses are allowed", () => {
-  for (const license of ["cc0", "pdm", "by", "by-sa"]) assert.equal(isAllowedLicense(license), true);
-  for (const license of ["by-nc", "by-nc-sa", "by-nd", "by-nc-nd", "unknown", ""]) assert.equal(isAllowedLicense(license), false);
+  for (const license of ["cc0", "pdm", "by"]) assert.equal(isAllowedLicense(license), true);
+  for (const license of ["by-sa", "by-nc", "by-nc-sa", "by-nd", "by-nc-nd", "unknown", ""]) assert.equal(isAllowedLicense(license), false);
 });
 
 test("candidate normalization preserves attribution and source metadata", () => {
