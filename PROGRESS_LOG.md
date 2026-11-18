@@ -2,6 +2,13 @@
 
 This file is the durable record of project decisions and session handoffs. Append new dated entries; do not silently rewrite history. Keep the newest entry at the top.
 
+## 2026-11-18 — Sidechain fix strict-type correction
+
+- PR #55's first CI run #44383361646 failed at TypeScript typecheck because `AudioTrack.loop` is optional and the helper requires a concrete boolean.
+- Corrected the call site to pass `track.loop ?? false`; no tests were skipped or weakened.
+- Superseded PR #55 with PR #56 on branch `fix/sidechain-music-tail-v2`, based on the corrected head.
+- Next: verify CI for PR #56, run the branch's VALORANT render v6, and inspect the actual audio QA report before merge.
+
 ## 2026-11-18 — VALORANT v5 diagnosis and sidechain tail fix (PR #55 in progress)
 
 - Render run #44381103388 completed successfully on main commit `8804c66264f2243378424836c3d74fddb24617ab`; artifact #14462663601 contains the MP4 and `.qa.json` (expires 2026-11-21).
