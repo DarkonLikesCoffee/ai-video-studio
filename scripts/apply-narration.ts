@@ -4,7 +4,7 @@ import type { AudioTrack, VideoProject } from "../packages/video-engine/src/proj
 import { getProjectDurationInFrames, validateProjectDefinition } from "../packages/video-engine/src/project";
 import { buildNarrationSubtitles, type NarrationAlignedWord, type NarrationSubtitleOptions } from "../packages/video-engine/src/narration";
 import { retimeProjectToDuration } from "../packages/video-engine/src/narration-timeline";
-import { buildNarratedFootageTimeline } from "../packages/video-engine/src/footage";
+import { applyNarratedFootageToProject, buildNarratedFootageTimeline } from "../packages/video-engine/src/footage";
 
 const projectArg = process.argv[2];
 const configArg = process.argv[3];
@@ -126,12 +126,31 @@ const visualTailFrames = Math.round(fps * 0.4);
 const targetDurationInFrames = narrationDurationInFrames + visualTailFrames;
 const videoProject = retimeProjectToDuration(originalProject, targetDurationInFrames);
 const projectDurationInFrames = getProjectDurationInFrames(videoProject);
+const storyboardPath = resolve(projectDirectory, "production/production-plan.json");
+const assetManifestPath = resolve(projectDirectory, "production/asset-manifest.json");
+const hasStoryboard = await access(storyboardPath).then(() => true).catch(() => false);
+const hasAssetManifest = await access(assetManifestPath).then(() => true).catch(() => false);
+if (hasStoryboard !== hasAssetManifest) {
+  throw new Error("Narrated ProjectVideo footage requires both production/production-plan.json and production/asset-manifest.json.");
+}
+let footageProject = videoProject;
+let appliedFootageCount = 0;
+if (hasStoryboard && hasAssetManifest) {
+  const plan = JSON.parse(await readFile(storyboardPath, "utf8")) as unknown;
+  const manifest = JSON.parse(await readFile(assetManifestPath, "utf8")) as unknown;
+  footageProject = applyNarratedFootageToProject(videoProject, manifest, plan);
+  const footageLayers = footageProject.scenes.flatMap((scene) => scene.mediaLayers ?? [])
+    .filter((layer) => layer.type === "video");
+  await Promise.all(footageLayers.map((layer) => access(resolve(projectDirectory, layer.src))));
+  appliedFootageCount = footageLayers.length;
+}
+console.log(`Applied ${appliedFootageCount} storyboard-matched full-frame footage clips.`);
 console.log(
   `Retimed storyboard from ${(originalDurationInFrames / fps).toFixed(2)}s to ${(projectDurationInFrames / fps).toFixed(2)}s ` +
   `to follow the ${alignment.durationSeconds!.toFixed(2)}s narration, with a ${(visualTailFrames / fps).toFixed(2)}s visual landing.`
 );
 
-const existingTracks = videoProject.audioTracks ?? [];
+const existingTracks = footageProject.audioTracks ?? [];
 if (existingTracks.some((track) => track.role === "voiceover")) {
   throw new Error("This project already has a voiceover track. Remove it before adding generated narration.");
 }
@@ -181,9 +200,9 @@ for (const cue of generatedSubtitles) {
 }
 
 const narratedProject: VideoProject = {
-  ...videoProject,
+  ...footageProject,
   audioTracks,
-  subtitles: [...(videoProject.subtitles ?? []), ...generatedSubtitles],
+  subtitles: [...(footageProject.subtitles ?? []), ...generatedSubtitles],
 };
 const validationErrors = validateProjectDefinition(narratedProject);
 if (validationErrors.length > 0) {
