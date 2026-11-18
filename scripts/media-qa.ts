@@ -139,15 +139,15 @@ export const buildMediaQaReport = (
   const audioStream = streams.find(stream => stream.codec_type === "audio");
   const silenceIntervals = parseIntervals(
     audioLog,
-    /silence_start:\\s*(-?[0-9.]+)[\\s\\S]*?silence_end:\\s*([0-9.]+)/g,
+    /silence_start:\s*(-?[0-9.]+)[\s\S]*?silence_end:\s*([0-9.]+)/g,
   );
   const frozenIntervals = parseIntervals(
     videoLog,
-    /freeze_start:\\s*([0-9.]+)[\\s\\S]*?freeze_end:\\s*([0-9.]+)/g,
+    /freeze_start:\s*([0-9.]+)[\s\S]*?freeze_end:\s*([0-9.]+)/g,
   );
   const blackIntervals = parseIntervals(
     videoLog,
-    /black_start:\\s*([0-9.]+)[\\s\\S]*?black_end:\\s*([0-9.]+)/g,
+    /black_start:\s*([0-9.]+)[\s\S]*?black_end:\s*([0-9.]+)/g,
   );
 
   const findings: MediaQaReport["findings"] = [];
@@ -185,7 +185,7 @@ export const buildMediaQaReport = (
     });
   }
 
-  const loudnessSummary = audioLog.match(/Integrated loudness:\\s*([^\\n]+)/)?.[1]?.trim();
+  const loudnessSummary = audioLog.match(/Integrated loudness:\s*([^\n]+)/)?.[1]?.trim();
   const video = videoStream ? {
     codec: videoStream.codec_name ?? "unknown",
     width: Number(videoStream.width ?? 0),
