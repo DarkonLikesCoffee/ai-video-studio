@@ -48,6 +48,8 @@ jobs:
         run: npm test
       - name: Validate example production plan
         run: npm run validate:plan -- projects/examples/production-plan.json
+      - name: Validate narrated explainer footage storyboard
+        run: npm run validate:plan -- projects/examples/narrated-explainer/production/production-plan.json
       - name: Validate SORA production plan
         run: npm run validate:plan -- projects/sora/production/production-plan.json
       - name: Ensure FFmpeg is available
