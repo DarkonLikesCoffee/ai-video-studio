@@ -9,6 +9,10 @@ export type MediaQaOptions = {
   freezeMinDurationSeconds?: number;
   blackPixelThreshold?: number;
   blackMinDurationSeconds?: number;
+  maxSilenceDurationSeconds?: number;
+  maxFreezeDurationSeconds?: number;
+  maxBlackDurationSeconds?: number;
+  maxAudioVideoDriftSeconds?: number;
 };
 
 export type MediaStream = {
@@ -35,6 +39,10 @@ export type MediaQaReport = {
     freezeMinDurationSeconds: number;
     blackPixelThreshold: number;
     blackMinDurationSeconds: number;
+    maxSilenceDurationSeconds: number;
+    maxFreezeDurationSeconds: number;
+    maxBlackDurationSeconds: number;
+    maxAudioVideoDriftSeconds: number;
   };
   format: {
     durationSeconds: number;
@@ -69,6 +77,7 @@ export type MediaQaReport = {
     frozenIntervals: Array<{ startSeconds: number; endSeconds: number; durationSeconds: number }>;
     blackIntervals: Array<{ startSeconds: number; endSeconds: number; durationSeconds: number }>;
     loudnessSummary?: string;
+    audioVideoDurationDriftSeconds?: number;
   };
 };
 
@@ -81,6 +90,10 @@ const defaults: Required<MediaQaOptions> = {
   freezeMinDurationSeconds: 1.5,
   blackPixelThreshold: 0.02,
   blackMinDurationSeconds: 0.5,
+  maxSilenceDurationSeconds: 2,
+  maxFreezeDurationSeconds: 2.5,
+  maxBlackDurationSeconds: 1,
+  maxAudioVideoDriftSeconds: 0.5,
 };
 
 const run = (command: string, args: string[]): Promise<string> =>
@@ -164,27 +177,47 @@ export const buildMediaQaReport = (
     findings.push({ severity: "error", code: "missing-audio-stream", message: "The MP4 contains no audio stream." });
   }
   for (const interval of silenceIntervals) {
+    const excessive = interval.durationSeconds > config.maxSilenceDurationSeconds;
     findings.push({
-      severity: "warning",
+      severity: excessive ? "error" : "warning",
       code: "silence",
-      message: `Audio silence detected for ${interval.durationSeconds.toFixed(2)} seconds.`,
+      message: `Audio silence detected for ${interval.durationSeconds.toFixed(2)} seconds` +
+        (excessive ? ` (maximum ${config.maxSilenceDurationSeconds.toFixed(2)}s).` : "."),
       ...interval,
     });
   }
   for (const interval of frozenIntervals) {
+    const excessive = interval.durationSeconds > config.maxFreezeDurationSeconds;
     findings.push({
-      severity: "warning",
+      severity: excessive ? "error" : "warning",
       code: "frozen-video",
-      message: `Video freeze detected for ${interval.durationSeconds.toFixed(2)} seconds.`,
+      message: `Video freeze detected for ${interval.durationSeconds.toFixed(2)} seconds` +
+        (excessive ? ` (maximum ${config.maxFreezeDurationSeconds.toFixed(2)}s).` : "."),
       ...interval,
     });
   }
   for (const interval of blackIntervals) {
+    const excessive = interval.durationSeconds > config.maxBlackDurationSeconds;
     findings.push({
-      severity: "warning",
+      severity: excessive ? "error" : "warning",
       code: "black-video",
-      message: `Black frame interval detected for ${interval.durationSeconds.toFixed(2)} seconds.`,
+      message: `Black frame interval detected for ${interval.durationSeconds.toFixed(2)} seconds` +
+        (excessive ? ` (maximum ${config.maxBlackDurationSeconds.toFixed(2)}s).` : "."),
       ...interval,
+    });
+  }
+
+  const videoDuration = Number(videoStream?.duration ?? 0);
+  const audioDuration = Number(audioStream?.duration ?? 0);
+  const audioVideoDurationDriftSeconds = Number.isFinite(videoDuration) && videoDuration > 0 &&
+    Number.isFinite(audioDuration) && audioDuration > 0
+    ? Math.abs(videoDuration - audioDuration)
+    : undefined;
+  if (audioVideoDurationDriftSeconds !== undefined && audioVideoDurationDriftSeconds > config.maxAudioVideoDriftSeconds) {
+    findings.push({
+      severity: "error",
+      code: "audio-video-duration-mismatch",
+      message: `Audio/video duration differs by ${audioVideoDurationDriftSeconds.toFixed(2)} seconds (maximum ${config.maxAudioVideoDriftSeconds.toFixed(2)}s).`,
     });
   }
 
@@ -218,6 +251,10 @@ export const buildMediaQaReport = (
       freezeMinDurationSeconds: config.freezeMinDurationSeconds,
       blackPixelThreshold: config.blackPixelThreshold,
       blackMinDurationSeconds: config.blackMinDurationSeconds,
+      maxSilenceDurationSeconds: config.maxSilenceDurationSeconds,
+      maxFreezeDurationSeconds: config.maxFreezeDurationSeconds,
+      maxBlackDurationSeconds: config.maxBlackDurationSeconds,
+      maxAudioVideoDriftSeconds: config.maxAudioVideoDriftSeconds,
     },
     format: {
       durationSeconds,
@@ -229,7 +266,13 @@ export const buildMediaQaReport = (
     ...(video ? { video } : {}),
     ...(audio ? { audio } : {}),
     findings,
-    measurements: { silenceIntervals, frozenIntervals, blackIntervals, ...(loudnessSummary ? { loudnessSummary } : {}) },
+    measurements: {
+      silenceIntervals,
+      frozenIntervals,
+      blackIntervals,
+      ...(loudnessSummary ? { loudnessSummary } : {}),
+      ...(audioVideoDurationDriftSeconds === undefined ? {} : { audioVideoDurationDriftSeconds }),
+    },
   };
 };
 

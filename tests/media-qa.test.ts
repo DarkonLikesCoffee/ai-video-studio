@@ -25,11 +25,35 @@ test("media QA detects long digital silence intervals with timestamps", () => {
     "[silencedetect] silence_start: 46.850\n[silencedetect] silence_end: 50.070 | silence_duration: 3.220\n",
     "",
   );
-  assert.equal(report.passed, true);
+  assert.equal(report.passed, false);
   assert.deepEqual(report.measurements.silenceIntervals, [
     { startSeconds: 46.85, endSeconds: 50.07, durationSeconds: 3.22 },
   ]);
   assert.equal(report.findings[0]?.code, "silence");
+  assert.equal(report.findings[0]?.severity, "error");
+});
+
+test("media QA keeps short silence as a warning but rejects excessive A/V drift", () => {
+  const shortSilence = buildMediaQaReport(
+    "brief-pause.mp4",
+    probe,
+    "[silencedetect] silence_start: 4.0" + String.fromCharCode(10) + "[silencedetect] silence_end: 5.0 | silence_duration: 1.0",
+    "",
+  );
+  assert.equal(shortSilence.passed, true);
+  assert.equal(shortSilence.findings[0]?.severity, "warning");
+
+  const mismatchedProbe = {
+    ...probe,
+    streams: [
+      probe.streams[0]!,
+      { ...probe.streams[1]!, duration: "58.9" },
+    ],
+  };
+  const mismatch = buildMediaQaReport("mismatch.mp4", mismatchedProbe, "", "");
+  assert.equal(mismatch.passed, false);
+  assert.ok(Math.abs((mismatch.measurements.audioVideoDurationDriftSeconds ?? 0) - 1.2) < 0.001);
+  assert.ok(mismatch.findings.some((finding) => finding.code === "audio-video-duration-mismatch"));
 });
 
 test("media QA detects frozen video and black intervals", () => {
@@ -42,6 +66,8 @@ test("media QA detects frozen video and black intervals", () => {
   assert.equal(report.measurements.frozenIntervals[0]?.durationSeconds, 3);
   assert.equal(report.measurements.blackIntervals[0]?.durationSeconds, 2.5);
   assert.deepEqual(report.findings.map(f => f.code), ["frozen-video", "black-video"]);
+  assert.ok(report.findings.every((finding) => finding.severity === "error"));
+  assert.equal(report.passed, false);
 });
 
 test("media QA fails when video or audio stream is missing", () => {
