@@ -3,7 +3,7 @@
 **Last verified:** 2026-11-18  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `3d243d83608750eddbe5a483cd578affbfa7ae44` — “Add durable cross-AI project continuity”
+**Last verified main commit:** `8e2049f7dd2a26a64b64431f6c4fb6fed3921a26` — “Add automated rendered-media quality diagnostics”
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -100,9 +100,9 @@ The next agent should use this project as a regression/quality case, not simply 
 ## 6. Latest GitHub state snapshot
 
 At the time of verification:
-- `main` points to `3d243d8`; main CI run #44379637013 completed successfully. The latest VALORANT render workflow #44362064050 completed successfully and uploaded artifact #14455047189 (expires 2026-11-21).
+- `main` points to `8e2049f`; PR #54 merged after CI run #44380704836 passed (typecheck, tests, all project validation and build). The render workflow now runs `npm run qa:media` on the final MP4 and uploads the sidecar JSON alongside the artifact. A new VALORANT verification render is being triggered by request v5.
 - PR #52 was merged. PR #51 was confirmed obsolete and closed without merging.
-- PR #54 (`feat/media-quality-gates`) is open and adds first-pass FFmpeg/ffprobe media diagnostics plus a JSON sidecar; it is not yet merged. CI run #44380458995 failed only on a TypeScript strict-null check in the new FPS parser; fixed in commit `6676c5f`. Run #44380631630 was queued at last check.
+- PR #54 was merged by squash into `8e2049f`. The first CI attempt exposed a strict-null issue in FPS parsing (fixed); final run #44380704836 passed. PR #51 was closed as obsolete without merge.
 - Successful render artifact run #44360142074 had artifact ID `14453909935`; GitHub reported expiry on 2026-11-21. Artifacts are temporary; preserve important final videos elsewhere if needed.
 - `render-request.json` is a mutable request file and currently relates to a specific example/project. Never assume it is a generic default.
 
