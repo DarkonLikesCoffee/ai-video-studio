@@ -74,14 +74,16 @@ test("resolves the original MP4 from a NASA Images API asset manifest", async ()
     return new Response(JSON.stringify({
       collection: {
         items: [
-          { href: "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~thumb.mp4" },
-          { href: "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~orig.mp4" },
-          { href: "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID.srt" },
+          { href: "http://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~thumb.mp4" },
+          { href: "http://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~orig.mp4" },
+          { href: "http://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~large.mp4" },
+          { href: "http://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~medium.mp4" },
+          { href: "http://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID.srt" },
         ],
       },
     }), { status: 200, headers: { "content-type": "application/json" } });
   });
-  assert.equal(result, "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~orig.mp4");
+  assert.equal(result, "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~large.mp4");
 });
 
 test("rejects NASA asset manifests containing no approved video files", async () => {
@@ -143,4 +145,21 @@ test("upgrades NASA asset API HTTP video hrefs to HTTPS without changing host", 
     normalizeNasaLibraryVideoUrl("http://images-assets.nasa.gov/image/ID/ID.jpg"),
     null,
   );
+});
+
+test("returns NASA video renditions from highest to lowest delivery size", async () => {
+  const { resolveNasaLibraryVideoUrls } = await import("../scripts/nasa-video-assets.mjs");
+  const urls = await resolveNasaLibraryVideoUrls("NASA VIDEO ID", async () =>
+    new Response(JSON.stringify({
+      collection: { items: [
+        { href: "http://images-assets.nasa.gov/video/ID/ID~orig.mp4" },
+        { href: "http://images-assets.nasa.gov/video/ID/ID~small.mp4" },
+        { href: "http://images-assets.nasa.gov/video/ID/ID~medium.mp4" },
+        { href: "http://images-assets.nasa.gov/video/ID/ID~large.mp4" },
+      ] },
+    }), { status: 200 }),
+  );
+  assert.deepEqual(urls.map((url) => url.split("~").at(-1)), [
+    "large.mp4", "medium.mp4", "small.mp4", "orig.mp4",
+  ]);
 });
