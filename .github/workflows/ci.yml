@@ -63,6 +63,8 @@ jobs:
         run: npm run validate:project -- projects/showcase-transitions/scene.json
       - name: Validate SORA product film
         run: npm run validate:project -- projects/sora/scene.json
+      - name: Validate narrated explainer project
+        run: npm run validate:project -- projects/examples/narrated-explainer/scene.json
       - name: Prepare track DSP and sidechain processing
         run: npm run audio:prepare -- projects/showcase-motion/scene.json
       - name: Build studio
