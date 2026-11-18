@@ -29,7 +29,7 @@ Translate the creative direction into a timed, shootable/editable sequence. A st
 - Avoid uniform shot lengths unless the rhythm intentionally requires them.
 - Establish a clear rhythm: hook, development, escalation/contrast, payoff.
 - Avoid changing scene every few frames simply to make the video feel busy.
-- For dialogue/voice-over, allow natural pauses and do not overload the frame with text.
+- For dialogue/voice-over, allow natural pauses and do not overload the frame with text. When narration is required, write the spoken script before locking shot durations; use the recorded/generated voice and word-level alignment as the master timeline. Map each spoken beat to a visual action, footage change, diagram build or intentional pause. Reject a storyboard made mostly of static title cards.
 
 ## Required output
 
