@@ -26,7 +26,7 @@ test("omits unrelated assets and handles an empty manifest", () => {
   const credits = buildFootageCredits({
     assets: [{ type: "image", title: "Still image" }],
   });
-  assert.match(credits, /No third-party video footage/);
+  assert.match(credits, /No third-party or user-provided video footage/);
   assert.doesNotMatch(credits, /Still image/);
 });
 
