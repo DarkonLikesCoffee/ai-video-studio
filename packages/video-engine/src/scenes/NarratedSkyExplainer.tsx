@@ -465,7 +465,9 @@ export const NarratedSkyExplainer: FC<NarratedSkyExplainerProps> = (props) => {
   }, 0);
   const musicVolume = 0.16 - duckAmount * 0.105;
   const progress = frame / Math.max(1, props.durationInFrames);
-  const hasFootage = Boolean(props.footageClips?.length);
+  const hasFootage = Boolean(props.footageClips?.some((clip) =>
+    frame >= clip.startInFrames && frame < clip.startInFrames + clip.durationInFrames
+  ));
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#050c19", color: "#f4f7fb", fontFamily: "Arial, Helvetica, sans-serif" }}>
