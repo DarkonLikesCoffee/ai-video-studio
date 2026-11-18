@@ -54,50 +54,41 @@ def download_once(url: str, destination: Path, expected_sha256: str) -> None:
         temporary.unlink(missing_ok=True)
 
 
-def phoneme_groups(timings: list[Any]) -> list[list[Any]]:
-    """Split per-phoneme timestamps at spaces while retaining punctuation."""
-    groups: list[list[Any]] = []
-    current: list[Any] = []
-    for item in timings:
-        phoneme = str(item.phoneme)
-        if phoneme.isspace():
-            if current:
-                groups.append(current)
-                current = []
-        else:
-            current.append(item)
-    if current:
-        groups.append(current)
-    return groups
-
-
 def map_words(kokoro: Any, text: str, language: str, timings: list[Any]) -> list[dict[str, Any]]:
+    """Map written words to timed phoneme characters, not whitespace groups.
+
+    A written token can phonemize to multiple groups (for example, a compound or
+    numeral), while context-sensitive phonemization can change those group
+    boundaries in the complete sentence. The phoneme characters remain the
+    timing source of truth, so allocate those characters per written token.
+    """
     words = re.findall(r"\S+", text)
-    groups = phoneme_groups(timings)
-    if not words or not groups:
+    timed_phonemes = [item for item in timings if not str(item.phoneme).isspace()]
+    if not words or not timed_phonemes:
         raise RuntimeError("Kokoro did not return usable word timing data.")
 
-    if len(groups) == len(words):
-        allocation = [1] * len(words)
-    else:
-        # eSpeak may expand numerals and abbreviations into multiple spoken groups.
-        allocation = []
-        for word in words:
-            phonemes = kokoro.tokenizer.phonemize(word, language)
-            allocation.append(max(1, len(phonemes.split())))
-        if sum(allocation) != len(groups):
-            raise RuntimeError(
-                "Could not map Kokoro's phoneme timings back to the original words "
-                f"({len(words)} written words, {len(groups)} phoneme groups). "
-                "Spell out numbers or abbreviations and retry; timestamps will not be guessed."
-            )
+    allocation: list[int] = []
+    for word in words:
+        phonemes = kokoro.tokenizer.phonemize(word, language)
+        count = sum(not character.isspace() for character in phonemes)
+        if count == 0:
+            raise RuntimeError(f"Kokoro produced no phonemes for written word {word!r}.")
+        allocation.append(count)
+
+    if sum(allocation) != len(timed_phonemes):
+        raise RuntimeError(
+            "Could not map Kokoro's phoneme timings back to the original words "
+            f"({len(words)} written words; {sum(allocation)} expected phoneme characters, "
+            f"{len(timed_phonemes)} timed phoneme characters). "
+            "The pronunciation differs between isolated words and sentence context; "
+            "timestamps will not be guessed."
+        )
 
     aligned: list[dict[str, Any]] = []
     cursor = 0
     for index, (word, count) in enumerate(zip(words, allocation, strict=True)):
-        word_groups = groups[cursor : cursor + count]
+        word_timings = timed_phonemes[cursor : cursor + count]
         cursor += count
-        word_timings = [item for group in word_groups for item in group]
         start = min(float(item.start) for item in word_timings)
         end = max(float(item.end) for item in word_timings)
         if start < 0 or end <= start:
@@ -109,7 +100,6 @@ def map_words(kokoro: Any, text: str, language: str, timings: list[Any]) -> list
             "endSeconds": round(end, 4),
         })
     return aligned
-
 
 def main() -> int:
     parser = argparse.ArgumentParser()
