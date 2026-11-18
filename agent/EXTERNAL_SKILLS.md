@@ -7,7 +7,7 @@ This repository keeps its own orchestration rules in agent/skills/. The followin
 ### Remotion official Agent Skills
 - Repository: https://github.com/remotion-dev/skills
 - Documentation: https://www.remotion.dev/docs/ai/skills
-- Install in a compatible agent workspace: npx skills add remotion-dev/skills
+- Install in a compatible agent workspace: npx remotion skills add
 - Official skills are not vendored here; install them separately when using Claude Code or another compatible agent.
 - Use remotion-best-practices, remotion-create, remotion-markup, remotion-captions and remotion-render where relevant.
 - The official documentation describes these as agent skills for Claude Code, Codex, Cursor and other compatible agents. This project does not vendor their source files.
