@@ -7,6 +7,31 @@ import { pathToFileURL } from "node:url";
 const API = "https://commons.wikimedia.org/w/api.php";
 const MAX_BYTES = 150 * 1024 * 1024;
 const TIMEOUT = 30_000;
+const MAX_DOWNLOAD_RETRIES = 4;
+const RETRYABLE_HTTP_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+export const getHttpRetryDelayMs = (retryAfter, attempt, now = Date.now()) => {
+  const header = String(retryAfter ?? "").trim();
+  if (header) {
+    const seconds = Number(header);
+    if (Number.isFinite(seconds) && seconds >= 0) return Math.max(1_000, Math.min(120_000, seconds * 1_000));
+    const date = Date.parse(header);
+    if (Number.isFinite(date)) return Math.max(1_000, Math.min(120_000, date - now));
+  }
+  return Math.min(30_000, 2_000 * (2 ** Math.max(0, attempt)));
+};
+
+const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+export const fetchWithRetries = async (url, options = {}, fetchImpl = fetch, pause = sleep) => {
+  for (let attempt = 0; ; attempt += 1) {
+    const response = await fetchImpl(url, options);
+    if (response.ok || !RETRYABLE_HTTP_STATUSES.has(response.status) || attempt >= MAX_DOWNLOAD_RETRIES) return response;
+    const delay = getHttpRetryDelayMs(response.headers.get("retry-after"), attempt);
+    process.stderr.write("Wikimedia download returned HTTP " + response.status + "; retrying in " + delay + " ms (" + (attempt + 1) + "/" + MAX_DOWNLOAD_RETRIES + ").\n");
+    await pause(delay);
+  }
+};
 const VIDEO_TYPES = new Map([
   ["video/mp4", "mp4"],
   ["video/webm", "webm"],
@@ -124,10 +149,13 @@ const downloadSelection = async (selectionPath, projectPath) => {
   await mkdir(productionDir, { recursive: true });
   const downloaded = [];
   const failures = [];
-  for (const asset of assets) {
+  for (const [assetIndex, asset] of assets.entries()) {
     try {
-      const response = await fetch(safeMediaUrl(asset.url), {
-        headers: { Accept: "video/mp4,video/webm,video/quicktime,video/ogg" },
+      const response = await fetchWithRetries(safeMediaUrl(asset.url), {
+        headers: {
+          Accept: "video/mp4,video/webm,video/quicktime,video/ogg",
+          "User-Agent": "AI-Video-Studio/0.1 (Wikimedia Commons media downloader)",
+        },
         redirect: "follow",
         signal: AbortSignal.timeout(TIMEOUT),
       });
@@ -161,6 +189,7 @@ const downloadSelection = async (selectionPath, projectPath) => {
     } catch (error) {
       failures.push({ id: asset.id, title: asset.title, error: error instanceof Error ? error.message : String(error) });
     }
+    if (assetIndex < assets.length - 1) await sleep(1_500);
   }
   const manifestPath = path.join(productionDir, "asset-manifest.json");
   let manifest = { project: path.basename(projectDir), assets: [] };
