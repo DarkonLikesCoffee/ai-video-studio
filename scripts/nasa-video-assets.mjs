@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+const execFileAsync = promisify(execFile);
 const MAX_BYTES = 150 * 1024 * 1024;
 const TIMEOUT = 45_000;
 const MAX_RETRIES = 3;
@@ -113,6 +116,43 @@ export const validateNasaSelection = (selection) => {
   });
 };
 
+const errorDetails = (error) => {
+  const cause = error && typeof error === "object" && "cause" in error ? error.cause : null;
+  const causeCode = cause && typeof cause === "object" && "code" in cause ? String(cause.code) : "";
+  const causeMessage = cause && typeof cause === "object" && "message" in cause ? String(cause.message) : "";
+  return [error instanceof Error ? error.message : String(error), causeCode, causeMessage]
+    .filter(Boolean).join(" | ");
+};
+
+const downloadWithCurl = async (url, destination) => {
+  const temporaryPath = destination + ".partial";
+  try {
+    const { stdout } = await execFileAsync("curl", [
+      "--fail", "--location", "--silent", "--show-error",
+      "--proto", "=https", "--proto-redir", "=https",
+      "--retry", "3", "--retry-delay", "2", "--retry-all-errors",
+      "--max-time", "45", "--output", temporaryPath,
+      "--write-out", "%{http_code}\n%{content_type}\n%{url_effective}\n%{size_download}",
+      url,
+    ], { timeout: 240_000, maxBuffer: 1024 * 1024 });
+    const [status, mime, finalUrl, sizeText] = stdout.trim().split("\n");
+    const size = Number(sizeText);
+    if (status !== "200") throw new Error("curl returned HTTP " + (status || "unknown"));
+    if (!isSafeNasaSvsUrl(finalUrl)) throw new Error("curl redirected outside the approved NASA SVS media host.");
+    if (!VIDEO_TYPES.has(String(mime).split(";")[0].toLowerCase())) {
+      throw new Error("curl returned unsupported video MIME type " + mime);
+    }
+    if (!Number.isFinite(size) || size <= 0 || size > MAX_BYTES) {
+      throw new Error("curl download is empty or exceeds 150 MiB.");
+    }
+    const bytes = await readFile(temporaryPath);
+    if (bytes.length !== size) throw new Error("curl download size did not match its response metadata.");
+    return { bytes, mime: String(mime).split(";")[0].toLowerCase() };
+  } finally {
+    await unlink(temporaryPath).catch(() => {});
+  }
+};
+
 const downloadSelection = async (selectionPath, projectPath) => {
   const selection = JSON.parse(await readFile(selectionPath, "utf8"));
   const assets = validateNasaSelection(selection);
@@ -126,15 +166,24 @@ const downloadSelection = async (selectionPath, projectPath) => {
   const failures = [];
   for (const [index, asset] of assets.entries()) {
     try {
-      const response = await fetchNasaVideoWithRetries(asset.url);
-      if (!response.ok) throw new Error("HTTP " + response.status);
-      if (!isSafeNasaSvsUrl(response.url)) throw new Error("NASA SVS download redirected outside the approved media host.");
-      const length = Number(response.headers.get("content-length") || 0);
-      if (length > MAX_BYTES) throw new Error("File exceeds 150 MiB.");
-      const bytes = Buffer.from(await response.arrayBuffer());
-      const mime = String(response.headers.get("content-type") || "").split(";")[0].toLowerCase();
-      if (!bytes.length || bytes.length > MAX_BYTES || !VIDEO_TYPES.has(mime)) {
-        throw new Error("Response is empty, oversized or not a supported video.");
+      let bytes;
+      let mime;
+      try {
+        const response = await fetchNasaVideoWithRetries(asset.url);
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        if (!isSafeNasaSvsUrl(response.url)) throw new Error("NASA SVS download redirected outside the approved media host.");
+        const length = Number(response.headers.get("content-length") || 0);
+        if (length > MAX_BYTES) throw new Error("File exceeds 150 MiB.");
+        bytes = Buffer.from(await response.arrayBuffer());
+        mime = String(response.headers.get("content-type") || "").split(";")[0].toLowerCase();
+        if (!bytes.length || bytes.length > MAX_BYTES || !VIDEO_TYPES.has(mime)) {
+          throw new Error("Response is empty, oversized or not a supported video.");
+        }
+      } catch (fetchError) {
+        process.stderr.write("Node fetch failed for " + asset.id + ": " + errorDetails(fetchError) + "; trying curl fallback.\n");
+        const fallback = await downloadWithCurl(asset.url, path.join(assetsDir, path.basename(new URL(asset.url).pathname)));
+        bytes = fallback.bytes;
+        mime = fallback.mime;
       }
       const extension = VIDEO_TYPES.get(mime);
       if (extension !== path.extname(new URL(asset.url).pathname).slice(1).toLowerCase()) {
