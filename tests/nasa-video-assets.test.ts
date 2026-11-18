@@ -4,6 +4,8 @@ import {
   fetchNasaVideoWithRetries,
   getNasaRetryDelayMs,
   isSafeNasaSvsUrl,
+  isSafeNasaLibraryVideoUrl,
+  resolveNasaLibraryVideoUrl,
   validateNasaSelection,
 } from "../scripts/nasa-video-assets.mjs";
 
@@ -57,4 +59,37 @@ test("retries temporary NASA download failures", async () => {
   assert.equal(response.status, 200);
   assert.equal(calls, 2);
   assert.deepEqual(waits, [1000]);
+});
+
+test("only accepts NASA Images Library media URLs on the approved video host", () => {
+  assert.equal(isSafeNasaLibraryVideoUrl("https://images-assets.nasa.gov/video/ID/ID~orig.mp4"), true);
+  assert.equal(isSafeNasaLibraryVideoUrl("https://images-assets.nasa.gov/image/ID/ID~orig.jpg"), false);
+  assert.equal(isSafeNasaLibraryVideoUrl("https://evil.example/video/ID.mp4"), false);
+});
+
+test("resolves the original MP4 from a NASA Images API asset manifest", async () => {
+  const result = await resolveNasaLibraryVideoUrl("NASA VIDEO ID", async (url) => {
+    assert.equal(String(url), "https://images-api.nasa.gov/asset/NASA%20VIDEO%20ID");
+    return new Response(JSON.stringify({
+      collection: {
+        items: [
+          { href: "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~thumb.mp4" },
+          { href: "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~orig.mp4" },
+          { href: "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID.srt" },
+        ],
+      },
+    }), { status: 200, headers: { "content-type": "application/json" } });
+  });
+  assert.equal(result, "https://images-assets.nasa.gov/video/NASA%20VIDEO%20ID/NASA%20VIDEO%20ID~orig.mp4");
+});
+
+test("rejects NASA asset manifests containing no approved video files", async () => {
+  await assert.rejects(
+    resolveNasaLibraryVideoUrl("NASA VIDEO ID", async () =>
+      new Response(JSON.stringify({ collection: { items: [
+        { href: "https://images-assets.nasa.gov/image/ID/ID~orig.jpg" },
+        { href: "https://evil.example/video/ID.mp4" },
+      ] } }), { status: 200 })),
+    /no supported images-assets/,
+  );
 });
