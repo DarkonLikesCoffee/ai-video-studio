@@ -52,6 +52,8 @@ jobs:
         run: npm run validate:plan -- projects/examples/narrated-explainer/production/production-plan.json
       - name: Validate SORA production plan
         run: npm run validate:plan -- projects/sora/production/production-plan.json
+      - name: Validate VALORANT explainer production plan
+        run: npm run validate:plan -- projects/valorant-immortal-decision-making/production/production-plan.json
       - name: Ensure FFmpeg is available
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1; then
@@ -61,6 +63,14 @@ jobs:
           ffmpeg -version | head -n 1
       - name: Generate original audio fixtures
         run: npm run assets:audio
+      - name: Stage VALORANT audio fixtures for validation
+        run: |
+          PROJECT_DIR="projects/valorant-immortal-decision-making"
+          mkdir -p "$PROJECT_DIR/assets/audio"
+          cp projects/showcase-pulse/assets/audio/score.wav "$PROJECT_DIR/assets/audio/score.wav"
+          cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
+          cp projects/showcase-motion/assets/audio/impact.wav "$PROJECT_DIR/assets/audio/impact.wav"
+          cp projects/showcase-motion/assets/audio/transition-chime.wav "$PROJECT_DIR/assets/audio/transition-chime.wav"
       - name: Validate original demo project
         run: npm run validate:demo
       - name: Validate legacy data-driven example
@@ -73,6 +83,10 @@ jobs:
         run: npm run validate:project -- projects/sora/scene.json
       - name: Validate narrated explainer project
         run: npm run validate:project -- projects/examples/narrated-explainer/scene.json
+      - name: Validate VALORANT explainer project
+        run: npm run validate:project -- projects/valorant-immortal-decision-making/scene.json
+      - name: Prepare VALORANT explainer audio mix
+        run: npm run audio:prepare -- projects/valorant-immortal-decision-making/scene.json
       - name: Validate narrated custom composition metadata
         run: node -e 'const p = JSON.parse(require("node:fs").readFileSync("projects/examples/narrated-explainer/composition.json", "utf8")); if (p.schemaVersion !== 1 || p.composition.id !== "NarratedSkyExplainer" || p.composition.width !== 1920 || p.composition.height !== 1080 || p.composition.fps !== 30 || p.composition.durationInFrames !== 600) throw new Error("Invalid NarratedSkyExplainer metadata");'
       - name: Prepare track DSP and sidechain processing
