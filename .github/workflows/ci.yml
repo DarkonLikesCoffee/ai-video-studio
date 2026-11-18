@@ -34,8 +34,14 @@ jobs:
           key: npm-${{ runner.os }}-node22-${{ hashFiles('package.json', 'apps/*/package.json', 'packages/*/package.json') }}
           restore-keys: |
             npm-${{ runner.os }}-node22-
+      - name: Set up Python for narration adapter tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install dependencies
         run: npm install --no-audit --no-fund --prefer-offline
+      - name: Test narration alignment mapping
+        run: python -m unittest discover -s tests -p "test_*.py"
       - name: Type-check
         run: npm run typecheck
       - name: Test
