@@ -8,6 +8,7 @@ export type NarratedFootageAsset = {
   file: string;
   license: string;
   shotIds: string[];
+  trimBeforeSecondsByShotId?: Record<string, number>;
 };
 
 export type NarratedFootageTimelineClip = {
