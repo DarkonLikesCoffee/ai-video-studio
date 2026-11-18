@@ -26,7 +26,7 @@ const isSafeFootageFilename = (value: unknown): value is string =>
 
 const isAllowedFootageLicense = (value: unknown): boolean =>
   typeof value === "string" &&
-  /^(?:CC0(?:\\s+1\\.0)?|Public domain|PD-[A-Za-z0-9-]+|CC BY [234]\\.0)$/i.test(value.trim());
+  /^(?:CC0(?:\s+1\.0)?|Public domain|PD-[A-Za-z0-9-]+|CC BY [234]\.0)$/i.test(value.trim());
 
 /**
  * Resolve reviewed local footage assets onto the matching storyboard shots.
