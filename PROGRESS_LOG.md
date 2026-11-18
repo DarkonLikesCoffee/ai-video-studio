@@ -2,6 +2,14 @@
 
 This file is the durable record of project decisions and session handoffs. Append new dated entries; do not silently rewrite history. Keep the newest entry at the top.
 
+## 2026-11-18 — Sidechain fix CI passed; VALORANT v6 rendering
+
+- Corrected the strict optional-property typing issue by passing `track.loop ?? false` to the helper.
+- Fresh CI run #44384134279 passed: typecheck, all tests, all production-plan validations, VALORANT audio preparation, DSP/sidechain processing and studio build.
+- Triggered a full branch render v6 from commit `366d5767cc12cde45d6e914dc00a8ed19caabc36`; workflow run #44383766685 is in progress. It includes the updated sidechain audio-preparation code.
+- PR #56 remains open and unmerged until the v6 artifact is downloaded and QA proves the late gaps are gone.
+- Next: inspect v6 QA report and audio tail; if clean, merge PR #56 and rerun on main. Then address visual repetition/freeze: the v5 contact sheet confirms the same SVG/tactical-map compositions repeat for long intervals and QA reported nine frozen intervals.
+
 ## 2026-11-18 — Sidechain fix strict-type correction
 
 - PR #55's first CI run #44383361646 failed at TypeScript typecheck because `AudioTrack.loop` is optional and the helper requires a concrete boolean.
