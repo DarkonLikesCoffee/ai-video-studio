@@ -39,6 +39,7 @@ export const normalizeCandidate = (item) => ({
   creatorUrl: item.creator_url || null,
   source: item.source || item.provider || "Openverse",
   sourcePage: item.foreign_landing_url || null,
+  thumbnail: item.thumbnail || null,
   url: item.url || null,
   license: String(item.license || "").toLowerCase(),
   licenseVersion: item.license_version || null,
@@ -49,6 +50,22 @@ export const normalizeCandidate = (item) => ({
   height: Number.isInteger(item.height) ? item.height : null,
   filesize: Number.isFinite(item.filesize) ? item.filesize : null,
 });
+
+export const buildShotQueries = (plan, maxShots = 12) => {
+  if (!plan || typeof plan !== "object" || !Array.isArray(plan.shots) || plan.shots.length === 0) {
+    throw new Error("Production plan must contain a non-empty shots array.");
+  }
+  const limit = Math.max(1, Math.min(20, Number(maxShots) || 12));
+  return plan.shots.slice(0, limit).map((shot, index) => {
+    const id = typeof shot.id === "string" && shot.id.trim() ? shot.id : "shot-" + (index + 1);
+    const visual = typeof shot.visual === "string" ? shot.visual : "";
+    const purpose = typeof shot.purpose === "string" ? shot.purpose : "";
+    const framing = typeof shot.framing === "string" ? shot.framing : "";
+    const query = [visual, purpose, framing].filter(Boolean).join(" ").replace(/\s+/g, " ").trim().slice(0, 200);
+    if (!query) throw new Error("Shot " + id + " has no visual, purpose or framing description to search.");
+    return { shotId: id, query };
+  });
+};
 
 export const detectImageExtension = (bytes, contentType = "") => {
   const data = Buffer.from(bytes);
@@ -144,6 +161,23 @@ const search = async (query, limit) => {
   };
 };
 
+const searchStoryboard = async (planPath, limit, maxShots) => {
+  const plan = JSON.parse(await readFile(planPath, "utf8"));
+  const shotQueries = buildShotQueries(plan, maxShots);
+  const shots = [];
+  for (const shot of shotQueries) {
+    const result = await search(shot.query, limit);
+    shots.push({ shotId: shot.shotId, query: shot.query, ...result });
+  }
+  return {
+    provider: "Openverse",
+    project: plan.title || plan.id || path.basename(planPath),
+    searchedAt: new Date().toISOString(),
+    shots,
+    selectionInstructions: "Review candidates and original source licenses. Copy approved candidate objects into a top-level assets array and add shotIds containing the corresponding shot IDs before using the download command.",
+  };
+};
+
 const downloadOne = async (asset, assetsDir) => {
   const response = await fetch(asset.url, {
     headers: { Accept: "image/avif,image/webp,image/png,image/jpeg" },
@@ -231,6 +265,14 @@ export const runCli = async (argv = process.argv.slice(2)) => {
     else process.stdout.write(output);
     return;
   }
+  if (command === "storyboard-search") {
+    if (!options.plan) throw new Error("storyboard-search requires --plan.");
+    const result = await searchStoryboard(options.plan, options.limit, options["max-shots"]);
+    const output = JSON.stringify(result, null, 2) + "\n";
+    if (options.output) await writeFile(path.resolve(options.output), output, "utf8");
+    else process.stdout.write(output);
+    return;
+  }
   if (command === "download") {
     if (!options.selection || !options.project) throw new Error("download requires --selection and --project.");
     const result = await downloadSelection(options.selection, options.project);
@@ -238,7 +280,7 @@ export const runCli = async (argv = process.argv.slice(2)) => {
     if (result.failures.length > 0) process.exitCode = 1;
     return;
   }
-  throw new Error("Usage:\n  node scripts/openverse-assets.mjs search --query \"...\" [--limit 12] [--output candidates.json]\n  node scripts/openverse-assets.mjs download --selection selection.json --project projects/<slug>");
+  throw new Error("Usage:\n  node scripts/openverse-assets.mjs search --query \"...\" [--limit 12] [--output candidates.json]\n  node scripts/openverse-assets.mjs storyboard-search --plan projects/<slug>/production/production-plan.json [--max-shots 12] [--limit 8] --output candidates.json\n  node scripts/openverse-assets.mjs download --selection selection.json --project projects/<slug>");
 };
 
 const invokedPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : "";
