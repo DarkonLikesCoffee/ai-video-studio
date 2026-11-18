@@ -12,7 +12,7 @@ VALORANT players around Diamond who are mechanically capable but want to underst
 The edit contrasts the isolated duel with the coordinated round. Red represents threat and unnecessary risk; blue represents team information, spacing and control. The piece should feel like an esports documentary, not an in-game montage.
 
 ## Visual system
-- 16:9, 1920×1080, 30 fps, 75-second target.
+- 16:9, 1920×1080, 30 fps, 60-second target.
 - Near-black backgrounds, VALORANT-inspired red, white typography and restrained blue information accents.
 - Editorial headlines on the left; original tactical diagrams on the right.
 - Moving route lines, shifting markers, target geometry, warning zones, particle accents and kinetic typography.
