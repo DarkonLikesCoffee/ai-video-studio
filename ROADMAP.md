@@ -122,5 +122,5 @@ Do not mark a milestone complete until:
 
 - [x] Verify PR #57's per-scene camera motion in a fresh rendered VALORANT artifact; v9 has zero freeze warnings and the contact sheet was inspected.
 - [x] Synchronize narration and visuals on one shared timeline; v9 video duration is 47.733s for a 47.31s narration, with a 0.4s visual landing.
-- [ ] Add real licensed moving footage for briefs that demand authentic action; camera motion over static SVGs is an incremental improvement, not a substitute.
+- [x] Integrate shot-matched local footage into the narrated ProjectVideo path, including explicit user-owned/permission-granted rights metadata and separate credits (PR #58).\n- [ ] Add actual gameplay clips to the VALORANT project and verify a rendered edit with real action; the pipeline is ready but no clips have been supplied yet.
 - [ ] Review shot variety, action relevance and pacing across the complete rendered timeline before accepting the video.
