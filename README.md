@@ -89,6 +89,16 @@ node scripts/commons-video-assets.mjs storyboard-search \
 
 Review each original Commons file page, license, attribution and clip content before selecting it. The downloader accepts CC0, public-domain and CC BY 2.0/3.0/4.0 candidates, supports MP4/WebM/QuickTime/Ogg, limits downloads to 150 MiB and records provenance in `production/asset-manifest.json`. Candidate discovery is not license approval; verify the original source and the actual video duration/codec before editing.
 
+## Automated rendered-media QA
+
+After a render, run a technical diagnostic pass on the actual MP4:
+
+```bash
+npm run qa:media -- render-output/my-video.mp4
+```
+
+This writes `render-output/my-video.qa.json` (or a supplied report path) with ffprobe metadata, audio silence intervals, video freeze intervals, black-frame intervals and EBU R128 loudness diagnostics. Missing audio/video streams or invalid duration fail the command. Silence, freeze and black intervals are warnings because a deliberate pause, fade or black transition may be legitimate; compare timestamps with the brief and inspect/listen to the MP4. This is a technical first-pass gate, not semantic or creative approval. See [Media QA skill](agent/skills/media-qa/SKILL.md).
+
 ## Example project
 
 The repository keeps [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json) as a compatibility sample for local SVG and remote MP4 assets.

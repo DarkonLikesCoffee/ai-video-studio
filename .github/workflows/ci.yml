@@ -93,3 +93,5 @@ jobs:
         run: npm run audio:prepare -- projects/showcase-motion/scene.json
       - name: Build studio
         run: npm run build
+      - name: Test media QA diagnostics
+        run: npm test -- --test-name-pattern="media QA"
