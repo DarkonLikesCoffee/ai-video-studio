@@ -15,6 +15,7 @@ export type NarratedFootageTimelineClip = {
   src: string;
   startInFrames: number;
   durationInFrames: number;
+  trimBefore?: number;
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -76,12 +77,18 @@ export const buildNarratedFootageTimeline = (
       if (!shot) continue;
       const startInFrames = Math.round(shot.startSeconds * fps);
       const durationInFrames = Math.round(shot.durationSeconds * fps);
+      const trimSeconds = isRecord(value.trimBeforeSecondsByShotId)
+        ? value.trimBeforeSecondsByShotId[shotId]
+        : 0;
+      if (typeof trimSeconds !== "number" || !Number.isFinite(trimSeconds) || trimSeconds < 0) continue;
+      const trimBefore = Math.round(trimSeconds * fps);
       if (durationInFrames < 1) continue;
       clips.push({
         id: "footage-" + shot.id + "-" + assetIndex,
         src: "assets/" + value.file,
         startInFrames,
         durationInFrames,
+        ...(trimBefore > 0 ? { trimBefore } : {}),
       });
       assignedShots.add(shotId);
     }
