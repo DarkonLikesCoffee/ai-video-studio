@@ -25,7 +25,8 @@
     "audio:prepare": "tsx scripts/prepare-project-audio.ts",
     "audio:master": "tsx scripts/master-audio.ts",
     "validate:plan": "tsx scripts/validate-production-plan.ts",
-    "narration:apply": "tsx scripts/apply-narration.ts"
+    "narration:apply": "tsx scripts/apply-narration.ts",
+    "qa:media": "tsx scripts/qa-media.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.6",

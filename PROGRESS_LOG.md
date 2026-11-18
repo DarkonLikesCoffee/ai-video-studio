@@ -2,6 +2,18 @@
 
 This file is the durable record of project decisions and session handoffs. Append new dated entries; do not silently rewrite history. Keep the newest entry at the top.
 
+## 2026-11-18 — First automated media-QA slice (PR #54 in progress)
+
+- Re-read `START_HERE.md`, `AGENTS.md`, `PROJECT_STATE.md`, `ROADMAP.md`, `PROGRESS_LOG.md`, README, production workflow and the relevant creative/audio/Remotion/visual-QA skills.
+- Confirmed main CI #44379637013 passed and the latest main VALORANT render #44362064050 completed, but the video still has documented digital-silence gaps and did not meet the cinematic creative brief.
+- Closed obsolete PR #51 without merging; its alignment repair was superseded by merged PR #52.
+- Opened PR #54: [Add automated rendered-media quality diagnostics](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/54).
+- Added `scripts/media-qa.ts` and `scripts/qa-media.ts`: ffprobe metadata, FFmpeg silence detection, EBU R128 diagnostics, freeze detection and black-frame detection; JSON report; missing audio/video or invalid duration are hard failures, while silence/freeze/black are warnings for human review.
+- Added four media-QA regression tests and a dedicated skill/README section. Render workflow now runs the diagnostics on each GitHub Actions MP4 and uploads the JSON sidecar.
+- First CI run #44380458995 found strict TypeScript nullability in FPS parsing; fixed in `6676c5f`. Follow-up run #44380595061 was cancelled by a superseding push; run #44380631630 was queued at the time of this log update.
+- No code has been merged into main from PR #54. No real MP4 has yet been run through the new diagnostics; local execution is unavailable in this GitHub-only session. Do not describe the CI tests as passing until the latest workflow completes.
+- Next action: inspect run #44380631630, fix any further failures, then merge PR #54 only after green CI; trigger the VALORANT render request so the new report can inspect the actual artifact and use its timestamps to guide the source-level fix.
+
 ## 2026-11-18 — Continuity system created
 
 - Added a universal entry point so a new AI or conversation can resume by reading `START_HERE.md`.

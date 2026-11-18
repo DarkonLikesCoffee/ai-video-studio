@@ -147,6 +147,12 @@ jobs:
             "render-output/$OUTPUT_NAME.mastered.mp4"
           mv "render-output/$OUTPUT_NAME.mastered.mp4" "render-output/$OUTPUT_NAME.mp4"
 
+      - name: Run rendered-media diagnostics
+        if: steps.request.outputs.provider == 'github-actions'
+        env:
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+        run: npm run qa:media -- "render-output/$OUTPUT_NAME.mp4"
+
       - name: Write footage attribution credits
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
         env:
@@ -164,6 +170,7 @@ jobs:
           path: |
             render-output/${{ steps.request.outputs.output_name }}.mp4
             render-output/${{ steps.request.outputs.output_name }}-credits.txt
+            render-output/${{ steps.request.outputs.output_name }}.qa.json
           if-no-files-found: error
           retention-days: 3
 
