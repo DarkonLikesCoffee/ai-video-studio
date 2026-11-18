@@ -50,7 +50,7 @@ test("accepts user-owned footage only with an explicit rights basis and note", (
   assert.deepEqual(clips.map((clip) => clip.shotId), ["opening", "closing"]);
 });
 
-test("uses only the first selected asset for each shot and skips unknown shot IDs", () => {
+test("supports intentional consecutive clips in one shot and skips unknown shot IDs", () => {
   const manifest = {
     assets: [
       { file: "first.mp4", license: "Public domain", shotIds: ["opening", "not-in-plan"] },
@@ -58,9 +58,12 @@ test("uses only the first selected asset for each shot and skips unknown shot ID
     ],
   };
   const clips = buildNarratedFootageTimeline(manifest, plan, 24);
-  assert.equal(clips.length, 2);
-  assert.equal(clips[0]?.src, "assets/first.mp4");
-  assert.equal(clips[1]?.src, "assets/second.mp4");
+  assert.equal(clips.length, 3);
+  assert.deepEqual(clips.map((clip) => [clip.src, clip.startInFrames, clip.durationInFrames]), [
+    ["assets/first.mp4", 0, 48],
+    ["assets/second.mp4", 48, 48],
+    ["assets/second.mp4", 96, 84],
+  ]);
 });
 
 test("does not emit unsafe paths or unsupported file extensions", () => {
@@ -123,4 +126,23 @@ test("applies footage as a full-frame background while retaining scene overlays"
   assert.equal(output.scenes[0]?.graphics?.length, 0);
   assert.equal(output.scenes[1]?.mediaLayers, undefined);
   assert.equal(output.scenes[2]?.mediaLayers?.[0]?.trimBefore, 540);
+});
+
+
+test("applies multiple selected gameplay clips as sequential full-frame layers in one scene", () => {
+  const input = project();
+  const output = applyNarratedFootageToProject(input, {
+    assets: [
+      { file: "ace-one.mp4", rightsBasis: "user-owned", rightsNote: "Recorded by me in my own matches.", shotIds: ["opening"] },
+      { file: "ace-two.mp4", rightsBasis: "user-owned", rightsNote: "Recorded by me in my own matches.", shotIds: ["opening"] },
+    ],
+  }, plan);
+  assert.deepEqual(output.scenes[0]?.mediaLayers?.map((layer) => ({
+    src: layer.src,
+    startInFrames: layer.startInFrames,
+    durationInFrames: layer.durationInFrames,
+  })), [
+    { src: "assets/ace-one.mp4", startInFrames: 0, durationInFrames: 60 },
+    { src: "assets/ace-two.mp4", startInFrames: 60, durationInFrames: 60 },
+  ]);
 });
