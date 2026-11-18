@@ -27,6 +27,11 @@ const alignment = JSON.parse(await readFile(alignmentPath, "utf8")) as {
   words?: NarrationAlignedWord[];
 };
 
+if (alignment.schemaVersion !== 1 || !Number.isFinite(alignment.durationSeconds) ||
+    !Array.isArray(alignment.words) || alignment.words.length === 0) {
+  throw new Error("Narration alignment file is missing valid duration or word timestamps.");
+}
+
 if (!project || typeof project !== "object" || !("composition" in project) ||
     !project.composition || typeof project.composition !== "object" || !("id" in project.composition)) {
   throw new Error("Project metadata is missing its composition definition.");
@@ -85,15 +90,11 @@ if (compositionId === "NarratedSkyExplainer") {
 if (compositionId !== "ProjectVideo") {
   throw new Error("Generated narration is supported only for ProjectVideo and NarratedSkyExplainer.");
 }
-if (alignment.schemaVersion !== 1 || !Number.isFinite(alignment.durationSeconds) ||
-    !Array.isArray(alignment.words) || alignment.words.length === 0) {
-  throw new Error("Narration alignment file is missing valid duration or word timestamps.");
-}
 
 const narrationAsset = resolve(projectDirectory, "assets/audio/narration.wav");
 await access(narrationAsset);
-const fps = videoProject.composition.fps;
 const videoProject = project as VideoProject;
+const fps = videoProject.composition.fps;
 const projectDurationInFrames = getProjectDurationInFrames(videoProject);
 const narrationDurationInFrames = Math.ceil(alignment.durationSeconds! * fps);
 if (narrationDurationInFrames > projectDurationInFrames) {
