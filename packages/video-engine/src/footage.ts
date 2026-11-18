@@ -6,6 +6,7 @@ export type NarratedFootageShot = {
 
 export type NarratedFootageAsset = {
   file: string;
+  license: string;
   shotIds: string[];
 };
 
@@ -62,7 +63,7 @@ export const buildNarratedFootageTimeline = (
   const clips: NarratedFootageTimelineClip[] = [];
   for (const [assetIndex, value] of manifestValue.assets.entries()) {
     if (!isRecord(value) || !isSafeFootageFilename(value.file) ||
-        !Array.isArray(value.shotIds)) {
+        !isAllowedFootageLicense(value.license) || !Array.isArray(value.shotIds)) {
       continue;
     }
     for (const shotId of value.shotIds) {
