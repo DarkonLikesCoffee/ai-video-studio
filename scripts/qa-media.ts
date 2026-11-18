@@ -9,7 +9,7 @@ if (!input) {
   process.exit(2);
 }
 const inputPath = resolve(input);
-const outputPath = resolve(outputArg ?? inputPath.replace(/\\.mp4$/i, "") + ".qa.json");
+const outputPath = resolve(outputArg ?? inputPath.replace(/\.mp4$/i, "") + ".qa.json");
 try {
   const report = await inspectMedia(inputPath);
   await writeFile(outputPath, JSON.stringify(report, null, 2) + "\n", "utf8");
