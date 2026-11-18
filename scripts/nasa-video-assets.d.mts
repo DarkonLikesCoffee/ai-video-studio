@@ -37,3 +37,4 @@ export function resolveNasaLibraryVideoUrl(
   nasaId: string,
   fetchImpl?: typeof fetch,
 ): Promise<string>;
+export function normalizeNasaLibraryVideoUrl(value: string): string | null;

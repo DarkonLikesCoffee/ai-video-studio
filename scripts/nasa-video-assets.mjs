@@ -78,18 +78,28 @@ export const fetchNasaVideoWithRetries = async (
   }
 };
 
-export const isSafeNasaLibraryVideoUrl = (value) => {
+export const normalizeNasaLibraryVideoUrl = (value) => {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" &&
-      url.hostname === "images-assets.nasa.gov" &&
-      !url.username && !url.password &&
-      url.pathname.startsWith("/video/") &&
-      /\.(?:mp4|webm)$/i.test(url.pathname);
+    if ((url.protocol !== "http:" && url.protocol !== "https:") ||
+        url.hostname !== "images-assets.nasa.gov" ||
+        url.username || url.password ||
+        !url.pathname.startsWith("/video/") ||
+        !/\.(?:mp4|webm)$/i.test(url.pathname)) {
+      return null;
+    }
+    // NASA's public asset API can return http:// media hrefs; the same
+    // official host serves them over HTTPS, so upgrade without changing host/path.
+    url.protocol = "https:";
+    return url.toString();
   } catch {
-    return false;
+    return null;
   }
 };
+
+export const isSafeNasaLibraryVideoUrl = (value) =>
+  typeof value === "string" &&
+  normalizeNasaLibraryVideoUrl(value) === value;
 
 const isNasaLibrarySourcePage = (value) =>
   typeof value === "string" &&
@@ -124,8 +134,8 @@ export const resolveNasaLibraryVideoUrl = async (nasaId, fetchImpl = fetch) => {
   const items = payload?.collection?.items;
   if (!Array.isArray(items)) throw new Error("NASA Images API manifest has no collection.items array.");
   const candidates = items
-    .map((item) => item?.href)
-    .filter((href) => typeof href === "string" && isSafeNasaLibraryVideoUrl(href));
+    .map((item) => normalizeNasaLibraryVideoUrl(item?.href))
+    .filter((href) => typeof href === "string");
   if (!candidates.length) throw new Error("NASA Images API manifest contains no supported images-assets.nasa.gov MP4/WebM files.");
   const original = candidates.find((href) => /~orig\.(?:mp4|webm)$/i.test(new URL(href).pathname));
   return original ?? candidates.sort((a, b) => b.length - a.length)[0];
