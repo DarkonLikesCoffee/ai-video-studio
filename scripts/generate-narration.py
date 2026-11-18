@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -15,6 +16,8 @@ MODEL_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model
 VOICES_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/voices-v1.0.bin"
 MODEL_NAME = "kokoro-v1.0.onnx"
 VOICES_NAME = "voices-v1.0.bin"
+MODEL_SHA256 = "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a"
+VOICES_SHA256 = "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
 
 VOICE_LANGUAGES = {
     "es": {"ef_dora", "em_alex", "em_santa"},
@@ -22,9 +25,18 @@ VOICE_LANGUAGES = {
 }
 
 
-def download_once(url: str, destination: Path) -> None:
-    if destination.is_file() and destination.stat().st_size > 0:
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def download_once(url: str, destination: Path, expected_sha256: str) -> None:
+    if destination.is_file() and sha256_file(destination) == expected_sha256:
         return
+    destination.unlink(missing_ok=True)
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_suffix(destination.suffix + ".part")
     try:
@@ -32,8 +44,11 @@ def download_once(url: str, destination: Path) -> None:
         with urllib.request.urlopen(request, timeout=60) as response, temporary.open("wb") as output:
             while chunk := response.read(1024 * 1024):
                 output.write(chunk)
-        if temporary.stat().st_size == 0:
-            raise RuntimeError(f"Downloaded an empty model file from {url}")
+        actual_sha256 = sha256_file(temporary)
+        if actual_sha256 != expected_sha256:
+            raise RuntimeError(
+                f"SHA-256 mismatch for {destination.name}: expected {expected_sha256}, got {actual_sha256}"
+            )
         temporary.replace(destination)
     finally:
         temporary.unlink(missing_ok=True)
@@ -123,8 +138,8 @@ def main() -> int:
     model_dir = args.model_dir.expanduser().resolve()
     model_path = model_dir / MODEL_NAME
     voices_path = model_dir / VOICES_NAME
-    download_once(MODEL_URL, model_path)
-    download_once(VOICES_URL, voices_path)
+    download_once(MODEL_URL, model_path, MODEL_SHA256)
+    download_once(VOICES_URL, voices_path, VOICES_SHA256)
 
     try:
         import soundfile as sf
