@@ -51,7 +51,7 @@ Review the candidate source pages and licenses, then create a selection JSON by 
 node scripts/openverse-assets.mjs download --selection /path/to/selection.json --project projects/<slug>
 ```
 
-The helper accepts CC0, Public Domain Mark, CC BY and CC BY-SA assets; rejects non-commercial/no-derivatives licenses, unsafe URLs, unsupported formats and files over 25 MiB; and records creator, source page, license, attribution, dimensions and SHA-256. Openverse is a discovery index, not a guarantee that source metadata is correct: verify each original source page before approval. This workflow discovers still images and is not a video-generation or stock-footage API.
+The helper accepts CC0, Public Domain Mark and CC BY assets; rejects non-commercial/no-derivatives licenses, unsafe URLs, unsupported formats and files over 25 MiB; and records creator, source page, license, attribution, dimensions and SHA-256. Openverse is a discovery index, not a guarantee that source metadata is correct: verify each original source page before approval. This workflow discovers still images and is not a video-generation or stock-footage API.
 
 ## Example project
 
