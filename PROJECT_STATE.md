@@ -102,7 +102,7 @@ The next agent should use this project as a regression/quality case, not simply 
 At the time of verification:
 - `main` points to `8e2049f`; PR #54 merged after CI run #44380704836 passed (typecheck, tests, all project validation and build). The render workflow now runs `npm run qa:media` on the final MP4 and uploads the sidecar JSON alongside the artifact. VALORANT v5 render #44381103388 completed successfully and produced artifact #14462663601 (MP4 + QA JSON). QA confirmed the three late silence intervals remain and identified nine frozen-video intervals. PR #55 (`fix/sidechain-music-tail`) is open with a proposed fix; it is not merged or CI-verified yet.
 - PR #52 was merged. PR #51 was confirmed obsolete and closed without merging.
-- PR #54 was merged by squash into `8e2049f`. The first CI attempt exposed a strict-null issue in FPS parsing (fixed); final run #44380704836 passed. PR #51 was closed as obsolete without merge.
+- PR #54 was merged by squash into `8e2049f`. CI #44380704836 passed. PR #51 was closed as obsolete without merge. PR #55 was superseded and closed; PR #56 is the active sidechain fix.
 - Successful render artifact run #44360142074 had artifact ID `14453909935`; GitHub reported expiry on 2026-11-21. Artifacts are temporary; preserve important final videos elsewhere if needed.
 - `render-request.json` is a mutable request file and currently relates to a specific example/project. Never assume it is a generic default.
 
