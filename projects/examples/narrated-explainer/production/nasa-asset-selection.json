@@ -1,64 +1,25 @@
 {
   "assets": [
     {
-      "id": "nasa-earth-illuminated",
-      "title": "Earth Illuminated — ISS astronaut time-lapse",
-      "creator": "NASA's Goddard Space Flight Center",
-      "attribution": "NASA's Goddard Space Flight Center; video and images courtesy of NASA/JSC/Image Science and Analysis Laboratory/The Gateway to Astronaut Photography of Earth",
-      "sourcePage": "https://svs.gsfc.nasa.gov/11474",
-      "url": "https://svs.gsfc.nasa.gov/vis/a010000/a011400/a011474/Earth_Illuminated-540-MASTER_high.mp4",
-      "mime": "video/mp4",
-      "width": 960,
-      "height": 540,
+      "id": "nasa-earth-views-iss",
+      "nasaId": "NHQ_2020_1221_Earth Views",
+      "title": "Earth Views from the ISS — No Music",
+      "creator": "NASA/JSC",
+      "attribution": "NASA/JSC",
+      "sourcePage": "https://images.nasa.gov/details/NHQ_2020_1221_Earth%20Views",
       "license": "Public domain",
       "shotIds": [
-        "solar-spectrum"
-      ]
-    },
-    {
-      "id": "nasa-low-alt-clouds",
-      "title": "Low altitude clouds — NASA Clouds 101 visualization",
-      "creator": "NASA's Conceptual Image Lab",
-      "attribution": "NASA's Conceptual Image Lab; animator Jenny McElligott",
-      "sourcePage": "https://svs.gsfc.nasa.gov/20383",
-      "url": "https://svs.gsfc.nasa.gov/vis/a020000/a020300/a020383/LowAltClouds_web.mp4",
-      "mime": "video/mp4",
-      "width": 1920,
-      "height": 1080,
-      "license": "Public domain",
-      "shotIds": [
-        "molecular-atmosphere"
-      ]
-    },
-    {
-      "id": "nasa-high-alt-clouds",
-      "title": "High altitude clouds — NASA Clouds 101 visualization",
-      "creator": "NASA's Conceptual Image Lab",
-      "attribution": "NASA's Conceptual Image Lab; animator Jenny McElligott",
-      "sourcePage": "https://svs.gsfc.nasa.gov/20383",
-      "url": "https://svs.gsfc.nasa.gov/vis/a020000/a020300/a020383/HightAltCloud_web.mp4",
-      "mime": "video/mp4",
-      "width": 1920,
-      "height": 1080,
-      "license": "Public domain",
-      "shotIds": [
-        "rayleigh-scattering"
-      ]
-    },
-    {
-      "id": "nasa-airglow-iss",
-      "title": "Milky Way on the Horizon — ISS airglow footage",
-      "creator": "NASA",
-      "attribution": "NASA",
-      "sourcePage": "https://svs.gsfc.nasa.gov/12963",
-      "url": "https://svs.gsfc.nasa.gov/vis/a010000/a012900/a012963/Airglow_ISS_Airglow1-1280viz-MASTER.webm",
-      "mime": "video/webm",
-      "width": 1280,
-      "height": 720,
-      "license": "Public domain",
-      "shotIds": [
+        "solar-spectrum",
+        "molecular-atmosphere",
+        "rayleigh-scattering",
         "blue-horizon"
-      ]
+      ],
+      "trimBeforeSecondsByShotId": {
+        "solar-spectrum": 0,
+        "molecular-atmosphere": 48,
+        "rayleigh-scattering": 112,
+        "blue-horizon": 174
+      }
     }
   ]
 }
