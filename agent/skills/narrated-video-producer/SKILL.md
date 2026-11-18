@@ -11,7 +11,7 @@ Produce explainers, educational videos, stories and short-form videos that feel 
 3. **Use footage when footage is the right answer.** Source or generate shot-specific B-roll, environments, objects, people and details. Use diagrams and motion graphics to explain abstract ideas. Do not replace every visual with a centered title over an SVG.
 4. **One visual language, varied shot grammar.** Define a style bible, then vary shot size, angle, depth, movement, pace, lighting and composition. Do not repeat the same framing and title layout shot after shot.
 5. **Sound is edited, not pasted on.** Place voice, music, ambience, Foley and designed SFX deliberately. Duck music under speech. Tie important effects to exact visual events. Use silence and contrast where appropriate.
-6. **Captions follow speech.** Prefer word- or phrase-level alignment from the actual voice recording. Keep captions readable, correctly timed, within safe areas and visually subordinate to the story. Karaoke highlighting is a stylistic choice, not a default.
+6. **Captions follow speech.** Prefer word- or phrase-level alignment from the actual voice recording. Keep captions readable, correctly timed, within safe areas and visually subordinate to the story. Use per-word highlighting only when it serves the format; the current built-in adapter can render active-word highlighting.
 7. **Review the rendered artifact.** Inspect contact sheets and motion at shot boundaries, listen to the actual mix when playback is available, and rerender after meaningful corrections.
 8. **No false capability claims.** Never say narration, footage, music or SFX were generated unless the corresponding asset exists and was verified.
 
@@ -26,11 +26,11 @@ Produce explainers, educational videos, stories and short-form videos that feel 
 
 ### 2. Voice and alignment
 - Use one consistent voice for a series.
-- Support provider-generated TTS, user-supplied narration and explicitly configured local TTS through the same provider adapter contract.
+- For opt-in generated speech, use the built-in Kokoro ONNX render-worker adapter (Spanish and US English only in this first version). It runs on the CI worker without a hosted TTS API or API key. Do not install the model on the user's device.
 - Produce a dry-run showing provider, voice, language, characters/minutes and estimated cost before any paid request. Never spend money or use a paid API without explicit user consent.
 - Cache audio by a hash of provider, voice, model, language, exact spoken text and voice settings.
 - Preserve the original recording and provenance. Verify generated/imported audio against the script using transcription where available.
-- Produce word-level timestamps. If only phrase-level timing is available, label it honestly and use phrase captions rather than inventing word timings.
+- For Kokoro-generated narration, use its model-reported phoneme durations to derive word timings; fail rather than guessing if the mapping cannot be verified. This first adapter does not force-align arbitrary uploaded voice recordings. If only phrase-level timing is available, label it honestly and use phrase captions.
 
 ### 3. Visual direction and storyboard
 - Create a style bible: palette, typography, texture, lighting, depth, camera language, motion language and caption treatment.
@@ -70,4 +70,4 @@ A narrated video is not complete unless:
 
 ## Fallback policy
 
-If no voice provider or API key is configured, do not silently substitute generated beeps, music-only audio or fake narration. Continue with a supplied recording, or prepare the script and alignment-ready project while clearly marking voice generation as blocked. Do not call paid APIs until the user has approved the quoted cost.
+If the required language or voice is not supported by the built-in Kokoro adapter, do not silently substitute another voice or invent alignment. Continue with a supplied recording and honest phrase-level timing, or mark narration generation as blocked. Do not call paid APIs until the user has approved the quoted cost.
