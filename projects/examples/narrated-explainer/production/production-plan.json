@@ -15,9 +15,18 @@
     "objective": "Explain Rayleigh scattering through a cinematic blend of real atmospheric footage and clear 3D scientific visualizations.",
     "audience": "General Spanish-speaking audience curious about everyday science.",
     "concept": "Move from sunlight and the atmosphere into a molecular explanation, then resolve on the blue sky and Earth's horizon.",
-    "emotionalArc": ["Wonder", "Discovery", "Understanding"],
+    "emotionalArc": [
+      "Wonder",
+      "Discovery",
+      "Understanding"
+    ],
     "visualSystem": {
-      "palette": ["#06182A", "#55B6FF", "#DCEEFF", "#FFD18A"],
+      "palette": [
+        "#06182A",
+        "#55B6FF",
+        "#DCEEFF",
+        "#FFD18A"
+      ],
       "typography": "Large editorial sans-serif headlines with restrained technical labels.",
       "composition": "Full-bleed documentary footage with a compact 3D scientific picture-in-picture and safe-area captions.",
       "lighting": "Natural atmospheric light in footage; cool edge lighting and warm solar highlights in 3D.",
@@ -26,8 +35,9 @@
     "motionLanguage": "Use continuous footage with slow reframing, deliberate match cuts, a small animated 3D insert, and short light-wipe transitions. Avoid static title-card pacing.",
     "soundDirection": "Warm cinematic score beneath clear Spanish narration, restrained transition whooshes, and subtle atmospheric texture. Keep footage source audio muted.",
     "rightsAndFactualConstraints": [
-      "Use only manually reviewed Wikimedia Commons clips with CC0, Public Domain, or CC BY licenses.",
-      "Verify each file page, creator, attribution requirements, and the selected clip before rendering.",
+      "Use only manually reviewed NASA SVS and NASA Image and Video Library clips confirmed as public domain, or other independently reviewed assets with compatible licenses.",
+      "Verify each clip's official source page, creator and attribution requirements, license, and selected media file before rendering.",
+      "Assign a distinct source clip to each full-bleed storyboard shot when suitable footage exists; do not repeat a source clip in adjacent shots.",
       "Do not present a visual metaphor as literal molecular-scale footage."
     ]
   },
