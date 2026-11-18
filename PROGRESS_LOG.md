@@ -2,6 +2,17 @@
 
 This file is the durable record of project decisions and session handoffs. Append new dated entries; do not silently rewrite history. Keep the newest entry at the top.
 
+## 2026-11-18 — Media QA diagnostics merged; VALORANT verification render
+
+- PR #54 merged into main by squash as `8e2049f7dd2a26a64b64431f6c4fb6fed3921a26`.
+- CI run #44380704836 passed: Python narration tests, TypeScript typecheck, all Node tests including four media-QA cases, production-plan validation, FFmpeg audio fixture/project preparation, and studio build.
+- Added `npm run qa:media -- <rendered.mp4>`, writing a timestamped JSON report with ffprobe metadata, silence intervals, EBU R128 loudness diagnostics, freeze intervals and black-frame intervals.
+- Missing audio/video streams or invalid duration fail the command. Silence/freeze/black are warnings for human/creative review, not automatic failures (intentional pauses/cuts can be valid).
+- Render workflow runs media diagnostics on the final mastered MP4 and includes the `.qa.json` report in the uploaded artifact.
+- PR #51 was closed as obsolete, not merged; its alignment work was superseded by PR #52.
+- The previous VALORANT video remains creatively unacceptable (slideshow-like) and had documented late audio gaps. The new diagnostic has not yet been run on a fresh real render; a v5 verification render is being triggered now.
+- Next action: inspect its QA report for the three known late audio gaps, trace the root cause to timeline/audio track processing or narration alignment, fix and rerender. After audio repair, return to shot/visual-method variety and real licensed footage; do not call the project finished from technical QA alone.
+
 ## 2026-11-18 — First automated media-QA slice (PR #54 in progress)
 
 - Re-read `START_HERE.md`, `AGENTS.md`, `PROJECT_STATE.md`, `ROADMAP.md`, `PROGRESS_LOG.md`, README, production workflow and the relevant creative/audio/Remotion/visual-QA skills.
