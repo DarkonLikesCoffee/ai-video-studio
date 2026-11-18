@@ -21,6 +21,7 @@
     "render:custom": "npm run render:custom --workspace @ai-video-studio/video-engine --",
     "assets:audio": "tsx scripts/generate-audio-fixtures.ts",
     "assets:commons-video": "node scripts/commons-video-assets.mjs",
+    "assets:nasa-video": "node scripts/nasa-video-assets.mjs",
     "audio:prepare": "tsx scripts/prepare-project-audio.ts",
     "audio:master": "tsx scripts/master-audio.ts",
     "validate:plan": "tsx scripts/validate-production-plan.ts",

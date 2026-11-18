@@ -27,6 +27,15 @@ Create or source a coherent set of visual and audio assets that makes the storyb
 8. Create an asset manifest containing filename, type, intended shot IDs, source/provenance, license/permission, generation prompt or source URL, dimensions/duration and any limitations.
 9. Check every file exists, opens, has the expected dimensions/codec and matches the storyboard. Replace broken or mismatched assets before rendering.
 
+## NASA public-domain video footage
+
+For NASA footage and scientific visualizations, use the NASA Scientific Visualization Studio (SVS) when the relevant item is marked for public use:
+- Review the individual NASA SVS source page, credits and any item-specific exceptions before selecting a file.
+- NASA SVS states its content is public domain unless otherwise noted. Do not assume all NASA-linked third-party media is public domain.
+- Download selected MP4/WebM files from the SVS `/vis/` media paths with `node scripts/nasa-video-assets.mjs download --selection <selection.json> --project projects/<slug>`.
+- The helper accepts only HTTPS `svs.gsfc.nasa.gov/vis/` video files, records creator/source/license provenance and rejects selections not explicitly marked `Public domain`.
+- Mute the source audio in the final composition; some NASA visualizations include licensed production music. Include source-page credits with the final video.
+
 ## Image/video continuity
 
 - Keep product identity, proportions, color, markings and orientation consistent across shots.
