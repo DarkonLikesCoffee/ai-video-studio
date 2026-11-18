@@ -1,4 +1,5 @@
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 import {
   fetchNasaVideoWithRetries,
@@ -162,4 +163,39 @@ test("returns NASA video renditions from highest to lowest delivery size", async
   assert.deepEqual(urls.map((url) => url.split("~").at(-1)), [
     "large.mp4", "medium.mp4", "small.mp4", "orig.mp4",
   ]);
+});
+
+
+test("rejects two NASA video assets assigned to the same storyboard shot", () => {
+  assert.throws(
+    () => validateNasaSelection({
+      assets: [
+        selection.assets[0],
+        { ...selection.assets[0], id: "duplicate-shot-source" },
+      ],
+    }),
+    /assigned to more than one NASA video asset/,
+  );
+});
+
+test("narrated explainer uses a distinct reviewed source clip for each footage shot", async () => {
+  const selectionPath = new URL(
+    "../projects/examples/narrated-explainer/production/nasa-asset-selection.json",
+    import.meta.url,
+  );
+  const projectSelection = JSON.parse(await readFile(selectionPath, "utf8"));
+  const assets = validateNasaSelection(projectSelection);
+  const assignments = assets.flatMap((asset) =>
+    asset.shotIds.map((shotId) => ({
+      shotId,
+      source: asset.nasaId ?? asset.url,
+    })),
+  );
+
+  assert.deepEqual(
+    assignments.map(({ shotId }) => shotId).sort(),
+    ["blue-horizon", "molecular-atmosphere", "rayleigh-scattering", "solar-spectrum"],
+  );
+  assert.equal(new Set(assignments.map(({ source }) => source)).size, assignments.length);
+  assert.equal(assets.length, 4);
 });
