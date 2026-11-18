@@ -260,6 +260,15 @@ export type SceneTransition = {
   easing?: AnimationEasing;
 };
 
+export type SceneCameraMotion = {
+  /** Final camera zoom multiplier. 1.0 is neutral; keep within 1.0–1.2. */
+  zoom?: number;
+  /** Final horizontal camera offset as a percentage of the scene width (-10 to 10). */
+  panX?: number;
+  /** Final vertical camera offset as a percentage of the scene height (-10 to 10). */
+  panY?: number;
+};
+
 export type VideoScene = {
   id: string;
   type: SceneType;
@@ -269,6 +278,8 @@ export type VideoScene = {
   body?: string;
   backgroundColor?: string;
   accentColor?: string;
+  /** Optional continuous Ken Burns-style camera move applied to media/graphics, not typography. */
+  cameraMotion?: SceneCameraMotion;
   /** How this scene enters over the end of the previous scene. Omit for a hard cut. */
   transitionIn?: SceneTransition;
   /** Legacy single-layer property. Kept for backwards compatibility. */
@@ -1357,6 +1368,22 @@ export const validateProjectDefinition = (value: unknown): string[] => {
             errors.push(`${prefix}.${field} must be a six-digit hex color`);
           }
         }
+        if (scene.cameraMotion !== undefined) {
+          const camera = isRecord(scene.cameraMotion) ? scene.cameraMotion : {};
+          if (!isRecord(scene.cameraMotion)) {
+            errors.push(`${prefix}.cameraMotion must be an object`);
+          } else {
+            if (camera.zoom !== undefined && (!isFiniteNumber(camera.zoom) || camera.zoom < 1 || camera.zoom > 1.2)) {
+              errors.push(`${prefix}.cameraMotion.zoom must be between 1 and 1.2`);
+            }
+            for (const field of ["panX", "panY"] as const) {
+              if (camera[field] !== undefined && (!isFiniteNumber(camera[field]) || camera[field] < -10 || camera[field] > 10)) {
+                errors.push(`${prefix}.cameraMotion.${field} must be between -10 and 10`);
+              }
+            }
+          }
+        }
+
         if (scene.transitionIn !== undefined) {
           errors.push(...validateSceneTransition(
             scene.transitionIn,
