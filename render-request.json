@@ -3,6 +3,6 @@
   "projectPath": "projects/examples/narrated-explainer/composition.json",
   "narrationPath": "projects/examples/narrated-explainer/production/narration.json",
   "compositionId": "NarratedSkyExplainer",
-  "outputName": "narrated-sky-nasa-svs-hybrid-curl",
-  "requestId": "narrated-sky-nasa-svs-hybrid-curl-20261118"
+  "outputName": "narrated-sky-images-library",
+  "requestId": "narrated-sky-images-library-20261118"
 }
