@@ -116,6 +116,9 @@ jobs:
                   . .venv-tts/bin/activate
                   pip install --disable-pip-version-check -r requirements-tts.txt
                   PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+                  mkdir -p "$PROJECT_DIR/assets/audio"
+                  cp projects/sora/assets/audio/score.wav "$PROJECT_DIR/assets/audio/score.wav"
+                  cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
                   python scripts/generate-narration.py \
                     --config "$NARRATION_PATH" \
                     --project-dir "$PROJECT_DIR" \
@@ -154,6 +157,12 @@ jobs:
           command: |
             if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
               npm run audio:master -- "render-output/$OUTPUT_NAME.mp4" "$PROJECT_PATH"
+            elif [[ "$COMPOSITION_ID" == "NarratedSkyExplainer" ]]; then
+              ffmpeg -y -i "render-output/$OUTPUT_NAME.mp4" \
+                -af "loudnorm=I=-16:TP=-1.5:LRA=11" \
+                -c:v copy -c:a aac -b:a 192k -movflags +faststart \
+                "render-output/$OUTPUT_NAME.mastered.mp4"
+              mv "render-output/$OUTPUT_NAME.mastered.mp4" "render-output/$OUTPUT_NAME.mp4"
             fi
       - store_artifacts:
           path: render-output
