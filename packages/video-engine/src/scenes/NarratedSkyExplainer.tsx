@@ -344,8 +344,17 @@ export const NarratedSkyExplainer: FC<NarratedSkyExplainerProps> = (props) => {
   const cameraYaw = -Math.atan2(cameraX, cameraZ);
   const cameraPitch = -Math.atan2(cameraY, Math.hypot(cameraX, cameraZ));
   const cue = props.subtitleCues.find((item) => frame >= item.startInFrames && frame < item.startInFrames + item.durationInFrames);
-  const speaking = Boolean(cue);
-  const musicVolume = speaking ? 0.075 : 0.16;
+  const duckAmount = props.subtitleCues.reduce((maximum, item) => {
+    const wordDuck = (item.wordTimings ?? []).reduce((wordMaximum, word) => {
+      const wordStart = item.startInFrames + word.startInFrames;
+      const wordEnd = item.startInFrames + word.endInFrames;
+      const attack = interpolate(frame, [wordStart - 8, wordStart + 4], [0, 1], clamp);
+      const release = interpolate(frame, [wordEnd - 2, wordEnd + 16], [1, 0], clamp);
+      return Math.max(wordMaximum, Math.min(attack, release));
+    }, 0);
+    return Math.max(maximum, wordDuck);
+  }, 0);
+  const musicVolume = 0.16 - duckAmount * 0.105;
   const progress = frame / Math.max(1, props.durationInFrames);
 
   return (
