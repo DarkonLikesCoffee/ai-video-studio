@@ -145,7 +145,23 @@ const SubtitleCueLayer: FC<SubtitleCueLayerProps> = ({ cue }) => {
             {cue.speaker}
           </span>
         ) : null}
-        <span>{cue.text}</span>
+        {cue.wordTimings?.length ? cue.wordTimings.map((word, index) => {
+          const active = frame >= word.startInFrames && frame < word.endInFrames;
+          return (
+            <span
+              key={word.startInFrames + "-" + index}
+              style={{
+                display: "inline-block",
+                marginRight: "0.28em",
+                color: active ? (cue.activeWordColor ?? cue.color ?? "#FFFFFF") : (cue.color ?? "#FFFFFF"),
+                opacity: active ? 1 : 0.76,
+                transition: "color 80ms linear, opacity 80ms linear",
+              }}
+            >
+              {word.text}
+            </span>
+          );
+        }) : <span>{cue.text}</span>}
       </div>
     </AbsoluteFill>
   );
