@@ -100,9 +100,27 @@ export const resolveNasaLibraryVideoUrl = async (nasaId, fetchImpl = fetch) => {
     throw new Error("NASA library asset ID must be a non-empty string of at most 180 characters.");
   }
   const manifestUrl = "https://images-api.nasa.gov/asset/" + encodeURIComponent(nasaId);
-  const response = await fetchNasaVideoWithRetries(manifestUrl, fetchImpl);
-  if (!response.ok) throw new Error("NASA Images API manifest returned HTTP " + response.status + ".");
-  const payload = await response.json();
+  let payload;
+  try {
+    const response = await fetchNasaVideoWithRetries(manifestUrl, fetchImpl);
+    if (!response.ok) throw new Error("NASA Images API manifest returned HTTP " + response.status + ".");
+    payload = await response.json();
+  } catch (fetchError) {
+    process.stderr.write("NASA Images API fetch failed: " + errorDetails(fetchError) + "; trying curl fallback.\n");
+    const tempPath = path.resolve(".nasa-asset-manifest-" + Date.now() + ".json");
+    try {
+      const { stdout } = await execFileAsync("curl", [
+        "--fail", "--location", "--silent", "--show-error",
+        "--proto", "=https", "--proto-redir", "=https",
+        "--retry", "2", "--retry-delay", "1", "--max-time", "20",
+        "--output", tempPath, "--write-out", "%{http_code}", manifestUrl,
+      ], { timeout: 60_000, maxBuffer: 1024 * 1024 });
+      if (stdout.trim() !== "200") throw new Error("NASA Images API curl returned HTTP " + stdout.trim());
+      payload = JSON.parse(await readFile(tempPath, "utf8"));
+    } finally {
+      await unlink(tempPath).catch(() => {});
+    }
+  }
   const items = payload?.collection?.items;
   if (!Array.isArray(items)) throw new Error("NASA Images API manifest has no collection.items array.");
   const candidates = items
