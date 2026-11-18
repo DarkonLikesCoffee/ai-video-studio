@@ -105,7 +105,16 @@ const isNasaLibrarySourcePage = (value) =>
   typeof value === "string" &&
   /^https:\/\/images\.nasa\.gov\/details\/[A-Za-z0-9_%.-]+$/i.test(value);
 
-export const resolveNasaLibraryVideoUrl = async (nasaId, fetchImpl = fetch) => {
+const nasaVideoRenditionRank = (value) => {
+  const filename = path.basename(new URL(value).pathname);
+  if (/~large\.(?:mp4|webm)$/i.test(filename)) return 0;
+  if (/~medium\.(?:mp4|webm)$/i.test(filename)) return 1;
+  if (/~small\.(?:mp4|webm)$/i.test(filename)) return 2;
+  if (/~orig\.(?:mp4|webm)$/i.test(filename)) return 3;
+  return 4;
+};
+
+export const resolveNasaLibraryVideoUrls = async (nasaId, fetchImpl = fetch) => {
   if (typeof nasaId !== "string" || !nasaId.trim() || nasaId.length > 180) {
     throw new Error("NASA library asset ID must be a non-empty string of at most 180 characters.");
   }
@@ -137,9 +146,12 @@ export const resolveNasaLibraryVideoUrl = async (nasaId, fetchImpl = fetch) => {
     .map((item) => normalizeNasaLibraryVideoUrl(item?.href))
     .filter((href) => typeof href === "string");
   if (!candidates.length) throw new Error("NASA Images API manifest contains no supported images-assets.nasa.gov MP4/WebM files.");
-  const original = candidates.find((href) => /~orig\.(?:mp4|webm)$/i.test(new URL(href).pathname));
-  return original ?? candidates.sort((a, b) => b.length - a.length)[0];
+  const unique = [...new Set(candidates)];
+  return unique.sort((a, b) => nasaVideoRenditionRank(a) - nasaVideoRenditionRank(b));
 };
+
+export const resolveNasaLibraryVideoUrl = async (nasaId, fetchImpl = fetch) =>
+  (await resolveNasaLibraryVideoUrls(nasaId, fetchImpl))[0];
 
 export const validateNasaSelection = (selection) => {
   if (!selection || !Array.isArray(selection.assets) || !selection.assets.length) {
