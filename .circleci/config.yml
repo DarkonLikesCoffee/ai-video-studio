@@ -45,18 +45,35 @@ jobs:
           name: Generate original audio fixtures
           command: npm run assets:audio
       - run:
-          name: Validate project
+          name: Validate render inputs
           command: |
             set -Eeuo pipefail
-            case "$PROJECT_PATH" in
-              projects/*.json) ;;
-              *) echo "project_path must point inside projects/"; exit 1 ;;
-            esac
-            if [[ "$PROJECT_PATH" == *".."* ]]; then
-              echo "project_path cannot contain parent-directory segments"
+            if [[ ! "$COMPOSITION_ID" =~ ^[A-Za-z][A-Za-z0-9_-]{0,63}$ ]]; then
+              echo "composition_id must be a safe Remotion composition identifier"
               exit 1
             fi
-            npm run validate:project -- "$PROJECT_PATH"
+            if [[ ! "$OUTPUT_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,59}$ ]]; then
+              echo "output_name must contain 1-60 letters, numbers, or hyphens"
+              exit 1
+            fi
+            if [[ -n "$PROJECT_PATH" ]]; then
+              case "$PROJECT_PATH" in
+                projects/*.json) ;;
+                *) echo "project_path must point inside projects/"; exit 1 ;;
+              esac
+              if [[ "$PROJECT_PATH" == *".."* || ! -f "$PROJECT_PATH" ]]; then
+                echo "project_path must be an existing JSON file without traversal segments"
+                exit 1
+              fi
+              node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"))' "$PROJECT_PATH"
+            fi
+            if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
+              if [[ -z "$PROJECT_PATH" ]]; then
+                echo "ProjectVideo requires project_path"
+                exit 1
+              fi
+              npm run validate:project -- "$PROJECT_PATH"
+            fi
       - run:
           name: Prepare project audio processing
           command: |
@@ -67,19 +84,14 @@ jobs:
           name: Render MP4
           command: |
             set -Eeuo pipefail
-            if [[ ! "$OUTPUT_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,59}$ ]]; then
-              echo "output_name must contain 1-60 letters, numbers, or hyphens"
-              exit 1
-            fi
-            if [[ "$COMPOSITION_ID" != "DemoVideo" && "$COMPOSITION_ID" != "ProjectVideo" ]]; then
-              echo "composition_id must be DemoVideo or ProjectVideo"
-              exit 1
-            fi
             mkdir -p render-output
             echo "Rendering request: $REQUEST_ID"
             if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
               PROJECT_DIR="$(dirname "$PROJECT_PATH")"
               npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_DIR/.render-project.json" "--public-dir=../../$PROJECT_DIR"
+            elif [[ -n "$PROJECT_PATH" ]]; then
+              PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+              npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
             else
               npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
             fi

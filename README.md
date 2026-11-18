@@ -612,3 +612,8 @@ A push that changes only this file starts a short GitHub Actions status check. I
 ## CI
 
 GitHub Actions runs type-checking, tests, production-plan validation, legacy-project validation, FFmpeg audio preparation (including sidechain DSP), and the studio build. Video rendering is intentionally separated into the on-demand render workflow so ordinary code changes do not generate benchmark videos or accumulate render artifacts. A change limited to `render-request.json` skips the normal CI workflow and starts only the selected render provider.
+
+
+## Custom Remotion compositions
+
+The cloud render request can target any composition registered in `packages/video-engine/src/root.tsx`; Remotion rejects IDs that are not registered. Use `ProjectVideo` with a validated `projectPath` for schema-driven projects. For a custom React composition, set `compositionId` to its registered ID and optionally provide `projectPath` to a JSON props file under `projects/`. The request file may omit `projectPath` when the composition uses only its own defaults and bundled assets. When a custom composition receives `projectPath`, the render worker passes that JSON file as props and uses its folder as the public asset directory.

@@ -25,44 +25,7 @@ jobs:
 
       - name: Validate render request
         id: request
-        shell: bash
-        run: |
-          node <<'NODE'
-          const fs = require("node:fs");
-          const request = JSON.parse(fs.readFileSync("render-request.json", "utf8"));
-          const allowedProviders = new Set(["github-actions", "circleci"]);
-          if (!allowedProviders.has(request.provider)) {
-            throw new Error("provider must be github-actions or circleci");
-          }
-          if (typeof request.projectPath !== "string" ||
-              !/^projects\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.json$/.test(request.projectPath)) {
-            throw new Error("projectPath must point to a JSON file inside projects/");
-          }
-          if (typeof request.outputName !== "string" ||
-              !/^[A-Za-z0-9][A-Za-z0-9-]{0,59}$/.test(request.outputName)) {
-            throw new Error("outputName must contain 1-60 letters, numbers, or hyphens");
-          }
-          if (request.compositionId !== "DemoVideo" && request.compositionId !== "ProjectVideo") {
-            throw new Error("compositionId must be DemoVideo or ProjectVideo");
-          }
-          if (typeof request.requestId !== "string" ||
-              !/^[A-Za-z0-9._-]{1,80}$/.test(request.requestId)) {
-            throw new Error("requestId must be a unique 1-80 character identifier");
-          }
-          const scene = JSON.parse(fs.readFileSync(request.projectPath, "utf8"));
-          if (scene?.composition?.id !== request.compositionId) {
-            throw new Error("The selected scene composition ID does not match the requested composition");
-          }
-          const output = process.env.GITHUB_OUTPUT;
-          fs.appendFileSync(output, [
-            `provider=${request.provider}`,
-            `project_path=${request.projectPath}`,
-            `composition_id=${request.compositionId}`,
-            `output_name=${request.outputName}`,
-            `request_id=${request.requestId}`
-          ].join("\n") + "\n");
-          console.log(`Accepted render request ${request.requestId} for ${request.provider}`);
-          NODE
+        run: node scripts/render-request.mjs render-request.json
 
       - name: Install dependencies
         if: steps.request.outputs.provider == 'github-actions'
@@ -81,8 +44,8 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         run: npm run assets:audio
 
-      - name: Validate selected project
-        if: steps.request.outputs.provider == 'github-actions'
+      - name: Validate selected ProjectVideo project
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'ProjectVideo'
         env:
           PROJECT_PATH: ${{ steps.request.outputs.project_path }}
         run: npm run validate:project -- "$PROJECT_PATH"
@@ -104,11 +67,14 @@ jobs:
           if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_DIR/.render-project.json" "--public-dir=../../$PROJECT_DIR"
+          elif [[ -n "$PROJECT_PATH" ]]; then
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
           else
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
           fi
 
-      - name: Master final audio
+      - name: Master final ProjectVideo audio
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'ProjectVideo'
         env:
           PROJECT_PATH: ${{ steps.request.outputs.project_path }}
