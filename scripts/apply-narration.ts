@@ -86,7 +86,7 @@ if (compositionId === "NarratedSkyExplainer") {
         JSON.parse(await readFile(assetManifestPath, "utf8")) as unknown,
         JSON.parse(await readFile(storyboardPath, "utf8")) as unknown,
         metadata.composition.fps,
-      )
+      ).map(({ shotId: _shotId, ...clip }) => clip)
     : [];
   for (const clip of footageClips) {
     await access(resolve(projectDirectory, clip.src));
