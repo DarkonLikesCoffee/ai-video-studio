@@ -24,6 +24,10 @@ const isSafeFootageFilename = (value: unknown): value is string =>
   typeof value === "string" &&
   /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}\.(?:mp4|webm|mov|ogv)$/i.test(value);
 
+const isAllowedFootageLicense = (value: unknown): boolean =>
+  typeof value === "string" &&
+  /^(?:CC0(?:\\s+1\\.0)?|Public domain|PD-[A-Za-z0-9-]+|CC BY [234]\\.0)$/i.test(value.trim());
+
 /**
  * Resolve reviewed local footage assets onto the matching storyboard shots.
  * The first manifest asset assigned to a shot wins, so duplicate selections
