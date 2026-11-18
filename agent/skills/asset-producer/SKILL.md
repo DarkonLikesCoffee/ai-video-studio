@@ -17,9 +17,15 @@ Create or source a coherent set of visual and audio assets that makes the storyb
    - Download: `node scripts/openverse-assets.mjs download --selection /path/to/selection.json --project projects/<slug>`.
    - The helper allows CC0, PDM and CC BY only; it rejects non-commercial/no-derivatives licenses, non-HTTPS URLs, unsupported formats and oversized files. It downloads raster images locally and merges provenance into `production/asset-manifest.json`.
    - Openverse currently provides image/audio discovery here, not generated video footage. Treat stills as B-roll plates for deliberate parallax, camera moves and compositing; do not describe them as video clips.
-6. Save approved assets under `projects/<slug>/assets/`. Use descriptive, stable filenames. Avoid remote URLs in final renders unless there is a compelling reason.
-7. Create an asset manifest containing filename, type, intended shot IDs, source/provenance, license/permission, generation prompt or source URL, dimensions/duration and any limitations.
-8. Check every file exists, opens, has the expected dimensions/codec and matches the storyboard. Replace broken or mismatched assets before rendering.
+6. For sourced moving footage, use the Wikimedia Commons helper as a separate candidate finder:
+   - Search a single subject: `node scripts/commons-video-assets.mjs search --query "ocean waves crashing" --limit 8`.
+   - Search every storyboard shot: `node scripts/commons-video-assets.mjs storyboard-search --plan projects/<slug>/production/production-plan.json --max-shots 12 --limit 8`.
+   - Review the original Commons file page, the license, attribution, duration and content before selection. Search results marked allowed are only candidates, never automatic approval.
+   - Select only CC0, Public Domain or CC BY 2.0/3.0/4.0 assets, add the relevant `shotIds`, and download with `node scripts/commons-video-assets.mjs download --selection selection.json --project projects/<slug>`.
+   - Only HTTPS files hosted on upload.wikimedia.org and supported MP4/WebM/QuickTime/Ogg videos are accepted; downloads are capped at 150 MiB and recorded in the shared asset manifest. Check the final clip's actual duration and codec before editing.
+7. Save approved assets under `projects/<slug>/assets/`. Use descriptive, stable filenames. Avoid remote URLs in final renders unless there is a compelling reason.
+8. Create an asset manifest containing filename, type, intended shot IDs, source/provenance, license/permission, generation prompt or source URL, dimensions/duration and any limitations.
+9. Check every file exists, opens, has the expected dimensions/codec and matches the storyboard. Replace broken or mismatched assets before rendering.
 
 ## Image/video continuity
 

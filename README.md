@@ -64,6 +64,19 @@ node scripts/openverse-assets.mjs storyboard-search \
 
 The output keeps candidates separate per shot and includes thumbnail URLs for visual review. The agent should compare the candidate image against the shot's subject, framing and continuity before selecting it; no image is auto-approved.
 
+
+### Open-license video footage discovery
+
+For actual moving B-roll, the separate Wikimedia Commons helper searches video files without an API key:
+
+```bash
+node scripts/commons-video-assets.mjs storyboard-search \
+  --plan projects/<slug>/production/production-plan.json \
+  --max-shots 12 --limit 8
+```
+
+Review each original Commons file page, license, attribution and clip content before selecting it. The downloader accepts CC0, public-domain and CC BY 2.0/3.0/4.0 candidates, supports MP4/WebM/QuickTime/Ogg, limits downloads to 150 MiB and records provenance in `production/asset-manifest.json`. Candidate discovery is not license approval; verify the original source and the actual video duration/codec before editing.
+
 ## Example project
 
 The repository keeps [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json) as a compatibility sample for local SVG and remote MP4 assets.
