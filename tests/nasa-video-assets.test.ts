@@ -93,3 +93,38 @@ test("rejects NASA asset manifests containing no approved video files", async ()
     /no supported images-assets/,
   );
 });
+
+test("accepts reviewed NASA Image Library selections with different source trim times", () => {
+  const librarySelection = {
+    assets: [{
+      id: "nasa-earth-views-library",
+      nasaId: "NHQ_2020_1221_Earth Views",
+      title: "Earth Views from the ISS — No Music",
+      creator: "NASA/JSC",
+      sourcePage: "https://images.nasa.gov/details/NHQ_2020_1221_Earth%20Views",
+      license: "Public domain",
+      shotIds: ["solar-spectrum", "rayleigh-scattering"],
+      trimBeforeSecondsByShotId: { "solar-spectrum": 0, "rayleigh-scattering": 112 },
+    }],
+  };
+  const validated = validateNasaSelection(librarySelection);
+  assert.equal(validated[0]?.nasaId, "NHQ_2020_1221_Earth Views");
+  assert.deepEqual(validated[0]?.trimBeforeSecondsByShotId, {
+    "solar-spectrum": 0,
+    "rayleigh-scattering": 112,
+  });
+});
+
+test("rejects non-public-domain or unverified NASA Images Library selections", () => {
+  const libraryAsset = {
+    id: "nasa-earth-views-library",
+    nasaId: "NHQ_2020_1221_Earth Views",
+    title: "Earth Views from the ISS — No Music",
+    creator: "NASA/JSC",
+    sourcePage: "https://images.nasa.gov/details/NHQ_2020_1221_Earth%20Views",
+    license: "Public domain",
+    shotIds: ["solar-spectrum"],
+  };
+  assert.throws(() => validateNasaSelection({ assets: [{ ...libraryAsset, license: "CC BY-NC 4.0" }] }), /Public domain/);
+  assert.throws(() => validateNasaSelection({ assets: [{ ...libraryAsset, sourcePage: "https://example.com" }] }), /source page/);
+});
