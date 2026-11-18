@@ -61,7 +61,7 @@ export const buildShotQueries = (plan, maxShots = 12) => {
     const visual = typeof shot.visual === "string" ? shot.visual : "";
     const purpose = typeof shot.purpose === "string" ? shot.purpose : "";
     const framing = typeof shot.framing === "string" ? shot.framing : "";
-    const query = [visual, purpose, framing].filter(Boolean).join(" ").replace(/\\s+/g, " ").trim().slice(0, 200);
+    const query = [visual, purpose, framing].filter(Boolean).join(" ").replace(/\s+/g, " ").trim().slice(0, 200);
     if (!query) throw new Error("Shot " + id + " has no visual, purpose or framing description to search.");
     return { shotId: id, query };
   });
@@ -268,7 +268,7 @@ export const runCli = async (argv = process.argv.slice(2)) => {
   if (command === "storyboard-search") {
     if (!options.plan) throw new Error("storyboard-search requires --plan.");
     const result = await searchStoryboard(options.plan, options.limit, options["max-shots"]);
-    const output = JSON.stringify(result, null, 2) + "\\n";
+    const output = JSON.stringify(result, null, 2) + "\n";
     if (options.output) await writeFile(path.resolve(options.output), output, "utf8");
     else process.stdout.write(output);
     return;
