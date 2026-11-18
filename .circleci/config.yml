@@ -10,6 +10,9 @@ parameters:
   composition_id:
     type: string
     default: DemoVideo
+  narration_path:
+    type: string
+    default: ""
   output_name:
     type: string
     default: ai-video-studio-circleci
@@ -27,6 +30,7 @@ jobs:
       PROJECT_PATH: << pipeline.parameters.project_path >>
       COMPOSITION_ID: << pipeline.parameters.composition_id >>
       OUTPUT_NAME: << pipeline.parameters.output_name >>
+      NARRATION_PATH: << pipeline.parameters.narration_path >>
       REQUEST_ID: << pipeline.parameters.request_id >>
     steps:
       - checkout
@@ -67,6 +71,21 @@ jobs:
               fi
               node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"))' "$PROJECT_PATH"
             fi
+            if [[ -n "$NARRATION_PATH" ]]; then
+              case "$NARRATION_PATH" in
+                projects/*.json) ;;
+                *) echo "narration_path must point inside projects/"; exit 1 ;;
+              esac
+              if [[ "$NARRATION_PATH" == *".."* || ! -f "$NARRATION_PATH" ]]; then
+                echo "narration_path must be an existing JSON file without traversal segments"
+                exit 1
+              fi
+              node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"))' "$NARRATION_PATH"
+              if [[ "$COMPOSITION_ID" != "ProjectVideo" || -z "$PROJECT_PATH" ]]; then
+                echo "Narration requires a ProjectVideo request with project_path"
+                exit 1
+              fi
+            fi
             if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
               if [[ -z "$PROJECT_PATH" ]]; then
                 echo "ProjectVideo requires project_path"
@@ -74,6 +93,24 @@ jobs:
               fi
               npm run validate:project -- "$PROJECT_PATH"
             fi
+      - run:
+          name: Generate optional narration and word alignment
+          command: |
+            if [[ -z "$NARRATION_PATH" ]]; then
+              exit 0
+            fi
+            python3 --version
+            python3 -m venv .venv-tts
+            . .venv-tts/bin/activate
+            pip install --disable-pip-version-check -r requirements-tts.txt
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+            python scripts/generate-narration.py \
+              --config "$NARRATION_PATH" \
+              --project-dir "$PROJECT_DIR" \
+              --model-dir "$HOME/.cache/ai-video-studio/kokoro-v1.0"
+            npm run narration:apply -- "$PROJECT_PATH" "$NARRATION_PATH" "$PROJECT_DIR/production/narration-alignment.json"
+            echo "export PROJECT_PATH=$PROJECT_DIR/.narrated-project.json" >> "$BASH_ENV"
+            export PROJECT_PATH="$PROJECT_DIR/.narrated-project.json"
       - run:
           name: Prepare project audio processing
           command: |
