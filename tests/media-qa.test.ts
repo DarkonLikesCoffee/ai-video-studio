@@ -37,7 +37,7 @@ test("media QA keeps short silence as a warning but rejects excessive A/V drift"
   const shortSilence = buildMediaQaReport(
     "brief-pause.mp4",
     probe,
-    "[silencedetect] silence_start: 4.0\n[silencedetect] silence_end: 5.0 | silence_duration: 1.0\n",
+    "[silencedetect] silence_start: 4.0" + String.fromCharCode(10) + "[silencedetect] silence_end: 5.0 | silence_duration: 1.0",
     "",
   );
   assert.equal(shortSilence.passed, true);
