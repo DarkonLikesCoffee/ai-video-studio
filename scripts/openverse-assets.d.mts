@@ -1,0 +1,23 @@
+export type OpenverseAsset = {
+  id: string;
+  title: string;
+  creator: string;
+  creatorUrl: string | null;
+  source: string;
+  sourcePage: string | null;
+  url: string | null;
+  license: string;
+  licenseVersion: string | null;
+  licenseUrl: string | null;
+  attribution: string | null;
+  filetype: string;
+  width: number | null;
+  height: number | null;
+  filesize: number | null;
+};
+export function isAllowedLicense(license: string): boolean;
+export function buildSearchUrl(query: string, limit?: number): URL;
+export function normalizeCandidate(item: Record<string, unknown>): OpenverseAsset;
+export function detectImageExtension(bytes: Uint8Array, contentType?: string): string | null;
+export function validateSelection(selection: { assets: Array<Record<string, unknown>> }): Array<OpenverseAsset & { shotIds: string[] }>;
+export function runCli(argv?: string[]): Promise<void>;

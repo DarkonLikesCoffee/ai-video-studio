@@ -4,10 +4,12 @@ Prompt-driven video production system. GitHub stores projects and source code; C
 
 ## Engine capabilities
 
-Two Remotion compositions are registered:
+Remotion compositions include:
 
 - `DemoVideo`: the original fixed M1 pipeline demonstration.
 - `ProjectVideo`: a data-driven composition that reads a project JSON file and renders consecutive scenes.
+- `ThreeDShowcase` and `CinematicAdBenchmark`: bespoke 3D/motion-design benchmarks.
+- `NarratedSkyExplainer`: a custom 3D composition with Kokoro narration, aligned captions and music.
 
 A `ProjectVideo` project can define:
 - 1–20 scenes of type `title`, `content`, or `outro`.
@@ -33,7 +35,23 @@ The current validator limits projects to 1,800 total frames, with each scene bet
 
 For narrated explainers and short-form videos, follow [the Narrated Video Producer skill](agent/skills/narrated-video-producer/SKILL.md). The voice track and its actual word/phrase alignment should drive the edit; footage, motion graphics, captions, music and sound effects are coordinated around that timeline. See [external skill references](agent/EXTERNAL_SKILLS.md) for the official Remotion agent skills and reviewed open-source production workflows.
 
-The current repository can import and mix voice-over audio, but it does not include a built-in speech-generation provider or word-level alignment service. A TTS provider or supplied recording is required for narrated output. Paid provider calls require explicit user consent. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses. Remote audio hosts must also allow cross-origin access; local project assets are more reliable for repeatable renders.
+The repository includes an optional Kokoro ONNX narration adapter on the GitHub Actions render worker for Spanish and US English. It derives word timings from the generated speech alignment; arbitrary uploaded recordings still need a separate alignment workflow. Paid provider calls require explicit user consent. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses. Remote audio hosts must also allow cross-origin access; local project assets are more reliable for repeatable renders.
+
+### Open-license visual asset discovery
+
+The asset producer can search Openverse without an API key and prepare reviewed still-image assets for local use:
+
+```bash
+node scripts/openverse-assets.mjs search --query "cinematic ocean aerial" --limit 12 --output /tmp/openverse-candidates.json
+```
+
+Review the candidate source pages and licenses, then create a selection JSON by copying only approved result objects into an `assets` array and adding a `shotIds` array to each one. Download the approved images and merge their provenance into the project's asset manifest:
+
+```bash
+node scripts/openverse-assets.mjs download --selection /path/to/selection.json --project projects/<slug>
+```
+
+The helper accepts CC0, Public Domain Mark and CC BY assets; rejects non-commercial/no-derivatives licenses, unsafe URLs, unsupported formats and files over 25 MiB; and records creator, source page, license, attribution, dimensions and SHA-256. Openverse is a discovery index, not a guarantee that source metadata is correct: verify each original source page before approval. This workflow discovers still images and is not a video-generation or stock-footage API.
 
 ## Example project
 
