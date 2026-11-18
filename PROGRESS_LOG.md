@@ -1,3 +1,15 @@
+## 2026-11-18 — User-provided gameplay footage integration merged (PR #58)
+
+- Reviewed the post-merge narration-sync render #44394465979 and downloaded artifact #14469659407. QA: 47.733s video, 47.8s audio, 1920x1080, 30fps, H.264/AAC stereo, -16.1 LUFS, zero silence/freeze/black intervals. Contact sheet confirmed the technical result still reads as repeated vector-diagram compositions.
+- Diagnosed a missing production integration: buildNarratedFootageTimeline existed and was used for NarratedSkyExplainer custom props, but the ProjectVideo narration path never added the resulting footage to scene media layers.
+- PR #58 added owner-provided footage rights metadata (user-owned or permission-granted plus a meaningful rightsNote), injects matched local video as muted full-frame backgrounds behind the scene's vector overlays and captions, preserves custom-composition props compatibility, and adds separate user footage credits.
+- Added tests for explicit rights metadata, shot-to-scene injection, trim offsets, overlay preservation and credits. Added projects/valorant-immortal-decision-making/production/USER_FOOTAGE.md and README documentation.
+- First CI run #44396824372 failed only because the empty-credits test expected the old message. Updated the expectation; final PR CI #44397239973 passed, including typecheck and all tests.
+- PR #58 merged by squash to main as baeabc412b2a52be48e69d41b6709936b265cc6c.
+- No actual gameplay clips have been added yet and no footage render has been performed. The code path is now ready; creative validation requires real, authorized gameplay clips.
+- Next: verify post-merge main CI, then select short clips from the user's own recordings or clips with explicit permission, map them to shot IDs, render and inspect.
+- Current branch / commit: main / baeabc412b2a52be48e69d41b6709936b265cc6c.
+
 ## 2026-11-18 — Narration/video timeline synchronization fixed and merged
 
 - User review identified that narration ended before the video. Measured v7 from workflow #44387937003: generated narration was 47.31s while the rendered video remained 60.0s, leaving approximately 12.7s of un-narrated visuals.
