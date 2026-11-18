@@ -140,12 +140,23 @@ jobs:
             "render-output/$OUTPUT_NAME.mastered.mp4"
           mv "render-output/$OUTPUT_NAME.mastered.mp4" "render-output/$OUTPUT_NAME.mp4"
 
+      - name: Write footage attribution credits
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
+        env:
+          PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+        run: |
+          PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+          npx tsx scripts/write-footage-credits.ts "$PROJECT_DIR/production/asset-manifest.json" "render-output/$OUTPUT_NAME-credits.txt"
+
       - name: Upload MP4 artifact
         if: steps.request.outputs.provider == 'github-actions'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.request.outputs.output_name }}
-          path: render-output/${{ steps.request.outputs.output_name }}.mp4
+          path: |
+            render-output/${{ steps.request.outputs.output_name }}.mp4
+            render-output/${{ steps.request.outputs.output_name }}-credits.txt
           if-no-files-found: error
           retention-days: 3
 
