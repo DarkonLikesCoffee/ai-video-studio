@@ -9,7 +9,7 @@ Remotion compositions include:
 - `DemoVideo`: the original fixed M1 pipeline demonstration.
 - `ProjectVideo`: a data-driven composition that reads a project JSON file and renders consecutive scenes.
 - `ThreeDShowcase` and `CinematicAdBenchmark`: bespoke 3D/motion-design benchmarks.
-- `NarratedSkyExplainer`: a custom 3D composition with Kokoro narration, aligned captions and music.
+- `NarratedSkyExplainer`: a custom 3D composition with Kokoro narration, aligned captions and music; it can also composite reviewed Wikimedia Commons footage as full-bleed B-roll with an animated 3D scientific inset.
 
 A `ProjectVideo` project can define:
 - 1–20 scenes of type `title`, `content`, or `outro`.
@@ -30,6 +30,22 @@ A `ProjectVideo` project can define:
 - MP4/H.264 output.
 
 The current validator limits projects to 1,800 total frames, with each scene between 30 and 900 frames.
+
+## Narrated footage workflow
+
+The `projects/examples/narrated-explainer` sample includes a five-shot storyboard. Discover candidates with:
+
+```bash
+npm run assets:commons-video -- storyboard-search --plan projects/examples/narrated-explainer/production/production-plan.json
+```
+
+Review each original Wikimedia Commons file page and its attribution requirements. Put only approved results in `projects/examples/narrated-explainer/production/asset-selection.json`, preserving their source and license fields and adding the matching `shotIds`. Download locally for a manual preview with:
+
+```bash
+npm run assets:commons-video -- download --selection projects/examples/narrated-explainer/production/asset-selection.json --project projects/examples/narrated-explainer
+```
+
+When a `NarratedSkyExplainer` render request runs, GitHub Actions downloads that reviewed selection, writes the asset manifest and supplies the matching clips to Remotion. Without a selection file, the original 3D-only render remains unchanged. The repository stores the selection and provenance, not the large video binaries.
 
 ## Agent production workflow
 
