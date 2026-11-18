@@ -227,10 +227,11 @@ const downloadWithCurl = async (url, destination) => {
       "--fail", "--location", "--silent", "--show-error",
       "--proto", "=https", "--proto-redir", "=https",
       "--retry", "3", "--retry-delay", "2", "--retry-all-errors",
-      "--max-time", "45", "--output", temporaryPath,
+      "--max-filesize", String(MAX_BYTES),
+      "--max-time", "120", "--output", temporaryPath,
       "--write-out", "%{http_code}\n%{content_type}\n%{url_effective}\n%{size_download}",
       url,
-    ], { timeout: 240_000, maxBuffer: 1024 * 1024 });
+    ], { timeout: 8 * 60_000, maxBuffer: 1024 * 1024 });
     const [status, mime, finalUrl, sizeText] = stdout.trim().split("\n");
     const size = Number(sizeText);
     if (status !== "200") throw new Error("curl returned HTTP " + (status || "unknown"));
@@ -264,34 +265,60 @@ const downloadSelection = async (selectionPath, projectPath) => {
   const failures = [];
   for (const [index, asset] of assets.entries()) {
     try {
-      const mediaUrl = asset.nasaId
-        ? await resolveNasaLibraryVideoUrl(asset.nasaId)
-        : asset.url;
       const isLibraryAsset = Boolean(asset.nasaId);
       const safeMediaHost = isLibraryAsset ? isSafeNasaLibraryVideoUrl : isSafeNasaSvsUrl;
+      const mediaUrls = isLibraryAsset
+        ? await resolveNasaLibraryVideoUrls(asset.nasaId)
+        : [asset.url];
       let bytes;
       let mime;
-      try {
-        const response = await fetchNasaVideoWithRetries(mediaUrl);
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        if (!safeMediaHost(response.url)) throw new Error("NASA download redirected outside the approved media host.");
-        const length = Number(response.headers.get("content-length") || 0);
-        if (length > MAX_BYTES) throw new Error("File exceeds 150 MiB.");
-        bytes = Buffer.from(await response.arrayBuffer());
-        mime = String(response.headers.get("content-type") || "").split(";")[0].toLowerCase();
-        if (!bytes.length || bytes.length > MAX_BYTES || !VIDEO_TYPES.has(mime)) {
-          throw new Error("Response is empty, oversized or not a supported video.");
+      let mediaUrl;
+      let lastRenditionError;
+      for (const candidateUrl of mediaUrls) {
+        try {
+          let candidateBytes;
+          let candidateMime;
+          try {
+            const response = await fetchNasaVideoWithRetries(candidateUrl);
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            if (!safeMediaHost(response.url)) throw new Error("NASA download redirected outside the approved media host.");
+            const length = Number(response.headers.get("content-length") || 0);
+            if (length > MAX_BYTES) {
+              await response.body?.cancel().catch(() => {});
+              throw new Error("Rendition exceeds 150 MiB (" + length + " bytes).");
+            }
+            candidateBytes = Buffer.from(await response.arrayBuffer());
+            candidateMime = String(response.headers.get("content-type") || "").split(";")[0].toLowerCase();
+            if (!candidateBytes.length || candidateBytes.length > MAX_BYTES || !VIDEO_TYPES.has(candidateMime)) {
+              throw new Error("Response is empty, oversized or not a supported video.");
+            }
+          } catch (fetchError) {
+            if (fetchError instanceof Error && fetchError.message.startsWith("Rendition exceeds 150 MiB")) {
+              throw fetchError;
+            }
+            process.stderr.write("Node fetch failed for " + asset.id + " rendition " + path.basename(new URL(candidateUrl).pathname) + ": " + errorDetails(fetchError) + "; trying curl fallback.\n");
+            const fallback = await downloadWithCurl(candidateUrl, path.join(assetsDir, path.basename(new URL(candidateUrl).pathname)));
+            candidateBytes = fallback.bytes;
+            candidateMime = fallback.mime;
+          }
+          const candidateExtension = VIDEO_TYPES.get(candidateMime);
+          if (candidateExtension !== path.extname(new URL(candidateUrl).pathname).slice(1).toLowerCase()) {
+            throw new Error("Downloaded video MIME type does not match its filename.");
+          }
+          bytes = candidateBytes;
+          mime = candidateMime;
+          mediaUrl = candidateUrl;
+          break;
+        } catch (renditionError) {
+          lastRenditionError = renditionError;
+          process.stderr.write("Skipping NASA rendition " + path.basename(new URL(candidateUrl).pathname) + ": " +
+            (renditionError instanceof Error ? renditionError.message : String(renditionError)) + "\n");
         }
-      } catch (fetchError) {
-        process.stderr.write("Node fetch failed for " + asset.id + ": " + errorDetails(fetchError) + "; trying curl fallback.\n");
-        const fallback = await downloadWithCurl(mediaUrl, path.join(assetsDir, path.basename(new URL(mediaUrl).pathname)));
-        bytes = fallback.bytes;
-        mime = fallback.mime;
+      }
+      if (!bytes || !mime || !mediaUrl) {
+        throw lastRenditionError ?? new Error("No NASA video rendition could be downloaded within the configured size limit.");
       }
       const extension = VIDEO_TYPES.get(mime);
-      if (extension !== path.extname(new URL(mediaUrl).pathname).slice(1).toLowerCase()) {
-        throw new Error("Downloaded video MIME type does not match its source filename.");
-      }
       const safeName = path.basename(new URL(mediaUrl).pathname)
         .normalize("NFKD").replace(/[^\w.-]+/g, "-").slice(0, 110) || "nasa-footage." + extension;
       const filename = safeName;
