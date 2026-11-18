@@ -81,10 +81,11 @@ jobs:
                 exit 1
               fi
               node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"))' "$NARRATION_PATH"
-              if [[ "$COMPOSITION_ID" != "ProjectVideo" || -z "$PROJECT_PATH" ]]; then
-                echo "Narration requires a ProjectVideo request with project_path"
+              if [[ "$COMPOSITION_ID" != "ProjectVideo" && "$COMPOSITION_ID" != "NarratedSkyExplainer" ]]; then
+                echo "Narration requires ProjectVideo or NarratedSkyExplainer"
                 exit 1
               fi
+              node -e 'const p=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8")); if (p.composition?.id !== process.argv[2]) process.exit(1)' "$PROJECT_PATH" "$COMPOSITION_ID"
             fi
             if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
               if [[ -z "$PROJECT_PATH" ]]; then
@@ -124,7 +125,11 @@ jobs:
                     --project-dir "$PROJECT_DIR" \
                     --model-dir "$HOME/.cache/ai-video-studio/kokoro-v1.0"
                   npm run narration:apply -- "$PROJECT_PATH" "$NARRATION_PATH" "$PROJECT_DIR/production/narration-alignment.json"
-                  npm run validate:project -- "$PROJECT_DIR/.narrated-project.json"
+                  if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
+                    npm run validate:project -- "$PROJECT_DIR/.narrated-project.json"
+                  else
+                    node -e 'const p=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8")); if (!Array.isArray(p.subtitleCues) || !Number.isInteger(p.durationInFrames)) process.exit(1)' "$PROJECT_DIR/.narrated-project.json"
+                  fi
                   echo "export PROJECT_PATH=$PROJECT_DIR/.narrated-project.json" >> "$BASH_ENV"
                   export PROJECT_PATH="$PROJECT_DIR/.narrated-project.json"
             - save_cache:
