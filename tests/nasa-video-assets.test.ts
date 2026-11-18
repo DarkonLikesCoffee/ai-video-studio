@@ -5,6 +5,7 @@ import {
   getNasaRetryDelayMs,
   isSafeNasaSvsUrl,
   isSafeNasaLibraryVideoUrl,
+  normalizeNasaLibraryVideoUrl,
   resolveNasaLibraryVideoUrl,
   validateNasaSelection,
 } from "../scripts/nasa-video-assets.mjs";
@@ -127,4 +128,19 @@ test("rejects non-public-domain or unverified NASA Images Library selections", (
   };
   assert.throws(() => validateNasaSelection({ assets: [{ ...libraryAsset, license: "CC BY-NC 4.0" }] }), /Public domain/);
   assert.throws(() => validateNasaSelection({ assets: [{ ...libraryAsset, sourcePage: "https://example.com" }] }), /source page/);
+});
+
+test("upgrades NASA asset API HTTP video hrefs to HTTPS without changing host", () => {
+  assert.equal(
+    normalizeNasaLibraryVideoUrl("http://images-assets.nasa.gov/video/ID/ID~orig.mp4"),
+    "https://images-assets.nasa.gov/video/ID/ID~orig.mp4",
+  );
+  assert.equal(
+    normalizeNasaLibraryVideoUrl("http://evil.example/video/ID.mp4"),
+    null,
+  );
+  assert.equal(
+    normalizeNasaLibraryVideoUrl("http://images-assets.nasa.gov/image/ID/ID.jpg"),
+    null,
+  );
 });
