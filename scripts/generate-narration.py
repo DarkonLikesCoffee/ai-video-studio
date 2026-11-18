@@ -148,6 +148,7 @@ def main() -> int:
         voice=voice,
         speed=float(speed),
         lang=language,
+        continuous=True,
     )
     words = map_words(kokoro, text.strip(), language, phoneme_timings)
     duration_seconds = len(audio) / sample_rate
