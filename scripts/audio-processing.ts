@@ -6,19 +6,6 @@ export const buildAudioInputArgs = (track: Pick<AudioTrack, "src" | "loop">): st
   track.src,
 ];
 
-export const getSidechainTailSeconds = (
-  trackDurationInFrames: number,
-  sidechainDelayMs: number,
-  fps: number,
-): number => {
-  if (!Number.isFinite(trackDurationInFrames) || trackDurationInFrames < 0 ||
-      !Number.isFinite(sidechainDelayMs) || sidechainDelayMs < 0 ||
-      !Number.isFinite(fps) || fps <= 0) {
-    throw new Error("Sidechain timeline values must be finite and non-negative, with a positive FPS.");
-  }
-  return Math.max(0, trackDurationInFrames / fps - sidechainDelayMs / 1000);
-};
-
 export const buildMainAudioFilter = (durationSeconds: number, loop: boolean): string => {
   if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
     throw new Error("Audio track duration must be a positive finite number.");
