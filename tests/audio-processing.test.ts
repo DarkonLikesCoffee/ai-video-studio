@@ -4,7 +4,6 @@ import {
   buildAudioInputArgs,
   buildMainAudioFilter,
   buildSidechainTailFilter,
-  getSidechainTailSeconds,
 } from "../scripts/audio-processing";
 
 test("looped audio inputs are explicitly looped by FFmpeg", () => {
@@ -28,15 +27,12 @@ test("looped main music is bounded to its project timeline", () => {
 });
 
 test("short narration sidechain is padded to the end of the music track", () => {
-  assert.equal(getSidechainTailSeconds(1800, 0, 30), 60);
-  assert.equal(getSidechainTailSeconds(1800, 10000, 30), 50);
   assert.deepEqual(buildSidechainTailFilter(60), [
     "apad=whole_dur=60.00000",
     "atrim=duration=60.00000",
   ]);
 });
 
-test("sidechain timeline helper rejects invalid timing values", () => {
-  assert.throws(() => getSidechainTailSeconds(1800, 0, 0), /positive FPS/);
+test("sidechain padding rejects invalid duration values", () => {
   assert.throws(() => buildSidechainTailFilter(0), /positive finite number/);
 });
