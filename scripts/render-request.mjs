@@ -7,6 +7,10 @@ const isRecord = (value) =>
 const isProjectPath = (value) =>
   /^projects\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.json$/.test(value);
 
+export const matchesCompositionMetadata = (project, compositionId) =>
+  isRecord(project) && isRecord(project.composition) &&
+  project.composition.id === compositionId;
+
 /**
  * Validate the request envelope independently of the selected composition.
  * Remotion remains the source of truth for whether compositionId is registered.
@@ -95,8 +99,7 @@ const run = async () => {
     }
 
     if ((request.compositionId === "ProjectVideo" || request.compositionId === "NarratedSkyExplainer") &&
-        (!isRecord(project) || !isRecord(project.composition) ||
-         project.composition.id !== request.compositionId)) {
+        !matchesCompositionMetadata(project, request.compositionId)) {
       throw new Error("The selected project composition ID must match " + request.compositionId + ".");
     }
   }
