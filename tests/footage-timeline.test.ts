@@ -13,8 +13,8 @@ const plan = {
 test("maps reviewed local footage assets to exact storyboard frame ranges", () => {
   const manifest = {
     assets: [
-      { file: "sunrise-12345678.mp4", shotIds: ["opening", "middle"] },
-      { file: "horizon-abcd1234.webm", shotIds: ["closing"] },
+      { file: "sunrise-12345678.mp4", license: "CC BY 4.0", shotIds: ["opening", "middle"] },
+      { file: "horizon-abcd1234.webm", license: "CC0", shotIds: ["closing"] },
     ],
   };
   assert.deepEqual(buildNarratedFootageTimeline(manifest, plan, 30), [
@@ -27,8 +27,8 @@ test("maps reviewed local footage assets to exact storyboard frame ranges", () =
 test("uses only the first selected asset for each shot and skips unknown shot IDs", () => {
   const manifest = {
     assets: [
-      { file: "first.mp4", shotIds: ["opening", "not-in-plan"] },
-      { file: "second.mp4", shotIds: ["opening", "middle"] },
+      { file: "first.mp4", license: "Public domain", shotIds: ["opening", "not-in-plan"] },
+      { file: "second.mp4", license: "CC BY 3.0", shotIds: ["opening", "middle"] },
     ],
   };
   const clips = buildNarratedFootageTimeline(manifest, plan, 24);
@@ -40,9 +40,9 @@ test("uses only the first selected asset for each shot and skips unknown shot ID
 test("does not emit unsafe paths or unsupported file extensions", () => {
   const manifest = {
     assets: [
-      { file: "../secret.mp4", shotIds: ["opening"] },
-      { file: "still.jpg", shotIds: ["middle"] },
-      { file: "safe.mov", shotIds: ["closing"] },
+      { file: "../secret.mp4", license: "CC0", shotIds: ["opening"] },
+      { file: "still.jpg", license: "CC0", shotIds: ["middle"] },
+      { file: "safe.mov", license: "CC BY 2.0", shotIds: ["closing"] },
     ],
   };
   const clips = buildNarratedFootageTimeline(manifest, plan, 30);
