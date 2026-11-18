@@ -131,9 +131,9 @@ export const applyNarratedFootageToProject = (
     scenes: project.scenes.map((scene) => {
       const clip = clipsByShotId.get(scene.id);
       if (!clip) return scene;
+      const { media: _legacyMedia, ...sceneWithoutLegacyMedia } = scene;
       return {
-        ...scene,
-        media: undefined,
+        ...sceneWithoutLegacyMedia,
         mediaLayers: [{
           id: clip.id,
           type: "video",
