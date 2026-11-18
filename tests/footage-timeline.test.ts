@@ -42,6 +42,7 @@ test("does not emit unsafe paths or unsupported file extensions", () => {
     assets: [
       { file: "../secret.mp4", license: "CC0", shotIds: ["opening"] },
       { file: "still.jpg", license: "CC0", shotIds: ["middle"] },
+      { file: "unlicensed.mp4", license: "CC BY-SA 4.0", shotIds: ["opening"] },
       { file: "safe.mov", license: "CC BY 2.0", shotIds: ["closing"] },
     ],
   };
