@@ -93,11 +93,18 @@ jobs:
               fi
               npm run validate:project -- "$PROJECT_PATH"
             fi
+      - restore_cache:
+          keys:
+            - kokoro-onnx-model-files-v1.1-linux-amd64
       - run:
           name: Generate optional narration and word alignment
           command: |
             if [[ -z "$NARRATION_PATH" ]]; then
               exit 0
+            fi
+            if ! python3 -c 'import venv' >/dev/null 2>&1; then
+              sudo apt-get update
+              sudo apt-get install -y python3-venv
             fi
             python3 --version
             python3 -m venv .venv-tts
@@ -111,6 +118,10 @@ jobs:
             npm run narration:apply -- "$PROJECT_PATH" "$NARRATION_PATH" "$PROJECT_DIR/production/narration-alignment.json"
             echo "export PROJECT_PATH=$PROJECT_DIR/.narrated-project.json" >> "$BASH_ENV"
             export PROJECT_PATH="$PROJECT_DIR/.narrated-project.json"
+      - save_cache:
+          key: kokoro-onnx-model-files-v1.1-linux-amd64
+          paths:
+            - ~/.cache/ai-video-studio/kokoro-v1.0
       - run:
           name: Prepare project audio processing
           command: |
