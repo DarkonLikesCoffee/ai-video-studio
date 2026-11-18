@@ -1,3 +1,15 @@
+## 2026-11-18 — Narration/video timeline synchronization fixed and merged
+
+- User review identified that narration ended before the video. Measured v7 from workflow #44387937003: generated narration was 47.31s while the rendered video remained 60.0s, leaving approximately 12.7s of un-narrated visuals.
+- Added packages/video-engine/src/narration-timeline.ts and integrated it into scripts/apply-narration.ts. The helper retimes scene durations, transitions, local animation keyframes, media/graphic/particle timing, existing subtitles, and non-voice audio events together to the narration duration plus a 0.4s visual landing. Source trim and playback-rate values remain unchanged.
+- Added regression tests for shared timeline retiming and frame-boundary clamping. V8 render #44392886686 exposed a one-frame keyframe overflow in two outro graphics; fixed it by clamping local keyframes to their shortened scene/layer duration. V9 render succeeded.
+- Latest PR CI #44393414920 passed. PR #57 merged by squash into main as 2bd52e9f0830600718fcb60fc5bd6f5cf6b4677.
+- V9 branch render #44393399283 produced artifact #14469578336. Measured narration: 47.31s. Video: 47.733s (47.8s container duration), approximately 0.42s visual landing after speech. QA: 1920x1080, 30fps, H.264/AAC stereo, -16.2 LUFS, zero silence/freeze/black intervals. Contact sheet inspected.
+- Main CI #44394465963 passed. Main render #44394465979 was running at the time of this log entry; inspect its artifact before closing this handoff.
+- Creative limitation: the video is still built primarily from tactical vector diagrams and typography. Camera motion reduces freeze detections but does not create authentic gameplay footage. The result is technically synchronized but not yet accepted as a cinematic VALORANT explainer.
+- Next: inspect post-merge main render; then prioritize verified licensed moving gameplay footage, semantic shot variety and audio/video sync diagnostics in media QA.
+- Current branch / commit: main / 2bd52e9f0830600718fcb60fc5bd6f5cf6b4677.
+
 ## 2026-11-18 — v6 audio fix verified; cinematic camera motion in PR #57
 
 - PR #56 merged into main as 338b55a2bf45e39e096ac722a740f73b9562a5f1 (fix(audio): preserve looped music through narration tail).
