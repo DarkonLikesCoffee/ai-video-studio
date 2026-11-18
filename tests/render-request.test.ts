@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { validateRenderRequest } from "../scripts/render-request";
+import { validateRenderRequest } from "../scripts/render-request.mjs";
 
 const validProjectRequest = {
   provider: "github-actions",
@@ -17,7 +17,7 @@ test("accepts the existing ProjectVideo request format", () => {
   assert.equal(result.request?.projectPath, "projects/demo/scene.json");
 });
 
-test("accepts custom registered compositions without a project JSON file", () => {
+test("accepts custom compositions without a project JSON file", () => {
   const result = validateRenderRequest({
     provider: "github-actions",
     compositionId: "CinematicAdBenchmark",
