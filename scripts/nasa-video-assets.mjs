@@ -78,6 +78,41 @@ export const fetchNasaVideoWithRetries = async (
   }
 };
 
+export const isSafeNasaLibraryVideoUrl = (value) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" &&
+      url.hostname === "images-assets.nasa.gov" &&
+      !url.username && !url.password &&
+      url.pathname.startsWith("/video/") &&
+      /\.(?:mp4|webm)$/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+};
+
+const isNasaLibrarySourcePage = (value) =>
+  typeof value === "string" &&
+  /^https:\/\/images\.nasa\.gov\/details\/[A-Za-z0-9_%.-]+$/i.test(value);
+
+export const resolveNasaLibraryVideoUrl = async (nasaId, fetchImpl = fetch) => {
+  if (typeof nasaId !== "string" || !nasaId.trim() || nasaId.length > 180) {
+    throw new Error("NASA library asset ID must be a non-empty string of at most 180 characters.");
+  }
+  const manifestUrl = "https://images-api.nasa.gov/asset/" + encodeURIComponent(nasaId);
+  const response = await fetchNasaVideoWithRetries(manifestUrl, fetchImpl);
+  if (!response.ok) throw new Error("NASA Images API manifest returned HTTP " + response.status + ".");
+  const payload = await response.json();
+  const items = payload?.collection?.items;
+  if (!Array.isArray(items)) throw new Error("NASA Images API manifest has no collection.items array.");
+  const candidates = items
+    .map((item) => item?.href)
+    .filter((href) => typeof href === "string" && isSafeNasaLibraryVideoUrl(href));
+  if (!candidates.length) throw new Error("NASA Images API manifest contains no supported images-assets.nasa.gov MP4/WebM files.");
+  const original = candidates.find((href) => /~orig\.(?:mp4|webm)$/i.test(new URL(href).pathname));
+  return original ?? candidates.sort((a, b) => b.length - a.length)[0];
+};
+
 export const validateNasaSelection = (selection) => {
   if (!selection || !Array.isArray(selection.assets) || !selection.assets.length) {
     throw new Error("NASA selection must contain a non-empty assets array.");
@@ -88,21 +123,42 @@ export const validateNasaSelection = (selection) => {
       throw new Error("assets[" + index + "] must have a unique non-empty id.");
     }
     ids.add(asset.id);
-    if (!isSafeNasaSvsUrl(asset.url)) {
-      throw new Error("Video " + asset.id + " must use an HTTPS NASA SVS /vis/ video URL.");
-    }
-    if (!isNasaSourcePage(asset.sourcePage)) {
-      throw new Error("Video " + asset.id + " must reference its NASA SVS source page.");
+    const isLibraryAsset = typeof asset.nasaId === "string" && asset.nasaId.trim().length > 0;
+    if (isLibraryAsset) {
+      if (!isNasaLibrarySourcePage(asset.sourcePage)) {
+        throw new Error("Video " + asset.id + " must reference its NASA Images and Video Library source page.");
+      }
+      if (asset.url !== undefined) {
+        throw new Error("NASA library selection " + asset.id + " must use nasaId, not an unverified direct URL.");
+      }
+      if (asset.mime !== undefined && !VIDEO_TYPES.has(String(asset.mime).toLowerCase())) {
+        throw new Error("Video " + asset.id + " has an unsupported MIME type.");
+      }
+      if (asset.trimBeforeSecondsByShotId !== undefined) {
+        if (!asset.trimBeforeSecondsByShotId || typeof asset.trimBeforeSecondsByShotId !== "object" ||
+            Object.values(asset.trimBeforeSecondsByShotId).some((value) =>
+              typeof value !== "number" || !Number.isFinite(value) || value < 0
+            )) {
+          throw new Error("Video " + asset.id + " has invalid trimBeforeSecondsByShotId values.");
+        }
+      }
+    } else {
+      if (!isSafeNasaSvsUrl(asset.url)) {
+        throw new Error("Video " + asset.id + " must use an HTTPS NASA SVS /vis/ video URL or a NASA library nasaId.");
+      }
+      if (!isNasaSourcePage(asset.sourcePage)) {
+        throw new Error("Video " + asset.id + " must reference its NASA SVS source page.");
+      }
+      if (!VIDEO_TYPES.has(String(asset.mime ?? "").toLowerCase())) {
+        throw new Error("Video " + asset.id + " has an unsupported MIME type.");
+      }
+      const extension = path.extname(new URL(asset.url).pathname).slice(1).toLowerCase();
+      if (VIDEO_TYPES.get(String(asset.mime).toLowerCase()) !== extension) {
+        throw new Error("Video " + asset.id + " MIME type does not match its filename.");
+      }
     }
     if (asset.license !== "Public domain") {
       throw new Error("Video " + asset.id + " must be manually reviewed as Public domain.");
-    }
-    if (!VIDEO_TYPES.has(String(asset.mime ?? "").toLowerCase())) {
-      throw new Error("Video " + asset.id + " has an unsupported MIME type.");
-    }
-    const extension = path.extname(new URL(asset.url).pathname).slice(1).toLowerCase();
-    if (VIDEO_TYPES.get(String(asset.mime).toLowerCase()) !== extension) {
-      throw new Error("Video " + asset.id + " MIME type does not match its filename.");
     }
     if (!Array.isArray(asset.shotIds) || !asset.shotIds.length ||
         asset.shotIds.some((id) => typeof id !== "string" || !id.trim())) {
@@ -138,7 +194,9 @@ const downloadWithCurl = async (url, destination) => {
     const [status, mime, finalUrl, sizeText] = stdout.trim().split("\n");
     const size = Number(sizeText);
     if (status !== "200") throw new Error("curl returned HTTP " + (status || "unknown"));
-    if (!isSafeNasaSvsUrl(finalUrl)) throw new Error("curl redirected outside the approved NASA SVS media host.");
+    if (!isSafeNasaSvsUrl(finalUrl) && !isSafeNasaLibraryVideoUrl(finalUrl)) {
+      throw new Error("curl redirected outside approved NASA video media hosts.");
+    }
     if (!VIDEO_TYPES.has(String(mime).split(";")[0].toLowerCase())) {
       throw new Error("curl returned unsupported video MIME type " + mime);
     }
@@ -166,12 +224,17 @@ const downloadSelection = async (selectionPath, projectPath) => {
   const failures = [];
   for (const [index, asset] of assets.entries()) {
     try {
+      const mediaUrl = asset.nasaId
+        ? await resolveNasaLibraryVideoUrl(asset.nasaId)
+        : asset.url;
+      const isLibraryAsset = Boolean(asset.nasaId);
+      const safeMediaHost = isLibraryAsset ? isSafeNasaLibraryVideoUrl : isSafeNasaSvsUrl;
       let bytes;
       let mime;
       try {
-        const response = await fetchNasaVideoWithRetries(asset.url);
+        const response = await fetchNasaVideoWithRetries(mediaUrl);
         if (!response.ok) throw new Error("HTTP " + response.status);
-        if (!isSafeNasaSvsUrl(response.url)) throw new Error("NASA SVS download redirected outside the approved media host.");
+        if (!safeMediaHost(response.url)) throw new Error("NASA download redirected outside the approved media host.");
         const length = Number(response.headers.get("content-length") || 0);
         if (length > MAX_BYTES) throw new Error("File exceeds 150 MiB.");
         bytes = Buffer.from(await response.arrayBuffer());
@@ -181,15 +244,15 @@ const downloadSelection = async (selectionPath, projectPath) => {
         }
       } catch (fetchError) {
         process.stderr.write("Node fetch failed for " + asset.id + ": " + errorDetails(fetchError) + "; trying curl fallback.\n");
-        const fallback = await downloadWithCurl(asset.url, path.join(assetsDir, path.basename(new URL(asset.url).pathname)));
+        const fallback = await downloadWithCurl(mediaUrl, path.join(assetsDir, path.basename(new URL(mediaUrl).pathname)));
         bytes = fallback.bytes;
         mime = fallback.mime;
       }
       const extension = VIDEO_TYPES.get(mime);
-      if (extension !== path.extname(new URL(asset.url).pathname).slice(1).toLowerCase()) {
+      if (extension !== path.extname(new URL(mediaUrl).pathname).slice(1).toLowerCase()) {
         throw new Error("Downloaded video MIME type does not match its source filename.");
       }
-      const safeName = path.basename(new URL(asset.url).pathname)
+      const safeName = path.basename(new URL(mediaUrl).pathname)
         .normalize("NFKD").replace(/[^\w.-]+/g, "-").slice(0, 110) || "nasa-footage." + extension;
       const filename = safeName;
       await writeFile(path.join(assetsDir, filename), bytes);
@@ -198,15 +261,16 @@ const downloadSelection = async (selectionPath, projectPath) => {
         type: "licensed video footage",
         shotIds: asset.shotIds,
         title: asset.title,
-        source: "NASA Scientific Visualization Studio",
+        source: isLibraryAsset ? "NASA Image and Video Library" : "NASA Scientific Visualization Studio",
         sourcePage: asset.sourcePage,
-        sourceUrl: asset.url,
+        sourceUrl: mediaUrl,
         license: "Public domain",
         licenseUrl: "https://www.nasa.gov/nasa-brand-center/images-and-media/",
         creator: asset.creator,
         attribution: asset.attribution || asset.creator,
         width: asset.width ?? null,
         height: asset.height ?? null,
+        ...(asset.trimBeforeSecondsByShotId ? { trimBeforeSecondsByShotId: asset.trimBeforeSecondsByShotId } : {}),
         bytes: bytes.length,
         sha256: createHash("sha256").update(bytes).digest("hex"),
       });
