@@ -3,7 +3,7 @@
   "id": "valorant-immortal-decision-making",
   "title": "The Difference Between Diamond and Immortal",
   "delivery": {
-    "durationSeconds": 75,
+    "durationSeconds": 60,
     "width": 1920,
     "height": 1080,
     "fps": 30,
@@ -52,7 +52,7 @@
     {
       "id": "the-hook",
       "startSeconds": 0,
-      "durationSeconds": 12.5,
+      "durationSeconds": 10,
       "purpose": "Hook Diamond players with the frustration of being mechanically strong but stuck.",
       "visual": "An abstract red pressure corridor closes around a moving reticle; the frame resolves into the question WHY DO GOOD PLAYERS GET STUCK? This is a designed visual metaphor, not gameplay.",
       "framing": "Editorial left-aligned headline with a large right-side pressure tunnel and central reticle.",
@@ -67,8 +67,8 @@
     },
     {
       "id": "aim-isnt-everything",
-      "startSeconds": 12.5,
-      "durationSeconds": 12.5,
+      "startSeconds": 10,
+      "durationSeconds": 10,
       "purpose": "Show that a clean aim duel is only one part of winning a round.",
       "visual": "A reticle sweeps toward a concentric target, a tracer draws across frame, and an impact ring expands then disappears.",
       "framing": "Left editorial statement; right macro target geometry and reticle.",
@@ -83,8 +83,8 @@
     },
     {
       "id": "read-the-round",
-      "startSeconds": 25,
-      "durationSeconds": 12.5,
+      "startSeconds": 20,
+      "durationSeconds": 10,
       "purpose": "Explain positioning, information, utility and trade spacing.",
       "visual": "A top-down abstract map appears; teammate nodes move into crossfire positions while route lines draw and enemy information pulses.",
       "framing": "Left title and concise copy; right tactical map with blue allied nodes and red threat markers.",
@@ -99,8 +99,8 @@
     },
     {
       "id": "the-ego-peek",
-      "startSeconds": 37.5,
-      "durationSeconds": 12.5,
+      "startSeconds": 30,
+      "durationSeconds": 10,
       "purpose": "Make the cost of an unnecessary solo duel immediately legible.",
       "visual": "One blue player path pushes alone into a red danger zone; enemy threat lines converge, the motion stops, and BAD DECISION = LOST ROUND appears.",
       "framing": "Left editorial headline; right map, isolated player marker and red warning cross.",
@@ -115,8 +115,8 @@
     },
     {
       "id": "the-better-play",
-      "startSeconds": 50,
-      "durationSeconds": 12.5,
+      "startSeconds": 40,
+      "durationSeconds": 10,
       "purpose": "Show a coordinated alternative: utility, space, trading and execution.",
       "visual": "Two routes converge, a utility radius expands, and three allied markers enter together while the site is isolated.",
       "framing": "Left statement; right map with converging routes, utility radius and coordinated markers.",
@@ -131,8 +131,8 @@
     },
     {
       "id": "play-smarter",
-      "startSeconds": 62.5,
-      "durationSeconds": 12.5,
+      "startSeconds": 50,
+      "durationSeconds": 10,
       "purpose": "Resolve the opening question with a memorable competitive principle.",
       "visual": "The tactical lines collapse into a red-and-white geometric emblem; the final message locks into place over a slow luminous orbit.",
       "framing": "Clean centered final title with an animated emblem behind it.",
@@ -147,7 +147,7 @@
     }
   ],
   "acceptanceCriteria": [
-    "Final output is a 1920×1080, 16:9 H.264 MP4 with a target duration of 60–75 seconds.",
+    "Final output is a 1920×1080, 16:9 H.264 MP4 with a 60-second duration, within the repository's supported 60-second project limit.",
     "English narration is generated from the approved script, remains intelligible, and is accompanied by word-aligned captions.",
     "Every scene contains purposeful animated motion and the six chapters use distinct compositions; the result must not read as a slideshow.",
     "Music is ducked beneath narration and transitions/impact accents are synchronized to the visual events.",
