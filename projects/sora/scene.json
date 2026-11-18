@@ -207,8 +207,8 @@
       "type": "outro",
       "durationInFrames": 90,
       "transitionIn": {
-        "type": "fade",
-        "durationInFrames": 15
+        "type": "cut",
+        "durationInFrames": 0
       },
       "backgroundColor": "#0c100f",
       "accentColor": "#d56a42",
