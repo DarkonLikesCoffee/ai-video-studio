@@ -183,6 +183,14 @@ test("camera motion rejects extreme zoom and pan values", async () => {
   assert.ok(errors.some((error) => error.includes("cameraMotion.panY must be between -10 and 10")));
 });
 
+test("camera motion supports eased movement and rejects unknown easing", async () => {
+  const project = await readExample();
+  project.scenes[0]!.cameraMotion = { zoom: 1.08, panX: -2, easing: "ease-in-out" };
+  assert.deepEqual(validateProjectDefinition(project), []);
+  project.scenes[0]!.cameraMotion.easing = "overshoot" as "linear";
+  assert.ok(validateProjectDefinition(project).some((error) => error.includes("cameraMotion.easing")));
+});
+
 test("validator accepts valid media and text animation tracks", async () => {
   const project = await readExample();
   project.scenes[0]!.mediaLayers![0]!.animations = {

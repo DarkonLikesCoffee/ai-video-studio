@@ -267,6 +267,8 @@ export type SceneCameraMotion = {
   panX?: number;
   /** Final vertical camera offset as a percentage of the scene height (-10 to 10). */
   panY?: number;
+  /** Easing for the continuous camera move. Defaults to linear for backwards compatibility. */
+  easing?: "linear" | "ease-in" | "ease-out" | "ease-in-out";
 };
 
 export type VideoScene = {
@@ -1380,6 +1382,10 @@ export const validateProjectDefinition = (value: unknown): string[] => {
               if (camera[field] !== undefined && (!isFiniteNumber(camera[field]) || camera[field] < -10 || camera[field] > 10)) {
                 errors.push(`${prefix}.cameraMotion.${field} must be between -10 and 10`);
               }
+            }
+            if (camera.easing !== undefined &&
+                !["linear", "ease-in", "ease-out", "ease-in-out"].includes(String(camera.easing))) {
+              errors.push(`${prefix}.cameraMotion.easing must be linear, ease-in, ease-out, or ease-in-out`);
             }
           }
         }

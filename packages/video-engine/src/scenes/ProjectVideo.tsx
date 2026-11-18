@@ -1,5 +1,5 @@
 import { Audio } from "@remotion/media";
-import { AbsoluteFill, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Easing, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { useMemo } from "react";
 import type { CSSProperties, FC, ReactNode } from "react";
 import type { AnimationTracks, AudioTrack, GraphicElement, ParticleSystem, SceneMedia, SceneTransition, SubtitleCue, VideoProject, VideoScene } from "../project";
@@ -469,8 +469,19 @@ const SceneCard: FC<SceneCardProps> = ({
 }) => {
   const frame = useCurrentFrame();
   const duration = scene.durationInFrames;
-  const cameraProgress = interpolate(frame, [0, Math.max(1, duration - 1)], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const cameraMotion = scene.cameraMotion;
+  const cameraEasing = cameraMotion?.easing === "ease-in"
+    ? Easing.in(Easing.cubic)
+    : cameraMotion?.easing === "ease-out"
+      ? Easing.out(Easing.cubic)
+      : cameraMotion?.easing === "ease-in-out"
+        ? Easing.inOut(Easing.cubic)
+        : Easing.linear;
+  const cameraProgress = interpolate(frame, [0, Math.max(1, duration - 1)], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: cameraEasing,
+  });
   const cameraTransform = cameraMotion
     ? `translate(${(cameraMotion.panX ?? 0) * cameraProgress}%, ${(cameraMotion.panY ?? 0) * cameraProgress}%) scale(${1 + ((cameraMotion.zoom ?? 1) - 1) * cameraProgress})`
     : undefined;
