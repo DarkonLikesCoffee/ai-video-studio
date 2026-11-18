@@ -2,7 +2,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 
 const API_BASE = "https://api.openverse.org/v1/images/";
 const ALLOWED_LICENSES = new Set(["cc0", "pdm", "by", "by-sa"]);
@@ -161,7 +161,7 @@ const downloadOne = async (asset, assetsDir) => {
   const filename = slugify(asset.title) + "-" + asset.id.slice(0, 8) + "." + extension;
   const target = path.resolve(assetsDir, filename);
   if (!target.startsWith(path.resolve(assetsDir) + path.sep)) throw new Error("Unsafe asset destination.");
-  await writeFile(target, bytes, { flag: "wx" });
+  await writeFile(target, bytes);
   return {
     file: filename,
     type: "open-license photograph",
