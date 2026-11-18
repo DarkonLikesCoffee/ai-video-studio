@@ -1,3 +1,5 @@
+import type { VideoProject } from "./project";
+
 export type NarratedFootageShot = {
   id: string;
   startSeconds: number;
@@ -6,13 +8,18 @@ export type NarratedFootageShot = {
 
 export type NarratedFootageAsset = {
   file: string;
-  license: string;
+  license?: string;
+  /** Rights basis for footage supplied by the project owner rather than a public-license source. */
+  rightsBasis?: "user-owned" | "permission-granted";
+  /** Human-readable confirmation of ownership or permission. Required for user-supplied footage. */
+  rightsNote?: string;
   shotIds: string[];
   trimBeforeSecondsByShotId?: Record<string, number>;
 };
 
 export type NarratedFootageTimelineClip = {
   id: string;
+  shotId: string;
   src: string;
   startInFrames: number;
   durationInFrames: number;
@@ -30,10 +37,13 @@ const isAllowedFootageLicense = (value: unknown): boolean =>
   typeof value === "string" &&
   /^(?:CC0(?:\s+1\.0)?|Public domain|PD-[A-Za-z0-9-]+|CC BY [234]\.0)$/i.test(value.trim());
 
+const hasExplicitUserRights = (value: Record<string, unknown>): boolean =>
+  (value.rightsBasis === "user-owned" || value.rightsBasis === "permission-granted") &&
+  typeof value.rightsNote === "string" && value.rightsNote.trim().length >= 8;
+
 /**
- * Resolve reviewed local footage assets onto the matching storyboard shots.
- * The first manifest asset assigned to a shot wins, so duplicate selections
- * cannot stack several full-frame clips over one another accidentally.
+ * Resolve reviewed local footage assets onto matching storyboard shots.
+ * The first manifest asset assigned to a shot wins.
  */
 export const buildNarratedFootageTimeline = (
   manifestValue: unknown,
@@ -69,7 +79,8 @@ export const buildNarratedFootageTimeline = (
   const clips: NarratedFootageTimelineClip[] = [];
   for (const [assetIndex, value] of manifestValue.assets.entries()) {
     if (!isRecord(value) || !isSafeFootageFilename(value.file) ||
-        !isAllowedFootageLicense(value.license) || !Array.isArray(value.shotIds)) {
+        !(isAllowedFootageLicense(value.license) || hasExplicitUserRights(value)) ||
+        !Array.isArray(value.shotIds)) {
       continue;
     }
     for (const shotId of value.shotIds) {
@@ -86,6 +97,7 @@ export const buildNarratedFootageTimeline = (
       if (durationInFrames < 1) continue;
       clips.push({
         id: "footage-" + shot.id + "-" + assetIndex,
+        shotId: shot.id,
         src: "assets/" + value.file,
         startInFrames,
         durationInFrames,
@@ -95,4 +107,47 @@ export const buildNarratedFootageTimeline = (
     }
   }
   return clips.sort((a, b) => a.startInFrames - b.startInFrames);
+};
+
+/**
+ * Put approved footage behind each matching ProjectVideo scene's existing
+ * vector overlays and typography. The scene's legacy SVG media is replaced,
+ * because it is an opaque full-frame illustration rather than a transparent
+ * overlay. Unmatched scenes remain unchanged.
+ */
+export const applyNarratedFootageToProject = (
+  project: VideoProject,
+  manifestValue: unknown,
+  planValue: unknown,
+): VideoProject => {
+  const clips = buildNarratedFootageTimeline(
+    manifestValue,
+    planValue,
+    project.composition.fps,
+  );
+  const clipsByShotId = new Map(clips.map((clip) => [clip.shotId, clip]));
+  return {
+    ...project,
+    scenes: project.scenes.map((scene) => {
+      const clip = clipsByShotId.get(scene.id);
+      if (!clip) return scene;
+      const { media: _legacyMedia, ...sceneWithoutLegacyMedia } = scene;
+      return {
+        ...sceneWithoutLegacyMedia,
+        mediaLayers: [{
+          id: clip.id,
+          type: "video",
+          src: clip.src,
+          placement: "background",
+          fit: "cover",
+          opacity: 0.82,
+          muted: true,
+          zIndex: 0,
+          startInFrames: 0,
+          durationInFrames: scene.durationInFrames,
+          ...(clip.trimBefore === undefined ? {} : { trimBefore: clip.trimBefore }),
+        }],
+      };
+    }),
+  };
 };

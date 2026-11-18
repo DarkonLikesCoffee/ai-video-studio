@@ -2,7 +2,7 @@ name: Render video
 
 on:
   push:
-    branches: [main, "fix/**", "feat/cinematic-motion-qa"]
+    branches: [main, "fix/**", "feat/cinematic-motion-qa", "feat/user-gameplay-footage-pipeline"]
     paths:
       - render-request.json
 
@@ -62,7 +62,7 @@ jobs:
         run: npm run assets:audio
 
       - name: Download approved NASA SVS footage
-        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
+        if: steps.request.outputs.provider == 'github-actions' && (steps.request.outputs.composition_id == 'NarratedSkyExplainer' || (steps.request.outputs.composition_id == 'ProjectVideo' && steps.request.outputs.narration_path != ''))
         env:
           PROJECT_PATH: ${{ steps.request.outputs.project_path }}
         run: |
@@ -137,7 +137,7 @@ jobs:
         run: npm run audio:master -- "render-output/$OUTPUT_NAME.mp4" "$PROJECT_PATH"
 
       - name: Master final custom narrated composition audio
-        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
+        if: steps.request.outputs.provider == 'github-actions' && (steps.request.outputs.composition_id == 'NarratedSkyExplainer' || (steps.request.outputs.composition_id == 'ProjectVideo' && steps.request.outputs.narration_path != ''))
         env:
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
         run: |
