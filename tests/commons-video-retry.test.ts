@@ -48,3 +48,24 @@ test("does not retry permanent HTTP failures", async () => {
   assert.equal(requests, 1);
   assert.deepEqual(waits, []);
 });
+
+test("creates a fresh timeout signal for every retry attempt", async () => {
+  const signals: AbortSignal[] = [];
+  let requests = 0;
+  const response = await fetchWithRetries(
+    "https://upload.wikimedia.org/example.webm",
+    {},
+    async (_url, options) => {
+      requests += 1;
+      signals.push(options.signal as AbortSignal);
+      return requests === 1
+        ? new Response("rate limited", { status: 429, headers: { "retry-after": "1" } })
+        : new Response("video", { status: 200 });
+    },
+    async () => {},
+  );
+  assert.equal(response.status, 200);
+  assert.equal(signals.length, 2);
+  assert.notEqual(signals[0], signals[1]);
+  assert.equal(signals.every((signal) => signal instanceof AbortSignal), true);
+});
