@@ -2,6 +2,7 @@ import { mkdir, readFile, realpath, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { spawn } from "node:child_process";
 import type { AudioTrack, VideoProject } from "../packages/video-engine/src/project";
+import { buildAudioInputArgs, buildMainAudioFilter, buildSidechainTailFilter } from "./audio-processing";
 import { isSafeProjectAssetPath, isRemoteMediaUrl, validateProjectDefinition } from "../packages/video-engine/src/project";
 
 const ffmpeg = process.env.FFMPEG_PATH || "ffmpeg";
@@ -91,11 +92,14 @@ for (let index = 0; index < tracks.length; index += 1) {
   const sidechainPaths: string[] = [];
   for (const sidechain of sidechainTracks) sidechainPaths.push(await resolveLocalAudio(sidechain));
 
-  const args = ["-y", "-i", inputPath];
+  const trackDurationInFrames = track.durationInFrames ??
+    project.scenes.reduce((total, scene) => total + scene.durationInFrames, 0) - track.startInFrames;
+  const trackDurationSeconds = trackDurationInFrames / fps;
+  const args = ["-y", ...buildAudioInputArgs({ src: inputPath, loop: track.loop ?? false })];
   for (const path of sidechainPaths) args.push("-i", path);
 
   const filters: string[] = [];
-  filters.push("[0:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo[main0]");
+  filters.push(buildMainAudioFilter(trackDurationSeconds, track.loop ?? false));
   let current = "main0";
 
   if (sidechainTracks.length > 0 && track.ducking) {
@@ -117,6 +121,9 @@ for (let index = 0; index < tracks.length; index += 1) {
         preFilters.push(...buildAtempoFilters(sidechain.playbackRate));
       }
       if (delayMs > 0) preFilters.push(`adelay=${delayMs}|${delayMs}`);
+      // sidechaincompress stops at its shortest input. Pad after timeline delay so the
+      // sidechain bus spans the complete music-track window, including the post-voice tail.
+      preFilters.push(...buildSidechainTailFilter(trackDurationSeconds));
       filters.push(`[${inputIndex}:a]${preFilters.join(",")}[${label}]`);
       sidechainLabels.push(`[${label}]`);
     });

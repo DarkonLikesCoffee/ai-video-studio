@@ -2,6 +2,32 @@
 
 This file is the durable record of project decisions and session handoffs. Append new dated entries; do not silently rewrite history. Keep the newest entry at the top.
 
+## 2026-11-18 — Sidechain fix CI passed; VALORANT v6 rendering
+
+- Corrected the strict optional-property typing issue by passing `track.loop ?? false` to the helper.
+- Fresh CI run #44384134279 passed: typecheck, all tests, all production-plan validations, VALORANT audio preparation, DSP/sidechain processing and studio build.
+- Triggered a full branch render v6 from commit `366d5767cc12cde45d6e914dc00a8ed19caabc36`; workflow run #44383766685 is in progress. It includes the updated sidechain audio-preparation code.
+- PR #56 remains open and unmerged until the v6 artifact is downloaded and QA proves the late gaps are gone.
+- Next: inspect v6 QA report and audio tail; if clean, merge PR #56 and rerun on main. Then address visual repetition/freeze: the v5 contact sheet confirms the same SVG/tactical-map compositions repeat for long intervals and QA reported nine frozen intervals.
+
+## 2026-11-18 — Sidechain fix strict-type correction
+
+- PR #55's first CI run #44383361646 failed at TypeScript typecheck because `AudioTrack.loop` is optional and the helper requires a concrete boolean.
+- Corrected the call site to pass `track.loop ?? false`; no tests were skipped or weakened.
+- Superseded PR #55 with PR #56 on branch `fix/sidechain-music-tail-v2`, based on the corrected head.
+- Next: verify CI for PR #56, run the branch's VALORANT render v6, and inspect the actual audio QA report before merge.
+
+## 2026-11-18 — VALORANT v5 diagnosis and sidechain tail fix (PR #55 in progress)
+
+- Render run #44381103388 completed successfully on main commit `8804c66264f2243378424836c3d74fddb24617ab`; artifact #14462663601 contains the MP4 and `.qa.json` (expires 2026-11-21).
+- Downloaded and inspected the actual QA report: 60.1s, 1920x1080, 30fps, H.264/AAC stereo, integrated loudness -16.3 LUFS, no black-frame intervals.
+- Confirmed three persistent digital-silence intervals: 46.840–50.063s, 51.256–56.033s, 57.353–60.100s. QA also reported nine frozen-video intervals, including 46.667–50.000s and 55.867–58.133s. The video is not accepted.
+- Inspected the source pipeline: the VALORANT music track is a 20-second generated score marked `loop: true`, and is preprocessed with FFmpeg sidechain compression against a shorter generated narration track. The offline preprocessing did not explicitly loop the music input or pad the voice sidechain to the full track timeline. This is the leading root-cause hypothesis for the missing music tail; verify with the next actual render.
+- Opened PR #55: [Fix looped music truncation in sidechain processing](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/55). Added reusable FFmpeg input/filter helpers, explicit looping and timeline trimming for looped music, sidechain padding after timeline delay, and four regression tests.
+- Reproduced a 20-second music + 46.84-second narration scenario with the proposed FFmpeg filter graph locally. Output was exactly 60.0 seconds and a -50 dB/0.75s silence scan found no silence intervals.
+- CI/check-runs for PR #55 had not appeared at the time of this log update. Do not merge until CI/typecheck/tests pass and a fresh VALORANT render confirms the three late silence gaps are gone.
+- Next action: get PR #55 CI green; rerender the actual VALORANT project; download and inspect the new MP4/QA report. Then tackle visual stagnation: nine freeze warnings and repeated SVG-only compositions; add real licensed motion footage or a more cinematic motion/shot grammar rather than merely changing text cards.
+
 ## 2026-11-18 — Media QA diagnostics merged; VALORANT verification render
 
 - PR #54 merged into main by squash as `8e2049f7dd2a26a64b64431f6c4fb6fed3921a26`.
