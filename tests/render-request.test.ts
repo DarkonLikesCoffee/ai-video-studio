@@ -87,11 +87,37 @@ test("rejects narration for custom compositions and unsafe config paths", () => 
     compositionId: "CinematicAdBenchmark",
     narrationPath: "projects/demo/production/narration.json",
   });
-  assert.ok(customComposition.errors.includes("narrationPath is currently supported only for ProjectVideo."));
+  assert.ok(customComposition.errors.includes("narrationPath is currently supported only for ProjectVideo and NarratedSkyExplainer."));
 
   const unsafePath = validateRenderRequest({
     ...validProjectRequest,
     narrationPath: "projects/../private.json",
   });
   assert.ok(unsafePath.errors.some((error) => error.startsWith("narrationPath")));
+});
+
+
+test("accepts narrated requests for the custom NarratedSkyExplainer composition", () => {
+  const result = validateRenderRequest({
+    provider: "github-actions",
+    projectPath: "projects/examples/narrated-explainer/production/composition.json",
+    narrationPath: "projects/examples/narrated-explainer/production/narration.json",
+    compositionId: "NarratedSkyExplainer",
+    outputName: "narrated-sky-custom",
+    requestId: "custom-narrated-001",
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.request?.compositionId, "NarratedSkyExplainer");
+});
+
+test("requires matching custom composition metadata", () => {
+  const result = validateRenderRequest({
+    provider: "github-actions",
+    projectPath: "projects/examples/narrated-explainer/scene.json",
+    narrationPath: "projects/examples/narrated-explainer/production/narration.json",
+    compositionId: "NarratedSkyExplainer",
+    outputName: "narrated-sky-custom",
+    requestId: "custom-narrated-002",
+  });
+  assert.deepEqual(result.errors, []);
 });
