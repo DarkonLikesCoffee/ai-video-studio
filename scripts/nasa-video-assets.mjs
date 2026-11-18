@@ -158,6 +158,7 @@ export const validateNasaSelection = (selection) => {
     throw new Error("NASA selection must contain a non-empty assets array.");
   }
   const ids = new Set();
+  const assignedShots = new Set();
   return selection.assets.map((asset, index) => {
     if (!asset || typeof asset.id !== "string" || !asset.id.trim() || ids.has(asset.id)) {
       throw new Error("assets[" + index + "] must have a unique non-empty id.");
@@ -208,7 +209,13 @@ export const validateNasaSelection = (selection) => {
         typeof asset.creator !== "string" || !asset.creator.trim()) {
       throw new Error("Video " + asset.id + " must retain its title and creator.");
     }
-    return { ...asset, shotIds: [...new Set(asset.shotIds)] };
+    const shotIds = [...new Set(asset.shotIds)];
+    const conflictingShot = shotIds.find((shotId) => assignedShots.has(shotId));
+    if (conflictingShot) {
+      throw new Error("Storyboard shot " + conflictingShot + " is assigned to more than one NASA video asset.");
+    }
+    shotIds.forEach((shotId) => assignedShots.add(shotId));
+    return { ...asset, shotIds };
   });
 };
 
