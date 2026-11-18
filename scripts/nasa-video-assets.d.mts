@@ -18,5 +18,22 @@ export function fetchNasaVideoWithRetries(
   fetchImpl?: typeof fetch,
   pause?: (milliseconds: number) => Promise<void>,
 ): Promise<Response>;
-export function validateNasaSelection(selection: { assets: NasaSvsSelectedAsset[] }): NasaSvsSelectedAsset[];
+export function validateNasaSelection(selection: { assets: Array<NasaSvsSelectedAsset | NasaLibrarySelectedAsset> }): Array<NasaSvsSelectedAsset | NasaLibrarySelectedAsset>;
 export function runCli(argv?: string[]): Promise<void>;
+
+export type NasaLibrarySelectedAsset = {
+  id: string;
+  nasaId: string;
+  title: string;
+  creator: string;
+  attribution?: string;
+  sourcePage: string;
+  license: "Public domain";
+  shotIds: string[];
+  trimBeforeSecondsByShotId?: Record<string, number>;
+};
+export function isSafeNasaLibraryVideoUrl(value: string): boolean;
+export function resolveNasaLibraryVideoUrl(
+  nasaId: string,
+  fetchImpl?: typeof fetch,
+): Promise<string>;

@@ -29,12 +29,14 @@ Create or source a coherent set of visual and audio assets that makes the storyb
 
 ## NASA public-domain video footage
 
-For NASA footage and scientific visualizations, use the NASA Scientific Visualization Studio (SVS) when the relevant item is marked for public use:
-- Review the individual NASA SVS source page, credits and any item-specific exceptions before selecting a file.
-- NASA SVS states its content is public domain unless otherwise noted. Do not assume all NASA-linked third-party media is public domain.
-- Download selected MP4/WebM files from the SVS `/vis/` media paths with `node scripts/nasa-video-assets.mjs download --selection <selection.json> --project projects/<slug>`.
-- The helper accepts only HTTPS `svs.gsfc.nasa.gov/vis/` video files, records creator/source/license provenance and rejects selections not explicitly marked `Public domain`.
-- Mute the source audio in the final composition; some NASA visualizations include licensed production music. Include source-page credits with the final video.
+For NASA-produced footage, use the NASA Image and Video Library API and official item page:
+- Review the individual NASA media item for its creator, credits and any item-specific exceptions; NASA-produced content is generally public domain, but don't assume third-party materials hosted by NASA are.
+- Record the stable `nasaId`, details-page URL, title, creator, license and storyboard shot IDs in `nasa-asset-selection.json`.
+- The downloader resolves `https://images-api.nasa.gov/asset/{nasa_id}` and accepts only MP4/WebM media renditions hosted on `images-assets.nasa.gov/video/`.
+- Download with `node scripts/nasa-video-assets.mjs download --selection <selection.json> --project projects/<slug>`.
+- The helper enforces HTTPS, domain, file-extension, MIME and 150 MiB limits, then records the exact resolved media URL, original page, attribution and SHA-256.
+- When several shots use the same long source clip, use `trimBeforeSecondsByShotId` to select different source-time ranges instead of repeating the opening frames.
+- Mute embedded source audio unless the individual item explicitly permits its use; include source-page and creator credits with the final render.
 
 ## Image/video continuity
 

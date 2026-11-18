@@ -56,7 +56,7 @@ jobs:
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1; then
             sudo timeout 300 apt-get update -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30
-            sudo timeout 180 apt-get install -y --no-install-recommends ffmpeg
+            sudo timeout 600 apt-get install -y --no-install-recommends ffmpeg
           fi
           ffmpeg -version | head -n 1
       - name: Generate original audio fixtures

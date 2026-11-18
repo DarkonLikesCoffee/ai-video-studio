@@ -33,15 +33,15 @@ The current validator limits projects to 1,800 total frames, with each scene bet
 
 ## Narrated footage workflow
 
-The `projects/examples/narrated-explainer` sample uses selected NASA Scientific Visualization Studio (SVS) clips. NASA SVS states that its visualizations are public domain unless an individual item notes an exception; check each source page and use without embedded source audio.
+The `projects/examples/narrated-explainer` sample uses the NASA Image and Video Library, including the official no-music ISS video *Earth Views from the ISS*. NASA's media guidance allows public reuse of NASA-produced content with appropriate credit; check each individual item's creator and any exceptions before selection.
 
-The selection is stored in `production/nasa-asset-selection.json`. Download it locally with:
+The sample selection is in `projects/examples/narrated-explainer/production/nasa-asset-selection.json`. The NASA API resolves the selected NASA ID to its official media manifest, then downloads only an MP4/WebM rendition hosted by `images-assets.nasa.gov`:
 
 ```bash
 npm run assets:nasa-video -- download --selection projects/examples/narrated-explainer/production/nasa-asset-selection.json --project projects/examples/narrated-explainer
 ```
 
-The render workflow downloads only these explicitly selected NASA SVS files, merges their source-page and creator details into the project asset manifest, and passes the matching clips to Remotion. The render artifact includes the attribution sidecar. Large video files are not committed to Git.
+The same ISS clip is cut from different source-time offsets for distinct storyboard shots; the wavelength comparison remains an animated 3D scientific visual. The downloader records the actual resolved source URL, NASA item page, creator, license and SHA-256 in the project manifest. Render artifacts include attribution credits. Large video binaries are not committed to Git.
 
 ## Agent production workflow
 
