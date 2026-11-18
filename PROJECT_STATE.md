@@ -3,7 +3,7 @@
 **Last verified:** 2026-11-18  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `2bd52e9f0830600718fcb60fc5bd6f5cf6b4677` — “feat(video): sync narration and scene timelines”
+**Last verified main commit:** `baeabc412b2a52be48e69d41b6709936b265cc6c` — “feat(footage): integrate user gameplay clips”
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -100,23 +100,25 @@ The next agent should use this project as a regression/quality case, not simply 
 ## 6. Latest GitHub state snapshot
 
 Verified on 2026-11-18:
-- main is `2bd52e9f0830600718fcb60fc5bd6f5cf6b4677`, the squash merge of PR #57. PR #57 is merged; latest pre-merge CI run #44393414920 passed.
-- PR #56 remains merged as `338b55a2bf45e39e096ac722a740f73b9562a5f1`; its looped-music and sidechain-tail fix removed the late digital-silence intervals in v6.
-- V7 render #44387937003 showed generated narration lasted 47.31s while the video lasted 60.0s, leaving about 12.7s of visuals after the voice-over ended.
-- PR #57 added validated per-scene camera motion and narration-aware retiming. It retimes scenes, transitions, local animation keyframes, particles, existing subtitles and non-voice audio events to the generated narration duration plus a 0.4s visual landing. It clamps keyframes to shortened scene/layer bounds and includes regression tests.
-- V8 render #44392886686 failed safely during validation because two outro keyframes rounded one frame beyond the shortened scene. The bounds clamp and regression test fixed this; v8 did not produce an accepted MP4.
-- V9 render #44393399283 succeeded before merge. Artifact #14469578336 contains the MP4 and QA JSON (temporary artifact; expires 2026-11-21). Generated narration was 47.31s; video stream 47.733s (47.8s container duration), leaving approximately 0.42s of visual landing.
-- V9 QA: 1920x1080, 30fps, H.264/AAC stereo, -16.2 LUFS, zero silence intervals, zero frozen intervals and zero black-frame intervals. Contact sheet inspected. This verifies technical timing and motion diagnostics, not full creative acceptance.
-- Main CI #44394465963 passed. Main render #44394465979 was still running at the last snapshot; inspect its artifact and update this state when complete.
-- The visual result remains dominated by original tactical SVG/diagram compositions. There is still no authentic licensed VALORANT gameplay footage, so the explainer remains creatively below the intended cinematic standard.
+- main is `baeabc412b2a52be48e69d41b6709936b265cc6c`, the squash merge of PR #58. PR #58's CI run #44397239973 passed before merge.
+- PR #57 merged as `2bd52e9f0830600718fcb60fc5bd6f5cf6b4677`; narration-aware retiming and per-scene camera motion are on main.
+- PR #56 merged as `338b55a2bf45e39e096ac722a740f73b9562a5f1`; looped music/sidechain-tail fix removed the late digital-silence intervals.
+- V7 render #44387937003 exposed the original narration mismatch: voice 47.31s, video 60.0s.
+- V9 branch render #44393399283 and post-merge main render #44394465979 both succeeded. Main artifact #14469659407: 1920x1080, 30fps, H.264/AAC stereo, video 47.733s, audio 47.8s, -16.1 LUFS, zero silence/freeze/black intervals. Contact sheet inspected. This proves technical synchronization, not creative acceptance.
+- PR #58 fixed a missing integration: the existing footage timeline helper was used by the custom NarratedSkyExplainer branch, but not by the main narrated ProjectVideo path. It now injects approved clips as muted full-frame scene backgrounds, preserving vector overlays and captions.
+- The footage manifest accepts either approved CC0/Public Domain/CC BY 2/3/4 assets or user-provided clips with explicit `rightsBasis` (`user-owned` or `permission-granted`) and a meaningful `rightsNote`. User-provided footage is credited separately and is not mislabeled as a public license.
+- Added `projects/valorant-immortal-decision-making/production/USER_FOOTAGE.md` with shot IDs, clip preparation, manifest format and privacy/rights guidance.
+- PR #58 CI #44397239973 passed; PR #58 merged as `baeabc412b2a52be48e69d41b6709936b265cc6c`. The post-merge main CI should be checked before next render.
+- No gameplay clips have been added to the repository yet. The pipeline is ready, but no new gameplay render has been performed. The current video still uses illustrative SVGs and is not accepted as a cinematic VALORANT explainer.
 
 ## 7. Immediate development direction
 
-1. Verify the post-merge main render #44394465979 and update this snapshot with its artifact/QA.
-2. Prioritize authentic licensed moving VALORANT/gameplay footage and a shot-level workflow with verified rights and provenance.
-3. Improve shot variety, purposeful camera movement, visual pacing and semantic QA; the current diagrams are still slideshow-like despite zero freeze warnings.
-4. Add explicit voice-versus-video timing diagnostics to the media QA report so future projects cannot hide a short narration behind a long music track.
-5. Keep the release gate strict: inspect the actual artifact and judge it against the brief. Technical QA alone does not make a finished cinematic explainer.
+1. Verify post-merge main CI for PR #58.
+2. Add a small set of actual VALORANT gameplay selects recorded by the project owner or supplied with explicit permission, mapped to the six shot IDs in `production/USER_FOOTAGE.md`.
+3. Keep player names/chat/account identifiers out of the final edit unless explicitly wanted; crop or blur them before use.
+4. Render with the new footage injection, then inspect the full MP4 for visual relevance, motion, crop, pacing, caption legibility and audio sync.
+5. If clips cannot be supplied, search only genuinely reusable public-license footage; do not pretend unrelated stock video is VALORANT gameplay.
+6. Extend semantic visual QA and shot variety checks once real footage is present.
 
 The biggest gap is not basic rendering. It is the **production intelligence and audiovisual quality** between a user's prompt and the final edit.
 
