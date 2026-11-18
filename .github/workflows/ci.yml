@@ -72,7 +72,7 @@ jobs:
       - name: Validate narrated explainer project
         run: npm run validate:project -- projects/examples/narrated-explainer/scene.json
       - name: Validate narrated custom composition metadata
-        run: node --input-type=module -e 'const p = JSON.parse(require("node:fs").readFileSync("projects/examples/narrated-explainer/composition.json", "utf8")); if (p.schemaVersion !== 1 || p.composition.id !== "NarratedSkyExplainer" || p.composition.width !== 1920 || p.composition.height !== 1080 || p.composition.fps !== 30 || p.composition.durationInFrames !== 600) throw new Error("Invalid NarratedSkyExplainer metadata");'
+        run: node -e 'const p = JSON.parse(require("node:fs").readFileSync("projects/examples/narrated-explainer/composition.json", "utf8")); if (p.schemaVersion !== 1 || p.composition.id !== "NarratedSkyExplainer" || p.composition.width !== 1920 || p.composition.height !== 1080 || p.composition.fps !== 30 || p.composition.durationInFrames !== 600) throw new Error("Invalid NarratedSkyExplainer metadata");'
       - name: Prepare track DSP and sidechain processing
         run: npm run audio:prepare -- projects/showcase-motion/scene.json
       - name: Build studio
