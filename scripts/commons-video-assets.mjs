@@ -142,14 +142,16 @@ const downloadSelection = async (selectionPath, projectPath) => {
       const name = path.basename(asset.title || "footage").replace(/\.[^.]+$/, "")
         .normalize("NFKD").replace(/[^\w-]+/g, "-").replace(/-+/g, "-").slice(0, 48) || "footage";
       const filename = name + "-" + String(asset.id).slice(0, 8) + "." + extension;
-      await writeFile(path.join(assetsDir, filename), bytes, { flag: "wx" }).catch(async (error) => {
+      let savedFilename = filename;
+      try {
+        await writeFile(path.join(assetsDir, savedFilename), bytes, { flag: "wx" });
+      } catch (error) {
         if (error.code !== "EEXIST") throw error;
-        const fallback = name + "-" + String(asset.id).slice(0, 8) + "-" + createHash("sha1").update(bytes).digest("hex").slice(0, 6) + "." + extension;
-        await writeFile(path.join(assetsDir, fallback), bytes, { flag: "wx" });
-        return fallback;
-      });
+        savedFilename = name + "-" + String(asset.id).slice(0, 8) + "-" + createHash("sha1").update(bytes).digest("hex").slice(0, 6) + "." + extension;
+        await writeFile(path.join(assetsDir, savedFilename), bytes, { flag: "wx" });
+      }
       downloaded.push({
-        file: filename, type: "licensed video footage", shotIds: asset.shotIds,
+        file: savedFilename, type: "licensed video footage", shotIds: asset.shotIds,
         title: asset.title, source: asset.source, sourcePage: asset.sourcePage,
         sourceUrl: asset.url, license: asset.license, licenseUrl: asset.licenseUrl,
         creator: asset.creator, attribution: asset.attribution,
