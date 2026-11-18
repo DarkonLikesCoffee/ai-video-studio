@@ -118,8 +118,11 @@ const parseIntervals = (
 
 const fpsNumber = (value?: string): number => {
   if (!value) return 0;
-  const [numerator, denominator] = value.split("/").map(Number);
-  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) return 0;
+  const [numeratorText, denominatorText] = value.split("/");
+  const numerator = Number(numeratorText);
+  const denominator = Number(denominatorText);
+  if (!numeratorText || !denominatorText ||
+      !Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) return 0;
   return numerator / denominator;
 };
 
