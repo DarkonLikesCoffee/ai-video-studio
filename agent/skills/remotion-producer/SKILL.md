@@ -14,11 +14,14 @@ Translate the approved storyboard and asset manifest into a valid, deterministic
 
 ## Build rules
 
-- Use `ProjectVideo` for work expressible by its supported schema.
+- Use `ProjectVideo` for work expressible by its supported schema and where its fixed scene layout is appropriate.
+- For ambitious narrated explainers, cinematic edits, layered B-roll, kinetic typography, 2.5D camera moves or per-word synchronized motion, create a scoped custom Remotion composition rather than forcing the concept into `ProjectVideo`.
 - Use a custom Remotion composition only when a genuine capability gap requires it (for example real 3D geometry, custom shaders or procedural camera work). Keep it scoped and reusable.
 - Prefer actual visual assets and deliberate compositing over piles of generic vector shapes.
 - Use varied shot sizes, subject placement and movement. A single static composition with changing text is not a cinematic sequence.
 - Use keyframes with purposeful easing; avoid arbitrary oscillation and constant motion.
+- Build shots from multiple independently animated layers where appropriate. Give foreground, subject and background distinct movement; use camera paths, parallax and deliberate object entrances/exits to create depth. Do not mistake a single slow zoom for a complete motion design system.
+- For narrated projects, make scene timing and visual events derive from the actual voice alignment, not uniform scene durations.
 - Keep typography legible, aligned to safe areas and consistent with the art direction.
 - Use transitions sparingly and motivate each one.
 - Place music, voice, ambience and effects on the project timeline. Mix so dialogue remains intelligible and effects do not dominate.
