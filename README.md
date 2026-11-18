@@ -89,6 +89,12 @@ node scripts/commons-video-assets.mjs storyboard-search \
 
 Review each original Commons file page, license, attribution and clip content before selecting it. The downloader accepts CC0, public-domain and CC BY 2.0/3.0/4.0 candidates, supports MP4/WebM/QuickTime/Ogg, limits downloads to 150 MiB and records provenance in `production/asset-manifest.json`. Candidate discovery is not license approval; verify the original source and the actual video duration/codec before editing.
 
+### User-provided gameplay footage
+
+For projects that need authentic gameplay rather than illustrative diagrams, add short clips recorded by the project owner or supplied with explicit permission. The VALORANT example documents the intake process in [USER_FOOTAGE.md](projects/valorant-immortal-decision-making/production/USER_FOOTAGE.md).
+
+The narration application now injects approved video assets into matching `ProjectVideo` scene IDs as muted full-frame backgrounds, retaining vector overlays and timed captions. Scene duration follows the narration-retimed timeline. Add manifest entries with `type: "user-provided-gameplay"`, a local `file`, `shotIds`, and either `rightsBasis: "user-owned"` or `"permission-granted"` plus a meaningful `rightsNote`. User-supplied footage is not mislabeled as Creative Commons or public domain. Unmatched scenes retain their original visuals. The render artifact includes a credits/provenance text file.
+
 ## Automated rendered-media QA
 
 After a render, run a technical diagnostic pass on the actual MP4:
