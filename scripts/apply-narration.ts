@@ -16,7 +16,7 @@ const projectPath = resolve(projectArg);
 const configPath = resolve(configArg);
 const alignmentPath = resolve(alignmentArg);
 const projectDirectory = dirname(projectPath);
-const project = JSON.parse(await readFile(projectPath, "utf8")) as VideoProject;
+const project = JSON.parse(await readFile(projectPath, "utf8")) as unknown;
 const config = JSON.parse(await readFile(configPath, "utf8")) as {
   subtitle?: NarrationSubtitleOptions;
   speaker?: string;
@@ -27,8 +27,63 @@ const alignment = JSON.parse(await readFile(alignmentPath, "utf8")) as {
   words?: NarrationAlignedWord[];
 };
 
-if (project.composition.id !== "ProjectVideo") {
-  throw new Error("Generated narration can only be applied to a ProjectVideo project.");
+if (!project || typeof project !== "object" || !("composition" in project) ||
+    !project.composition || typeof project.composition !== "object" || !("id" in project.composition)) {
+  throw new Error("Project metadata is missing its composition definition.");
+}
+
+const compositionId = project.composition.id;
+if (compositionId === "NarratedSkyExplainer") {
+  const metadata = project as {
+    schemaVersion?: number;
+    title?: string;
+    composition: { id: string; width: number; height: number; fps: number; durationInFrames: number };
+  };
+  if (metadata.schemaVersion !== 1 || typeof metadata.title !== "string" ||
+      !Number.isInteger(metadata.composition.durationInFrames) ||
+      !Number.isInteger(metadata.composition.fps) || metadata.composition.fps < 1 ||
+      metadata.composition.fps > 120) {
+    throw new Error("NarratedSkyExplainer metadata has an invalid schema or duration.");
+  }
+  const durationInFrames = metadata.composition.durationInFrames;
+  const narrationDurationInFrames = Math.ceil(alignment.durationSeconds! * metadata.composition.fps);
+  if (narrationDurationInFrames > durationInFrames) {
+    throw new Error(
+      `Narration is ${alignment.durationSeconds!.toFixed(2)}s but the custom composition is only ${(durationInFrames / metadata.composition.fps).toFixed(2)}s. ` +
+      "Extend the composition; narration will not be sped up or clipped automatically."
+    );
+  }
+  await Promise.all([
+    access(resolve(projectDirectory, "assets/audio/narration.wav")),
+    access(resolve(projectDirectory, "assets/audio/score.wav")),
+    access(resolve(projectDirectory, "assets/audio/transition-whoosh.wav")),
+  ]);
+  const subtitleCues = buildNarrationSubtitles(
+    alignment.words,
+    metadata.composition.fps,
+    durationInFrames,
+    {
+      ...(config.subtitle ?? {}),
+      ...(config.speaker ? { speaker: config.speaker } : {}),
+    },
+  );
+  const customProps = {
+    title: metadata.title,
+    durationInFrames,
+    narrationAudioSrc: "assets/audio/narration.wav",
+    musicAudioSrc: "assets/audio/score.wav",
+    transitionAudioSrc: "assets/audio/transition-whoosh.wav",
+    subtitleCues,
+  };
+  const outputPath = resolve(projectDirectory, ".narrated-project.json");
+  await writeFile(outputPath, JSON.stringify(customProps, null, 2) + "\n", "utf8");
+  console.log(`Applied generated voice-over and ${subtitleCues.length} timed caption cues to NarratedSkyExplainer.`);
+  console.log(`Custom composition props: ${outputPath}`);
+  process.exit(0);
+}
+
+if (compositionId !== "ProjectVideo") {
+  throw new Error("Generated narration is supported only for ProjectVideo and NarratedSkyExplainer.");
 }
 if (alignment.schemaVersion !== 1 || !Number.isFinite(alignment.durationSeconds) ||
     !Array.isArray(alignment.words) || alignment.words.length === 0) {
@@ -37,8 +92,9 @@ if (alignment.schemaVersion !== 1 || !Number.isFinite(alignment.durationSeconds)
 
 const narrationAsset = resolve(projectDirectory, "assets/audio/narration.wav");
 await access(narrationAsset);
-const fps = project.composition.fps;
-const projectDurationInFrames = getProjectDurationInFrames(project);
+const fps = videoProject.composition.fps;
+const videoProject = project as VideoProject;
+const projectDurationInFrames = getProjectDurationInFrames(videoProject);
 const narrationDurationInFrames = Math.ceil(alignment.durationSeconds! * fps);
 if (narrationDurationInFrames > projectDurationInFrames) {
   throw new Error(
@@ -47,7 +103,7 @@ if (narrationDurationInFrames > projectDurationInFrames) {
   );
 }
 
-const existingTracks = project.audioTracks ?? [];
+const existingTracks = videoProject.audioTracks ?? [];
 if (existingTracks.some((track) => track.role === "voiceover")) {
   throw new Error("This project already has a voiceover track. Remove it before adding generated narration.");
 }
@@ -89,7 +145,7 @@ const generatedSubtitles = buildNarrationSubtitles(
   projectDurationInFrames,
   subtitleOptions,
 );
-const existingSubtitleIds = new Set((project.subtitles ?? []).map((cue) => cue.id));
+const existingSubtitleIds = new Set((videoProject.subtitles ?? []).map((cue) => cue.id));
 for (const cue of generatedSubtitles) {
   if (existingSubtitleIds.has(cue.id)) {
     throw new Error(`Generated subtitle ID conflicts with an existing cue: ${cue.id}`);
@@ -97,9 +153,9 @@ for (const cue of generatedSubtitles) {
 }
 
 const narratedProject: VideoProject = {
-  ...project,
+  ...videoProject,
   audioTracks,
-  subtitles: [...(project.subtitles ?? []), ...generatedSubtitles],
+  subtitles: [...(videoProject.subtitles ?? []), ...generatedSubtitles],
 };
 const validationErrors = validateProjectDefinition(narratedProject);
 if (validationErrors.length > 0) {
