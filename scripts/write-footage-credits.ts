@@ -10,6 +10,8 @@ type ManifestAsset = {
   sourcePage?: unknown;
   license?: unknown;
   licenseUrl?: unknown;
+  rightsBasis?: unknown;
+  rightsNote?: unknown;
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -21,15 +23,27 @@ const clean = (value: unknown): string =>
 export const buildFootageCredits = (manifest: unknown): string => {
   const assets = isRecord(manifest) && Array.isArray(manifest.assets)
     ? manifest.assets.filter((item): item is ManifestAsset =>
-        isRecord(item) && item.type === "licensed video footage")
+        isRecord(item) && (
+          item.type === "licensed video footage" ||
+          item.type === "user-provided-gameplay"
+        ))
     : [];
 
   if (assets.length === 0) {
-    return "Footage attribution\n\nNo third-party video footage was used in this render.\n";
+    return "Footage attribution\n\nNo third-party or user-provided video footage was used in this render.\n";
   }
 
   const entries = assets.map((asset, index) => {
     const title = clean(asset.title) || clean(asset.file) || "Untitled video";
+    if (asset.type === "user-provided-gameplay") {
+      return [
+        `${index + 1}. ${title}`,
+        "   Source: User-provided footage",
+        `   Rights basis: ${clean(asset.rightsBasis) || "Not recorded"}`,
+        `   Rights note: ${clean(asset.rightsNote) || "Not recorded"}`,
+        "   Changes: trimmed, cropped/reframed and source audio muted.",
+      ].join("\n");
+    }
     const creator = clean(asset.attribution) || clean(asset.creator) || "Creator not identified";
     const source = clean(asset.sourcePage) || "Source page not recorded";
     const license = clean(asset.license) || "License not recorded";
@@ -46,12 +60,12 @@ export const buildFootageCredits = (manifest: unknown): string => {
   return [
     "Footage attribution",
     "",
-    "Third-party footage credits for the accompanying video render.",
-    "Clips have been trimmed, cropped/reframed, and muted; no source audio is included.",
+    "Sources used in the accompanying video render.",
+    "Third-party clips have been trimmed, cropped/reframed and muted; user-provided clips are identified separately.",
     "",
     ...entries,
     "",
-    "Include these credits with any public redistribution of the video.",
+    "Retain third-party credits with any public redistribution. Confirm user-provided footage rights before publishing.",
   ].join("\n") + "\n";
 };
 
