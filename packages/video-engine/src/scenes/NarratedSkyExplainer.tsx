@@ -6,12 +6,22 @@ import {
   Easing,
   Sequence,
   interpolate,
+  OffthreadVideo,
   staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
 import { BackSide } from "three";
 import type { SubtitleCue } from "../project";
+
+export type NarratedFootageClip = {
+  id: string;
+  src: string;
+  startInFrames: number;
+  durationInFrames: number;
+  trimBefore?: number;
+  playbackRate?: number;
+};
 
 export type NarratedSkyExplainerProps = {
   title: string;
@@ -20,6 +30,7 @@ export type NarratedSkyExplainerProps = {
   musicAudioSrc: string;
   transitionAudioSrc: string;
   subtitleCues: SubtitleCue[];
+  footageClips?: NarratedFootageClip[];
 };
 
 const clamp = {
@@ -298,7 +309,7 @@ const HorizonShot: FC = () => {
   );
 };
 
-const ChapterOverlay: FC<{ frame: number; phase: number }> = ({ frame, phase }) => {
+const ChapterOverlay: FC<{ frame: number; phase: number; footageMode?: boolean }> = ({ frame, phase, footageMode = false }) => {
   const local = frame - phase * 120;
   const enter = interpolate(local, [4, 26], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
   const fade = interpolate(local, [0, 14, 103, 120], [0, 1, 1, 0], clamp);
@@ -310,16 +321,16 @@ const ChapterOverlay: FC<{ frame: number; phase: number }> = ({ frame, phase }) 
     { label: "05 / LO QUE VEMOS", title: "ASÍ NACE\nEL CIELO AZUL.", note: "El color está en la luz que llena el aire." },
   ];
   const content = chapters[phase]!;
-  const left = phase === 3;
+  const left = footageMode || phase === 3;
   return (
     <div
       style={{
         position: "absolute",
         left: left ? "8%" : "auto",
         right: left ? "auto" : "8%",
-        top: phase === 0 ? "9%" : phase === 2 ? "13%" : "18%",
-        width: phase === 0 ? "40%" : phase === 2 ? "82%" : "36%",
-        textAlign: phase === 2 ? "center" : left ? "left" : "right",
+        top: footageMode ? "13%" : phase === 0 ? "9%" : phase === 2 ? "13%" : "18%",
+        width: footageMode ? "48%" : phase === 0 ? "40%" : phase === 2 ? "82%" : "36%",
+        textAlign: footageMode ? "left" : phase === 2 ? "center" : left ? "left" : "right",
         opacity: fade * enter,
         transform: "translateY(" + ((1 - enter) * 28) + "px)",
         color: "#f4f7fb",
@@ -364,21 +375,21 @@ const TransitionWipe: FC<{ frame: number }> = ({ frame }) => (
   </>
 );
 
-const WordCaption: FC<{ cue: SubtitleCue; frame: number }> = ({ cue, frame }) => {
+const WordCaption: FC<{ cue: SubtitleCue; frame: number; footageMode?: boolean }> = ({ cue, frame, footageMode = false }) => {
   const localFrame = frame - cue.startInFrames;
   const active = cue.wordTimings?.find((word) => localFrame >= word.startInFrames && localFrame < word.endInFrames);
   return (
     <div
       style={{
         position: "absolute",
-        left: "50%",
-        bottom: "8.5%",
-        transform: "translateX(-50%)",
+        left: footageMode ? "7.7%" : "50%",
+        bottom: "6.5%",
+        transform: footageMode ? "none" : "translateX(-50%)",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        minWidth: 420,
-        maxWidth: "82%",
+        alignItems: footageMode ? "flex-start" : "center",
+        minWidth: footageMode ? 0 : 420,
+        maxWidth: footageMode ? "57%" : "82%",
         padding: "14px 28px 17px",
         borderRadius: 7,
         background: "rgba(3, 11, 22, .68)",
@@ -389,7 +400,7 @@ const WordCaption: FC<{ cue: SubtitleCue; frame: number }> = ({ cue, frame }) =>
       }}
     >
       {cue.speaker ? <div style={{ color: "#8ddcff", fontSize: 13, letterSpacing: 3, fontWeight: 800, marginBottom: 7 }}>{cue.speaker}</div> : null}
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", columnGap: 8, rowGap: 3, fontSize: 34, lineHeight: 1.16, fontWeight: 750 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: footageMode ? "flex-start" : "center", columnGap: 8, rowGap: 3, fontSize: 34, lineHeight: 1.16, fontWeight: 750 }}>
         {cue.wordTimings?.map((word, index) => (
           <span key={index} style={{ color: active === word ? "#ffd27a" : "#f5f8fc", opacity: active === word ? 1 : 0.74 }}>
             {word.text}
@@ -397,6 +408,35 @@ const WordCaption: FC<{ cue: SubtitleCue; frame: number }> = ({ cue, frame }) =>
         ))}
       </div>
     </div>
+  );
+};
+
+const FootageClipLayer: FC<{ clip: NarratedFootageClip }> = ({ clip }) => {
+  const frame = useCurrentFrame();
+  const fadeIn = interpolate(frame, [0, 10], [0, 1], clamp);
+  const fadeOut = interpolate(
+    frame,
+    [Math.max(0, clip.durationInFrames - 10), clip.durationInFrames],
+    [1, 0],
+    clamp,
+  );
+  const scale = interpolate(frame, [0, Math.max(1, clip.durationInFrames - 1)], [1.035, 1.085], clamp);
+  return (
+    <OffthreadVideo
+      src={staticFile(clip.src)}
+      muted
+      playbackRate={clip.playbackRate ?? 1}
+      {...(clip.trimBefore === undefined ? {} : { trimBefore: clip.trimBefore })}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        objectPosition: "center",
+        opacity: fadeIn * fadeOut,
+        transform: `scale(${scale})`,
+        filter: "saturate(.88) contrast(1.06)",
+      }}
+    />
   );
 };
 
@@ -422,6 +462,7 @@ export const NarratedSkyExplainer: FC<NarratedSkyExplainerProps> = (props) => {
   }, 0);
   const musicVolume = 0.16 - duckAmount * 0.105;
   const progress = frame / Math.max(1, props.durationInFrames);
+  const hasFootage = Boolean(props.footageClips?.length);
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#050c19", color: "#f4f7fb", fontFamily: "Arial, Helvetica, sans-serif" }}>
@@ -432,20 +473,54 @@ export const NarratedSkyExplainer: FC<NarratedSkyExplainerProps> = (props) => {
           <Audio src={staticFile(props.transitionAudioSrc)} volume={0.16} />
         </Sequence>
       ))}
-      <ThreeCanvas
-        width={width}
-        height={height}
-        camera={{ position: [cameraX, cameraY, cameraZ], rotation: [cameraPitch, cameraYaw, 0], fov: 39 }}
-        style={{ width: "100%", height: "100%" }}
+      {props.footageClips?.map((clip) => (
+        <Sequence key={clip.id} from={clip.startInFrames} durationInFrames={clip.durationInFrames} name={clip.id}>
+          <FootageClipLayer clip={clip} />
+        </Sequence>
+      ))}
+      {hasFootage ? (
+        <AbsoluteFill
+          style={{
+            zIndex: 1,
+            pointerEvents: "none",
+            background: "linear-gradient(90deg, rgba(3,10,20,.55) 0%, rgba(3,10,20,.14) 58%, rgba(3,10,20,.2) 100%), linear-gradient(0deg, rgba(3,10,20,.38), transparent 48%)",
+          }}
+        />
+      ) : null}
+      <div
+        style={hasFootage ? {
+          position: "absolute",
+          left: "62%",
+          top: "17%",
+          width: "32%",
+          height: "47%",
+          overflow: "hidden",
+          borderRadius: 18,
+          border: "1px solid rgba(210,238,255,.48)",
+          boxShadow: "0 20px 70px rgba(0,0,0,.5), 0 0 34px rgba(93,183,255,.14)",
+          background: "#06182a",
+          zIndex: 5,
+        } : {
+          position: "absolute",
+          inset: 0,
+          zIndex: 2,
+        }}
       >
-        {phase === 0 ? <SolarSystemShot /> : null}
-        {phase === 1 ? <MoleculeMacroShot /> : null}
-        {phase === 2 ? <WavelengthShot /> : null}
-        {phase === 3 ? <ScatteringShot /> : null}
-        {phase === 4 ? <HorizonShot /> : null}
-      </ThreeCanvas>
-      <AbsoluteFill style={{ pointerEvents: "none" }}>
-        <ChapterOverlay frame={frame} phase={phase} />
+        <ThreeCanvas
+          width={hasFootage ? Math.round(width * 0.32) : width}
+          height={hasFootage ? Math.round(height * 0.47) : height}
+          camera={{ position: [cameraX, cameraY, cameraZ], rotation: [cameraPitch, cameraYaw, 0], fov: 39 }}
+          style={{ width: "100%", height: "100%" }}
+        >
+          {phase === 0 ? <SolarSystemShot /> : null}
+          {phase === 1 ? <MoleculeMacroShot /> : null}
+          {phase === 2 ? <WavelengthShot /> : null}
+          {phase === 3 ? <ScatteringShot /> : null}
+          {phase === 4 ? <HorizonShot /> : null}
+        </ThreeCanvas>
+      </div>
+      <AbsoluteFill style={{ pointerEvents: "none", zIndex: 10 }}>
+        <ChapterOverlay frame={frame} phase={phase} footageMode={hasFootage} />
         <TransitionWipe frame={frame} />
         <div style={{ position: "absolute", left: "7.7%", right: "7.7%", top: 44, display: "flex", justifyContent: "space-between", color: "rgba(220,238,250,.6)", fontSize: 12, letterSpacing: 3, fontWeight: 800 }}>
           <span>AI VIDEO STUDIO / EXPLAINER FILM</span>
@@ -454,7 +529,7 @@ export const NarratedSkyExplainer: FC<NarratedSkyExplainerProps> = (props) => {
         <div style={{ position: "absolute", left: "7.7%", right: "7.7%", bottom: 36, height: 2, background: "rgba(216,235,250,.16)" }}>
           <div style={{ width: String(Math.min(100, progress * 100)) + "%", height: "100%", background: "#83d6ff" }} />
         </div>
-        {cue ? <WordCaption cue={cue} frame={frame} /> : null}
+        {cue ? <WordCaption cue={cue} frame={frame} footageMode={hasFootage} /> : null}
       </AbsoluteFill>
     </AbsoluteFill>
   );
