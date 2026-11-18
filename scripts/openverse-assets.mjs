@@ -280,7 +280,7 @@ export const runCli = async (argv = process.argv.slice(2)) => {
     if (result.failures.length > 0) process.exitCode = 1;
     return;
   }
-  throw new Error("Usage:\n  node scripts/openverse-assets.mjs search --query \"...\" [--limit 12] [--output candidates.json]\n  node scripts/openverse-assets.mjs download --selection selection.json --project projects/<slug>");
+  throw new Error("Usage:\n  node scripts/openverse-assets.mjs search --query \"...\" [--limit 12] [--output candidates.json]\n  node scripts/openverse-assets.mjs storyboard-search --plan projects/<slug>/production/production-plan.json [--max-shots 12] [--limit 8] --output candidates.json\n  node scripts/openverse-assets.mjs download --selection selection.json --project projects/<slug>");
 };
 
 const invokedPath = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : "";
