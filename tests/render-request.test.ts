@@ -81,7 +81,7 @@ test("accepts an optional narration request for ProjectVideo", () => {
   assert.equal(result.request?.narrationPath, "projects/demo/production/narration.json");
 });
 
-test("rejects narration for custom compositions and unsafe config paths", () => {
+test("rejects narration for unapproved custom compositions and unsafe config paths", () => {
   const customComposition = validateRenderRequest({
     ...validProjectRequest,
     compositionId: "CinematicAdBenchmark",
