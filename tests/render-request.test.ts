@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { validateRenderRequest } from "../scripts/render-request.mjs";
+import { matchesCompositionMetadata, validateRenderRequest } from "../scripts/render-request.mjs";
 
 const validProjectRequest = {
   provider: "github-actions",
@@ -110,14 +110,20 @@ test("accepts narrated requests for the custom NarratedSkyExplainer composition"
   assert.equal(result.request?.compositionId, "NarratedSkyExplainer");
 });
 
-test("requires matching custom composition metadata", () => {
-  const result = validateRenderRequest({
-    provider: "github-actions",
-    projectPath: "projects/examples/narrated-explainer/scene.json",
-    narrationPath: "projects/examples/narrated-explainer/production/narration.json",
-    compositionId: "NarratedSkyExplainer",
-    outputName: "narrated-sky-custom",
-    requestId: "custom-narrated-002",
-  });
-  assert.deepEqual(result.errors, []);
+test("checks that a project metadata file matches the requested composition", () => {
+  assert.equal(
+    matchesCompositionMetadata(
+      { composition: { id: "NarratedSkyExplainer" } },
+      "NarratedSkyExplainer",
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompositionMetadata(
+      { composition: { id: "ProjectVideo" } },
+      "NarratedSkyExplainer",
+    ),
+    false,
+  );
+  assert.equal(matchesCompositionMetadata({}, "NarratedSkyExplainer"), false);
 });
