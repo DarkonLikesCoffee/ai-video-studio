@@ -13,6 +13,26 @@ const scaleFrameValue = (value: number, ratio: number, field: string): number =>
   return field === "startInFrames" ? Math.max(0, scaled) : Math.max(1, scaled);
 };
 
+const clampKeyframesToDuration = (value: unknown, maxFrame: number, parentKey = ""): unknown => {
+  if (Array.isArray(value)) {
+    return value.map((item) => clampKeyframesToDuration(item, maxFrame, parentKey));
+  }
+  if (typeof value !== "object" || value === null) return value;
+
+  const record = value as Record<string, unknown>;
+  const localMax = typeof record.durationInFrames === "number"
+    ? Math.min(maxFrame, Math.max(0, record.durationInFrames - 1))
+    : maxFrame;
+  return Object.fromEntries(
+    Object.entries(record).map(([key, child]) => {
+      if (key === "frame" && parentKey === "keyframes" && typeof child === "number") {
+        return [key, Math.min(localMax, child)];
+      }
+      return [key, clampKeyframesToDuration(child, localMax, key)];
+    }),
+  );
+};
+
 const scaleTimelineValue = (value: unknown, ratio: number, parentKey = ""): unknown => {
   if (Array.isArray(value)) {
     return value.map((item) => scaleTimelineValue(item, ratio, parentKey));
@@ -56,5 +76,10 @@ export const retimeProjectToDuration = (
   if (lastScene.durationInFrames < 1) {
     throw new Error("Target duration is too short to preserve every scene.");
   }
+  // Rounding can put a final keyframe one frame beyond a shortened scene or
+  // layer. Clamp local animation tracks to the duration of their own element.
+  retimed.scenes = retimed.scenes.map((scene) =>
+    clampKeyframesToDuration(scene, scene.durationInFrames - 1) as typeof scene
+  );
   return retimed;
 };
