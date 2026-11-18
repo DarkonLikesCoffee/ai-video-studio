@@ -61,6 +61,19 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         run: npm run assets:audio
 
+      - name: Download approved narrated footage
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
+        env:
+          PROJECT_PATH: ${{ steps.request.outputs.project_path }}
+        run: |
+          PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+          SELECTION_PATH="$PROJECT_DIR/production/asset-selection.json"
+          if [[ -f "$SELECTION_PATH" ]]; then
+            node scripts/commons-video-assets.mjs download --selection "$SELECTION_PATH" --project "$PROJECT_DIR"
+          else
+            echo "No reviewed footage selection found; rendering the existing 3D-only composition." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Generate optional narration and word alignment
         id: narration
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.narration_path != ''
