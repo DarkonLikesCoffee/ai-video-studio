@@ -1,7 +1,8 @@
 {
   "provider": "github-actions",
-  "projectPath": "projects/sora/scene.json",
+  "projectPath": "projects/examples/narrated-explainer/scene.json",
+  "narrationPath": "projects/examples/narrated-explainer/production/narration.json",
   "compositionId": "ProjectVideo",
-  "outputName": "sora-product-film-benchmark-v3",
-  "requestId": "sora-product-film-20261118-03"
+  "outputName": "narrated-sky-explainer",
+  "requestId": "narrated-sky-v1-20261118"
 }
