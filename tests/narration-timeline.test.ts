@@ -47,3 +47,17 @@ testCase("does not alter source-media trim or playback rate", () => {
   assert.equal(result.scenes[0]!.media?.playbackRate, 1.25);
   assert.equal(result.scenes[0]!.media?.startInFrames, 15);
 });
+
+testCase("clamps rounded animation keyframes to the shortened scene boundary", () => {
+  const project = fixture();
+  project.scenes[1]!.durationInFrames = 300;
+  project.scenes[1]!.graphics = [{
+    id: "last-frame",
+    type: "ellipse",
+    x: 1, y: 1, width: 10, height: 10,
+    animations: { rotation: { keyframes: [{ frame: 0, value: 0 }, { frame: 299, value: 360 }] } },
+  }];
+  const result = retimeProjectToDuration(project, 473);
+  const finalScene = result.scenes[1]!;
+  assert.ok(finalScene.graphics?.[0]?.animations?.rotation?.keyframes[1]?.frame! < finalScene.durationInFrames);
+});
