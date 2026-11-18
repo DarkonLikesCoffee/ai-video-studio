@@ -100,7 +100,7 @@ test("rejects narration for custom compositions and unsafe config paths", () => 
 test("accepts narrated requests for the custom NarratedSkyExplainer composition", () => {
   const result = validateRenderRequest({
     provider: "github-actions",
-    projectPath: "projects/examples/narrated-explainer/production/composition.json",
+    projectPath: "projects/examples/narrated-explainer/composition.json",
     narrationPath: "projects/examples/narrated-explainer/production/narration.json",
     compositionId: "NarratedSkyExplainer",
     outputName: "narrated-sky-custom",
