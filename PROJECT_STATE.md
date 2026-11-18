@@ -3,7 +3,7 @@
 **Last verified:** 2026-11-18  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `338b55a2bf45e39e096ac722a740f73b9562a5f1` — “fix(audio): preserve looped music through narration tail”
+**Last verified main commit:** `2bd52e9f0830600718fcb60fc5bd6f5cf6b4677` — “feat(video): sync narration and scene timelines”
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -100,21 +100,23 @@ The next agent should use this project as a regression/quality case, not simply 
 ## 6. Latest GitHub state snapshot
 
 Verified on 2026-11-18:
-- main is 338b55a2bf45e39e096ac722a740f73b9562a5f1, the squash merge of PR #56.
-- PR #56 (looped music/sidechain tail fix) is merged. Main CI run #44385444014 passed.
-- Actual VALORANT v6 render run #44383766685 succeeded on the PR #56 code. Artifact #14466045811 contains the MP4 and QA JSON (temporary artifact; expires 2026-11-21).
-- Downloaded v6 QA: 60.1s, 1920x1080, 30fps, H.264/AAC stereo, -16.8 LUFS, zero silence intervals and zero black-frame intervals. Nine freeze intervals remain, so the video is still not creatively accepted.
-- Source diagnosis: multiple 300-frame scenes have media/graphic keyframes that end around frames 70–190. Their values clamp for the remainder of the scene, producing long near-static holds. The existing decorative ring motion is too subtle/off-canvas to provide meaningful shot motion.
-- PR #57 (feat/cinematic-motion-qa) adds validated per-scene camera motion and restrained alternating Ken Burns moves to the VALORANT project. CI run #44385753034 is in progress at this snapshot. Do not merge until CI passes and a fresh rendered MP4 is inspected; compare freeze warnings and actual motion.
-- V5 is rejected; v6 validates the audio fix only. Neither is accepted as a cinematic explainer. Authentic licensed gameplay footage remains absent.
+- main is `2bd52e9f0830600718fcb60fc5bd6f5cf6b4677`, the squash merge of PR #57. PR #57 is merged; latest pre-merge CI run #44393414920 passed.
+- PR #56 remains merged as `338b55a2bf45e39e096ac722a740f73b9562a5f1`; its looped-music and sidechain-tail fix removed the late digital-silence intervals in v6.
+- V7 render #44387937003 showed generated narration lasted 47.31s while the video lasted 60.0s, leaving about 12.7s of visuals after the voice-over ended.
+- PR #57 added validated per-scene camera motion and narration-aware retiming. It retimes scenes, transitions, local animation keyframes, particles, existing subtitles and non-voice audio events to the generated narration duration plus a 0.4s visual landing. It clamps keyframes to shortened scene/layer bounds and includes regression tests.
+- V8 render #44392886686 failed safely during validation because two outro keyframes rounded one frame beyond the shortened scene. The bounds clamp and regression test fixed this; v8 did not produce an accepted MP4.
+- V9 render #44393399283 succeeded before merge. Artifact #14469578336 contains the MP4 and QA JSON (temporary artifact; expires 2026-11-21). Generated narration was 47.31s; video stream 47.733s (47.8s container duration), leaving approximately 0.42s of visual landing.
+- V9 QA: 1920x1080, 30fps, H.264/AAC stereo, -16.2 LUFS, zero silence intervals, zero frozen intervals and zero black-frame intervals. Contact sheet inspected. This verifies technical timing and motion diagnostics, not full creative acceptance.
+- Main CI #44394465963 passed. Main render #44394465979 was still running at the last snapshot; inspect its artifact and update this state when complete.
+- The visual result remains dominated by original tactical SVG/diagram compositions. There is still no authentic licensed VALORANT gameplay footage, so the explainer remains creatively below the intended cinematic standard.
 
 ## 7. Immediate development direction
 
-1. Verify PR #57 and render its VALORANT project; continuous camera motion should reduce static holds but is not a substitute for real gameplay.
-2. Build a repeatable shot/asset workflow that can source verified licensed moving footage when the brief requires real-world or gameplay action.
-3. Improve semantic visual QA to judge shot relevance, meaningful motion, repetition and storytelling, not just technical freeze/silence signals.
-4. Keep the release gate strict: inspect the actual artifact, not just CI. Do not call a project finished while it still resembles a slideshow.
-
+1. Verify the post-merge main render #44394465979 and update this snapshot with its artifact/QA.
+2. Prioritize authentic licensed moving VALORANT/gameplay footage and a shot-level workflow with verified rights and provenance.
+3. Improve shot variety, purposeful camera movement, visual pacing and semantic QA; the current diagrams are still slideshow-like despite zero freeze warnings.
+4. Add explicit voice-versus-video timing diagnostics to the media QA report so future projects cannot hide a short narration behind a long music track.
+5. Keep the release gate strict: inspect the actual artifact and judge it against the brief. Technical QA alone does not make a finished cinematic explainer.
 
 The biggest gap is not basic rendering. It is the **production intelligence and audiovisual quality** between a user's prompt and the final edit.
 
