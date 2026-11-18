@@ -1099,6 +1099,7 @@ const validateSubtitleCue = (
 
   const start = cue.startInFrames;
   const duration = cue.durationInFrames;
+  const effectiveDuration = isInteger(duration) ? duration : 0;
   if (!isInteger(start) || start < 0 || start >= projectDuration) {
     errors.push(prefix + ".startInFrames must be between 0 and the last frame of the project");
   }
@@ -1171,7 +1172,6 @@ const validateSubtitleCue = (
     errors.push(prefix + ".backgroundOpacity must be between 0 and 0.95");
   }
 
-  const effectiveDuration = isInteger(duration) ? duration : 0;
   for (const field of ["fadeInFrames", "fadeOutFrames"] as const) {
     if (cue[field] !== undefined &&
         (!isInteger(cue[field]) || cue[field] < 0 || cue[field] > effectiveDuration)) {
