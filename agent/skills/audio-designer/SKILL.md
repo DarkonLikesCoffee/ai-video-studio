@@ -17,14 +17,15 @@ Design sound as part of the story and edit, not as a soundtrack pasted over fini
 ## Voice-over production contract
 
 - The voice-over is a first-class deliverable, not an optional background track. If the brief is an explainer, tutorial, educational video or narrated story, plan spoken narration unless the user explicitly asks for no voice.
-- The repository currently supports importing and mixing voice-over audio, but does not itself synthesize speech or create word-level alignment. Use a configured TTS provider adapter or a user-supplied recording; do not claim the engine generated speech by itself.
-- Generate/import the voice before final visual timing. Keep a transcript and alignment file alongside the audio. Use actual word timings for word-level captions and animation triggers; never fabricate timestamps.
+- An optional Kokoro ONNX generator is available to GitHub Actions renders when `narrationPath` is supplied. Its first adapter supports Spanish and US English and derives word timings from model phoneme durations. The model is downloaded and cached by the render worker; it does not call a hosted TTS API.
+- This is not yet a general forced-aligner for arbitrary user recordings. For imported narration, use verified external alignment or phrase-level captions; never fabricate word timestamps.
+- Generate/import the voice before final visual timing. Keep the script, audio and alignment file alongside the project. Use actual word timings for captions and animation triggers.
 - Ask for explicit consent before any paid TTS or music generation. Show provider, voice, language and estimated usage/cost first. Cache successful takes and never blindly retry an uncertain billed request.
 
 ## Constraints
 
 - Current audio processing is FFmpeg-based and supports track placement, fades, gain automation, EQ, compression, algorithmic reverb, pan, sidechain ducking and EBU R128 loudness mastering.
-- Voice generation and transcription are not built into this repository. Import a properly licensed recording or use an explicitly available speech-generation capability; do not claim the renderer generated a voice.
+- Kokoro ONNX voice generation is optional and limited to the voices/languages documented in README. The initial Spanish voice set is small and has not been quality-certified; listen to the result before treating it as production-ready. Arbitrary speech transcription/forced alignment is not yet integrated.
 - Use local audio files for reliable cloud rendering and DSP.
 - Record provenance and licensing for every non-original recording.
 
