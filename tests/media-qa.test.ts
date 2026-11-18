@@ -37,7 +37,7 @@ test("media QA keeps short silence as a warning but rejects excessive A/V drift"
   const shortSilence = buildMediaQaReport(
     "brief-pause.mp4",
     probe,
-    "[silencedetect] silence_start: 4.0\\n[silencedetect] silence_end: 5.0 | silence_duration: 1.0\\n",
+    "[silencedetect] silence_start: 4.0\n[silencedetect] silence_end: 5.0 | silence_duration: 1.0\n",
     "",
   );
   assert.equal(shortSilence.passed, true);
@@ -52,7 +52,7 @@ test("media QA keeps short silence as a warning but rejects excessive A/V drift"
   };
   const mismatch = buildMediaQaReport("mismatch.mp4", mismatchedProbe, "", "");
   assert.equal(mismatch.passed, false);
-  assert.equal(mismatch.measurements.audioVideoDurationDriftSeconds, 1.2);
+  assert.ok(Math.abs((mismatch.measurements.audioVideoDurationDriftSeconds ?? 0) - 1.2) < 0.001);
   assert.ok(mismatch.findings.some((finding) => finding.code === "audio-video-duration-mismatch"));
 });
 
