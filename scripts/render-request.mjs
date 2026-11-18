@@ -7,6 +7,10 @@ const isRecord = (value) =>
 const isProjectPath = (value) =>
   /^projects\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.json$/.test(value);
 
+export const matchesCompositionMetadata = (project, compositionId) =>
+  isRecord(project) && isRecord(project.composition) &&
+  project.composition.id === compositionId;
+
 /**
  * Validate the request envelope independently of the selected composition.
  * Remotion remains the source of truth for whether compositionId is registered.
@@ -41,16 +45,18 @@ export const validateRenderRequest = (value) => {
     errors.push("projectPath, when supplied, must point to a JSON file inside projects/.");
   }
 
-  if (compositionId === "ProjectVideo" && typeof projectPath !== "string") {
-    errors.push("ProjectVideo requires projectPath.");
+  if ((compositionId === "ProjectVideo" || compositionId === "NarratedSkyExplainer") &&
+      typeof projectPath !== "string") {
+    errors.push(compositionId + " requires projectPath.");
   }
 
   if (narrationPath !== undefined &&
       (typeof narrationPath !== "string" || !isProjectPath(narrationPath))) {
     errors.push("narrationPath, when supplied, must point to a JSON file inside projects/.");
   }
-  if (narrationPath !== undefined && compositionId !== "ProjectVideo") {
-    errors.push("narrationPath is currently supported only for ProjectVideo.");
+  if (narrationPath !== undefined &&
+      compositionId !== "ProjectVideo" && compositionId !== "NarratedSkyExplainer") {
+    errors.push("narrationPath is currently supported only for ProjectVideo and NarratedSkyExplainer.");
   }
 
   if (errors.length > 0) return { errors };
@@ -92,10 +98,9 @@ const run = async () => {
       throw new Error(`Could not read project props ${request.projectPath}: ${error instanceof Error ? error.message : String(error)}`);
     }
 
-    if (request.compositionId === "ProjectVideo" &&
-        (!isRecord(project) || !isRecord(project.composition) ||
-         project.composition.id !== "ProjectVideo")) {
-      throw new Error("The selected project composition ID must match ProjectVideo.");
+    if ((request.compositionId === "ProjectVideo" || request.compositionId === "NarratedSkyExplainer") &&
+        !matchesCompositionMetadata(project, request.compositionId)) {
+      throw new Error("The selected project composition ID must match " + request.compositionId + ".");
     }
   }
 

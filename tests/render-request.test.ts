@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { validateRenderRequest } from "../scripts/render-request.mjs";
+import { matchesCompositionMetadata, validateRenderRequest } from "../scripts/render-request.mjs";
 
 const validProjectRequest = {
   provider: "github-actions",
@@ -81,17 +81,49 @@ test("accepts an optional narration request for ProjectVideo", () => {
   assert.equal(result.request?.narrationPath, "projects/demo/production/narration.json");
 });
 
-test("rejects narration for custom compositions and unsafe config paths", () => {
+test("rejects narration for unapproved custom compositions and unsafe config paths", () => {
   const customComposition = validateRenderRequest({
     ...validProjectRequest,
     compositionId: "CinematicAdBenchmark",
     narrationPath: "projects/demo/production/narration.json",
   });
-  assert.ok(customComposition.errors.includes("narrationPath is currently supported only for ProjectVideo."));
+  assert.ok(customComposition.errors.includes("narrationPath is currently supported only for ProjectVideo and NarratedSkyExplainer."));
 
   const unsafePath = validateRenderRequest({
     ...validProjectRequest,
     narrationPath: "projects/../private.json",
   });
   assert.ok(unsafePath.errors.some((error) => error.startsWith("narrationPath")));
+});
+
+
+test("accepts narrated requests for the custom NarratedSkyExplainer composition", () => {
+  const result = validateRenderRequest({
+    provider: "github-actions",
+    projectPath: "projects/examples/narrated-explainer/composition.json",
+    narrationPath: "projects/examples/narrated-explainer/production/narration.json",
+    compositionId: "NarratedSkyExplainer",
+    outputName: "narrated-sky-custom",
+    requestId: "custom-narrated-001",
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.request?.compositionId, "NarratedSkyExplainer");
+});
+
+test("checks that a project metadata file matches the requested composition", () => {
+  assert.equal(
+    matchesCompositionMetadata(
+      { composition: { id: "NarratedSkyExplainer" } },
+      "NarratedSkyExplainer",
+    ),
+    true,
+  );
+  assert.equal(
+    matchesCompositionMetadata(
+      { composition: { id: "ProjectVideo" } },
+      "NarratedSkyExplainer",
+    ),
+    false,
+  );
+  assert.equal(matchesCompositionMetadata({}, "NarratedSkyExplainer"), false);
 });
