@@ -27,7 +27,13 @@ A `ProjectVideo` project can define:
 - Composition width, height and frame rate.
 - MP4/H.264 output.
 
-The current validator limits projects to 1,800 total frames, with each scene between 30 and 900 frames. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses. Remote audio hosts must also allow cross-origin access; local project assets are more reliable for repeatable renders.
+The current validator limits projects to 1,800 total frames, with each scene between 30 and 900 frames.
+
+## Agent production workflow
+
+For narrated explainers and short-form videos, follow [the Narrated Video Producer skill](agent/skills/narrated-video-producer/SKILL.md). The voice track and its actual word/phrase alignment should drive the edit; footage, motion graphics, captions, music and sound effects are coordinated around that timeline. See [external skill references](agent/EXTERNAL_SKILLS.md) for the official Remotion agent skills and reviewed open-source production workflows.
+
+The current repository can import and mix voice-over audio, but it does not include a built-in speech-generation provider or word-level alignment service. A TTS provider or supplied recording is required for narrated output. Paid provider calls require explicit user consent. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses. Remote audio hosts must also allow cross-origin access; local project assets are more reliable for repeatable renders.
 
 ## Example project
 

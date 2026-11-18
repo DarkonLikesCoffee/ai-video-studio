@@ -25,6 +25,9 @@ Judge the actual rendered video as an editor, cinematographer, motion designer a
    - Are subjects and products visible, coherent and consistent?
    - Are typography, contrast, safe areas and reading time correct?
    - Do cuts/transitions feel motivated and rhythmically intentional?
+   - Is voice-over present when the brief calls for it, and does it match the script?
+   - Do captions match the actual spoken words and remain synchronized throughout?
+   - Does music duck under speech, and are important SFX audible and synchronized to their visual actions?
    - Does sound support the picture without masking speech?
    - Does the ending deliver a memorable payoff?
 6. Compare against the creative brief and acceptance criteria, not personal taste alone.
