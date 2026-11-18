@@ -2,7 +2,7 @@ name: Render video
 
 on:
   push:
-    branches: [main, "fix/**"]
+    branches: [main, "fix/**", "feat/cinematic-motion-qa"]
     paths:
       - render-request.json
 
