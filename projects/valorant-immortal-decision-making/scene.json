@@ -260,7 +260,8 @@
       "cameraMotion": {
         "zoom": 1.055,
         "panX": -1.1,
-        "panY": 0.25
+        "panY": 0.25,
+        "easing": "ease-out"
       }
     },
     {
@@ -546,7 +547,8 @@
       "cameraMotion": {
         "zoom": 1.055,
         "panX": 1.1,
-        "panY": -0.25
+        "panY": -0.25,
+        "easing": "ease-in-out"
       }
     },
     {
@@ -928,7 +930,8 @@
       "cameraMotion": {
         "zoom": 1.055,
         "panX": -1.1,
-        "panY": 0.25
+        "panY": 0.25,
+        "easing": "ease-in"
       }
     },
     {
@@ -1229,7 +1232,8 @@
       "cameraMotion": {
         "zoom": 1.055,
         "panX": 1.1,
-        "panY": -0.25
+        "panY": -0.25,
+        "easing": "ease-out"
       }
     },
     {
@@ -1646,7 +1650,8 @@
       "cameraMotion": {
         "zoom": 1.055,
         "panX": -1.1,
-        "panY": 0.25
+        "panY": 0.25,
+        "easing": "ease-in-out"
       }
     },
     {
@@ -1870,7 +1875,8 @@
       "cameraMotion": {
         "zoom": 1.055,
         "panX": 1.1,
-        "panY": -0.25
+        "panY": -0.25,
+        "easing": "ease-in"
       }
     }
   ],
