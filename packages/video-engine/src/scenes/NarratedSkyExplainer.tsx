@@ -109,42 +109,68 @@ const SolarSystemShot: FC = () => {
 
 const MoleculeMacroShot: FC = () => {
   const frame = useCurrentFrame();
-  const atoms = Array.from({ length: 17 }, (_, index) => {
-    const angle = index * 2.399963229728653 + frame / 70;
-    const radius = 0.9 + (index % 4) * 0.29;
+  const molecules = Array.from({ length: 19 }, (_, index) => {
+    const angle = index * 2.399963229728653 + frame / 95;
+    const radius = 1.25 + (index % 5) * 0.38;
     return {
       x: Math.cos(angle) * radius,
-      y: Math.sin(angle * 1.8) * (0.32 + (index % 3) * 0.2),
-      z: Math.sin(angle) * radius * 0.42,
+      y: Math.sin(angle * 1.4) * radius * 0.62,
+      z: Math.sin(angle * 0.8) * 0.8 - 0.7,
+      rotation: angle * 0.6,
+      scale: 0.48 + (index % 3) * 0.11,
     };
   });
   return (
     <>
       <color attach="background" args={["#03121f"]} />
       <fog attach="fog" args={["#03121f", 5, 16]} />
-      <ambientLight intensity={0.45} />
-      <pointLight position={[0, 2, 4]} color="#65d7f5" intensity={48} />
-      <pointLight position={[-3, -1, -2]} color="#2a85ff" intensity={18} />
-      <mesh>
-        <icosahedronGeometry args={[0.58, 2]} />
-        <meshPhysicalMaterial color="#79d6ee" metalness={0.28} roughness={0.16} clearcoat={1} emissive="#155c86" emissiveIntensity={0.4} />
-      </mesh>
-      {atoms.map((atom, index) => (
-        <group key={index} position={[atom.x, atom.y, atom.z]}>
-          <mesh>
-            <sphereGeometry args={[index % 4 === 0 ? 0.105 : 0.064, 20, 16]} />
-            <meshStandardMaterial color={index % 4 === 0 ? "#b2e8fa" : "#78bce2"} emissive="#164a70" emissiveIntensity={0.45} />
-          </mesh>
-          <mesh rotation={[0, 0, Math.atan2(atom.y, atom.x)]}>
-            <torusGeometry args={[0.15, 0.009, 6, 24]} />
-            <meshBasicMaterial color="#8bdef5" transparent opacity={0.42} />
-          </mesh>
-        </group>
-      ))}
-      {[0, 1, 2].map((index) => (
-        <mesh key={index} rotation={[Math.PI / 2 + index * 0.35, index * 0.8, frame / 110]}>
-          <torusGeometry args={[1.75 + index * 0.35, 0.009, 8, 120]} />
-          <meshBasicMaterial color={index === 1 ? "#69c8ff" : "#91dff2"} transparent opacity={0.35} />
+      <ambientLight intensity={0.55} />
+      <pointLight position={[0, 2, 4]} color="#65d7f5" intensity={52} />
+      <pointLight position={[-3, -1, -2]} color="#2a85ff" intensity={24} />
+      <group rotation={[0.08, frame / 180, -0.04]}>
+        {molecules.map((molecule, index) => (
+          <group key={index} position={[molecule.x, molecule.y, molecule.z]} rotation={[0, 0, molecule.rotation]} scale={molecule.scale}>
+            <mesh position={[-0.2, 0, 0]}>
+              <sphereGeometry args={[0.15, 18, 14]} />
+              <meshStandardMaterial color={index % 4 === 0 ? "#72c9ec" : "#9ad8f0"} emissive="#155c86" emissiveIntensity={0.35} roughness={0.28} />
+            </mesh>
+            <mesh position={[0.2, 0, 0]}>
+              <sphereGeometry args={[0.15, 18, 14]} />
+              <meshStandardMaterial color={index % 4 === 0 ? "#72c9ec" : "#9ad8f0"} emissive="#155c86" emissiveIntensity={0.35} roughness={0.28} />
+            </mesh>
+            <mesh rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.035, 0.035, 0.38, 10]} />
+              <meshStandardMaterial color="#b8edff" metalness={0.32} roughness={0.3} />
+            </mesh>
+          </group>
+        ))}
+      </group>
+      <group position={[0, 0, 0.45]} scale={1.45} rotation={[0, 0, Math.sin(frame / 80) * 0.08]}>
+        <mesh>
+          <sphereGeometry args={[0.3, 40, 32]} />
+          <meshPhysicalMaterial color="#e35b54" emissive="#651c30" emissiveIntensity={0.3} roughness={0.2} clearcoat={1} />
+        </mesh>
+        <mesh position={[-0.39, 0.31, 0.02]}>
+          <sphereGeometry args={[0.19, 32, 24]} />
+          <meshPhysicalMaterial color="#e8f4f8" metalness={0.12} roughness={0.2} clearcoat={1} />
+        </mesh>
+        <mesh position={[0.39, 0.31, 0.02]}>
+          <sphereGeometry args={[0.19, 32, 24]} />
+          <meshPhysicalMaterial color="#e8f4f8" metalness={0.12} roughness={0.2} clearcoat={1} />
+        </mesh>
+        <mesh position={[-0.2, 0.16, 0]} rotation={[0, 0, -0.88]}>
+          <cylinderGeometry args={[0.045, 0.045, 0.43, 10]} />
+          <meshStandardMaterial color="#e9f6fa" metalness={0.3} roughness={0.3} />
+        </mesh>
+        <mesh position={[0.2, 0.16, 0]} rotation={[0, 0, 0.88]}>
+          <cylinderGeometry args={[0.045, 0.045, 0.43, 10]} />
+          <meshStandardMaterial color="#e9f6fa" metalness={0.3} roughness={0.3} />
+        </mesh>
+      </group>
+      {[0, 1].map((index) => (
+        <mesh key={index} rotation={[Math.PI / 2 + index * 0.45, index * 0.7, frame / 130]}>
+          <torusGeometry args={[2.8 + index * 0.35, 0.008, 8, 128]} />
+          <meshBasicMaterial color="#62c9f5" transparent opacity={0.2} />
         </mesh>
       ))}
     </>
@@ -230,29 +256,44 @@ const ScatteringShot: FC = () => {
 
 const HorizonShot: FC = () => {
   const frame = useCurrentFrame();
-  const rise = interpolate(frame, [0, 120], [-0.5, 0.2], clamp);
+  const sunrise = interpolate(frame, [0, 116], [-1.9, 0.78], clamp);
+  const halo = 1 + Math.sin(frame / 22) * 0.035;
   return (
     <>
-      <color attach="background" args={["#0c4e83"]} />
-      <ambientLight intensity={1.1} />
-      <directionalLight position={[4, 6, 8]} intensity={2.4} color="#eaf7ff" />
-      <mesh position={[0, -1.45, -1]}>
-        <planeGeometry args={[30, 18]} />
-        <meshBasicMaterial color="#064574" />
+      <color attach="background" args={["#07192f"]} />
+      <fog attach="fog" args={["#07192f", 7, 22]} />
+      <ambientLight intensity={0.72} />
+      <directionalLight position={[2, 6, 5]} intensity={2.3} color="#cfeaff" />
+      <pointLight position={[0, 1, 3]} color="#6bbfff" intensity={32} distance={14} />
+      <mesh position={[0, -3.65, -2.1]}>
+        <sphereGeometry args={[5.0, 96, 64]} />
+        <meshStandardMaterial color="#135b91" roughness={0.72} metalness={0.08} />
       </mesh>
-      <mesh position={[0, rise, -0.45]}>
-        <sphereGeometry args={[1.0, 48, 32]} />
-        <meshBasicMaterial color="#bfe8ff" />
+      <mesh position={[0, -3.65, -2.1]} scale={1.015}>
+        <sphereGeometry args={[5.0, 96, 64]} />
+        <meshBasicMaterial color="#5ebdff" transparent opacity={0.18} side={BackSide} />
       </mesh>
-      <mesh position={[0, rise, -0.52]} scale={[1.2, 0.4, 0.7]}>
-        <sphereGeometry args={[1, 48, 32]} />
-        <meshBasicMaterial color="#67bfff" transparent opacity={0.3} />
+      <mesh position={[0, -3.58, -1.94]} scale={[5.08, 5.02, 5.02]}>
+        <sphereGeometry args={[1, 96, 64]} />
+        <meshBasicMaterial color="#69bfff" transparent opacity={0.1} />
       </mesh>
-      <mesh position={[0, -0.2, -0.2]}>
-        <torusGeometry args={[1.45, 0.026, 10, 128]} />
-        <meshBasicMaterial color="#c6edff" transparent opacity={0.72} />
-      </mesh>
-      <pointLight position={[0, 1.2, 1]} color="#8dcfff" intensity={55} distance={13} />
+      <group position={[0, sunrise, -0.3]}>
+        <mesh scale={halo}>
+          <sphereGeometry args={[0.48, 48, 36]} />
+          <meshBasicMaterial color="#fff1ce" />
+        </mesh>
+        <mesh scale={1.55}>
+          <sphereGeometry args={[0.48, 48, 36]} />
+          <meshBasicMaterial color="#ffd18a" transparent opacity={0.17} />
+        </mesh>
+        <pointLight color="#ffda9a" intensity={65} distance={13} />
+      </group>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 4.8, -1.95, -1.5]} rotation={[0, 0, side * -0.12]}>
+          <boxGeometry args={[3.4, 0.035, 0.035]} />
+          <meshBasicMaterial color="#81caff" transparent opacity={0.34} />
+        </mesh>
+      ))}
     </>
   );
 };
@@ -269,15 +310,15 @@ const ChapterOverlay: FC<{ frame: number; phase: number }> = ({ frame, phase }) 
     { label: "05 / LO QUE VEMOS", title: "ASÍ NACE\nEL CIELO AZUL.", note: "El color está en la luz que llena el aire." },
   ];
   const content = chapters[phase]!;
-  const left = phase === 0 || phase === 3;
+  const left = phase === 3;
   return (
     <div
       style={{
         position: "absolute",
         left: left ? "8%" : "auto",
         right: left ? "auto" : "8%",
-        top: phase === 2 ? "13%" : "18%",
-        width: phase === 2 ? "82%" : "36%",
+        top: phase === 0 ? "9%" : phase === 2 ? "13%" : "18%",
+        width: phase === 0 ? "40%" : phase === 2 ? "82%" : "36%",
         textAlign: phase === 2 ? "center" : left ? "left" : "right",
         opacity: fade * enter,
         transform: "translateY(" + ((1 - enter) * 28) + "px)",
@@ -297,6 +338,31 @@ const ChapterOverlay: FC<{ frame: number; phase: number }> = ({ frame, phase }) 
     </div>
   );
 };
+
+const TransitionWipe: FC<{ frame: number }> = ({ frame }) => (
+  <>
+    {[120, 240, 360, 480].map((start) => {
+      const progress = interpolate(frame, [start - 12, start + 12], [0, 1], clamp);
+      const opacity = interpolate(frame, [start - 12, start - 3, start + 3, start + 12], [0, 0.74, 0.74, 0], clamp);
+      return (
+        <div
+          key={start}
+          style={{
+            position: "absolute",
+            top: "-15%",
+            bottom: "-15%",
+            left: String(-45 + progress * 145) + "%",
+            width: "38%",
+            transform: "skewX(-18deg)",
+            background: "linear-gradient(90deg, rgba(90,188,255,0), rgba(132,214,255,.72), rgba(255,255,255,.88), rgba(90,188,255,0))",
+            filter: "blur(14px)",
+            opacity,
+          }}
+        />
+      );
+    })}
+  </>
+);
 
 const WordCaption: FC<{ cue: SubtitleCue; frame: number }> = ({ cue, frame }) => {
   const localFrame = frame - cue.startInFrames;
@@ -380,6 +446,7 @@ export const NarratedSkyExplainer: FC<NarratedSkyExplainerProps> = (props) => {
       </ThreeCanvas>
       <AbsoluteFill style={{ pointerEvents: "none" }}>
         <ChapterOverlay frame={frame} phase={phase} />
+        <TransitionWipe frame={frame} />
         <div style={{ position: "absolute", left: "7.7%", right: "7.7%", top: 44, display: "flex", justifyContent: "space-between", color: "rgba(220,238,250,.6)", fontSize: 12, letterSpacing: 3, fontWeight: 800 }}>
           <span>AI VIDEO STUDIO / EXPLAINER FILM</span>
           <span>{String(phase + 1).padStart(2, "0")} — 05</span>
