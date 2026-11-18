@@ -123,28 +123,32 @@ def map_words(kokoro: Any, text: str, language: str, timings: list[Any]) -> list
             j -= 1
 
     # Assign inserted sentence-context phonemes to the nearest aligned word.
-    previous: list[int | None] = [None] * m
-    following: list[int | None] = [None] * m
-    last: int | None = None
+    previous_position: list[int | None] = [None] * m
+    following_position: list[int | None] = [None] * m
+    last_position: int | None = None
     for index, word_index in enumerate(actual_word):
         if word_index is not None:
-            last = word_index
-        previous[index] = last
-    last = None
+            last_position = index
+        previous_position[index] = last_position
+    last_position = None
     for index in range(m - 1, -1, -1):
         if actual_word[index] is not None:
-            last = actual_word[index]
-        following[index] = last
+            last_position = index
+        following_position[index] = last_position
     for index, word_index in enumerate(actual_word):
         if word_index is None:
-            before, after = previous[index], following[index]
-            if before is None and after is None:
+            before_position = previous_position[index]
+            after_position = following_position[index]
+            if before_position is None and after_position is None:
                 raise RuntimeError("Kokoro's phoneme alignment contains no usable word anchors.")
-            actual_word[index] = after if before is None else before if after is None else (
-                before if index - (max(k for k in range(index) if actual_word[k] is not None)) <=
-                (min(k for k in range(index + 1, m) if actual_word[k] is not None)) - index
-                else after
-            )
+            if before_position is None:
+                actual_word[index] = actual_word[after_position]
+            elif after_position is None:
+                actual_word[index] = actual_word[before_position]
+            elif index - before_position <= after_position - index:
+                actual_word[index] = actual_word[before_position]
+            else:
+                actual_word[index] = actual_word[after_position]
 
     aligned: list[dict[str, Any]] = []
     for word_index, word in enumerate(words):
