@@ -137,7 +137,7 @@ jobs:
         run: npm run audio:master -- "render-output/$OUTPUT_NAME.mp4" "$PROJECT_PATH"
 
       - name: Master final custom narrated composition audio
-        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
+        if: steps.request.outputs.provider == 'github-actions' && (steps.request.outputs.composition_id == 'NarratedSkyExplainer' || (steps.request.outputs.composition_id == 'ProjectVideo' && steps.request.outputs.narration_path != ''))
         env:
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
         run: |
