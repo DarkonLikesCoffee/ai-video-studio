@@ -157,7 +157,6 @@ const SubtitleCueLayer: FC<SubtitleCueLayerProps> = ({ cue }) => {
                     marginRight: "0.28em",
                     color: active ? (cue.activeWordColor ?? cue.color ?? "#FFFFFF") : (cue.color ?? "#FFFFFF"),
                     opacity: active ? 1 : 0.76,
-                    transition: "color 80ms linear, opacity 80ms linear",
                   }}
                 >
                   {word.text}
