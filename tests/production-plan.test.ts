@@ -2,12 +2,25 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { validateProductionPlan } from "../scripts/validate-production-plan";
+import { NARRATIVE_BEATS } from "../scripts/storyboard-beats";
 import { analyzeStoryboardRisks } from "../scripts/storyboard-qa";
 import { critiqueStoryboard, renderStoryboardCritiqueMarkdown } from "../scripts/storyboard-critic";
 
 const example = JSON.parse(
   await readFile(new URL("../projects/examples/production-plan.json", import.meta.url), "utf8")
 ) as Record<string, unknown>;
+
+test("production-plan JSON Schema matches runtime shot requirements and narrative-beat labels", async () => {
+  const schema = JSON.parse(await readFile(new URL("../schemas/production-plan.schema.json", import.meta.url), "utf8"));
+  const shotSchema = schema.properties.shots.items;
+  const runtimeRequiredFields = ["id", "startSeconds", "durationSeconds", "purpose", "visual", "visualMethod", "action", "visualProgression", "framing", "cameraMovement", "transition", "audio"];
+  for (const field of runtimeRequiredFields) {
+    assert.ok(shotSchema.required.includes(field), `Schema must require ${field}`);
+    assert.ok(shotSchema.properties[field], `Schema must define ${field}`);
+  }
+  assert.deepEqual(shotSchema.properties.narrativeBeat.enum, NARRATIVE_BEATS);
+  assert.ok(!shotSchema.required.includes("narrativeBeat"), "narrativeBeat remains optional");
+});
 
 test("example production plan passes validation", () => {
   assert.deepEqual(validateProductionPlan(example), []);

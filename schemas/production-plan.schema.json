@@ -58,13 +58,17 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "startSeconds", "durationSeconds", "purpose", "visual", "framing", "cameraMovement", "transition", "audio"],
+        "required": ["id", "startSeconds", "durationSeconds", "purpose", "visual", "visualMethod", "action", "visualProgression", "framing", "cameraMovement", "transition", "audio"],
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
           "startSeconds": { "type": "number", "minimum": 0 },
           "durationSeconds": { "type": "number", "exclusiveMinimum": 0 },
           "purpose": { "type": "string", "minLength": 1, "maxLength": 300 },
           "visual": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "visualMethod": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "action": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "visualProgression": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "narrativeBeat": { "type": "string", "enum": ["hook", "setup", "context", "development", "escalation", "reveal", "payoff", "cta", "transition", "pause"] },
           "framing": { "type": "string", "minLength": 1, "maxLength": 200 },
           "cameraMovement": { "type": "string", "minLength": 1, "maxLength": 300 },
           "onScreenText": { "type": "string", "maxLength": 300 },

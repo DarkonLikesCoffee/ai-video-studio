@@ -62,7 +62,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 
 **Goal:** Make the storyboard an executable plan, not a scene-title list.
 
-- [x] Require every shot to include a selected visual method, concrete action and start/development/end visual progression in the production-plan schema; validate these fields and keep example plans updated.
+- [x] Require every shot to include a selected visual method, concrete action and start/development/end visual progression in both the production-plan JSON Schema and runtime validator; keep example plans updated. The schema/runtime required-shot contract is now regression-tested on branch `fix/production-plan-schema-runtime-contract` (CI pending), including optional `narrativeBeat` enum support.
 - [x] Generate a reviewable HTML storyboard planning preview from production plans before full production (timeline-ordered shot cards, visual method/action/progression, framing/camera/transition/audio cues; not an animated animatic).
 - [x] Add a review-only storyboard critic report that converts deterministic QA findings into prioritized revision suggestions; it does not modify plans or approve creative quality.
 
@@ -234,3 +234,8 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 - Technical QA passed: 1920×1080 H.264, 30fps, AAC stereo 96kHz, 47.899s, -16.0 LUFS, -1.5 dBFS true peak, 0 detected findings and 0.199s A/V duration drift.
 - The render workflow packaging/integration milestone is demonstrated; the broader P0 repeatable QA and human creative-acceptance checklist remains open.
 - Run: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383 ; artifact: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383/artifacts/14532466761
+
+## Production-plan schema contract correction (in progress)
+
+- The JSON Schema was missing the validator-required `visualMethod`, `action`, and `visualProgression` shot fields, and it omitted optional `narrativeBeat` labels accepted by runtime validation. Because `shots.items.additionalProperties` is false, schema consumers could reject or fail to request fields that the CLI requires.
+- Branch `fix/production-plan-schema-runtime-contract` adds the missing required fields, the optional narrative-beat enum, and a regression test comparing the runtime shot contract to the schema. CI pending; no video render needed for this schema-only correction.
