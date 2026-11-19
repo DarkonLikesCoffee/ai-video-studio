@@ -186,12 +186,13 @@ export const buildAssetEvidenceReport = async (
   const shots: ShotEvidence[] = shotsInput.map((shot) => {
     const shotId = asText(shot.id) ?? "unknown-shot";
     const plannedAssetRefs = Array.isArray(shot.assets) ? shot.assets.filter((value): value is string => typeof value === "string" && value.trim()) : [];
-    const matchedPlannedAssetRefs = plannedAssetRefs.filter((reference) => assets.some((asset) => assetMatchesRef(asset, reference)));
+    const shotManifestAssets = assetsByShot.get(shotId) ?? [];
+    const matchedPlannedAssetRefs = plannedAssetRefs.filter((reference) => shotManifestAssets.some((asset) => assetMatchesRef(asset, reference)));
     const unresolvedPlannedAssetRefs = plannedAssetRefs.filter((reference) => !matchedPlannedAssetRefs.includes(reference));
     for (const reference of unresolvedPlannedAssetRefs) {
       addIssue({ code: "PLAN_ASSET_UNRESOLVED", severity: "warning", message: `Shot "${shotId}" planned asset "${reference}" is not found in the manifest.`, shotId, assetRef: reference });
     }
-    return { shotId, plannedAssetRefs, matchedPlannedAssetRefs, unresolvedPlannedAssetRefs, manifestAssets: assetsByShot.get(shotId) ?? [] };
+    return { shotId, plannedAssetRefs, matchedPlannedAssetRefs, unresolvedPlannedAssetRefs, manifestAssets: shotManifestAssets };
   });
 
   const criteria: CriterionEvidence[] = [];
