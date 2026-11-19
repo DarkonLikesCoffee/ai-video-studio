@@ -54,13 +54,12 @@ jobs:
         run: npm run validate:plan -- projects/sora/production/production-plan.json
       - name: Validate VALORANT explainer production plan
         run: npm run validate:plan -- projects/valorant-immortal-decision-making/production/production-plan.json
-      - name: Ensure FFmpeg is available
+      - name: Set up FFmpeg
+        uses: AnimMouse/setup-ffmpeg@v1
+      - name: Verify FFmpeg and FFprobe
         run: |
-          if ! command -v ffmpeg >/dev/null 2>&1; then
-            sudo timeout 300 apt-get update -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30
-            sudo timeout 600 apt-get install -y --no-install-recommends ffmpeg
-          fi
           ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
       - name: Generate original audio fixtures
         run: npm run assets:audio
       - name: Stage VALORANT audio fixtures for validation
