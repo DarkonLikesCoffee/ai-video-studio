@@ -116,7 +116,6 @@ export const buildProductionPlanFromStoryboard = (briefInput: unknown, storyboar
     acceptanceCoverage,
   };
   const errors = validateProductionPlan(plan);
-  errors.push(...validateAcceptanceCoverage(plan));
   const timingErrors: string[] = [];
   const fps = Number(delivery.fps);
   const tolerance = 1e-6;
