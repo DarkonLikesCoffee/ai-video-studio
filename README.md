@@ -113,7 +113,7 @@ Run a deterministic first-pass review against a production plan:
 npm run storyboard:qa -- projects/examples/production-plan.json
 ```
 
-It reports transparent review signals such as long shots, explicit static camera holds and repeated adjacent framing/visual methods/camera movement. These are non-failing heuristics—not a semantic storyboard evaluator, creative score or approval gate. Review the findings against the brief; intentional repetition and long holds may be appropriate.
+It reports transparent review signals such as long shots, explicit static camera holds, repeated adjacent framing/visual methods/camera movement and shot-scale repetition or low recognized scale variety. It also flags placeholder-like descriptions, missing progression markers, highly similar adjacent visuals and lengthy copy. These are non-failing heuristics—not a semantic storyboard evaluator, creative score or approval gate. Recognized shot scales are inferred from common framing phrases; unknown descriptions are excluded from the variety warning. Review findings against the brief; intentional repetition and long holds may be appropriate.
 
 
 ## Example project
