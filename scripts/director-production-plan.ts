@@ -72,8 +72,10 @@ export const buildProductionPlanFromStoryboard = (briefInput: unknown, storyboar
       audio: requiredText(shot.audio, `shots[${index}].audio`),
       assets,
     };
-    for (const field of ["narrativeBeat", "onScreenText"] as const) {
-      if (shot[field] !== undefined) mapped[field] = requiredText(shot[field], `shots[${index}].${field}`);
+    if (shot.narrativeBeat !== undefined) mapped.narrativeBeat = requiredText(shot.narrativeBeat, `shots[${index}].narrativeBeat`);
+    if (shot.onScreenText !== undefined) {
+      if (typeof shot.onScreenText !== "string") throw new Error(`shots[${index}].onScreenText must be a string when provided.`);
+      if (shot.onScreenText.trim()) mapped.onScreenText = shot.onScreenText.trim();
     }
     if (shot.engineApproach !== undefined) {
       if (typeof shot.engineApproach !== "string" || !shot.engineApproach.trim()) {
