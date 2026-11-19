@@ -3,7 +3,7 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `a30be87792a5bc0646e4c4dc3b1bf04d42a8dd92` — “docs: log storyboard QA report merge”
+**Last verified main commit:** `e7988966b6783ff0cf4e0f92bcd656859b9cafc3` — “feat(storyboard): add pre-production planning preview”
 **Current development branch:** `feat/storyboard-animatic-preview` (based on that main commit; pre-production review preview work in progress)
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
@@ -181,3 +181,15 @@ Prioritize a small working vertical slice over a large architecture rewrite. Bef
 - The command is documented in README and agent guidance. The analyzer does not semantically understand story content or inspect rendered video.
 - No render was performed.
 - Next: build a more useful shot-sequence planning/validation layer that can inspect visual-method distribution and action/progression completeness, then prototype storyboard-to-animatic review before adding new renderer effects.
+
+
+## 11. Storyboard review preview — merged 2026-11-19
+
+- Main merge commit: `e7988966b6783ff0cf4e0f92bcd656859b9cafc3` (PR #68).
+- New command: `npm run storyboard:preview -- <production-plan.json> <output.html>`.
+- Produces a standalone HTML planning page with ordered shot cards, time ranges, visual method, purpose, visual description, action, start/development/end progression, framing, camera movement, on-screen copy, transition, audio cues, asset references and optional engine approach.
+- Validates first-shot start, shot/runtime bounds and final-shot end. Preserves authored transition overlaps rather than rejecting them.
+- CI run #44502735050 passed all steps, including typecheck, tests, project validations, both preview generations and build.
+- Artifact #14516579993 was downloaded and checked: `launch-film.html` (4 shots) and `valorant.html` (6 shots).
+- This is **not** an animated animatic or final video. It does not play footage, inspect actual assets, generate missing media or semantically judge creative quality.
+- Roadmap HTML planning-preview task is complete. Remaining: true media-backed animatic/shot preview, Production Director, richer per-shot method selection/capability mapping, semantic rendered-video QA, review latest VALORANT render creatively.
