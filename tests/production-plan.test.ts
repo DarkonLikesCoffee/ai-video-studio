@@ -212,3 +212,22 @@ test("visual strategy report is review-only and states its limits", () => {
   assert.match(report, /does not rewrite the plan/);
   assert.match(report, /Visual method mix/);
 });
+
+import { renderVisualStrategyJson } from "../scripts/storyboard-strategy";
+
+test("visual strategy JSON has a versioned machine-readable envelope", () => {
+  const plan = structuredClone(example);
+  const parsed = JSON.parse(renderVisualStrategyJson(plan)) as {
+    schemaVersion: number;
+    reportType: string;
+    planTitle: string;
+    report: { shotCount: number; methodCounts: Record<string, number>; recommendations: unknown[] };
+    generatedBy: string;
+  };
+  assert.equal(parsed.schemaVersion, 1);
+  assert.equal(parsed.reportType, "storyboard-visual-strategy");
+  assert.equal(parsed.planTitle, plan.title);
+  assert.equal(parsed.report.shotCount, plan.shots.length);
+  assert.equal(parsed.generatedBy, "ai-video-studio/storyboard:strategy");
+  assert.ok(Array.isArray(parsed.report.recommendations));
+});

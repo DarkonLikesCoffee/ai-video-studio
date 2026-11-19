@@ -340,3 +340,10 @@ Append one entry per meaningful development session:
 - Alternatives are concrete options (e.g. footage, physical/3D demonstration, macro detail, before/after, motivated camera choices) rather than generic "add variety" advice. The report does not modify the plan or claim semantic understanding.
 - Added regression tests for method counts, actionable shot alternatives and explicit report limitations.
 - Branch: `feat/storyboard-visual-strategy-report`. The first CI run found one assertion mismatch (the recommendation wording omitted the exact phrase expected by the test); TypeScript typecheck passed. Wording was corrected in commit b95bd5f. Local test execution was not possible because the container could not resolve github.com; rerun CI is in progress.
+
+## 2026-11-19 — PR #81 merged; strategy report JSON extension underway
+
+- PR #81 merged at `f621b018facaa1f37ed48d34d35d342fe788b32`. Branch CI passed and post-merge main CI passed.
+- `storyboard:strategy` currently emits Markdown by default. New branch `feat/storyboard-strategy-json` adds a versioned JSON output envelope with `schemaVersion`, `reportType`, `planTitle`, the full report payload, and `generatedBy`.
+- CLI adds `--json`; optional file output remains supported, enabling future agent/workflow consumption without scraping Markdown.
+- Regression test validates JSON envelope and report content. CI pending.

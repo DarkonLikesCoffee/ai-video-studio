@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `6f200389bbfb0ca4124755e881d9b821d272156e` — `feat(qa): add contact-sheet evidence JSON report (#79)`
-**Current development branch:** PR #79 merged; contact-sheet CLI and JSON evidence report merged; next development focuses on actionable visual strategy alternatives
+**Last verified main commit:** `f621b018facaa1f37ed48d34d35d342fe788b32b` — `feat(storyboard): add visual strategy report (#81)`
+**Current development branch:** PR #81 merged; contact-sheet evidence JSON and advisory visual-strategy report are on main. Current work adds a machine-readable strategy-report envelope; CI is required before merge.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -74,7 +74,7 @@ The repository is **not yet a fully autonomous prompt-to-video AI product**. In 
 
 Some related pieces exist as manual scripts, examples, playbooks or limited adapters. Do not confuse those with end-to-end product capabilities.
 
-## 5. Historical end-to-end test: VALORANT explainer
+## 5. Recent merged visual strategy report (PR #81)\n\n- `npm run storyboard:strategy -- production-plan.json` creates a review-only Markdown report of visual-method counts, existing storyboard risk signals and shot-specific alternatives.\n- Alternatives are deterministic mappings from QA finding codes. They are prompts for creative revision, not semantic judgments or automatic plan edits.\n- Main CI for PR #81 merge commit `f621b018` passed.\n\n## 6. Historical end-to-end test: VALORANT explainer
 
 Project: `projects/valorant-immortal-decision-making/`  
 PR #50: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/50  
