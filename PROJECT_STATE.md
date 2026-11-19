@@ -181,4 +181,12 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Main CI run #44525255281 is in progress; verify it before considering main validated.
 - PR #80 remains closed/unmerged; its implementation was selectively rebuilt into PR #86 on current main, without stale docs.
 - Next creative development should focus on production director/revision workflow, not more QA infrastructure unless it directly improves creative output.
-\n\n## 2026-11-19 — PR #88 merged; revision review workflow verified\n\n- PR #88 `feat(storyboard): add revision selection and review workflow` merged as `5e7b019ce8487c7af067b4b8fe0ee1f9186f4fd3`.\n- PR CI passed and post-merge main CI run #44526796903 passed.\n- Revision artifacts support selecting/deselecting critique suggestions and generating a Markdown review without changing the source plan.\n- Current main includes the prompt handoff export added in the next development PR; see its PR and progress-log entry for the exact status.\n- Live verified main commit: `5e7b019ce8487c7af067b4b8fe0ee1f9186f4fd3`.\n- No new video render was produced or inspected as part of PR #88.\n
+
+
+## 2026-11-19 — PR #88 merged; revision review workflow verified
+
+- PR #88 `feat(storyboard): add revision selection and review workflow` merged as `5e7b019ce8487c7af067b4b8fe0ee1f9186f4fd3`.
+- PR CI passed and post-merge main CI run #44526796903 passed.
+- Revision artifacts support selecting/deselecting critique suggestions and generating a Markdown review without changing the source plan.
+- Live verified main commit: `5e7b019ce8487c7af067b4bfe0ee1f9186f4fd3`.
+- No new video render was produced or inspected as part of PR #88.
