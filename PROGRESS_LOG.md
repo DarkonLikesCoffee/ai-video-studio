@@ -371,3 +371,12 @@ Append one entry per meaningful development session:
 - GitHub Actions now generates a 5-second contact sheet (4 columns, 320px width) and JSON evidence report after Media QA and includes them in the render artifact.
 - Post-merge main CI run #44524069933 is running. No render has yet been run through the new workflow.
 - Next: verify main CI, then inspect the revision artifact/critic integration for the next production-intelligence slice.
+
+
+## 2026-11-19 — True Peak media QA fix merged (PR #86)
+
+- Rebuilt the relevant code-only changes from stale PR #80 on current main, avoiding old documentation snapshots.
+- PR #86 merged as `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d`; PR CI passed for exact head `4e6ce4db751ed8fd307a631c68efda0ada990512`.
+- EBU R128 filter enables `peak=true`; parser handles the actual two-line True peak summary. Added regression tests and a pure configurable audio-filter builder.
+- Main CI #44525255281 is in progress; confirm result before declaring merge validation complete.
+- PR #80 was not merged; its code fix was rebuilt and merged through PR #86.
