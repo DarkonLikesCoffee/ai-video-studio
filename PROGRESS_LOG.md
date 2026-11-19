@@ -314,3 +314,14 @@ Append one entry per meaningful development session:
 - Post-merge main CI run #44516765269 is running; check its result before considering the merge fully verified.
 - No real MP4 contact sheet has been generated/visually inspected yet. This is implemented tooling, not completed rendered-video QA.
 - Next: verify post-merge main CI; then use the contact-sheet CLI plus existing `qa:media` report on an actual benchmark MP4 and record the artifact/evidence. Improve automation only after validating this real workflow.
+
+
+## 2026-11-19 — VALORANT v4 real-render media QA and contact-sheet inspection
+
+- PR #77 docs reconciliation merged as `93cec7fec2a4c8917bb6c231519b75181fb54d48`; its CI #44517012780 and post-merge main CI #44517175453 passed.
+- Retrieved render run #44485488551 artifact #14511125907 (`valorant-immortal-decision-making-v4.mp4`, 46.7 MB) and its bundled QA report. The MP4 is 47.856s container duration, 1920×1080, 30fps H.264 video and AAC stereo audio at 96kHz. Video stream duration is 47.733s; measured audio/video duration drift is 0.123s.
+- QA report: passed; no detected silence intervals, frozen intervals or black-frame intervals. Integrated loudness was -16.0 LUFS. No true-peak reading was present in this older render report, so true peak is not verified for this artifact. Audio was measured, not listened to.
+- Generated a 5-second contact sheet (10 sampled frames; 4 columns) and visually inspected it. It shows real gameplay clips under repeated large centered headline overlays. Frame samples indicate composition/framing repetition and text dominance; this is a review finding, not a continuous-motion analysis.
+- Contact-sheet image is retained in the current work environment at `/mnt/data/valorant-v4-qa/contact-sheet.jpg`; MP4/QA ZIP at `/mnt/data/valorant-v4-artifact.zip`. These are session artifacts, not repository assets.
+- This completes one real-artifact contact-sheet/QA trial, but not full creative acceptance: no full-timeline playback or audio listening occurred, and sparse samples cannot verify motion continuity or shot timing.
+- Next: turn the contact-sheet workflow into repeatable evidence/acceptance (including audio listening and true-peak coverage on a fresh render), then prioritize a production change that reduces repetitive text-overlay compositions instead of adding more QA infrastructure.
