@@ -88,7 +88,7 @@ const run = async (): Promise<void> => {
           process.exitCode = 1;
           return;
         }
-        await writeFile(output, JSON.stringify(result.revisedPlan, null, 2) + "\n", "utf8");
+        await writeFile(output!, JSON.stringify(result.revisedPlan, null, 2) + "\n", "utf8");
         process.stdout.write(`Revised plan written: ${output}\n`);
       } else {
         process.stdout.write(`Revision validation: ${result.valid ? "PASS" : "FAIL"}; ${result.errors.length} errors; ${result.warnings.length} warnings\n`);
