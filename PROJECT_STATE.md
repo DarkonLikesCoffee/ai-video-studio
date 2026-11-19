@@ -143,3 +143,12 @@ Prioritize a small working vertical slice over a large architecture rewrite. Bef
 - These changes strengthen agent orchestration guidance only. They do **not** implement a persistent AI Director, automatic storyboard generation, semantic slideshow detection or new render-engine capabilities.
 - No tests or renders run yet (documentation-only changes).
 - Next: open PR and validate CI, then implement a focused storyboard-quality validator with tests as the next code slice.
+
+## 9. Development update — required shot action/progression fields (2026-11-19)
+
+- Extended the production-plan validator to require `visualMethod`, `action`, and `visualProgression` on every shot, alongside existing purpose/visual/framing/camera/transition/audio fields.
+- Added tests for missing visual-method selection, action, and progression.
+- Updated all four checked-in production-plan examples (launch film, narrated sky explainer, SORA product film, VALORANT explainer) with per-shot method, action and start→development→end progression.
+- This enforces planning completeness, not semantic quality: it cannot yet detect whether descriptions are genuinely compelling, repetitive or slideshow-like. The fields can still be poorly authored and need later heuristic/AI-assisted review.
+- CI for the latest branch head is in progress; tests are not yet confirmed passing. No render was run because this changes production planning/validation, not the render engine.
+- Next: wait for CI, fix failures if any, then merge only after checks pass. Follow-up code task is a deterministic slideshow-risk report (duration/static visual progression/shot-variety signals), with warnings rather than subjective hard failures.
