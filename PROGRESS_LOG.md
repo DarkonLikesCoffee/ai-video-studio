@@ -327,9 +327,19 @@ Append one entry per meaningful development session:
 - Next: turn the contact-sheet workflow into repeatable evidence/acceptance (including audio listening and true-peak coverage on a fresh render), then prioritize a production change that reduces repetitive text-overlay compositions instead of adding more QA infrastructure.
 
 
-## 2026-11-19 — Contact-sheet evidence report (PR preparation)
+## 2026-11-19 — Contact-sheet evidence report merged (PR #79)
 
 - Added a pure helper to calculate exact sample timestamps, matching the contact-sheet interval/count logic (including short clips and non-multiple durations).
-- Extended the CLI with optional `--report report.json`. The JSON evidence report records schema version, input path, duration, frame count, grid rows, exact sampled timestamps, selected options, contact-sheet output path and generator name. Report output is optional; existing CLI use remains unchanged.
-- Added unit coverage for timestamp sequence, short clips and invalid intervals. CI is pending; do not claim tests pass until workflow confirms.
-- Goal: make sparse visual inspection repeatable and reviewable without pretending it replaces continuous playback or creative QA.
+- Extended the CLI with optional `--report report.json` output. The JSON evidence report records schema version, input path, duration, frame count, grid rows, exact sampled timestamps, selected options, contact-sheet output path and generator name. Report output is optional; existing CLI use remains unchanged.
+- Added unit coverage for timestamp sequence, short clips and invalid intervals. PR CI #44518679053 passed; post-merge main CI #44518723407 passed.
+- Goal: make sparse visual inspection repeatable and reviewable without pretending it replaces continuous playback or creative QA. Render-workflow integration remains pending.
+
+## 2026-11-19 — True-peak measurement correction (PR #80 in progress)
+
+- Main HEAD at branch start: `6f200389bbfb0ca4124755e881d9b821d272156e` (PR #79 contact-sheet evidence report). PR #79 CI #44518679053 and post-merge main CI #44518723407 passed.
+- Contact-sheet evidence report was exercised locally against benchmark artifact #14511125907: 1fps, 4 columns, 400px width, 48 sampled timestamps in the JSON report. This supplements the 5s/10-frame inspection already documented in PR #78.
+- Existing media QA rerun: 0 findings; no detected silence/freeze/black intervals; integrated loudness -16.0 LUFS; A/V duration drift 0.123s. True peak was absent.
+- FFmpeg EBU R128 true peak needs `peak=true`; its actual summary is `True peak:\n  Peak: -1.5 dBFS`. The old filter did not enable peak mode, and the old parser did not match the two-line summary. Direct FFmpeg with peak mode measured -1.5 dBFS.
+- PR #80 branch `fix/media-qa-true-peak-mode-v3` exports `buildMediaQaAudioFilter`, enables `ebur128=peak=true`, accepts the actual summary format, and adds unit tests. A local Node 22 strip-types copy of the QA core/tests passed 12/12; GitHub CI remains the official gate.
+- Local files: `/mnt/data/ai-video-studio-qa/contact-sheet-cli-1fps.jpg`, `contact-sheet-1fps.json`, `qa-rerun-peak-enabled.json`; not committed or uploaded to workflow artifacts. No full video playback/audio listening performed.
+- Next: open PR #80, monitor CI, merge only if checks pass, then integrate contact-sheet generation/report into render artifacts and validate with a real render.
