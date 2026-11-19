@@ -100,6 +100,8 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 
 **Goal:** Give every planned shot the appropriate media with review, rights and provenance.
 
+- [ ] Connect acceptance-criterion → shot mappings to asset-manifest entries and local build evidence. **Partial implementation:** `director:asset-evidence` reports linked assets, unresolved plan references, file presence, provenance/rights fields and unknown shot IDs; it is review-only and does not judge semantic suitability.
+
 - [ ] Unify discovery of still images and moving footage, including Openverse, Wikimedia Commons, NASA where relevant, and user-provided assets.
 - [ ] Build an asset review/selection manifest with source URL, creator, license, restrictions, attribution, media type, dimensions/duration, codec and hash.
 - [ ] Add provider adapters for generated still/video media only after comparing quality, rights, latency, reliability, controllability and cost.
@@ -214,7 +216,7 @@ The recent work has established important pipeline foundations: media QA diagnos
 - [x] Integrate authorized local footage into the narrated ProjectVideo production path with rights metadata and separate credits.
 - [ ] Verify and document the latest real render against its creative brief; do not equate motion diagnostics or technical synchronization with creative acceptance.
 - [ ] Update the project-state, continuity and progress docs so stale benchmark/footage claims do not contradict verified current evidence.
-- [ ] Begin the next quality-first vertical slice with the Production Director → storyboard/shot plan → visual-method selection → production → actual-video QA loop.
+- [ ] Continue the quality-first vertical slice with the Production Director → storyboard/shot plan → asset evidence → build → actual-video QA loop. PR #97 now imports a storyboard into a validated production plan; the next branch adds a report-only bridge from criterion/shot mappings to manifest files and provenance, without semantic approval.
 - [ ] Use the existing VALORANT project as a regression/creative-quality case, not as justification to repeat its diagram-heavy visual approach.
 - [ ] Choose the first implementation task only after inspecting the current director, storyboard, production schema, render path and QA code. Favor a focused, testable improvement.
 
