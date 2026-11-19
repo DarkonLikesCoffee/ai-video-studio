@@ -165,6 +165,9 @@ test("storyboard critic prioritizes actionable high-impact shot revisions", () =
 
 test("storyboard critic report is review-only and does not modify the source plan", () => {
   const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots[0]!.visual = "Show this concept";
+  shots[0]!.action = "Show the idea";
   const before = JSON.stringify(plan);
   const report = renderStoryboardCritiqueMarkdown(plan);
   assert.match(report, /Review-only report/);
