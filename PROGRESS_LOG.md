@@ -406,3 +406,11 @@ Append one entry per meaningful development session:
 - PR #91 `feat(storyboard): add explicit narrative beat review` merged as `85d1ab0fd4d211365e2dec2fb0213cdf4fda2296`; CI run #44534929322 passed after fixing a test fixture whose opening beat did not trigger the intended warning.
 - Production plans now optionally label shot beats; `storyboard:beats` reports counts, duration totals, unlabeled shots and arc review prompts. Example plan tags hook → development → reveal → payoff.
 - The report is explicit-label only, advisory and not semantic story QA. No render was produced for these planning-tool changes.
+
+
+## 2026-11-19 — PR #93 creative brief contract
+
+- Verified live main after PR #92 merge commit `7bcb7b583d16eb5cf4ef2445bdefc25b614bcd27`. No open PRs were reported at start; post-merge status checks were unavailable via combined-status endpoint.
+- New branch `feat/creative-brief-contract` defines a versioned creative brief schema, deterministic validator/Markdown summary CLI, sample brief and tests. This separates director-level intent from the executable storyboard/render plan.
+- The CLI is groundwork only: it validates/summarizes an authored brief and does not call an LLM or claim autonomous direction.
+- CI pending; no render produced.
