@@ -51,6 +51,7 @@ export const validateAcceptanceCoverage = (value: unknown): string[] => {
   if (!Array.isArray(value.acceptanceCoverage)) return ["acceptanceCoverage must be an array when provided."];
   if (value.acceptanceCoverage.length < 3 || value.acceptanceCoverage.length > 10) errors.push("acceptanceCoverage must contain 3–10 entries when provided.");
   const criteria = value.acceptanceCriteria.filter((item): item is string => typeof item === "string");
+  if (criteria.some((criterion) => criterion.length > 300)) errors.push("acceptanceCriteria entries must be at most 300 characters.");
   if (new Set(criteria).size !== criteria.length) errors.push("acceptanceCriteria must not contain duplicates.");
   const knownShots = new Set(value.shots.flatMap((shot) => isRecord(shot) && typeof shot.id === "string" ? [shot.id] : []));
   const covered = new Set<string>();
@@ -69,8 +70,9 @@ export const validateAcceptanceCoverage = (value: unknown): string[] => {
       covered.add(criterion);
     }
     const shotIds = entry.shotIds;
-    if (!Array.isArray(shotIds) || shotIds.length === 0 || shotIds.some((id) => typeof id !== "string" || !id.trim())) {
-      errors.push(`${prefix}.shotIds must contain at least one non-empty shot ID.`);
+    if (typeof criterion === "string" && criterion.length > 300) errors.push(`${prefix}.criterion must be at most 300 characters.`);
+    if (!Array.isArray(shotIds) || shotIds.length === 0 || shotIds.length > 80 || shotIds.some((id) => typeof id !== "string" || !id.trim())) {
+      errors.push(`${prefix}.shotIds must contain 1–80 non-empty shot IDs.`);
     } else {
       const local = new Set<string>();
       shotIds.forEach((id) => {
@@ -80,8 +82,8 @@ export const validateAcceptanceCoverage = (value: unknown): string[] => {
         if (!knownShots.has(id)) errors.push(`${prefix}.shotIds references unknown shot "${id}".`);
       });
     }
-    if (typeof entry.rationale !== "string" || !entry.rationale.trim()) {
-      errors.push(`${prefix}.rationale must be a non-empty string.`);
+    if (typeof entry.rationale !== "string" || !entry.rationale.trim() || entry.rationale.length > 500) {
+      errors.push(`${prefix}.rationale must be a non-empty string of at most 500 characters.`);
     }
   });
   criteria.forEach((criterion) => {
@@ -182,7 +184,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
   }
 
   if (!Array.isArray(plan.acceptanceCriteria) || plan.acceptanceCriteria.length < 3 || plan.acceptanceCriteria.length > 10 ||
-      plan.acceptanceCriteria.some((item) => typeof item !== "string" || !item.trim())) {
+      plan.acceptanceCriteria.some((item) => typeof item !== "string" || !item.trim() || item.length > 300)) {
     errors.push("acceptanceCriteria must contain 3–10 non-empty strings.");
   }
 
