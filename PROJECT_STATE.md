@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `85d1ab0fd4d211365e2dec2fb0213cdf4fda2296` — `feat(storyboard): add explicit narrative beat review (#91)`
-**Current development branch:** PRs #81, #82, #84, #85, #86, #88, #89, #90 and #91 merged. PR #84 adds automatic 5-second contact sheets and JSON evidence to render artifacts; PR #86 fixes FFmpeg EBU R128 True Peak measurement and parsing. PR #91 CI run #44534929322 passed; post-merge main CI status is not exposed by the current connector.
+**Last verified main commit:** `7bcb7b583d16eb5cf4ef2445bdefc25b614bcd27` — `docs: reconcile project state after PR #91 (#92)`
+**Current development branch:** PRs #81, #82, #84, #85, #86, #88, #89, #90, #91 and #92 merged. PR #93 (creative-brief contract) is in progress. PR #84 adds automatic 5-second contact sheets and JSON evidence to render artifacts; PR #86 fixes FFmpeg EBU R128 True Peak measurement and parsing. PR #91 CI run #44534929322 passed; post-merge main CI status is not exposed by the current connector.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -205,3 +205,9 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - `npm run storyboard:beats` groups explicitly labeled shots, sums durations, lists unlabeled shots and generates review prompts for missing opening/development/payoff coverage when a sequence is sufficiently labeled.
 - The report does not infer narrative meaning from shot text, force a formula, or approve creative quality. JSON output is available for future agent workflows.
 - PR #90 safe revision import and PR #91 narrative beat review are merged. PR #91 CI run #44534929322 passed; no render was produced for these planning-tool changes.
+
+
+## Creative brief contract (PR #93 in progress)
+
+- Adds a version-1 creative brief schema and validator covering source prompt, objective, audience, response, delivery, thesis, emotional arc, visual language, story/motion/sound strategy, constraints, assumptions and measurable acceptance criteria.
+- `npm run director:brief` validates a brief and prints or writes a Markdown summary. This is schema/contract groundwork; no LLM creates briefs yet.
