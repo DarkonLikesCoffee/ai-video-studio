@@ -144,7 +144,7 @@ export const buildAssetEvidenceReport = async (
     const local = await resolveLocalPath(value, projectRoot);
     const provenanceStatus = hasProvenance(value) ? "documented" : "missing";
     const rightsStatus = hasRights(value) ? "documented" : "missing";
-    const assetShotIds = Array.isArray(value.shotIds) ? value.shotIds.filter((id): id is string => typeof id === "string" && id.trim()).map((id) => id.trim()) : [];
+    const assetShotIds = Array.isArray(value.shotIds) ? value.shotIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0).map((id) => id.trim()) : [];
     if (!assetShotIds.length) addIssue({ code: "ASSET_SHOT_IDS_MISSING", severity: "warning", message: `Asset "${reference}" has no valid shotIds.`, assetRef: reference });
     for (const shotId of assetShotIds) {
       if (shotId !== "all" && !knownShots.has(shotId)) {
@@ -204,7 +204,7 @@ export const buildAssetEvidenceReport = async (
         continue;
       }
       const criterion = asText(value.criterion)!;
-      const criterionShotIds = value.shotIds.filter((id): id is string => typeof id === "string" && id.trim()).map((id) => id.trim());
+      const criterionShotIds = value.shotIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0).map((id) => id.trim());
       if (!criterionShotIds.length) addIssue({ code: "CRITERION_SHOTS_MISSING", severity: "error", message: `Criterion "${criterion}" must reference at least one shot.`, criterion });
       const unknown = criterionShotIds.filter((id) => !knownShots.has(id));
       unknown.forEach((shotId) => addIssue({ code: "CRITERION_UNKNOWN_SHOT", severity: "error", message: `Criterion "${criterion}" references unknown shot "${shotId}".`, shotId, criterion }));
