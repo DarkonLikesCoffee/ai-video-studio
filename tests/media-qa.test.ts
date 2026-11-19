@@ -97,3 +97,28 @@ test("media QA accepts true peak at or below recommended ceiling", () => {
   assert.equal(report.passed, true);
   assert.equal(report.findings.length, 0);
 });
+
+
+test("media QA detects trailing silence that has no silence_end at EOF", () => {
+  const report = buildMediaQaReport(
+    "trailing-silence.mp4",
+    probe,
+    "[silencedetect] silence_start: 55.0\\n",
+    "",
+  );
+  assert.deepEqual(report.measurements.silenceIntervals, [
+    { startSeconds: 55, endSeconds: 60.1, durationSeconds: 5.1 },
+  ]);
+  assert.equal(report.passed, false);
+  assert.ok(report.findings.some(f => f.code === "silence" && f.severity === "error"));
+});
+
+test("media QA closes short trailing silence at EOF and skips zero-length trailing intervals", () => {
+  const short = buildMediaQaReport("short-trailing.mp4", probe, "silence_start: 58.2\\n", "");
+  assert.deepEqual(short.measurements.silenceIntervals, [
+    { startSeconds: 58.2, endSeconds: 60.1, durationSeconds: 1.9 },
+  ]);
+  assert.equal(short.passed, true);
+  const zeroLength = buildMediaQaReport("zero-trailing.mp4", probe, "silence_start: 60.1\\n", "");
+  assert.deepEqual(zeroLength.measurements.silenceIntervals, []);
+});

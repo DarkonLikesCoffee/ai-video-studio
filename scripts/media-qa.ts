@@ -136,6 +136,27 @@ const parseIntervals = (
   return intervals;
 };
 
+const parseSilenceIntervals = (output: string, mediaDurationSeconds: number) => {
+  const intervals = parseIntervals(
+    output,
+    /silence_start:\s*(-?[0-9.]+)[\s\S]*?silence_end:\s*([0-9.]+)/g,
+  );
+  const starts = [...output.matchAll(/silence_start:\s*(-?[0-9.]+)/g)];
+  const ends = [...output.matchAll(/silence_end:\s*(-?[0-9.]+)/g)];
+  const lastStart = starts.length ? Number(starts[starts.length - 1]![1]) : undefined;
+  const lastEnd = ends.length ? Number(ends[ends.length - 1]![1]) : undefined;
+  if (lastStart !== undefined && Number.isFinite(lastStart) &&
+      Number.isFinite(mediaDurationSeconds) && mediaDurationSeconds > lastStart &&
+      (lastEnd === undefined || lastStart > lastEnd)) {
+    intervals.push({
+      startSeconds: lastStart,
+      endSeconds: mediaDurationSeconds,
+      durationSeconds: Number((mediaDurationSeconds - lastStart).toFixed(3)),
+    });
+  }
+  return intervals;
+};
+
 const fpsNumber = (value?: string): number => {
   if (!value) return 0;
   const [numeratorText, denominatorText] = value.split("/");
@@ -160,10 +181,7 @@ export const buildMediaQaReport = (
   const sizeBytes = Number(format.size ?? 0);
   const videoStream = streams.find(stream => stream.codec_type === "video");
   const audioStream = streams.find(stream => stream.codec_type === "audio");
-  const silenceIntervals = parseIntervals(
-    audioLog,
-    /silence_start:\s*(-?[0-9.]+)[\s\S]*?silence_end:\s*([0-9.]+)/g,
-  );
+  const silenceIntervals = parseSilenceIntervals(audioLog, durationSeconds);
   const frozenIntervals = parseIntervals(
     videoLog,
     /freeze_start:\s*([0-9.]+)[\s\S]*?freeze_end:\s*([0-9.]+)/g,
