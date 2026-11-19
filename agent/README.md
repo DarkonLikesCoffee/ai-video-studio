@@ -21,7 +21,7 @@ Before full production, generate a lightweight HTML planning preview with `npm r
 
 ## Deterministic storyboard risk review
 
-The `npm run storyboard:qa -- <production-plan.json>` command provides warning-only signals for long shots, static camera holds and repeated adjacent visual method/framing/camera movement. It is a transparent heuristic review aid, not semantic QA or a creative verdict. Do not automatically fail or rewrite a plan from these warnings alone.
+The `npm run storyboard:qa -- <production-plan.json>` command provides warning-only signals for long shots, static camera holds, repeated adjacent visual method/framing/camera movement, repeated recognized shot scale and low recognized shot-scale variety in longer sequences. It also flags vague descriptions/actions, missing progression markers, highly similar adjacent visuals and lengthy on-screen copy. Shot scale is inferred from common phrases (extreme close-up/macro/close-up/medium/wide); unknown framing text is excluded, and variety warnings require most shots to be recognizable. These transparent heuristics are not semantic QA or a creative verdict. Do not automatically fail or rewrite a plan from warnings alone.
 
 
 ## Production intelligence checklist

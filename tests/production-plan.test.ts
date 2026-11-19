@@ -129,3 +129,21 @@ test("storyboard QA warns on unusually long on-screen copy without failing valid
   shots[0]!.onScreenText = "A very long headline that may overwhelm the visual and take too long to read on screen";
   assert.ok(analyzeStoryboardRisks(plan).some((finding) => finding.code === "TEXT_HEAVY_SHOT"));
 });
+
+
+test("storyboard QA warns when a long sequence uses only two recognizable shot scales", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots.push({ ...shots[3], id: "extra-shot", startSeconds: 15, durationSeconds: 2 });
+  shots.forEach((shot, index) => { shot.framing = index % 2 === 0 ? "Close-up shot" : "Tight close up"; });
+  const findings = analyzeStoryboardRisks(plan);
+  assert.ok(findings.some((finding) => finding.code === "LOW_SHOT_SCALE_VARIETY" && finding.shotIds.length === 5));
+});
+
+test("storyboard QA warns on runs of three adjacent shots with the same recognized scale", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots.forEach((shot) => { shot.framing = "Medium shot with subject left"; });
+  const findings = analyzeStoryboardRisks(plan);
+  assert.ok(findings.some((finding) => finding.code === "REPEATED_SHOT_SCALE" && finding.shotIds.length === 4));
+});
