@@ -24,11 +24,14 @@ test("planning preview rejects a shot extending beyond the requested runtime", (
   assert.throws(() => buildStoryboardPreview(invalid), /extends beyond/);
 });
 
-test("planning preview rejects overlaps so the sequence is unambiguous", () => {
-  const invalid = structuredClone(example);
-  const shots = invalid.shots as Array<Record<string, unknown>>;
+test("planning preview preserves intentional transition overlaps", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
   shots[1]!.startSeconds = 2;
-  assert.throws(() => buildStoryboardPreview(invalid), /overlaps the previous shot/);
+  shots[1]!.durationSeconds = 7;
+  const preview = buildStoryboardPreview(plan);
+  assert.equal(preview.shots[1]?.startSeconds, 2);
+  assert.equal(preview.shots[1]?.durationSeconds, 7);
 });
 
 test("HTML preview escapes authored text", () => {
