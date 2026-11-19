@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { createStoryboardBeatReport, renderStoryboardBeatReportMarkdown } from "../scripts/storyboard-beats";
 
 const plan = {
@@ -41,4 +42,12 @@ test("markdown report is transparent about heuristics and limitations", () => {
   assert.match(markdown, /Narrative Beat Review/);
   assert.match(markdown, /No narrative-beat review prompts were generated/);
   assert.match(markdown, /does not infer story meaning/);
+});
+
+test("example production plan demonstrates a hook-development-reveal-payoff arc", async () => {
+  const example = JSON.parse(await readFile(new URL("../projects/examples/production-plan.json", import.meta.url), "utf8"));
+  const report = createStoryboardBeatReport(example);
+  assert.equal(report.taggedShotCount, report.shotCount);
+  assert.deepEqual(report.beats.map((beat) => beat.beat), ["hook", "development", "reveal", "payoff"]);
+  assert.deepEqual(report.warnings, []);
 });
