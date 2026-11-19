@@ -247,7 +247,7 @@ export const buildMediaQaReport = (
   }
 
   const loudnessSummary = audioLog.match(/Integrated loudness:\s*([^\n]+)/)?.[1]?.trim();
-  const truePeakMatch = audioLog.match(/True peak:\s*(-?[0-9.]+)\s*dBFS/i);
+  const truePeakMatch = audioLog.match(/True peak:\s*(?:Peak:\s*)?(-?[0-9.]+)\s*dBFS/i);
   const truePeakDbfs = truePeakMatch ? Number(truePeakMatch[1]) : undefined;
   if (truePeakDbfs !== undefined && Number.isFinite(truePeakDbfs)) {
     if (truePeakDbfs > config.maxTruePeakDbfs) {
@@ -313,6 +313,12 @@ export const buildMediaQaReport = (
   };
 };
 
+export const buildMediaQaAudioFilter = (options: MediaQaOptions = {}): string => {
+  const config = { ...defaults, ...options };
+  return `silencedetect=noise=${config.silenceNoiseDb}dB:d=${config.silenceMinDurationSeconds},ebur128=peak=true:framelog=verbose`;
+};
+
+
 export const inspectMedia = async (
   file: string,
   options: MediaQaOptions = {},
@@ -327,7 +333,7 @@ export const inspectMedia = async (
 
   const audioLog = hasAudio ? await run(config.ffmpegPath, [
     "-hide_banner", "-nostats", "-i", file, "-map", "0:a:0", "-af",
-    `silencedetect=noise=${config.silenceNoiseDb}dB:d=${config.silenceMinDurationSeconds},ebur128=framelog=verbose`,
+    buildMediaQaAudioFilter(options),
     "-f", "null", "-",
   ]) : "";
   const videoLog = hasVideo ? await run(config.ffmpegPath, [
