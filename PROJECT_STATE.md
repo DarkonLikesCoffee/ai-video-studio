@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `7bcb7b583d16eb5cf4ef2445bdefc25b614bcd27` — `docs: reconcile project state after PR #91 (#92)`
-**Current development branch:** PRs #81, #82, #84, #85, #86, #88, #89, #90, #91 and #92 merged. PR #93 (creative-brief contract) is in progress. PR #84 adds automatic 5-second contact sheets and JSON evidence to render artifacts; PR #86 fixes FFmpeg EBU R128 True Peak measurement and parsing. PR #91 CI run #44534929322 passed; post-merge main CI status is not exposed by the current connector.
+**Last verified main commit:** `d643e752b4430165121072185ef41e8ad5fc940c` — `feat(director): define creative brief contract (#93)`
+**Current development branch:** `main`; PR #93 creative-brief contract is merged. PR #84's automatic contact-sheet JPG + JSON evidence integration is verified by real Render workflow run #42 (artifact #14532466761); PR #86's EBU R128 True Peak correction is also merged. PR #93 CI run #44536804622 passed for head `50ee419791c88338a1b8ac690176ba088e5fb2bb`; post-merge main CI run #44537158524 is still running.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -211,3 +211,13 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 
 - Adds a version-1 creative brief schema and validator covering source prompt, objective, audience, response, delivery, thesis, emotional arc, visual language, story/motion/sound strategy, constraints, assumptions and measurable acceptance criteria.
 - `npm run director:brief` validates a brief and prints or writes a Markdown summary. This is schema/contract groundwork; no LLM creates briefs yet.
+
+
+## Verified render contact-sheet artifact — run #42 (2026-11-19)
+
+- Render workflow run #42 completed successfully on branch `fix/render-contact-sheet-artifact-validation-2026-11-19`, commit `96846b5186558bb91a912ed1a0c82227cd06ec3c`. The earlier run #41 failed because the output name exceeded the request validator's 60-character limit; the same branch was corrected and rerun.
+- Artifact #14532466761 contains the real MP4, technical media-QA JSON, contact-sheet JPG and contact-sheet timestamp/options JSON. The credits file was not emitted for this render (step skipped).
+- MP4: H.264, 1920×1080, 30fps, 1,431 frames, 47.899s; AAC stereo 96kHz. QA passed with 0 findings, integrated loudness -16.0 LUFS, true peak -1.5 dBFS, no detected silence/frozen/black intervals, and A/V duration drift 0.199s.
+- Contact-sheet report: 10 samples at 0, 5, 10, 15, 20, 25, 30, 35, 40 and 45 seconds; interval 5s, 4 columns, thumbnail width 320px. The actual contact-sheet image was retrieved and visually inspected. It shows recurring title/overlay composition in adjacent samples and gameplay imagery; sparse samples do not establish continuous motion, pacing or synchronization.
+- Full video playback and audio listening were not performed. This is artifact packaging and sparse visual evidence, not creative acceptance.
+- Run: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383 ; artifact: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383/artifacts/14532466761
