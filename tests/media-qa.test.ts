@@ -87,7 +87,7 @@ test("media QA detects audio that starts before video and honors the offset thre
   assert.equal(tooEarly.passed, false);
   assert.ok(tooEarly.findings.some((finding) =>
     finding.code === "audio-video-start-offset" && finding.message.includes("before video"),
-  );
+  ));
 
   const accepted = buildMediaQaReport("allowed-offset.mp4", earlyAudioProbe, "", "", {
     maxAudioVideoStartOffsetSeconds: 0.65,
