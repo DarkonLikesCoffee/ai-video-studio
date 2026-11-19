@@ -138,7 +138,7 @@ After a render, run a technical diagnostic pass on the actual MP4:
 npm run qa:media -- render-output/my-video.mp4
 ```
 
-This writes `render-output/my-video.qa.json` (or a supplied report path) with ffprobe metadata, audio silence intervals, video freeze intervals, black-frame intervals and EBU R128 loudness diagnostics. Missing audio/video streams or invalid duration fail the command. Silence, freeze and black intervals are warnings because a deliberate pause, fade or black transition may be legitimate; compare timestamps with the brief and inspect/listen to the MP4. This is a technical first-pass gate, not semantic or creative approval. See [Media QA skill](agent/skills/media-qa/SKILL.md).
+This writes `render-output/my-video.qa.json` (or a supplied report path) with ffprobe metadata, audio silence intervals, video freeze intervals, black-frame intervals, EBU R128 loudness diagnostics, and the signed audio/video stream start-time offset when both streams report `start_time`. A positive offset means audio starts later than video; a negative value means audio starts earlier. An absolute start offset above 0.5 seconds fails QA by default; the threshold is configurable through `buildMediaQaReport` options. Missing audio/video streams or invalid duration fail the command. Silence, freeze and black intervals are warnings because a deliberate pause, fade or black transition may be legitimate; compare timestamps with the brief and inspect/listen to the MP4. This is a technical first-pass gate, not semantic or creative approval. See [Media QA skill](agent/skills/media-qa/SKILL.md).
 
 ## Storyboard risk review
 
