@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `faacfbe097b1ac933052de9e6a7070d5fa9d6d28` — `fix(media-qa): detect trailing silence through EOF (#75)`
-**Current development branch:** `main`; PRs #72–#75 merged; contact-sheet CLI in development
+**Last verified main commit:** `93cec7fec2a4c8917bb6c231519b75181fb54d48` — `docs: reconcile contact sheet QA status after merge (#77)`
+**Current development branch:** `main`; PRs #72–#77 merged; contact-sheet CLI merged and used to inspect a real benchmark MP4
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -100,10 +100,11 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 6. Verified current repository snapshot — 2026-11-19
 
-- Main HEAD: `712b5b864a437f87501a735bfb718293abe9ad62` (PR #76 squash merge).
-- PR #76 CI run #44516361047 passed all steps; post-merge main CI run #44516765269 is currently in progress.
-- PRs #66–#76 are merged.
-- Recheck branches, PRs, CI and commit SHAs before relying on this snapshot.
+- Main HEAD: `93cec7fec2a4c8917bb6c231519b75181fb54d48` (PR #77 merged).
+- PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
+- PRs #66–#77 are merged.
+- A real MP4 from render run #44485488551 (artifact #14511125907) was retrieved and inspected with a contact sheet. Its bundled media-QA report passed with no detected silence, frozen video, black frames or audio/video duration drift beyond thresholds. See the new benchmark entry in `PROGRESS_LOG.md`.
+- Recheck live branches, PRs, CI and commit SHAs before relying on this snapshot.
 
 ### Storyboard milestones on main
 
@@ -113,10 +114,11 @@ The next agent should use this project as a regression/quality case, not simply 
 - **PR #69 — Expanded heuristic QA:** warnings for placeholder/vague descriptions and actions, incomplete progression, similar adjacent descriptions and text-heavy shots.
 - **PR #70 — Shot-scale variety signals:** recognized framing labels and warning-only repeated/low shot-scale variety signals.
 - **PR #71 — Storyboard critic:** `storyboard:critic` turns existing QA findings into prioritized revision suggestions. It is review-only; it does not mutate plans, use an AI provider, or approve creative quality.
+- **PR #76 — Contact-sheet CLI:** `qa:contact-sheet` samples frames from an MP4 into a reviewable image grid; now used on a real benchmark artifact.
 
 ### Verified limitations
 
-These features are deterministic and heuristic. They do not semantically understand the story, inspect rendered media or guarantee cinematic quality. A planning preview is not a footage-backed animatic. Do not claim a persistent autonomous Production Director or automatic repair loop exists.
+These features are deterministic and heuristic. They do not semantically understand the story, inspect motion continuously, listen to the audio, or guarantee cinematic quality. A contact sheet is a sparse visual sample, not full-video creative approval. Do not claim a persistent autonomous Production Director or automatic repair loop exists.
 
 ## 7. Immediate development direction
 
