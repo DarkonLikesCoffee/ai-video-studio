@@ -20,7 +20,7 @@ test("creative brief rejects missing core direction and invalid delivery", () =>
 });
 test("creative brief enforces frame-aligned duration", () => {
   const invalid = structuredClone(example);
-  invalid.delivery.durationSeconds = 1.1;
+  invalid.delivery.durationSeconds = 1.11;
   assert.ok(validateCreativeBrief(invalid).some((e) => e.includes("whole number of frames")));
 });
 test("summary keeps the creative brief distinct from production plan", () => {
