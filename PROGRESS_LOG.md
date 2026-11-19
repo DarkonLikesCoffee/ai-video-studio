@@ -398,3 +398,11 @@ Append one entry per meaningful development session:
 - Follow-up slice: add `import-edits` to accept model JSON response and import only edits for existing shots covered by selected critique items.
 - Guardrails: reject unknown shot IDs, duplicate edits per shot, unselected shots and unsupported fields. Import clears validation state; plan remains untouched until validate/apply creates a separate output.
 - Added tests for accepted import and rejection paths. CI is required before merge. No video render created.
+
+
+## 2026-11-19 — PR #90 merged; narrative beat review in PR #91
+
+- PR #90 `feat(storyboard): safely import revision edits from AI` merged as `8c3c2dbf1ca8a819c7203cc3d4572c1e4cccce2f` after CI run #44533984018 passed.
+- The initial CI failure was a literal escaped newline in a test plus an inverted allowlist condition. Both were corrected; regression coverage checks allowed fields, unsupported fields and duplicate shot edits.
+- New branch `feat/storyboard-narrative-beats` adds optional explicit `narrativeBeat` labels and a report/CLI grouping beat counts and duration, showing unlabeled shots and suggesting review for arc gaps. It does not infer story meaning or force a fixed structure.
+- No render was produced. CI pending for PR #91.
