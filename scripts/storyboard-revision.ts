@@ -89,6 +89,36 @@ export const renderStoryboardRevisionReviewMarkdown = (artifact: StoryboardRevis
   return lines.join("\n");
 };
 
+export const renderStoryboardRevisionPromptMarkdown = (artifact: StoryboardRevisionArtifact): string => {
+  const selected = artifact.suggestions.filter((suggestion) => suggestion.selected);
+  if (selected.length === 0) throw new Error("Select at least one suggestion before generating a revision prompt.");
+  const plan = artifact.sourcePlan as Record<string, unknown>;
+  if (!Array.isArray(plan.shots)) throw new Error("Source plan has no shots array");
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  const selectedShotIds = [...new Set(selected.flatMap((suggestion) => suggestion.item.shotIds))];
+  const relevantShots = shots.filter((shot) => selectedShotIds.includes(String(shot.id)));
+  const lines = [
+    "# AI Storyboard Revision Brief", "",
+    "You are the creative director and storyboard editor. Revise only the listed shots, based on the selected critique. Preserve the source plan and its narrative intent; improve concrete visual storytelling, shot distinctiveness, action/progression and production feasibility.", "",
+    "## Safety and editing constraints",
+    "- Treat critique as heuristic input, not unquestionable truth. Apply only changes that improve the story and visual result.",
+    "- Do not rewrite unrelated shots, title, runtime, facts, or overall style.",
+    "- Do not invent assets, footage, licenses, or engine capabilities.",
+    "- Prefer specific visible events and staging over adjectives, text cards, or generic motion.",
+    "- Preserve each shot's required schema. Only return field edits for existing shot IDs.",
+    "- Return valid JSON only, matching the output schema below. No prose or markdown fences.", "",
+    "## Selected critique items", "",
+  ];
+  selected.forEach((suggestion) => {
+    const item = suggestion.item;
+    lines.push(`### ${suggestion.id} [${item.priority.toUpperCase()}]`, `Shots: ${item.shotIds.join(", ")}`, `Issue: ${item.issue}`, `Direction: ${item.revision}`, `Rationale: ${item.rationale`, "");
+  });
+  lines.push("## Original shot data (context; do not change unselected shots)", "", JSON.stringify(relevantShots, null, 2), "");
+  lines.push("## Output schema", "", JSON.stringify({ edits: [{ shotId: "existing-shot-id", changeNote: "Explain the concrete creative improvement", fields: { visual: "updated visual description", action: "observable action", visualProgression: "Start: ... Development: ... End: ..." } }] }, null, 2), "");
+  lines.push("Return edits only for the listed shot IDs. Include only fields that actually need changing. Make each change specific enough to stage, source, animate and review. If a selected critique should not be applied, omit that edit and explain nothing (the user will review the result).");
+  return lines.join("\\n");
+};
+
 export const applyStoryboardRevisionEdits = (artifact: StoryboardRevisionArtifact): unknown => {
   const plan = structuredClone(artifact.sourcePlan) as Record<string, unknown>;
   if (!Array.isArray(plan.shots)) throw new Error("Source plan has no shots array");
@@ -130,6 +160,18 @@ const run = async (): Promise<void> => {
       process.stdout.write(`Suggestion ${output} ${selected ? "selected" : "deselected"} in ${input} (no plan edits applied)\n`);
       return;
     }
+    if (command === "prompt") {
+      if (!input) throw new Error("Usage: npm run storyboard:revision -- prompt <revision.json> [revision-prompt.md]");
+      const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
+      const prompt = renderStoryboardRevisionPromptMarkdown(artifact);
+      if (output) {
+        await writeFile(output, prompt + "\\n", "utf8");
+        process.stdout.write(`Revision prompt written: ${output}\\n`);
+      } else {
+        process.stdout.write(prompt + "\\n");
+      }
+      return;
+    }
     if (command === "review") {
       if (!input) throw new Error("Usage: npm run storyboard:revision -- review <revision.json> [review.md]");
       const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
@@ -167,7 +209,7 @@ const run = async (): Promise<void> => {
       if (!result.valid) process.exitCode = 1;
       return;
     }
-    throw new Error("Usage: npm run storyboard:revision -- <init|select|review|apply|validate> ...");
+    throw new Error("Usage: npm run storyboard:revision -- <init|select|review|prompt|apply|validate> ...");
   } catch (error) {
     process.stderr.write(`Storyboard revision failed: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
