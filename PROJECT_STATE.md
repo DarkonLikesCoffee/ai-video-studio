@@ -190,3 +190,10 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Revision artifacts support selecting/deselecting critique suggestions and generating a Markdown review without changing the source plan.
 - Live verified main commit: `5e7b019ce8487c7af067b4b8fe0ee1f9186f4fd3`.
 - No new video render was produced or inspected as part of PR #88.
+
+
+## 2026-11-19 — PR #89 merged; safe AI revision import in progress
+
+- PR #89 revision prompt handoff merged at `bd1b0b5c62dddfd9c246af0da54c93f26cc6ace4`; validate CI passed.
+- The current follow-up implements a safe model-response import path. Imported edits are constrained to selected critique targets, existing shot IDs, unique per-shot edits and supported fields.
+- Imported revisions are still reviewed and validated; apply writes to a separate revised plan. No automatic source-plan mutation and no render was produced.

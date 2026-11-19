@@ -119,6 +119,35 @@ export const renderStoryboardRevisionPromptMarkdown = (artifact: StoryboardRevis
   return lines.join("\n");
 };
 
+export const importStoryboardRevisionEdits = (artifact: StoryboardRevisionArtifact, payload: unknown): StoryboardRevisionArtifact => {
+  const edits = payload && typeof payload === "object" && !Array.isArray(payload) && Array.isArray((payload as Record<string, unknown>).edits)
+    ? (payload as { edits: unknown[] }).edits
+    : Array.isArray(payload) ? payload : null;
+  if (!edits) throw new Error("Revision response must be an edits array or an object containing edits.");
+  const selectedShotIds = new Set(artifact.suggestions.filter((suggestion) => suggestion.selected).flatMap((suggestion) => suggestion.item.shotIds));
+  const sourceShots = Array.isArray((artifact.sourcePlan as Record<string, unknown>)?.shots) ? (artifact.sourcePlan as { shots: Array<Record<string, unknown>> }).shots : [];
+  const existingIds = new Set(sourceShots.map((shot) => String(shot.id)));
+  const allowedFields = new Set(["visual", "action", "visualProgression", "framing", "cameraMovement", "transition", "onScreenText", "visualMethod", "engineApproach"]);
+  const imported: StoryboardRevisionEdit[] = [];
+  const seen = new Set<string>();
+  for (const raw of edits) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("Each imported edit must be an object.");
+    const edit = raw as Record<string, unknown>;
+    if (typeof edit.shotId !== "string" || !edit.shotId.trim()) throw new Error("Each imported edit requires a shotId.");
+    if (!existingIds.has(edit.shotId)) throw new Error(`Edit references unknown shot ID: ${edit.shotId}`);
+    if (!selectedShotIds.has(edit.shotId)) throw new Error(`Edit targets shot ${edit.shotId}, which is not covered by a selected critique suggestion.`);
+    if (seen.has(edit.shotId)) throw new Error(`Duplicate imported edit for shot: ${edit.shotId}`);
+    if (typeof edit.changeNote !== "string" || !edit.changeNote.trim()) throw new Error(`Edit for ${edit.shotId} requires a changeNote.`);
+    if (!edit.fields || typeof edit.fields !== "object" || Array.isArray(edit.fields) || Object.keys(edit.fields as object).length === 0) throw new Error(`Edit for ${edit.shotId} requires non-empty fields.`);
+    const fields = edit.fields as Record<string, unknown>;
+    for (const key of Object.keys(fields)) if (!allowedFields.has(key)) throw new Error(`Unsupported revision field: ${key}`);
+    seen.add(edit.shotId);
+    imported.push({ shotId: edit.shotId, changeNote: edit.changeNote.trim(), fields: structuredClone(fields) });
+  }
+  if (imported.length === 0) throw new Error("No revision edits were provided.");
+  return { ...artifact, edits: [...artifact.edits, ...imported], validation: null };
+};
+
 export const applyStoryboardRevisionEdits = (artifact: StoryboardRevisionArtifact): unknown => {
   const plan = structuredClone(artifact.sourcePlan) as Record<string, unknown>;
   if (!Array.isArray(plan.shots)) throw new Error("Source plan has no shots array");
@@ -172,6 +201,15 @@ const run = async (): Promise<void> => {
       }
       return;
     }
+    if (command === "import-edits") {
+      if (!input || !output) throw new Error("Usage: npm run storyboard:revision -- import-edits <revision.json> <model-response.json>");
+      const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
+      const payload = JSON.parse(await readFile(output, "utf8")) as unknown;
+      const updated = importStoryboardRevisionEdits(artifact, payload);
+      await writeFile(input, JSON.stringify(updated, null, 2) + "\n", "utf8");
+      process.stdout.write(`Imported ${updated.edits.length - artifact.edits.length} edits into ${input} (plan not modified)\n`);
+      return;
+    }
     if (command === "review") {
       if (!input) throw new Error("Usage: npm run storyboard:revision -- review <revision.json> [review.md]");
       const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
@@ -209,7 +247,7 @@ const run = async (): Promise<void> => {
       if (!result.valid) process.exitCode = 1;
       return;
     }
-    throw new Error("Usage: npm run storyboard:revision -- <init|select|review|prompt|apply|validate> ...");
+    throw new Error("Usage: npm run storyboard:revision -- <init|select|review|prompt|import-edits|apply|validate> ...");
   } catch (error) {
     process.stderr.write(`Storyboard revision failed: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;

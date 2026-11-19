@@ -785,6 +785,14 @@ npm run storyboard:revision -- prompt projects/<slug>/production/storyboard-revi
 ```
 The prompt contains constraints to preserve the original plan, edit only referenced shots, avoid inventing assets or unsupported capabilities, and return JSON `edits` suitable for review. It is a handoff prompt—not an AI API call. It requires at least one selected suggestion and does not alter the revision artifact or plan.
 
+After the model returns JSON edits, import them into the revision artifact (this does not alter the storyboard plan):
+```bash
+npm run storyboard:revision -- import-edits projects/<slug>/production/storyboard-revision.json model-response.json
+npm run storyboard:revision -- validate projects/<slug>/production/storyboard-revision.json
+npm run storyboard:revision -- apply projects/<slug>/production/storyboard-revision.json projects/<slug>/production/storyboard-revised.json
+```
+The importer rejects unknown shot IDs, duplicate edits per shot, unselected-shot edits and unsupported field names. Imported edits remain explicit and must be validated before applying to a separate revised-plan file.
+
 
 ### True-peak audio QA
 
