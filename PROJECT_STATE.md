@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `f621b018facaa1f37ed48d34d35d342fe788b32b` — `feat(storyboard): add visual strategy report (#81)`
-**Current development branch:** PR #81 merged; contact-sheet evidence JSON and advisory visual-strategy report are on main. Current work adds a machine-readable strategy-report envelope; CI is required before merge.
+**Last verified main commit:** `25e946045f00764142fb26c9c8e305bdd511e8c5` — `feat(storyboard): add JSON visual strategy reports (#82)`
+**Current development branch:** PRs #81 and #82 merged; main CI passed for commit `25e946045f00764142fb26c9c8e305bdd511e8c5`. The visual strategy report now supports both Markdown and versioned JSON output.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -74,7 +74,14 @@ The repository is **not yet a fully autonomous prompt-to-video AI product**. In 
 
 Some related pieces exist as manual scripts, examples, playbooks or limited adapters. Do not confuse those with end-to-end product capabilities.
 
-## 5. Recent merged visual strategy report (PR #81)\n\n- `npm run storyboard:strategy -- production-plan.json` creates a review-only Markdown report of visual-method counts, existing storyboard risk signals and shot-specific alternatives.\n- Alternatives are deterministic mappings from QA finding codes. They are prompts for creative revision, not semantic judgments or automatic plan edits.\n- Main CI for PR #81 merge commit `f621b018` passed.\n\n## 6. Historical end-to-end test: VALORANT explainer
+## 5. Recent merged visual strategy reports (PRs #81–#82)
+
+- `npm run storyboard:strategy -- production-plan.json` creates a review-only Markdown report of visual-method counts, existing storyboard risk signals and shot-specific alternatives.
+- Add `--json` to emit a versioned JSON envelope (`schemaVersion`, `reportType`, `planTitle`, `report`, `generatedBy`), with optional output file, for agent/workflow consumption.
+- Alternatives are deterministic mappings from QA finding codes. They are prompts for creative revision, not semantic judgments or automatic plan edits.
+- PR #81 and #82 CI passed; main CI for merge commit `25e94604` passed.
+
+## 6. Historical end-to-end test: VALORANT explainer
 
 Project: `projects/valorant-immortal-decision-making/`  
 PR #50: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/50  
@@ -98,7 +105,7 @@ Creative QA result: **not accepted as a successful cinematic explainer**.
 
 The next agent should use this project as a regression/quality case, not simply produce another similar SVG slideshow.
 
-## 6. Verified current repository snapshot — 2026-11-19
+## 7. Verified current repository snapshot — 2026-11-19
 
 - Main HEAD: `93cec7fec2a4c8917bb6c231519b75181fb54d48` (PR #77 merged).
 - PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
