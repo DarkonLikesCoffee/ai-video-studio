@@ -430,3 +430,11 @@ Append one entry per meaningful development session:
 - First CI attempt #326 failed only because the frame-alignment fixture used 1.1s at 30fps, which is exactly 33 frames and therefore valid. Corrected fixture to 1.11s on the same PR branch; the rerun passed. This was a test-fixture error, not a validator failure.
 - The versioned creative-brief schema/validator and summary CLI are merged; they do not call an LLM or generate storyboards. No render gate was applicable to this schema/CLI slice.
 - Post-merge main CI run #328 (`44537158524`) is still running at this documentation update.
+
+
+## 2026-11-19 — Production-plan schema/runtime consistency fix (in progress)
+
+- Main at branch start: `7fc374fc8c96cd617bd490da5cff5fe8ea49fa0a` (PR #94 docs merge); post-merge main CI #44537639626 passed.
+- Found a contract mismatch: `validateProductionPlan` requires `visualMethod`, `action`, and `visualProgression`, but the JSON Schema omitted those fields from both `properties` and `required`. It also omitted `narrativeBeat`, which runtime accepts as an optional supported label; `additionalProperties:false` made the schema incompatible with the validator/example.
+- Branch `fix/production-plan-schema-runtime-contract` adds those properties, makes them required, adds the optional narrative-beat enum, and adds a regression test asserting schema/runtime-required fields and enum alignment.
+- This is a schema-only correction; no render was produced or needed. CI pending.
