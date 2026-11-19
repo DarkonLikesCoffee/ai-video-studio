@@ -201,6 +201,15 @@ const run = async (): Promise<void> => {
       }
       return;
     }
+    if (command === "import-edits") {
+      if (!input || !output) throw new Error("Usage: npm run storyboard:revision -- import-edits <revision.json> <model-response.json>");
+      const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
+      const payload = JSON.parse(await readFile(output, "utf8")) as unknown;
+      const updated = importStoryboardRevisionEdits(artifact, payload);
+      await writeFile(input, JSON.stringify(updated, null, 2) + "\\n", "utf8");
+      process.stdout.write(`Imported ${updated.edits.length - artifact.edits.length} edits into ${input} (plan not modified)\\n`);
+      return;
+    }
     if (command === "review") {
       if (!input) throw new Error("Usage: npm run storyboard:revision -- review <revision.json> [review.md]");
       const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
@@ -238,7 +247,7 @@ const run = async (): Promise<void> => {
       if (!result.valid) process.exitCode = 1;
       return;
     }
-    throw new Error("Usage: npm run storyboard:revision -- <init|select|review|prompt|apply|validate> ...");
+    throw new Error("Usage: npm run storyboard:revision -- <init|select|review|prompt|import-edits|apply|validate> ...");
   } catch (error) {
     process.stderr.write(`Storyboard revision failed: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
