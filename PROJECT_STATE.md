@@ -152,3 +152,13 @@ Prioritize a small working vertical slice over a large architecture rewrite. Bef
 - This enforces planning completeness, not semantic quality: it cannot yet detect whether descriptions are genuinely compelling, repetitive or slideshow-like. The fields can still be poorly authored and need later heuristic/AI-assisted review.
 - CI for the latest branch head is in progress; tests are not yet confirmed passing. No render was run because this changes production planning/validation, not the render engine.
 - Next: wait for CI, fix failures if any, then merge only after checks pass. Follow-up code task is a deterministic slideshow-risk report (duration/static visual progression/shot-variety signals), with warnings rather than subjective hard failures.
+
+## 9. Development update — visual storytelling requirements merged (2026-11-19)
+
+- PR #66: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/66 merged by squash into main.
+- Merge commit: `bbfce5c68d9a4c4a84b918285b23ac07f26b52f6`.
+- CI run #44499140921 passed for the PR head `8a1bf5bbca568792332972bc89b852c58ef00950`.
+- Creative Director, Storyboard and agent production workflow playbooks now emphasize story-first planning, per-shot method selection, concrete action, start/development/end progression and pre-production slideshow-risk review.
+- Production-plan validator requires `visualMethod`, `action`, and `visualProgression` for every shot. All four checked-in production-plan examples were updated. Tests cover missing method/action/progression.
+- These checks validate plan completeness, not creative quality or semantic slideshow detection. No renderer changes or render were made.
+- Next implementation slice: add a deterministic storyboard-risk report with transparent heuristic warnings (long holds, repeated adjacent visual method/framing/motion, static cues), without treating warnings as failures or pretending to understand story semantics.
