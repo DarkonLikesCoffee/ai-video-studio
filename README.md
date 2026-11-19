@@ -734,3 +734,7 @@ npm run storyboard:preview -- projects/<project>/production/production-plan.json
 ```
 
 The page presents shot order, time ranges, selected visual methods, concrete actions, start/development/end progression, framing, camera movement, transitions, text, asset references and audio cues. It is a **planning review artifact**, not an MP4, animated animatic, generated footage or semantic creative approval. It does not render or load referenced assets. Use it to review whether the authored sequence tells a coherent visual story before production.
+
+## Storyboard quality signals
+
+The storyboard QA command also reports transparent warning-only heuristics for placeholder-like visual/action descriptions, missing Start/Development/End progression markers, highly similar adjacent visual descriptions, and long on-screen copy. These are review prompts—not semantic judgments or automatic failures. A human/AI creative review remains necessary.
