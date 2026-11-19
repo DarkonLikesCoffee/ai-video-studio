@@ -74,7 +74,14 @@ The repository is **not yet a fully autonomous prompt-to-video AI product**. In 
 
 Some related pieces exist as manual scripts, examples, playbooks or limited adapters. Do not confuse those with end-to-end product capabilities.
 
-## 5. Recent merged visual strategy report (PR #81)\n\n- `npm run storyboard:strategy -- production-plan.json` creates a review-only Markdown report of visual-method counts, existing storyboard risk signals and shot-specific alternatives.\n- Alternatives are deterministic mappings from QA finding codes. They are prompts for creative revision, not semantic judgments or automatic plan edits.\n- Main CI for PR #81 merge commit `f621b018` passed.\n\n## 6. Historical end-to-end test: VALORANT explainer
+## 5. Recent merged visual strategy reports (PRs #81–#82)
+
+- `npm run storyboard:strategy -- production-plan.json` creates a review-only Markdown report of visual-method counts, existing storyboard risk signals and shot-specific alternatives.
+- Add `--json` to emit a versioned JSON envelope (`schemaVersion`, `reportType`, `planTitle`, `report`, `generatedBy`), with optional output file, for agent/workflow consumption.
+- Alternatives are deterministic mappings from QA finding codes. They are prompts for creative revision, not semantic judgments or automatic plan edits.
+- PR #81 and #82 CI passed; main CI for merge commit `25e94604` passed.
+
+## 6. Historical end-to-end test: VALORANT explainer
 
 Project: `projects/valorant-immortal-decision-making/`  
 PR #50: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/50  
