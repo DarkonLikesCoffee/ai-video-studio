@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `7fc374fc8c96cd617bd490da5cff5fe8ea49fa0a` — `docs: verify contact-sheet render artifact on run 42 (#94)`
-**Current development branch:** `fix/production-plan-schema-runtime-contract` (schema/validator alignment in progress). PR #93 creative-brief contract and PR #94 render evidence reconciliation are merged. PR #84's automatic contact-sheet JPG + JSON integration is verified by Render run #42 (artifact #14532466761); PR #86's EBU R128 True Peak correction is merged. PR #93 CI #44536804622 and post-merge main CI #44537158524 passed; PR #94 CI #44537425586 and post-merge main CI #44537639626 passed. This branch aligns the production-plan JSON Schema with runtime-required shot fields and optional narrative-beat tags; CI pending.
+**Last verified main commit:** `98a972911052fa8a3381c4852e1f6f38c1d94398` — PR #96 production-plan schema/runtime correction merged
+**Current development branch:** `feat/director-production-plan-import` (Creative Brief + storyboard import with acceptance-criterion traceability, CI pending). PR #96 is merged with CI #44538121663 passing on head `ebd53bec9f260af31b0d9c7e6e391eb426837057`; post-merge main CI #44547338478 is in progress. PR #95 remains open on head `63c8c3c43a39b06025d5be8df5ff287deb6dff53`, base `7fc374fc8c96cd617bd490da5cff5fe8ea49fa0a`; its check suites are queued and no check runs are available yet. PR #80 is closed without merge because the true-peak correction is superseded by merged PR #86 (merge commit `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d`). PR #84 contact-sheet JPG + JSON integration is verified by real render run #42 (artifact #14532466761).
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -227,3 +227,12 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Current main: `7fc374fc8c96cd617bd490da5cff5fe8ea49fa0a` (PR #94 merged; post-merge CI run #44537639626 passed).
 - The production-plan JSON Schema previously omitted `visualMethod`, `action`, and `visualProgression` from shot properties/required fields even though `validateProductionPlan` requires them; it also omitted optional `narrativeBeat`, which the validator accepts. With `additionalProperties:false`, the schema could reject valid plans or fail to communicate required fields to consumers.
 - Branch `fix/production-plan-schema-runtime-contract` adds the three missing required properties and optional supported `narrativeBeat` enum. A contract test ensures runtime-required fields are present in the schema and the beat enum matches the exported list. CI is pending; no render gate is applicable to this schema-only fix.
+
+
+## Creative Brief → production-plan import (branch in progress)
+
+- Branch `feat/director-production-plan-import`, based on main merge commit `98a972911052fa8a3381c4852e1f6f38c1d94398`.
+- Added `director:production-plan`: converts a Creative Brief and model-authored storyboard JSON into a separate production-plan JSON; requires matching delivery, valid shot fields, frame-aligned contiguous timing, exact criterion coverage with known shot IDs and rationale.
+- Production-plan schema now optionally accepts `acceptanceCoverage`; legacy plans remain valid. Validator checks criterion exactness, completeness, duplicate/unknown shot IDs and rationale. Free-form storyboard `engineApproach` is retained as `implementationNotes`; recognized engine enum values remain `engineApproach`.
+- Added converter and contract tests, README and agent-workflow documentation. Tests/typecheck/CI have not run yet; the GitHub connector cannot execute the repository locally. CI is the next gate. No render is required for this planning/validation-only feature.
+- Current main CI after PR #96 merge: run #44547338478 in progress. No implementation PR opened yet.
