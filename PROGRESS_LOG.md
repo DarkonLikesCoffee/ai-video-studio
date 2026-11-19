@@ -158,3 +158,13 @@ Append one entry per meaningful development session:
 - Added a roadmap check for this limited deterministic QA slice. The larger semantic storyboard/visual QA milestone remains incomplete.
 - Tests/CI not yet confirmed; no video render performed.
 - Next: inspect CI and fix failures, then update docs and merge only if green.
+
+## 2026-11-19 — Deterministic storyboard risk report merged (PR #67)
+
+- PR #67 https://github.com/DarkonLikesCoffee/ai-video-studio/pull/67 merged by squash as `40f38b7a7576bb061e5f0318e265358a759829f3`.
+- CI run #44499955017 passed typecheck, all tests, four plan validations, storyboard QA CLI against all four production plans, project validation, audio preparation and studio build.
+- `npm run storyboard:qa -- <production-plan.json>` now emits warning-only signals for shots 8s+, static camera holds 5s+, adjacent framing repetition, 3+ shot visual-method runs and 3+ camera-movement runs.
+- QA output: the launch-film, narrated explainer and SORA plans had no deterministic warnings; VALORANT generated six long-shot pacing warnings for its six 10-second chapters. This is expected as a review prompt, not an automatic defect.
+- Documentation added to README and agent guidance. This report is deterministic and does not claim semantic creative judgment or video inspection.
+- No render was run.
+- Next: improve shot-sequence planning/validation with transparent visual-method distribution and action/progression checks, then evaluate storyboard/animatic review before expanding renderer effects.
