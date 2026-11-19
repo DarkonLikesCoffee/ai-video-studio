@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `93cec7fec2a4c8917bb6c231519b75181fb54d48` — `docs: reconcile contact sheet QA status after merge (#77)`
-**Current development branch:** `main`; PRs #72–#77 merged; contact-sheet CLI merged and used to inspect a real benchmark MP4; JSON evidence reports are being added
+**Last verified main commit:** `6f200389bbfb0ca4124755e881d9b821d272156e` — `feat(qa): add contact-sheet evidence JSON report (#79)`
+**Current development branch:** PR #79 merged; contact-sheet CLI and JSON evidence report merged; next development focuses on actionable visual strategy alternatives
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 

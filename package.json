@@ -30,6 +30,7 @@
     "storyboard:qa": "tsx scripts/storyboard-qa.ts",
     "storyboard:preview": "tsx scripts/storyboard-preview.ts",
     "storyboard:critic": "tsx scripts/storyboard-critic.ts",
+    "storyboard:strategy": "tsx scripts/storyboard-strategy.ts",
     "storyboard:revision": "tsx scripts/storyboard-revision.ts",
     "qa:contact-sheet": "tsx scripts/qa-contact-sheet.ts"
   },
