@@ -748,3 +748,25 @@ npm run storyboard:critic -- projects/examples/production-plan.json review-outpu
 ```
 
 The report turns deterministic storyboard-risk findings into prioritized, concrete revision guidance (high/medium). It does not rewrite the source plan, does not use an AI model, and is not a creative approval. Apply selected changes to a copy, then rerun `npm run validate:plan` and `npm run storyboard:qa`.
+
+
+## Traceable storyboard revisions
+
+Create a revision artifact from a production plan. It preserves the exact source text and parsed plan, SHA-256 fingerprint, critic suggestions (initially unselected), explicit shot edits and validation results:
+
+
+```bash
+npm run storyboard:revision -- init projects/<slug>/production/production-plan.json projects/<slug>/production/storyboard-revision.json
+```
+
+Review the artifact and manually set `suggestions[].selected` to `true` for suggestions you want to retain. Add explicit edits to `edits` (each with `shotId`, `changeNote` and a `fields` object). Validate the revision, then write the revised plan to a separate file:
+
+
+```bash
+npm run storyboard:revision -- validate projects/<slug>/production/storyboard-revision.json
+npm run storyboard:revision -- apply projects/<slug>/production/storyboard-revision.json projects/<slug>/production/production-plan-revised.json
+npm run validate:plan -- projects/<slug>/production/production-plan-revised.json
+npm run storyboard:qa -- projects/<slug>/production/production-plan-revised.json
+```
+
+The CLI refuses to proceed if the original source file changed or the embedded source text/hash no longer match. The original plan is never overwritten. Validation errors and heuristic warnings are stored separately in the revision artifact; warnings are not semantic creative approval. Suggestions are not automatically applied: edits remain explicit and reviewable.

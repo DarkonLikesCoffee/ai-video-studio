@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `40ffe8fd8a21466fa4cca607ace6ecc422c7ab35` — `docs(progress): log storyboard critic merge`
-**Current development branch:** `main`; PR #71 merged; PR #72 is the current documentation reconciliation proposal
+**Last verified main commit:** `6af6e759ce40fa3b14727e51b541a16d225ce3ff` — `docs: reconcile project state (#72)`
+**Current development branch:** `main`; PR #72 merged; storyboard revision artifact workflow is in PR review
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -102,8 +102,8 @@ The next agent should use this project as a regression/quality case, not simply 
 
 - Main HEAD: `40ffe8fd8a21466fa4cca607ace6ecc422c7ab35`.
 - Main CI run #44507106494 completed successfully.
-- PRs #66–#71 are merged.
-- At the initial snapshot, main had no open PRs; documentation reconciliation PR #72 is now open.
+- PRs #66–#72 are merged.
+- Storyboard revision artifact workflow is being implemented in `feat/storyboard-revision-artifact`; verify its PR/CI before considering it merged.
 - Recheck branches, PRs, CI and commit SHAs before relying on this snapshot.
 
 ### Storyboard milestones on main

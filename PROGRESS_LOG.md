@@ -271,3 +271,13 @@ Append one entry per meaningful development session:
 - Safety review found the initial PR #72 draft shortened `PROJECT_STATE.md` too aggressively, removing useful architecture, engine capability, limitation, and VALORANT benchmark context.
 - Revised the proposed snapshot to preserve sections 1–5 of the existing state document and replace only stale duplicated history with current verified milestones and resume instructions.
 - CI must re-run against this updated head before merge. This is a documentation improvement only; no tests or render are claimed.
+
+
+## 2026-11-19 — Traceable storyboard revision artifact (PR preparation)
+
+- Implemented `scripts/storyboard-revision.ts` with `storyboard:revision init|validate|apply` CLI modes.
+- `init` creates a version-1 artifact that preserves the exact source plan text, parsed source object, source SHA-256, critic suggestions (unselected), explicit edit list and empty validation field.
+- `validate` and `apply` verify the source file and embedded text still match the original hash, and verify the embedded object matches the preserved text; source drift requires a fresh artifact.
+- Edits are explicit per shot (`shotId`, `changeNote`, `fields`). Applying writes a separate revised plan and never overwrites the original. Schema errors and heuristic warnings are recorded separately.
+- Added regression tests for source preservation, edits without source mutation, unknown shot IDs, and separating validation errors from QA warnings. Updated CLI docs, agent workflow and roadmap.
+- This is a deterministic review/edit artifact, not AI auto-repair or creative approval. CI is required for test/typecheck verification; no render is needed for this pre-production-only capability.
