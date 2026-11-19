@@ -64,7 +64,7 @@ export const renderVisualStrategyMarkdown = (plan: unknown, report = createVisua
     lines.push("");
   });
   lines.push("## Findings", "");
-  report.findings.forEach((finding) => lines.push(`- [${finding.code}] ${finding.shotIds.join(", ")}: ${finding.message`));
+  report.findings.forEach((finding) => lines.push(`- [${finding.code}] ${finding.shotIds.join(", ")}: ${finding.message}`));
   lines.push("", "Use the alternatives to revise the plan, then run `npm run validate:plan`, `npm run storyboard:qa`, and `npm run storyboard:preview`. Alternatives are prompts for an explicit creative decision; the report does not rewrite the plan.");
   return lines.join("\n");
 };
