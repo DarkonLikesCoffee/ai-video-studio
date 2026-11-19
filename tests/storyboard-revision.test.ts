@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createStoryboardRevision, applyStoryboardRevisionEdits, validateStoryboardRevision, setStoryboardRevisionSuggestionSelection, renderStoryboardRevisionReviewMarkdown } from "../scripts/storyboard-revision";
+import { createStoryboardRevision, applyStoryboardRevisionEdits, validateStoryboardRevision, setStoryboardRevisionSuggestionSelection, renderStoryboardRevisionReviewMarkdown, renderStoryboardRevisionPromptMarkdown } from "../scripts/storyboard-revision";
 
 const example = JSON.parse(await readFile(new URL("../projects/examples/production-plan.json", import.meta.url), "utf8"));
 
@@ -64,4 +64,16 @@ test("revision validation reports schema errors and heuristic warnings separatel
   assert.equal(result.valid, true);
   assert.ok(result.warnings.some((warning) => warning.includes("VAGUE_VISUAL_DESCRIPTION")));
   assert.deepEqual(result.errors, []);
+});
+
+test("revision prompt includes selected critiques and only the referenced shots", () => {
+  const artifact = createStoryboardRevision("example.json", JSON.stringify(revisionExample));
+  const selected = setStoryboardRevisionSuggestionSelection(artifact, artifact.suggestions[0].id, true);
+  const prompt = renderStoryboardRevisionPromptMarkdown(selected);
+  assert.match(prompt, /AI Storyboard Revision Brief/);
+  assert.match(prompt, /Selected critique items/);
+  assert.match(prompt, /Output schema/);
+  assert.match(prompt, /opening-macro/);
+  assert.match(prompt, /Return edits only for the listed shot IDs/);
+  assert.throws(() => renderStoryboardRevisionPromptMarkdown(artifact), /Select at least one suggestion/);
 });

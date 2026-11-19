@@ -779,6 +779,12 @@ npm run storyboard:revision -- review projects/<slug>/production/storyboard-revi
 ```
 Selected suggestions are review markers only; they do not generate edits. The Markdown review report shows selections, critique details, explicit edits and the last validation state.
 
+Export a ready-to-use, model-neutral revision brief that includes only selected suggestions and the original shot data for affected shots:
+```bash
+npm run storyboard:revision -- prompt projects/<slug>/production/storyboard-revision.json projects/<slug>/production/revision-prompt.md
+```
+The prompt contains constraints to preserve the original plan, edit only referenced shots, avoid inventing assets or unsupported capabilities, and return JSON `edits` suitable for review. It is a handoff prompt—not an AI API call. It requires at least one selected suggestion and does not alter the revision artifact or plan.
+
 
 ### True-peak audio QA
 
