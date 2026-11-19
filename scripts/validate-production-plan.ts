@@ -35,6 +35,8 @@ type Plan = {
     audio?: unknown;
     narrativeBeat?: unknown;
     implementationNotes?: unknown;
+    engineApproach?: unknown;
+    assets?: unknown;
   }>;
   acceptanceCriteria?: unknown;
 };
@@ -47,6 +49,7 @@ export const validateAcceptanceCoverage = (value: unknown): string[] => {
   const errors: string[] = [];
   if (!Array.isArray(value.acceptanceCriteria) || !Array.isArray(value.shots)) return errors;
   if (!Array.isArray(value.acceptanceCoverage)) return ["acceptanceCoverage must be an array when provided."];
+  if (value.acceptanceCoverage.length < 3 || value.acceptanceCoverage.length > 10) errors.push("acceptanceCoverage must contain 3–10 entries when provided.");
   const criteria = value.acceptanceCriteria.filter((item): item is string => typeof item === "string");
   if (new Set(criteria).size !== criteria.length) errors.push("acceptanceCriteria must not contain duplicates.");
   const knownShots = new Set(value.shots.flatMap((shot) => isRecord(shot) && typeof shot.id === "string" ? [shot.id] : []));
@@ -165,6 +168,9 @@ export const validateProductionPlan = (value: unknown): string[] => {
           errors.push(`shots[${index}].${field} is required.`);
         }
       }
+      if (shot.engineApproach !== undefined && !["project-video", "custom-remotion", "external-footage"].includes(String(shot.engineApproach))) errors.push(`shots[${index}].engineApproach is unsupported.`);
+      if (shot.implementationNotes !== undefined && (typeof shot.implementationNotes !== "string" || shot.implementationNotes.length > 500)) errors.push(`shots[${index}].implementationNotes must be a string of at most 500 characters.`);
+      if (shot.assets !== undefined && (!Array.isArray(shot.assets) || shot.assets.some((asset) => typeof asset !== "string" || asset.length > 120))) errors.push(`shots[${index}].assets must be an array of strings (each at most 120 characters).`);
     });
     const first = plan.shots[0];
     const last = plan.shots[plan.shots.length - 1];
