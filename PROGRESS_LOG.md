@@ -459,3 +459,14 @@ Append one entry per meaningful development session:
 - Compatibility fix preserves each legacy string as `implementationNotes`, removes unsupported `engineApproach`, and adds a regression test asserting the migrated example passes `validateProductionPlan`. The converter already maps unknown storyboard engineApproach strings to implementationNotes.
 - Reconciled PR #97 with PR #95's main merge and combined README/package/agent-workflow docs so the handoff CLI precedes production-plan import. PROJECT_STATE and ROADMAP now record current evidence.
 - No render gate is applicable to this planning/import slice. Local tests/typecheck cannot be executed through the GitHub connector; the updated CI run is required.
+
+
+## 2026-11-19 — PR #97 merged; criterion-to-asset evidence bridge in development
+
+- PR #95 storyboard handoff and PR #97 storyboard-to-production-plan import are merged. PR #97 required CI run #44556330379 passed; merge commit is `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`. Post-merge main CI #44574582076 is in progress.
+- Re-read `START_HERE.md`, live `PROJECT_STATE.md`, `ROADMAP.md`, `PROGRESS_LOG.md`, `AGENTS.md`, `README.md`, `agent/README.md`, `docs/agent-production-workflow.md`, and relevant Creative Director, Storyboard, Asset Producer, Remotion Producer, Media QA, Visual QA, Narrated Video Producer and Audio Designer skills. No installed plugin skills were available.
+- Verified the only open PR was #97 before merge; PR #95 and #97 are now merged, and no open PRs remain at the initial next-task check. PR #80 remains closed/unmerged; True Peak fix is through PR #86.
+- Selected the roadmap's next small slice: report-only linking of acceptance criterion → shot → asset manifest, checking plan references, local-file presence/path safety and provenance/rights metadata. It does not claim semantic asset suitability or require assets for procedural shots.
+- Added `scripts/director-asset-evidence.ts` and `director:asset-evidence`, plus tests for mapping/readiness, missing files/metadata, `all` assignments, unknown shot IDs, unsafe paths, unresolved plan references and missing coverage. Updated README, agent guide, production workflow, Asset Producer skill, PROJECT_STATE and ROADMAP.
+- Tests/typecheck have not been run in this connector-only workflow; GitHub Actions is the validation gate. This report-only change does not require a video render. No playback or audio listening was performed.
+- Branch: `feat/director-asset-evidence-report`; PR pending.
