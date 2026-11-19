@@ -44,7 +44,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 
 **Goal:** Turn arbitrary prompts into a creative brief and deliberate audiovisual plan before production begins.
 
-- [ ] Define stable, editable schemas for brief, audience/purpose, creative direction/style bible, script, storyboard/shot plan, asset requests, audio cue sheet, assumptions/sources and QA findings.
+- [x] Define a version-1 editable creative-brief schema for objective, audience, desired response, creative thesis, emotional arc, visual language, storytelling/motion/sound, production strategy, constraints, assumptions and acceptance criteria. Script, shot plan, assets, audio cue sheet, sources and QA remain separate downstream artifacts.
 - [ ] Implement a Director workflow that interprets the prompt and chooses a narrative approach, tone, pacing, style and visual storytelling strategy.
 - [ ] Translate abstract concepts into concrete visual events, actions, demonstrations, comparisons, metaphors or reveals; avoid defaulting to explanatory text cards.
 - [ ] Establish a narrative structure appropriate to the format (e.g. hook, development, optional midpoint re-engagement, payoff/CTA) rather than forcing a fixed formula on every video.
