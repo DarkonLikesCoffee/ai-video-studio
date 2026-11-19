@@ -69,8 +69,8 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 - [ ] Include shot ID, duration, narrative purpose, visual action/progression, method, composition, camera, asset dependencies and audio cues.
 - [ ] Support a review/approval checkpoint for expensive, complex or ambiguous production plans; do not make approval mandatory for every low-cost workflow unless configured.
 - [ ] Validate timing and transitions as a complete sequence, including pacing, continuity, repeated visual grammar and shot-to-shot variety.
-- [ ] Provide a clear path to revise individual shots without regenerating the entire plan.
-- [ ] Add a traceable revision artifact/workflow that records the source plan, critique, selected suggestions, explicit edits and validation results while preserving the original plan.
+- [x] Provide a clear path to revise individual shots without regenerating the entire plan using a versioned, source-preserving revision artifact and separate revised-plan output.
+- [x] Add a traceable revision artifact/workflow that records the source plan text/object and SHA-256, critic suggestions and selection state, explicit edits, and validation errors/warnings while preserving the original plan. Selection and edits are manual/agent-explicit; no silent auto-repair.
 
 **Exit criteria:** A reviewer can understand the intended video and approve or change its shot plan before expensive asset generation or rendering; the approved plan drives production.
 
