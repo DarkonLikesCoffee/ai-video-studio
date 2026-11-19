@@ -166,9 +166,14 @@ export const applyNarratedFootageToProject = (
       const shotStartInFrames = Math.round((shotsStartSeconds.get(scene.id) ?? 0) * project.composition.fps);
       const originalShotDurationInFrames = shotsDurationFrames.get(scene.id) ?? scene.durationInFrames;
       const scale = originalShotDurationInFrames > 0 ? scene.durationInFrames / originalShotDurationInFrames : 1;
-      return {
-        ...sceneWithoutLegacyMedia,
-        mediaLayers: shotClips.map((clip, index) => ({
+      const mediaLayers = shotClips.map((clip, index) => {
+        const scaledStart = Math.round((clip.startInFrames - shotStartInFrames) * scale);
+        const startInFrames = Math.min(scene.durationInFrames - 1, Math.max(0, scaledStart));
+        const scaledDuration = Math.max(1, Math.round(clip.durationInFrames * scale));
+        // Rounding after retiming can push a layer one or two frames past the
+        // scene boundary. Clamp the visible window to the actual scene timeline.
+        const durationInFrames = Math.min(scaledDuration, scene.durationInFrames - startInFrames);
+        return {
           id: clip.id,
           type: "video" as const,
           src: clip.src,
@@ -177,10 +182,14 @@ export const applyNarratedFootageToProject = (
           opacity: 0.82,
           muted: true,
           zIndex: index,
-          startInFrames: Math.max(0, Math.round((clip.startInFrames - shotStartInFrames) * scale)),
-          durationInFrames: Math.max(1, Math.round(clip.durationInFrames * scale)),
+          startInFrames,
+          durationInFrames,
           ...(clip.trimBefore === undefined ? {} : { trimBefore: clip.trimBefore }),
-        })),
+        };
+      });
+      return {
+        ...sceneWithoutLegacyMedia,
+        mediaLayers,
       };
     }),
   };
