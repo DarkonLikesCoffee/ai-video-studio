@@ -34,6 +34,7 @@
     "storyboard:revision": "tsx scripts/storyboard-revision.ts",
     "storyboard:beats": "tsx scripts/storyboard-beats.ts",
     "director:brief": "tsx scripts/director-brief.ts",
+    "director:storyboard-prompt": "tsx scripts/director-storyboard-prompt.ts",
     "director:production-plan": "tsx scripts/director-production-plan.ts",
     "qa:contact-sheet": "tsx scripts/qa-contact-sheet.ts"
   },
