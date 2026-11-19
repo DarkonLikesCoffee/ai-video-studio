@@ -780,3 +780,15 @@ The media QA report extracts EBU R128 true-peak readings from FFmpeg's `ebur128`
 ### Trailing-silence detection
 
 Media QA now treats an unmatched final FFmpeg `silence_start` as an interval ending at the probed file duration (EOF). This catches audio that becomes silent and remains silent through the end of the video, even when FFmpeg does not emit a matching `silence_end` event. A zero-length interval at EOF is ignored.
+
+
+### Contact sheets for rendered-video inspection
+
+Generate a visual contact sheet from an MP4 using FFmpeg, sampled at a configurable interval. This helps spot repeated compositions, pacing and visual gaps; it does not replace watching the video.
+
+```bash
+npm run qa:contact-sheet -- render.mp4
+npm run qa:contact-sheet -- render.mp4 --interval 3 --columns 5 --width 360 --output review.jpg
+```
+
+Defaults: one thumbnail every 5 seconds, 4 columns, 320 px width. Requires FFmpeg and FFprobe. Output is JPEG; video is not modified.
