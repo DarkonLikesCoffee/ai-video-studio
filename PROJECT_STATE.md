@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `98a972911052fa8a3381c4852e1f6f38c1d94398` — PR #96 production-plan schema/runtime correction merged
-**Current development branch:** `feat/director-production-plan-import` (PR #97 open; CI queued). PR #96 is merged with CI #44538121663 passing on head `ebd53bec9f260af31b0d9c7e6e391eb426837057`; post-merge main CI #44547338478 is in progress. PR #95 was rebased onto current main `98a972911052fa8a3381c4852e1f6f38c1d94398`; head `7bd50163aa29f284eedc5775891c743f085592cf`, mergeable, but check suites are queued with zero check runs. PR #80 is closed without merge because the true-peak correction is superseded by merged PR #86 (merge commit `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d`). PR #84 contact-sheet JPG + JSON integration is verified by real render run #42 (artifact #14532466761).
+**Last verified main commit:** `76b9b99fdd49c7f95ce35b01301170ab9658a4dd` — PR #95 storyboard handoff merged
+**Current development branch:** `feat/director-production-plan-import` (PR #97 open; branch reconciled with PR #95 merge and compatibility migration; CI rerunning). PR #96 and #95 are merged. PR #95 CI #44550178698 passed on head `6209942bdfa08cfeabac0c4f74849e59182db11b`; post-merge main CI #44554881017 passed on `76b9b99fdd49c7f95ce35b01301170ab9658a4dd`. PR #80 remains closed without merge; its true-peak correction is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -222,17 +222,20 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Full video playback and audio listening were not performed. This is artifact packaging and sparse visual evidence, not creative acceptance.
 - Run: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383 ; artifact: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383/artifacts/14532466761
 
-## Production-plan schema/runtime contract alignment (in progress)
+## Production-plan schema/runtime contract alignment (merged)
 
-- Current main: `7fc374fc8c96cd617bd490da5cff5fe8ea49fa0a` (PR #94 merged; post-merge CI run #44537639626 passed).
-- The production-plan JSON Schema previously omitted `visualMethod`, `action`, and `visualProgression` from shot properties/required fields even though `validateProductionPlan` requires them; it also omitted optional `narrativeBeat`, which the validator accepts. With `additionalProperties:false`, the schema could reject valid plans or fail to communicate required fields to consumers.
-- Branch `fix/production-plan-schema-runtime-contract` adds the three missing required properties and optional supported `narrativeBeat` enum. A contract test ensures runtime-required fields are present in the schema and the beat enum matches the exported list. CI is pending; no render gate is applicable to this schema-only fix.
+- PR #96 merged as `98a972911052fa8a3381c4852e1f6f38c1d94398`; CI #44538121663 passed.
+- The schema declares the runtime-required shot fields and optional narrativeBeat contract.
 
+## Creative Brief → storyboard handoff (merged)
 
-## Creative Brief → production-plan import (branch in progress)
+- PR #95 merged as `76b9b99fdd49c7f95ce35b01301170ab9658a4dd`. CI #44550178698 passed on exact head `6209942bdfa08cfeabac0c4f74849e59182db11b`; post-merge main CI #44554881017 passed.
+- `director:storyboard-prompt` validates a brief and emits model-neutral storyboard instructions; it does not call an LLM or generate a storyboard.
 
-- Branch `feat/director-production-plan-import`, based on main merge commit `98a972911052fa8a3381c4852e1f6f38c1d94398`.
-- Added `director:production-plan`: converts a Creative Brief and model-authored storyboard JSON into a separate production-plan JSON; requires matching delivery, valid shot fields, frame-aligned contiguous timing, exact criterion coverage with known shot IDs and rationale.
-- Production-plan schema now optionally accepts `acceptanceCoverage`; legacy plans remain valid. Validator checks criterion exactness, completeness, duplicate/unknown shot IDs and rationale. Free-form storyboard `engineApproach` is retained as `implementationNotes`; recognized engine enum values remain `engineApproach`.
-- Added converter and contract tests, README and agent-workflow documentation. Tests/typecheck/CI have not run yet; the GitHub connector cannot execute the repository locally. CI is the next gate. No render is required for this planning/validation-only feature.
-- PR #97 is open: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/97, head `2face7f8acfc96340800f6e363c650208c2a625e`, base `98a972911052fa8a3381c4852e1f6f38c1d94398`. CI check suites are queued; no run has completed. Current main CI after PR #96 merge: run #44547338478 in progress.
+## Creative Brief → production-plan import (PR #97 in progress)
+
+- PR #97 adds a CLI to convert model-authored storyboard JSON into a validated production plan, checking delivery, frame-aligned contiguous timing and complete exact criterion-to-shot coverage with rationale.
+- Optional `acceptanceCoverage` is schema/runtime validated; legacy plans without coverage remain valid. Free-form `engineApproach` is retained in bounded `implementationNotes`, while recognized enum values remain normalized.
+- Initial CI run #44550086585 failed because the validator's strict enum check rejected five legacy `external-footage-with-3d-inset` values in the narrated-explainer plan. Those values are now preserved as `implementationNotes`, and a regression test validates the migrated example.
+- The branch has been reconciled with PR #95's main merge commit. New CI is pending; no render gate applies to this planning/import slice. Local tests/typecheck are unavailable through the GitHub connector.
+- Next: review current CI/diff, fix any remaining failures, merge only after checks pass, then connect production-plan criteria to asset/build evidence and visual QA.
