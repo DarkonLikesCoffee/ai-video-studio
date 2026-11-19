@@ -297,3 +297,10 @@ Append one entry per meaningful development session:
 - Added a parser path to close unmatched final silence at the probed media duration, preserving interval duration precision and skipping zero-length intervals.
 - Added regression tests for a long trailing silence that must fail, a short trailing silence warning, and an EOF zero-length edge case.
 - CI pending. No benchmark render or audio listening was performed.
+
+
+## 2026-11-19 — PR #75 merged; contact-sheet QA utility started
+
+- PR #75 CI passed and was merged to main as `faacfbe097b1ac933052de9e6a7070d5fa9d6d28`. It detects trailing silence with an unmatched final `silence_start` by closing it at EOF.
+- Started a reusable FFmpeg contact-sheet CLI on `feat/media-qa-contact-sheet`: samples frames at configurable intervals, creates a JPEG grid and supports interval/columns/width/output options.
+- Added unit tests for grid layout and option validation. CI is pending; no real MP4 contact sheet has been generated/inspected in this session yet.

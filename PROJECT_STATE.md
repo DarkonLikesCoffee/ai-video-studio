@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `219d9980d332c52918b0e2448e1ddb472e0a0587` — `feat(media-qa): measure true peak audio levels (#74)`
-**Current development branch:** `main`; PRs #72–#74 merged; trailing-silence EOF detection in development
+**Last verified main commit:** `faacfbe097b1ac933052de9e6a7070d5fa9d6d28` — `fix(media-qa): detect trailing silence through EOF (#75)`
+**Current development branch:** `main`; PRs #72–#75 merged; contact-sheet CLI in development
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -141,6 +141,11 @@ Read `START_HERE.md`, this file, `ROADMAP.md`, `PROGRESS_LOG.md`, `AGENTS.md`, `
 The `scripts/media-qa.ts` report now extracts `True peak` from the FFmpeg EBU R128 log when present. It warns above -1.0 dBFS and fails above 0.0 dBFS. Both thresholds are configurable; absent readings are omitted. Unit tests cover safe, warning and over-limit readings. This is an additive audio QA improvement and does not claim audio listening or creative acceptance.
 
 
-## Trailing-silence QA improvement (in development)
+## Trailing-silence QA improvement (PR #75 merged)
 
-Media QA is being extended to treat a final `silence_start` without a corresponding `silence_end` as silence through the probed media duration (EOF). This addresses a gap in the current log parser and is being regression-tested. CI is pending; do not consider this behavior verified until PR checks pass.
+Media QA is being extended to treat a final `silence_start` without a corresponding `silence_end` as silence through the probed media duration (EOF). This addresses a gap in the current log parser and is being regression-tested. PR #75 CI passed and the change was merged. The parser closes a final unmatched silence interval at the probed duration; regression tests cover long/short trailing silence and zero-length EOF cases.
+
+
+## Contact-sheet review utility (in development)
+
+A CLI is being added to extract evenly spaced visual samples into a JPEG contact sheet for render review. This is a review aid, not a replacement for motion/audio inspection. PR and CI are pending.
