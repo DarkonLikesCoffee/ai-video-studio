@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createStoryboardRevision, applyStoryboardRevisionEdits, validateStoryboardRevision, setStoryboardRevisionSuggestionSelection, renderStoryboardRevisionReviewMarkdown, renderStoryboardRevisionPromptMarkdown } from "../scripts/storyboard-revision";
+import { createStoryboardRevision, applyStoryboardRevisionEdits, validateStoryboardRevision, setStoryboardRevisionSuggestionSelection, renderStoryboardRevisionReviewMarkdown, renderStoryboardRevisionPromptMarkdown, importStoryboardRevisionEdits } from "../scripts/storyboard-revision";
 
 const example = JSON.parse(await readFile(new URL("../projects/examples/production-plan.json", import.meta.url), "utf8"));
 
@@ -76,4 +76,18 @@ test("revision prompt includes selected critiques and only the referenced shots"
   assert.match(prompt, /opening-macro/);
   assert.match(prompt, /Return edits only for the listed shot IDs/);
   assert.throws(() => renderStoryboardRevisionPromptMarkdown(artifact), /Select at least one suggestion/);
+});
+ 
+test("imports AI edits only for selected suggestions and existing shots", () => {
+  const artifact = createStoryboardRevision("example.json", JSON.stringify(revisionExample));
+  const selected = setStoryboardRevisionSuggestionSelection(artifact, artifact.suggestions[0].id, true);
+  const targetShotId = artifact.suggestions[0].item.shotIds[0];
+  const imported = importStoryboardRevisionEdits(selected, { edits: [{ shotId: targetShotId, changeNote: "Make the reveal more specific", fields: { visual: "A concrete reveal in a defined environment." } }] });
+  assert.equal(imported.edits.length, 1);
+  assert.equal(imported.edits[0].shotId, targetShotId);
+  assert.equal(imported.validation, null);
+  assert.throws(() => importStoryboardRevisionEdits(selected, { edits: [{ shotId: "not-a-shot", changeNote: "x", fields: { visual: "y" } }] }), /unknown shot ID/);
+  const unselectedShot = artifact.sourcePlan.shots.find((shot) => !artifact.suggestions[0].item.shotIds.includes(shot.id));
+  if (unselectedShot) assert.throws(() => importStoryboardRevisionEdits(selected, { edits: [{ shotId: unselectedShot.id, changeNote: "x", fields: { visual: "y" } }] }), /not covered by a selected critique/);
+  assert.throws(() => importStoryboardRevisionEdits(selected, { edits: [{ shotId: targetShotId, changeNote: "x", fields: { unsupported: "y" } }] }), /Unsupported revision field/);
 });
