@@ -77,7 +77,7 @@ test("shotIds all links a manifest asset to every shot", async () => {
     await writeFile(path.join(root, "assets", "shared.svg"), "<svg/>");
     const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
     assert.equal(report.summary.shotsWithAssets, 3);
-    assert.ok(report.shots.every((shot) => shot.manifestAssets.some((asset) => asset.reference === "shared.svg"));
+    assert.ok(report.shots.every((shot) => shot.manifestAssets.some((asset) => asset.reference === "shared.svg")));
   });
 });
 
