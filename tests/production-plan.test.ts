@@ -187,3 +187,28 @@ test("storyboard critic states no creative approval when no findings exist", () 
   });
   assert.match(renderStoryboardCritiqueMarkdown(plan), /not a creative approval/);
 });
+
+import { createVisualStrategyReport, renderVisualStrategyMarkdown } from "../scripts/storyboard-strategy";
+
+test("visual strategy report summarizes methods and gives targeted alternatives", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots[0]!.visual = "Show this concept";
+  shots[0]!.action = "Show the idea";
+  shots[0]!.visualProgression = "No progression";
+  shots.forEach((shot) => { shot.visualMethod = "motion graphics"; });
+  const report = createVisualStrategyReport(plan);
+  assert.equal(report.shotCount, shots.length);
+  assert.equal(report.methodCounts["motion graphics"], shots.length);
+  const opening = report.recommendations.find((item) => item.shotId === "opening-macro");
+  assert.ok(opening);
+  assert.ok(opening.issueCodes.includes("VAGUE_VISUAL_DESCRIPTION"));
+  assert.ok(opening.alternatives.some((alternative) => alternative.includes("visual demonstration")));
+});
+
+test("visual strategy report is review-only and states its limits", () => {
+  const report = renderVisualStrategyMarkdown(example);
+  assert.match(report, /Rule-based planning aid/);
+  assert.match(report, /does not rewrite the plan/);
+  assert.match(report, /Visual method mix/);
+});
