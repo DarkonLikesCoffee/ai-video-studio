@@ -243,3 +243,16 @@ Append one entry per meaningful development session:
 - CI run #44505337143 passed for final head `b7a3a86f322cfeab5a96556cdfa3131c708b948c`: Python narration tests, typecheck, Node tests, plan validation, storyboard previews and QA, all project validations, FFmpeg/FFprobe/audio checks, and studio build. No render was run (pre-production QA only).
 - Next: prototype a separate critique report with prioritized, specific revisions for weak shots. Keep it review-only initially; do not silently rewrite a plan. Validate revised plans with the existing validator and QA, then evaluate an explicit approval/repair loop.
 - Main merge commit: `50a3e81d2bb29e72307772ba96ec22735af10ccb`.
+
+
+## 2026-11-19 — Review-only storyboard critic report merged (PR #71)
+
+- PR #71 https://github.com/DarkonLikesCoffee/ai-video-studio/pull/71 merged by squash as `c18b1be0e79f25e6b14b3d49838f31b9c683044d`.
+- Added `scripts/storyboard-critic.ts` and `npm run storyboard:critic -- <production-plan.json> [output.md]`. The command turns deterministic QA warnings into high/medium prioritized actionable revision suggestions.
+- Suggestions cover weak visual/action descriptions, missing visual progression, repeated adjacent visual content, text-heavy shots, long shots/static holds and repeated framing/scale/method/camera movement.
+- It is strictly review-only: does not mutate source plan, invoke an AI provider, auto-repair or approve the creative. Apply selected revisions to a copy and rerun plan validation and QA.
+- Added tests for prioritization, report content, non-mutation and no-findings behavior; CI smoke-generates a critique for the launch-film example. Updated README and agent docs.
+- First CI run #44506671305 failed on a test that expected recommendations from the clean example; fixed by deliberately weakening a shot in the test. Final PR CI run #44506823215 succeeded.
+- Final run passed typecheck, tests, plan validation, previews, critic report, all storyboard QA checks, project validation, FFmpeg/FFprobe, audio preparation and studio build. No render was performed because this is a pre-production review tool.
+- Main merge SHA: `c18b1be0e79f25e6b14b3d49838f31b9c683044d`.
+- Next: define a versioned revision artifact that preserves original plan, selected recommendations, applied edits and validation results. Then evaluate model-assisted semantic critique under an explicit no-paid-call constraint; do not implement auto-repair until review and rollback are auditable.
