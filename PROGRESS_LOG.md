@@ -139,3 +139,13 @@ Append one entry per meaningful development session:
 - The validator currently checks presence/non-empty strings only; it does not claim to judge creative quality or automatically detect slide-like output.
 - CI run #44498960909 is validating the latest branch head. No render was performed.
 - Next: resolve CI; then consider deterministic storyboard-risk warnings as a separate, testable slice.
+
+## 2026-11-19 — Visual storytelling requirements merged (PR #66)
+
+- PR #66 https://github.com/DarkonLikesCoffee/ai-video-studio/pull/66 merged by squash as `bbfce5c68d9a4c4a84b918285b23ac07f26b52f6`.
+- CI run #44499140921 passed for final PR head `8a1bf5bbca568792332972bc89b852c58ef00950`.
+- Updated Creative Director, Storyboard and agent production workflow guidance to emphasize concrete visual events, per-shot visual-method selection, start→development→end progression, and slideshow-risk review.
+- Validator now requires non-empty `visualMethod`, `action`, and `visualProgression` on every shot. Updated tests cover missing fields; all four checked-in production plans were enriched.
+- This validates planning completeness only; it does not semantically judge video/story quality or detect slideshow-like renders.
+- No render was run.
+- Next: implement a transparent deterministic storyboard-risk report with warnings only, backed by tests.
