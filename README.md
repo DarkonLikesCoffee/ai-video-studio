@@ -103,7 +103,7 @@ After a render, run a technical diagnostic pass on the actual MP4:
 npm run qa:media -- render-output/my-video.mp4
 ```
 
-This writes `render-output/my-video.qa.json` (or a supplied report path) with ffprobe metadata, audio silence intervals, video freeze intervals, black-frame intervals and EBU R128 loudness diagnostics. Missing audio/video streams or invalid duration fail the command. Silence, freeze and black intervals are warnings because a deliberate pause, fade or black transition may be legitimate; compare timestamps with the brief and inspect/listen to the MP4. This is a technical first-pass gate, not semantic or creative approval. See [Media QA skill](agent/skills/media-qa/SKILL.md).
+This writes `render-output/my-video.qa.json` (or a supplied report path) with ffprobe metadata, audio silence intervals, video freeze intervals, black-frame intervals, EBU R128 loudness diagnostics and true-peak measurements (`ebur128=peak=true`). True peak warns above -1.0 dBFS and fails above 0.0 dBFS. Missing audio/video streams or invalid duration fail the command. Silence, freeze and black intervals are warnings because a deliberate pause, fade or black transition may be legitimate; compare timestamps with the brief and inspect/listen to the MP4. This is a technical first-pass gate, not semantic or creative approval. See [Media QA skill](agent/skills/media-qa/SKILL.md).
 
 ## Storyboard risk review
 
@@ -774,7 +774,7 @@ The CLI refuses to proceed if the original source file changed or the embedded s
 
 ### True-peak audio QA
 
-The media QA report extracts EBU R128 true-peak readings from FFmpeg's `ebur128` summary when available. A reading above the recommended `-1.0 dBFS` threshold is reported as a warning; above `0.0 dBFS` is an error. Missing true-peak data is not treated as a pass or failure and is omitted from the report. These thresholds are configurable through `inspectMedia` options (`warningTruePeakDbfs`, `maxTruePeakDbfs`).
+The media QA audio filter enables true-peak mode (`ebur128=peak=true`) and parses FFmpeg's summary format (`True peak:` followed by `Peak: ... dBFS`). A reading above the recommended `-1.0 dBFS` threshold is reported as a warning; above `0.0 dBFS` is an error. If FFmpeg does not emit a true-peak reading, it is omitted from the report rather than treated as verified. These thresholds are configurable through `inspectMedia` options (`warningTruePeakDbfs`, `maxTruePeakDbfs`).
 
 
 ### Trailing-silence detection
@@ -791,4 +791,4 @@ npm run qa:contact-sheet -- render.mp4
 npm run qa:contact-sheet -- render.mp4 --interval 3 --columns 5 --width 360 --output review.jpg
 ```
 
-Defaults: one thumbnail every 5 seconds, 4 columns, 320 px width. Requires FFmpeg and FFprobe. Output is JPEG; video is not modified.
+Defaults: one thumbnail every 5 seconds, 4 columns, 320 px width. For detailed review of short videos, use `--interval 1` (one sample per second) and increase `--width` for legibility. Requires FFmpeg and FFprobe. Output is JPEG; video is not modified. A contact sheet is sampled imagery only; full playback is still needed to judge motion, timing and audio.
