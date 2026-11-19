@@ -12,7 +12,7 @@ A successful render is not a successful video. Technical validity, narrative qua
 
 ## Strategic direction
 
-The current slideshow-like output is a production-intelligence problem, not simply a shortage of effects. Avoid treating every scene as a text card, still image, diagram or background with generic motion.
+The current slideshow-like output is a production-intelligence problem, not simply a shortage of effects. PR #81 adds a deterministic report with shot-specific alternatives, but it is advisory and does not autonomously select or apply a revised strategy. Avoid treating every scene as a text card, still image, diagram or background with generic motion.
 
 A production should have:
 - A clear promise, narrative progression and intended audience.
