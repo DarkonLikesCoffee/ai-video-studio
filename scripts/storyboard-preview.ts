@@ -76,11 +76,11 @@ export const buildStoryboardPreview = (input: unknown): StoryboardPreview => {
       visualProgression: requiredText(shot.visualProgression, `${prefix}.visualProgression`),
       framing: requiredText(shot.framing, `${prefix}.framing`),
       cameraMovement: requiredText(shot.cameraMovement, `${prefix}.cameraMovement`),
-      ...(optionalText(shot.onScreenText) ? { onScreenText: optionalText(shot.onScreenText) } : {}),
+      ...(typeof shot.onScreenText === "string" && shot.onScreenText.trim() ? { onScreenText: shot.onScreenText.trim() } : {}),
       transition: requiredText(shot.transition, `${prefix}.transition`),
       audio: requiredText(shot.audio, `${prefix}.audio`),
       assets,
-      ...(optionalText(shot.engineApproach) ? { engineApproach: optionalText(shot.engineApproach) } : {}),
+      ...(typeof shot.engineApproach === "string" && shot.engineApproach.trim() ? { engineApproach: shot.engineApproach.trim() } : {}),
     };
   }).sort((left, right) => left.startSeconds - right.startSeconds);
 
