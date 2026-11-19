@@ -20,7 +20,7 @@ const storyboard = () => ({
       typography: brief.visualLanguage.typography,
       composition: brief.visualLanguage.composition,
       lighting: brief.visualLanguage.lighting,
-      textureAndMaterials: brief.visualLanguage.texture,
+      texture: brief.visualLanguage.texture,
     },
     motionLanguage: brief.motionLanguage,
     soundDirection: brief.soundIdentity,
@@ -90,6 +90,8 @@ test("Creative Brief + storyboard converts to a validated production plan with c
   assert.equal(plan.shots[0]?.implementationNotes, "Use a custom 3D render with a procedural brushed-metal material.");
   assert.equal(plan.shots[0]?.engineApproach, undefined);
   assert.equal(plan.creativeDirection.objective, brief.objective);
+  assert.equal(plan.creativeDirection.visualSystem.textureAndMaterials, brief.visualLanguage.texture);
+  assert.equal(plan.creativeDirection.visualSystem.texture, undefined);
 });
 
 test("conversion rejects uncovered brief criteria", () => {
