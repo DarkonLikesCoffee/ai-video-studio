@@ -100,10 +100,9 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 6. Verified current repository snapshot — 2026-11-19
 
-- Main HEAD: `40ffe8fd8a21466fa4cca607ace6ecc422c7ab35`.
-- Main CI run #44507106494 completed successfully.
-- PRs #66–#72 are merged.
-- Storyboard revision artifact workflow is being implemented in `feat/storyboard-revision-artifact`; verify its PR/CI before considering it merged.
+- Main HEAD: `712b5b864a437f87501a735bfb718293abe9ad62` (PR #76 squash merge).
+- PR #76 CI run #44516361047 passed all steps; post-merge main CI run #44516765269 is currently in progress.
+- PRs #66–#76 are merged.
 - Recheck branches, PRs, CI and commit SHAs before relying on this snapshot.
 
 ### Storyboard milestones on main
@@ -136,7 +135,7 @@ Start with a small versioned artifact schema and deterministic tests. Do not aut
 Read `START_HERE.md`, this file, `ROADMAP.md`, `PROGRESS_LOG.md`, `AGENTS.md`, `README.md`, and relevant source/tests/skills. Verify live GitHub state before doing work. Prefer small end-to-end slices with tests and concrete validation evidence. Never claim a render or creative inspection without evidence.
 
 
-## Media QA true-peak addition (PR in review)
+## Media QA true-peak addition (merged)
 
 The `scripts/media-qa.ts` report now extracts `True peak` from the FFmpeg EBU R128 log when present. It warns above -1.0 dBFS and fails above 0.0 dBFS. Both thresholds are configurable; absent readings are omitted. Unit tests cover safe, warning and over-limit readings. This is an additive audio QA improvement and does not claim audio listening or creative acceptance.
 
@@ -146,6 +145,6 @@ The `scripts/media-qa.ts` report now extracts `True peak` from the FFmpeg EBU R1
 Media QA is being extended to treat a final `silence_start` without a corresponding `silence_end` as silence through the probed media duration (EOF). This addresses a gap in the current log parser and is being regression-tested. PR #75 CI passed and the change was merged. The parser closes a final unmatched silence interval at the probed duration; regression tests cover long/short trailing silence and zero-length EOF cases.
 
 
-## Contact-sheet review utility (in development)
+## Contact-sheet review utility (PR #76 merged)
 
-A CLI is being added to extract evenly spaced visual samples into a JPEG contact sheet for render review. This is a review aid, not a replacement for motion/audio inspection. PR and CI are pending.
+`npm run qa:contact-sheet -- video.mp4` generates a JPEG contact sheet using FFmpeg/FFprobe, sampling frames at a configurable interval and arranging them in a configurable grid. Options include `--interval`, `--columns`, `--width`, and `--output`. PR #76 CI passed and the feature is merged. Unit tests cover layout and option validation, but an actual MP4 contact sheet has not yet been generated and visually inspected in this work.
