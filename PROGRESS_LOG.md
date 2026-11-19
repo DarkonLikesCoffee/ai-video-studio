@@ -470,3 +470,10 @@ Append one entry per meaningful development session:
 - Added `scripts/director-asset-evidence.ts` and `director:asset-evidence`, plus tests for mapping/readiness, missing files/metadata, `all` assignments, unknown shot IDs, unsafe paths, unresolved plan references and missing coverage. Updated README, agent guide, production workflow, Asset Producer skill, PROJECT_STATE and ROADMAP.
 - Tests/typecheck have not been run in this connector-only workflow; GitHub Actions is the validation gate. This report-only change does not require a video render. No playback or audio listening was performed.
 - Opened PR #98: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98. Initial CI #44576694962 failed typecheck on two missing closing parentheses in `scripts/director-asset-evidence.ts`; fixed on the existing branch. The latest CI run was queued, then cancelled by subsequent documentation commits; CI is rerunning against the current PR head. Post-merge main CI #44574582076 passed.
+
+
+## 2026-11-19 — PR #98 test syntax regression corrected
+
+- Inspected latest PR #98 CI run #44591887176. Type-check passed; the test step failed to load `tests/director-asset-evidence.test.ts` because the unknown-shot assertion at line 88 was missing a closing parenthesis. Earlier run #44585662593 had the same syntax error in the shared-asset assertion at line 80; that was corrected in a later head, revealing the second typo.
+- Fixed the line-88 assertion on the existing `feat/director-asset-evidence-report` branch in commit `42bdb0366e3a3ffa8063b5bde982cf4d559f3c6a`. No test was bypassed. Connector-only environment means tests were not executed locally; CI is required on the final branch head.
+- Updated PROJECT_STATE with the CI evidence. Main CI #44574582076 passed. This report-only change does not require a render gate. No full video playback or audio listening was performed.
