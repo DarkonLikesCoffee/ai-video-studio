@@ -121,7 +121,28 @@ const run = async (): Promise<void> => {
       process.stdout.write(`Revision artifact created: ${output} (source preserved; ${artifact.suggestions.length} suggestions)\n`);
       return;
     }
-    if (command === "select") {\n      if (!input || !output) throw new Error("Usage: npm run storyboard:revision -- select <revision.json> <suggestion-id> [--off]");\n      const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;\n      const selected = !process.argv.includes("--off");\n      const updated = setStoryboardRevisionSuggestionSelection(artifact, output, selected);\n      await writeFile(input, JSON.stringify(updated, null, 2) + "\\n", "utf8");\n      process.stdout.write(`Suggestion ${output} ${selected ? "selected" : "deselected"} in ${input} (no plan edits applied)\\n`);\n      return;\n    }\n    if (command === "review") {\n      if (!input) throw new Error("Usage: npm run storyboard:revision -- review <revision.json> [review.md]");\n      const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;\n      const report = renderStoryboardRevisionReviewMarkdown(artifact);\n      if (output) { await writeFile(output, report + "\\n", "utf8"); process.stdout.write(`Revision review written: ${output}\\n`); }\n      else process.stdout.write(report + "\\n");\n      return;\n    }\n    if (command === "apply" || command === "validate") {
+    if (command === "select") {
+      if (!input || !output) throw new Error("Usage: npm run storyboard:revision -- select <revision.json> <suggestion-id> [--off]");
+      const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
+      const selected = !process.argv.includes("--off");
+      const updated = setStoryboardRevisionSuggestionSelection(artifact, output, selected);
+      await writeFile(input, JSON.stringify(updated, null, 2) + "\\n", "utf8");
+      process.stdout.write(`Suggestion ${output} ${selected ? "selected" : "deselected"} in ${input} (no plan edits applied)\\n`);
+      return;
+    }
+    if (command === "review") {
+      if (!input) throw new Error("Usage: npm run storyboard:revision -- review <revision.json> [review.md]");
+      const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
+      const report = renderStoryboardRevisionReviewMarkdown(artifact);
+      if (output) {
+        await writeFile(output, report + "\\n", "utf8");
+        process.stdout.write(`Revision review written: ${output}\\n`);
+      } else {
+        process.stdout.write(report + "\\n");
+      }
+      return;
+    }
+    if (command === "apply" || command === "validate") {
       if (!input || (command === "apply" && !output)) throw new Error(command === "apply"
         ? "Usage: npm run storyboard:revision -- apply <revision.json> <revised-plan.json>"
         : "Usage: npm run storyboard:revision -- validate <revision.json>");
