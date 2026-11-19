@@ -45,20 +45,20 @@ export const renderStoryboardCritiqueMarkdown = (plan: unknown, items = critique
     ? (plan as Record<string, unknown>).title as string
     : "Untitled storyboard";
   const lines = ["# Storyboard Critique", "", `**Plan:** ${title}`, "", "**Review-only report. The source plan is not changed. Suggestions are heuristic and require creative review.**", ""];
-  if (items.length === 0) return lines.concat("No deterministic critique items were produced. This is not a creative approval.").join("\\n");
+  if (items.length === 0) return lines.concat("No deterministic critique items were produced. This is not a creative approval.").join("\n");
   lines.push(`## Suggested revisions (${items.length})`, "");
   items.forEach((item, index) => {
     lines.push(`### ${index + 1}. [${item.priority.toUpperCase()}] — ${item.shotIds.join(", ")} `, "", `**Issue:** ${item.issue}`, "", `**Suggested revision:** ${item.revision}`, "", `**Why:** ${item.rationale}`, "");
   });
   lines.push("## Next step", "", "Apply selected revisions manually to a copy of the plan, then run `npm run validate:plan` and `npm run storyboard:qa`. Do not treat this report as automatic approval.");
-  return lines.join("\\n");
+  return lines.join("\n");
 };
 
 const runCli = async (): Promise<void> => {
   const inputPath = process.argv[2];
   const outputPath = process.argv[3];
   if (!inputPath) {
-    process.stderr.write("Usage: npm run storyboard:critic -- <production-plan.json> [output.md]\\n");
+    process.stderr.write("Usage: npm run storyboard:critic -- <production-plan.json> [output.md]\n");
     process.exitCode = 2;
     return;
   }
@@ -66,13 +66,13 @@ const runCli = async (): Promise<void> => {
     const plan = JSON.parse(await readFile(inputPath, "utf8")) as unknown;
     const report = renderStoryboardCritiqueMarkdown(plan);
     if (outputPath) {
-      await writeFile(outputPath, report + "\\n", "utf8");
-      process.stdout.write(`Storyboard critique written: ${outputPath}\\n`);
+      await writeFile(outputPath, report + "\n", "utf8");
+      process.stdout.write(`Storyboard critique written: ${outputPath}\n`);
     } else {
-      process.stdout.write(report + "\\n");
+      process.stdout.write(report + "\n");
     }
   } catch (error) {
-    process.stderr.write(`Could not critique storyboard: ${error instanceof Error ? error.message : String(error)}\\n`);
+    process.stderr.write(`Could not critique storyboard: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
   }
 };
