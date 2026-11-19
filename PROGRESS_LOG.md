@@ -356,3 +356,10 @@ Append one entry per meaningful development session:
 - Added `--json` to `storyboard:strategy`, producing a versioned envelope while retaining Markdown default.
 - Reconciled PROJECT_STATE's commit snapshot and fixed an earlier escaped-newline formatting artifact in the strategy-report section.
 - Next: examine the existing `storyboard:revision` artifact workflow before designing any integration; avoid duplicating the critic's existing suggestions.
+
+
+## 2026-11-19 — Render contact-sheet evidence integration (PR preparation)
+
+- Added a render-workflow step after media QA to create a 5-second contact sheet (4 columns, 320px thumbnails) and a JSON evidence report using the existing `qa:contact-sheet` CLI.
+- Expanded the render artifact to include both evidence files in addition to MP4, credits and media-QA JSON. This avoids manual contact-sheet generation for future GitHub Actions renders.
+- No render has been run with this workflow change yet; validation is pending CI. Contact sheets remain sparse review evidence and do not replace full playback or audio listening.
