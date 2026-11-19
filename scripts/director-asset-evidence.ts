@@ -241,7 +241,7 @@ export const buildAssetEvidenceReport = async (
     project: { id: asText(planValue.id) ?? "unknown", title: asText(planValue.title) ?? "Untitled" },
     source: { planPath: options.planPath ?? null, manifestPath: options.manifestPath ?? null, projectRoot },
     summary: {
-      status: criteriaUnavailable && !assets.length ? "criteria-unavailable" : status,
+      status,
       shotCount: shots.length,
       assetCount: assets.length,
       shotsWithAssets,

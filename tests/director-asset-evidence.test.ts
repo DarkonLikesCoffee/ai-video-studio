@@ -104,6 +104,8 @@ test("unsafe asset paths are rejected before filesystem access", async () => {
 test("planned asset references absent from the manifest are reported", async () => {
   await withProject(async (root) => {
     const plan = makePlan();
+    plan.shots[0].assets = ["one.svg"];
+    plan.shots[1].assets = [];
     plan.shots[2].assets = ["unlisted.svg"];
     const report = await buildAssetEvidenceReport(plan, { assets: [{ file: "one.svg", type: "art", shotIds: ["shot-one"], provenance: "Test", license: "Original" }] }, { projectRoot: root });
     assert.equal(report.summary.unresolvedPlannedAssetRefs, 1);
@@ -130,7 +132,25 @@ test("missing criterion coverage and empty manifest remain explicit", async () =
     const report = await buildAssetEvidenceReport(plan, { assets: [] }, { projectRoot: root });
     assert.equal(report.criteria.length, 0);
     assert.equal(report.summary.status, "no-assets");
+    assert.equal(report.summary.assetCount, 0);
     assert.ok(report.issues.some((issue) => issue.code === "ASSET_MANIFEST_EMPTY"));
+  });
+});
+
+
+
+test("missing criterion coverage is reported when assets exist", async () => {
+  await withProject(async (root) => {
+    const plan = makePlan();
+    delete plan.acceptanceCoverage;
+    plan.shots[0].assets = ["one.svg"];
+    plan.shots[1].assets = [];
+    plan.shots[2].assets = [];
+    const manifest = { assets: [{ file: "one.svg", type: "art", shotIds: ["shot-one"], provenance: "Test", license: "Original" }] };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
+    assert.equal(report.criteria.length, 0);
+    assert.equal(report.summary.status, "criteria-unavailable");
+    assert.equal(report.summary.assetCount, 1);
   });
 });
 
