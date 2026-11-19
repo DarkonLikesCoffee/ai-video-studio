@@ -487,3 +487,10 @@ Append one entry per meaningful development session:
 - Added ffprobe stream `start_time` support and a signed `audioVideoStartOffsetSeconds` measurement (audio start minus video start). Absolute offsets over 0.5s default fail, independently from duration drift; the option is configurable. Missing timestamps are omitted rather than guessed.
 - Added regression tests for aligned starts, late audio with equal stream durations, early audio, configurable threshold and absent timestamps. Updated README and Media QA skill plus PROJECT_STATE and ROADMAP. No local test/typecheck was run because this connector session cannot execute the repo; CI is required.
 - This diagnostic slice does not require a render. No new render, full video playback or audio listening was performed. Latest previously inspected render run #42 remains technical QA evidence only: no detected silence and 0.199s duration drift, with limited contact-sheet inspection.
+
+
+## 2026-11-19 — PR #99 code review correction and benchmark timestamp check
+
+- Reviewed PR #99 diff and caught two unintended parser regressions before CI: the true-peak regex was missing its closing parenthesis, and the `silence_end` regex had lost its negative-number allowance. Corrected both on the same branch in commit `e40a71c3aeb7437dc2abffbbd6b503b8fe39fdac`.
+- Retrieved Render run #42 artifact #14532466761 and inspected its actual MP4 with ffprobe. Video start time 0.000s, audio start time 0.000s (new signed offset would be 0.000s); video stream duration 47.700s, audio/format duration 47.899s. Existing QA JSON passed with no findings, no detected silence/freeze/black intervals, -16.0 LUFS, -1.5 dBFS true peak and 0.199s duration drift. This is technical metadata, not full playback or listening.
+- PR #99 is open: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/99. CI run #44628848747 is pending for corrected commit `e40a71c3aeb7437dc2abffbbd6b503b8fe39fdac`; run #44628816689 is still running on the previous head. Documentation will record this parser correction and CI rerun; no render gate applies to the diagnostic-only slice.
