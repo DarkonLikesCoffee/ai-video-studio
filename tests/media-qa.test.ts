@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildMediaQaReport } from "../scripts/media-qa";
+import { buildMediaQaReport, buildMediaQaAudioFilter } from "../scripts/media-qa";
 
 const probe = {
   format: { duration: "60.1", size: "7000000", bit_rate: "900000", format_name: "mov,mp4" },
@@ -89,6 +89,27 @@ test("media QA fails true peak above 0 dBFS ceiling", () => {
   assert.equal(report.measurements.truePeakDbfs, 0.3);
   assert.equal(report.passed, false);
   assert.ok(report.findings.some(f => f.code === "true-peak-over-limit" && f.severity === "error"));
+});
+
+test("media QA parses FFmpeg EBU R128 true peak summary format", () => {
+  const report = buildMediaQaReport(
+    "ebu-summary.mp4",
+    probe,
+    "Integrated loudness:\\n  I: -16.0 LUFS\\n\\nTrue peak:\\n  Peak: -1.5 dBFS\\n",
+    "",
+  );
+  assert.equal(report.measurements.truePeakDbfs, -1.5);
+  assert.equal(report.passed, true);
+  assert.equal(report.findings.length, 0);
+});
+
+test("media QA enables true-peak measurement and keeps silence thresholds configurable", () => {
+  assert.match(buildMediaQaAudioFilter(), /ebur128=peak=true:framelog=verbose/);
+  assert.match(buildMediaQaAudioFilter(), /silencedetect=noise=-50dB:d=0.75/);
+  assert.equal(
+    buildMediaQaAudioFilter({ silenceNoiseDb: -42, silenceMinDurationSeconds: 0.5 }),
+    "silencedetect=noise=-42dB:d=0.5,ebur128=peak=true:framelog=verbose",
+  );
 });
 
 test("media QA accepts true peak at or below recommended ceiling", () => {
