@@ -85,7 +85,7 @@ test("unknown manifest shot IDs are reported without being assigned", async () =
   await withProject(async (root) => {
     const report = await buildAssetEvidenceReport(makePlan(), { assets: [{ file: "one.svg", type: "art", shotIds: ["shot-one", "ghost"], provenance: "Test", license: "Original" }] }, { projectRoot: root });
     assert.equal(report.summary.unknownManifestShotIds, 1);
-    assert.ok(report.issues.some((issue) => issue.code === "UNKNOWN_MANIFEST_SHOT_ID" && issue.shotId === "ghost");
+    assert.ok(report.issues.some((issue) => issue.code === "UNKNOWN_MANIFEST_SHOT_ID" && issue.shotId === "ghost"));
     assert.equal(report.shots[0]?.manifestAssets.length, 1);
     assert.equal(report.shots[1]?.manifestAssets.length, 0);
   });
