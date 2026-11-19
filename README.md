@@ -771,6 +771,14 @@ npm run storyboard:qa -- projects/<slug>/production/production-plan-revised.json
 
 The CLI refuses to proceed if the original source file changed or the embedded source text/hash no longer match. The original plan is never overwritten. Validation errors and heuristic warnings are stored separately in the revision artifact; warnings are not semantic creative approval. Suggestions are not automatically applied: edits remain explicit and reviewable.
 
+Select or deselect suggestions and generate a review report without applying changes:
+```bash
+npm run storyboard:revision -- select projects/<slug>/production/storyboard-revision.json suggestion-001
+npm run storyboard:revision -- select projects/<slug>/production/storyboard-revision.json suggestion-001 --off
+npm run storyboard:revision -- review projects/<slug>/production/storyboard-revision.json projects/<slug>/production/revision-review.md
+```
+Selected suggestions are review markers only; they do not generate edits. The Markdown review report shows selections, critique details, explicit edits and the last validation state.
+
 
 ### True-peak audio QA
 
