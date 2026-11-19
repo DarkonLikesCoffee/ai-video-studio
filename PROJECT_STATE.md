@@ -132,3 +132,14 @@ Start by examining the current implementation and building a quality-first, reus
 7. Iterate on high-impact defects before accepting delivery.
 
 Prioritize a small working vertical slice over a large architecture rewrite. Before choosing a video-generation provider or paid service, compare viable options and costs; do not spend money without explicit user approval.
+
+## 8. Development update — visual storytelling production guidance (2026-11-19)
+
+
+- Work started on branch `feature/visual-storytelling-production-guidelines`, based on the roadmap update commit `1341df8aa1f391024d5f30d25ecadc6048b9bebb`.
+- Creative Director guidance now requires concrete visual events, per-shot method choice, subject/action, producibility and effects motivated by the story.
+- Storyboard guidance now requires a shot's visual method, action and start/development/end progression, plus a pre-production slideshow-risk review. It explicitly rejects scene-title lists as storyboards.
+- Agent production workflow now has a production-intelligence checklist and warns against defaulting to title cards, static diagrams or repeated layouts.
+- These changes strengthen agent orchestration guidance only. They do **not** implement a persistent AI Director, automatic storyboard generation, semantic slideshow detection or new render-engine capabilities.
+- No tests or renders run yet (documentation-only changes).
+- Next: open PR and validate CI, then implement a focused storyboard-quality validator with tests as the next code slice.
