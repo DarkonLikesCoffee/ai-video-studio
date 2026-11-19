@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354` — PR #97 storyboard-to-production-plan import merged
-**Current development branch:** `feat/director-asset-evidence-report` (PR #98 open; required CI rerunning after a TypeScript syntax fix). PRs #95, #96 and #97 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 passed; merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; post-merge main CI #44574582076 passed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
+**Last verified main commit:** `73807bad31f133a0a2819cdd084286903f963645` — PR #98 criterion-to-asset evidence report merged; required validate CI #44608513408 and post-merge main CI passed
+**Current development branch:** `feat/media-qa-av-start-offset` (follow-up P0 synchronization diagnostic; CI pending). PRs #95, #96, #97 and #98 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 and post-merge main CI #44574582076 passed. PR #98 merged as `73807bad31f133a0a2819cdd084286903f963645`; PR CI and post-merge main CI #44608513408 passed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -238,8 +238,17 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 
 ## Creative Brief → asset evidence report (development branch)
 
-- PR #98: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98 on branch `feat/director-asset-evidence-report`, based on PR #97 merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`.
+- PR #98 merged: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98 as `73807bad31f133a0a2819cdd084286903f963645` (required CI #44608513408 passed).
 - New `director:asset-evidence` CLI maps manifest entries to shot IDs and criterion coverage; checks local file presence/path safety and provenance/rights metadata; surfaces unresolved planned asset references and unknown shot IDs.
 - Report is review-only. Asset links are not semantic proof; procedural shots may intentionally have no manifest assets. `--strict` is opt-in.
 - Tests are added for linked files, missing file/provenance/rights, `all` assignments, unknown IDs, unsafe paths, unresolved plan references and missing coverage.
 - CI history: #44577136550 failed typecheck (fixed); #44585662593 failed tests due to a missing closing parenthesis in the shared-asset test at line 80; #44591887176 failed on the same test file at line 88, where `assert.ok(...some(...))` was missing its final closing parenthesis. The test syntax was corrected on the same branch in commit `42bdb0366e3a3ffa8063b5bde982cf4d559f3c6a`; a new CI run is required for this exact commit. Main CI #44574582076 passed. CI remains the validation gate; no render is applicable to this report-only planning slice. No full video playback or audio listening was performed.
+
+
+## 2026-11-19 — PR #98 merged; A/V start-offset QA follow-up
+
+- PR #98 criterion-to-asset evidence report merged as `73807bad31f133a0a2819cdd084286903f963645`; required `validate` run #44608513408 passed, and post-merge main CI completed successfully.
+- `director:asset-evidence` is now on main. It remains report-only: local file/path safety and manifest/provenance/rights evidence do not prove visual asset relevance.
+- New follow-up branch `feat/media-qa-av-start-offset` adds a signed ffprobe stream-start offset measurement (audio start minus video start), with a configurable default 0.5-second hard-failure threshold. It complements, rather than replaces, the duration mismatch and silence checks.
+- Regression tests cover clean starts, audio starting late or early with matching stream durations, configurable threshold, and missing start-time metadata. CI is pending; local tests were not run.
+- No render, full playback, or audio listening was performed for this diagnostic change. Render #42 remains the latest verified artifact with no detected silence and 0.199s duration drift; it did not report start-offset evidence because this metric was not yet implemented.
