@@ -75,3 +75,7 @@ A successful render is not necessarily a successful video. CI proves reproducibi
 ## Expanded deterministic storyboard quality review
 
 The storyboard QA CLI includes warning-only signals for potentially vague visual/action descriptions, progression that lacks explicit Start/Development/End phases, highly similar adjacent visual descriptions and lengthy on-screen copy. Treat these as prompts to rewrite the weakest shots—not hard rules. The heuristics cannot understand narrative intent or judge rendered creative quality.
+
+## Storyboard critique report
+
+Use `npm run storyboard:critic -- <production-plan.json> [output.md]` to turn existing deterministic QA warnings into prioritized, specific revision suggestions. The critic is review-only: it never edits the source plan, does not call an AI model, and does not approve creative quality. Apply changes to a separate copy and rerun plan validation and storyboard QA.
