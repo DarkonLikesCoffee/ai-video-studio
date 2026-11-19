@@ -61,7 +61,7 @@ if (process.argv[1]?.endsWith("qa-contact-sheet.ts")) {
     const result = await createContactSheet(inputPath, outputPath, o);
     if (reportPath) {
       const report = { schemaVersion: 1, inputPath, ...result, generatedBy: "qa:contact-sheet" };
-      await writeFile(resolve(reportPath), JSON.stringify(report, null, 2) + "\\n", "utf8");
+      await writeFile(resolve(reportPath), JSON.stringify(report, null, 2) + "\n", "utf8");
     }
     process.stdout.write(`Contact sheet: ${result.outputPath}\nSampled ${result.frameCount} frames from ${result.durationSeconds.toFixed(2)}s; grid ${o.columns}x${result.rows}${reportPath ? `; report ${resolve(reportPath)}` : ""}.\n`);
   } catch (e) {
