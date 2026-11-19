@@ -211,3 +211,12 @@ Append one entry per meaningful development session:
 - Main CI after merge: run #44502943805 was queued at the time of this update; do not mark the post-merge CI complete until its result is checked.
 - No MP4 render was started: this PR changes pre-production planning review only and deliberately leaves the render request and renderer untouched.
 - Current main at documentation update start: `e7988966b6783ff0cf4e0f92bcd656859b9cafc3`.
+
+## 2026-11-19 — Expanded storyboard quality signals (PR preparation)
+
+- Started `feature/storyboard-quality-signals` from live main `f2f54d121279944a19a5fe187efba6b6aeccc066`.
+- Extended `storyboard:qa` with transparent warning-only checks: generic/placeholder visual descriptions, vague actions, missing explicit Start/Development/End progression markers, highly similar adjacent visual descriptions, and long on-screen copy.
+- These checks do not fail production plans and are not semantic quality scores. The purpose is to help an agent identify weak shots and rewrite them before asset production.
+- Added regression tests for all five signals; existing risk warnings remain unchanged.
+- Updated README and agent workflow guidance.
+- Pending validation/CI. No render yet; this change affects pre-production review only.
