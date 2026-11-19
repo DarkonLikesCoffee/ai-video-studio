@@ -59,6 +59,8 @@ jobs:
           name: storyboard-planning-previews
           path: review-output/*.html
           retention-days: 7
+      - name: Generate storyboard critic report on launch-film example
+        run: npm run storyboard:critic -- projects/examples/production-plan.json review-output/launch-film-critique.md
       - name: Run storyboard risk report on launch-film example
         run: npm run storyboard:qa -- projects/examples/production-plan.json
       - name: Run storyboard risk report on narrated explainer

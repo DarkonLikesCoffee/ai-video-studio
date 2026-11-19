@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { validateProductionPlan } from "../scripts/validate-production-plan";
 import { analyzeStoryboardRisks } from "../scripts/storyboard-qa";
+import { critiqueStoryboard, renderStoryboardCritiqueMarkdown } from "../scripts/storyboard-critic";
 
 const example = JSON.parse(
   await readFile(new URL("../projects/examples/production-plan.json", import.meta.url), "utf8")
@@ -146,4 +147,43 @@ test("storyboard QA warns on runs of three adjacent shots with the same recogniz
   shots.forEach((shot) => { shot.framing = "Medium shot with subject left"; });
   const findings = analyzeStoryboardRisks(plan);
   assert.ok(findings.some((finding) => finding.code === "REPEATED_SHOT_SCALE" && finding.shotIds.length === 4));
+});
+
+
+test("storyboard critic prioritizes actionable high-impact shot revisions", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots[0]!.visual = "Show this concept";
+  shots[0]!.action = "Show the idea";
+  shots[0]!.visualProgression = "No change";
+  const critique = critiqueStoryboard(plan);
+  assert.ok(critique.length > 0);
+  assert.equal(critique[0]!.priority, "high");
+  assert.ok(critique[0]!.revision.length > 30);
+  assert.ok(critique.some((item) => item.shotIds.includes("opening-macro")));
+});
+
+test("storyboard critic report is review-only and does not modify the source plan", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots[0]!.visual = "Show this concept";
+  shots[0]!.action = "Show the idea";
+  const before = JSON.stringify(plan);
+  const report = renderStoryboardCritiqueMarkdown(plan);
+  assert.match(report, /Review-only report/);
+  assert.match(report, /Suggested revision/);
+  assert.match(report, /validate:plan/);
+  assert.equal(JSON.stringify(plan), before);
+});
+
+test("storyboard critic states no creative approval when no findings exist", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots.forEach((shot, index) => {
+    shot.durationSeconds = 3;
+    shot.visualMethod = `method-${index}`;
+    shot.framing = `frame-${index}`;
+    shot.cameraMovement = `move-${index}`;
+  });
+  assert.match(renderStoryboardCritiqueMarkdown(plan), /not a creative approval/);
 });

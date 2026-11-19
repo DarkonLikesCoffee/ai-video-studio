@@ -738,3 +738,13 @@ The page presents shot order, time ranges, selected visual methods, concrete act
 ## Storyboard quality signals
 
 The storyboard QA command also reports transparent warning-only heuristics for placeholder-like visual/action descriptions, missing Start/Development/End progression markers, highly similar adjacent visual descriptions, and long on-screen copy. These are review prompts—not semantic judgments or automatic failures. A human/AI creative review remains necessary.
+
+## Storyboard critique report
+
+Run a review-only critique against a production plan:
+
+```bash
+npm run storyboard:critic -- projects/examples/production-plan.json review-output/critique.md
+```
+
+The report turns deterministic storyboard-risk findings into prioritized, concrete revision guidance (high/medium). It does not rewrite the source plan, does not use an AI model, and is not a creative approval. Apply selected changes to a copy, then rerun `npm run validate:plan` and `npm run storyboard:qa`.
