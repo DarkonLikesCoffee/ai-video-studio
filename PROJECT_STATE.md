@@ -232,7 +232,7 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - PR #97 merged as `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; its required `validate` run #44556330379 passed. The CLI converts model-authored storyboard JSON into a validated production plan, checking delivery, frame-aligned contiguous timing and complete exact criterion-to-shot coverage with rationale.
 - Optional `acceptanceCoverage` is schema/runtime validated; legacy plans without coverage remain valid. Free-form `engineApproach` is retained in bounded `implementationNotes`, while recognized enum values remain normalized.
 - Initial CI run #44550086585 failed because the validator's strict enum check rejected five legacy `external-footage-with-3d-inset` values in the narrated-explainer plan. Those values are now preserved as `implementationNotes`, and a regression test validates the migrated example.
-- The final PR diff was reviewed, including compatibility migration of legacy `engineApproach` notes and restoration of the storyboard handoff files; no render gate applies to this planning/import slice. Local tests/typecheck were not run outside CI. Post-merge main CI #44574582076 is in progress.
+- The final PR diff was reviewed, including compatibility migration of legacy `engineApproach` notes and restoration of the storyboard handoff files; no render gate applies to this planning/import slice. Local tests/typecheck were not run outside CI. Post-merge main CI #44574582076 passed.
 - Next: review current CI/diff, fix any remaining failures, merge only after checks pass, then connect production-plan criteria to asset/build evidence and visual QA.
 
 
