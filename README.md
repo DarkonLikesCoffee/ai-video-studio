@@ -770,3 +770,8 @@ npm run storyboard:qa -- projects/<slug>/production/production-plan-revised.json
 ```
 
 The CLI refuses to proceed if the original source file changed or the embedded source text/hash no longer match. The original plan is never overwritten. Validation errors and heuristic warnings are stored separately in the revision artifact; warnings are not semantic creative approval. Suggestions are not automatically applied: edits remain explicit and reviewable.
+
+
+### True-peak audio QA
+
+The media QA report extracts EBU R128 true-peak readings from FFmpeg's `ebur128` summary when available. A reading above the recommended `-1.0 dBFS` threshold is reported as a warning; above `0.0 dBFS` is an error. Missing true-peak data is not treated as a pass or failure and is omitted from the report. These thresholds are configurable through `inspectMedia` options (`warningTruePeakDbfs`, `maxTruePeakDbfs`).
