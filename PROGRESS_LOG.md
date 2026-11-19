@@ -264,3 +264,10 @@ Append one entry per meaningful development session:
 - Found `PROJECT_STATE.md` was stale and contradicted recent merged milestones. Replaced it with a current, evidence-based snapshot including PRs #66–#71 and explicit limits of the storyboard QA/critic tools.
 - Added the traceable storyboard revision artifact as a roadmap item: source plan, critique, selected suggestions, explicit edits and validation result, with original plan preserved.
 - This is documentation reconciliation only; no implementation or render was performed.
+
+
+## 2026-11-19 — Preserve continuity context during snapshot update
+
+- Safety review found the initial PR #72 draft shortened `PROJECT_STATE.md` too aggressively, removing useful architecture, engine capability, limitation, and VALORANT benchmark context.
+- Revised the proposed snapshot to preserve sections 1–5 of the existing state document and replace only stale duplicated history with current verified milestones and resume instructions.
+- CI must re-run against this updated head before merge. This is a documentation improvement only; no tests or render are claimed.
