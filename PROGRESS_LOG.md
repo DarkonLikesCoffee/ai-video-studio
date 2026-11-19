@@ -477,3 +477,13 @@ Append one entry per meaningful development session:
 - Inspected latest PR #98 CI run #44591887176. Type-check passed; the test step failed to load `tests/director-asset-evidence.test.ts` because the unknown-shot assertion at line 88 was missing a closing parenthesis. Earlier run #44585662593 had the same syntax error in the shared-asset assertion at line 80; that was corrected in a later head, revealing the second typo.
 - Fixed the line-88 assertion on the existing `feat/director-asset-evidence-report` branch in commit `42bdb0366e3a3ffa8063b5bde982cf4d559f3c6a`. No test was bypassed. Connector-only environment means tests were not executed locally; CI is required on the final branch head.
 - Updated PROJECT_STATE with the CI evidence. Main CI #44574582076 passed. This report-only change does not require a render gate. No full video playback or audio listening was performed.
+
+
+## 2026-11-19 — PR #98 merged; media QA stream start-offset diagnostic in progress
+
+- PR #98 criterion-to-asset evidence report merged as `73807bad31f133a0a2819cdd084286903f963645`. Required `validate` CI #44608513408 passed; post-merge main CI also passed. The report-only criterion→shot→manifest bridge is now on main; it checks unresolved references, local path/file safety and provenance/rights fields without asserting visual suitability.
+- Re-read `START_HERE.md` and its required state/roadmap/log/agent/docs/skills; checked current main, open PRs (none), CI/workflows and relevant media-QA implementation. PRs #95 and #97 remain merged and are not being redone; PR #80 remains closed/unmerged and its true-peak fix is through #86.
+- Roadmap P0 synchronization/QA remains incomplete: duration checks cannot detect equal-length streams with differing start timestamps. Selected a focused follow-up on branch `feat/media-qa-av-start-offset`.
+- Added ffprobe stream `start_time` support and a signed `audioVideoStartOffsetSeconds` measurement (audio start minus video start). Absolute offsets over 0.5s default fail, independently from duration drift; the option is configurable. Missing timestamps are omitted rather than guessed.
+- Added regression tests for aligned starts, late audio with equal stream durations, early audio, configurable threshold and absent timestamps. Updated README and Media QA skill plus PROJECT_STATE and ROADMAP. No local test/typecheck was run because this connector session cannot execute the repo; CI is required.
+- This diagnostic slice does not require a render. No new render, full video playback or audio listening was performed. Latest previously inspected render run #42 remains technical QA evidence only: no detected silence and 0.199s duration drift, with limited contact-sheet inspection.
