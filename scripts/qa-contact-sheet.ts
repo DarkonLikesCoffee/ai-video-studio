@@ -46,9 +46,11 @@ if (process.argv[1]?.endsWith("qa-contact-sheet.ts")) {
     }
     validateContactSheetOptions(o);
     const inputPath = resolve(input);
-    const outputPath = resolve(output ?? inputPath.replace(/\\.[^.]+$/, "") + ".contact-sheet.jpg");
+    const extensionIndex = inputPath.lastIndexOf(".");
+    const basePath = extensionIndex > 0 ? inputPath.slice(0, extensionIndex) : inputPath;
+    const outputPath = resolve(output ?? basePath + ".contact-sheet.jpg");
     const result = await createContactSheet(inputPath, outputPath, o);
-    process.stdout.write(`Contact sheet: ${result.outputPath}\\nSampled ${result.frameCount} frames from ${result.durationSeconds.toFixed(2)}s; grid ${o.columns}x${result.rows}.\\n`);
+    process.stdout.write(\`Contact sheet: \${result.outputPath}\nSampled \${result.frameCount} frames from \${result.durationSeconds.toFixed(2)}s; grid \${o.columns}x\${result.rows}.\n\`);
   } catch (e) {
     process.stderr.write(`Contact-sheet generation failed: ${e instanceof Error ? e.message : String(e)}\\n`);
     process.exitCode = 2;
