@@ -129,6 +129,23 @@ test("applies footage as a full-frame background while retaining scene overlays"
 });
 
 
+test("clamps retimed footage layer windows to the shortened scene", () => {
+  const input = project();
+  input.scenes[0]!.durationInFrames = 100;
+  const output = applyNarratedFootageToProject(input, {
+    assets: [
+      { file: "ace-one.mp4", rightsBasis: "user-owned", rightsNote: "Recorded by me in my own matches.", shotIds: ["opening"] },
+      { file: "ace-two.mp4", rightsBasis: "user-owned", rightsNote: "Recorded by me in my own matches.", shotIds: ["opening"] },
+    ],
+  }, plan);
+  const layers = output.scenes[0]?.mediaLayers ?? [];
+  assert.equal(layers.length, 2);
+  assert.deepEqual(layers.map((layer) => [layer.startInFrames, layer.durationInFrames]), [[0, 50], [50, 50]]);
+  for (const layer of layers) {
+    assert.ok((layer.startInFrames ?? 0) + (layer.durationInFrames ?? 0) <= 100);
+  }
+});
+
 test("applies multiple selected gameplay clips as sequential full-frame layers in one scene", () => {
   const input = project();
   const output = applyNarratedFootageToProject(input, {
