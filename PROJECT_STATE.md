@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `d643e752b4430165121072185ef41e8ad5fc940c` — `feat(director): define creative brief contract (#93)`
-**Current development branch:** `main`; PR #93 creative-brief contract is merged. PR #84's automatic contact-sheet JPG + JSON evidence integration is verified by real Render workflow run #42 (artifact #14532466761); PR #86's EBU R128 True Peak correction is also merged. PR #93 CI run #44536804622 passed for head `50ee419791c88338a1b8ac690176ba088e5fb2bb`; post-merge main CI run #44537158524 is still running.
+**Last verified main commit:** `7fc374fc8c96cd617bd490da5cff5fe8ea49fa0a` — `docs: verify contact-sheet render artifact on run 42 (#94)`
+**Current development branch:** `fix/production-plan-schema-runtime-contract` (schema/validator alignment in progress). PR #93 creative-brief contract and PR #94 render evidence reconciliation are merged. PR #84's automatic contact-sheet JPG + JSON integration is verified by Render run #42 (artifact #14532466761); PR #86's EBU R128 True Peak correction is merged. PR #93 CI #44536804622 and post-merge main CI #44537158524 passed; PR #94 CI #44537425586 and post-merge main CI #44537639626 passed. This branch aligns the production-plan JSON Schema with runtime-required shot fields and optional narrative-beat tags; CI pending.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -221,3 +221,9 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Contact-sheet report: 10 samples at 0, 5, 10, 15, 20, 25, 30, 35, 40 and 45 seconds; interval 5s, 4 columns, thumbnail width 320px. The actual contact-sheet image was retrieved and visually inspected. It shows recurring title/overlay composition in adjacent samples and gameplay imagery; sparse samples do not establish continuous motion, pacing or synchronization.
 - Full video playback and audio listening were not performed. This is artifact packaging and sparse visual evidence, not creative acceptance.
 - Run: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383 ; artifact: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383/artifacts/14532466761
+
+## Production-plan schema/runtime contract alignment (in progress)
+
+- Current main: `7fc374fc8c96cd617bd490da5cff5fe8ea49fa0a` (PR #94 merged; post-merge CI run #44537639626 passed).
+- The production-plan JSON Schema previously omitted `visualMethod`, `action`, and `visualProgression` from shot properties/required fields even though `validateProductionPlan` requires them; it also omitted optional `narrativeBeat`, which the validator accepts. With `additionalProperties:false`, the schema could reject valid plans or fail to communicate required fields to consumers.
+- Branch `fix/production-plan-schema-runtime-contract` adds the three missing required properties and optional supported `narrativeBeat` enum. A contract test ensures runtime-required fields are present in the schema and the beat enum matches the exported list. CI is pending; no render gate is applicable to this schema-only fix.
