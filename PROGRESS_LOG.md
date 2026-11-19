@@ -325,3 +325,11 @@ Append one entry per meaningful development session:
 - Contact-sheet image is retained in the current work environment at `/mnt/data/valorant-v4-qa/contact-sheet.jpg`; MP4/QA ZIP at `/mnt/data/valorant-v4-artifact.zip`. These are session artifacts, not repository assets.
 - This completes one real-artifact contact-sheet/QA trial, but not full creative acceptance: no full-timeline playback or audio listening occurred, and sparse samples cannot verify motion continuity or shot timing.
 - Next: turn the contact-sheet workflow into repeatable evidence/acceptance (including audio listening and true-peak coverage on a fresh render), then prioritize a production change that reduces repetitive text-overlay compositions instead of adding more QA infrastructure.
+
+
+## 2026-11-19 — Contact-sheet evidence report (PR preparation)
+
+- Added a pure helper to calculate exact sample timestamps, matching the contact-sheet interval/count logic (including short clips and non-multiple durations).
+- Extended the CLI with optional `--report report.json`. The JSON evidence report records schema version, input path, duration, frame count, grid rows, exact sampled timestamps, selected options, contact-sheet output path and generator name. Report output is optional; existing CLI use remains unchanged.
+- Added unit coverage for timestamp sequence, short clips and invalid intervals. CI is pending; do not claim tests pass until workflow confirms.
+- Goal: make sparse visual inspection repeatable and reviewable without pretending it replaces continuous playback or creative QA.
