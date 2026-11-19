@@ -333,3 +333,10 @@ Append one entry per meaningful development session:
 - Extended the CLI with optional `--report report.json`. The JSON evidence report records schema version, input path, duration, frame count, grid rows, exact sampled timestamps, selected options, contact-sheet output path and generator name. Report output is optional; existing CLI use remains unchanged.
 - Added unit coverage for timestamp sequence, short clips and invalid intervals. CI is pending; do not claim tests pass until workflow confirms.
 - Goal: make sparse visual inspection repeatable and reviewable without pretending it replaces continuous playback or creative QA.
+
+## 2026-11-19 — Visual strategy alternatives report (PR pending)
+
+- Added `scripts/storyboard-strategy.ts` and `npm run storyboard:strategy`, a report-only command that summarizes storyboard visual-method distribution and turns existing deterministic QA signals into shot-specific production alternatives.
+- Alternatives are concrete options (e.g. footage, physical/3D demonstration, macro detail, before/after, motivated camera choices) rather than generic "add variety" advice. The report does not modify the plan or claim semantic understanding.
+- Added regression tests for method counts, actionable shot alternatives and explicit report limitations.
+- Branch: `feat/storyboard-visual-strategy-report`. CI must validate before merge; local test execution was not possible in this session because the container could not resolve github.com.
