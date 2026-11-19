@@ -75,7 +75,8 @@
           "transition": { "type": "string", "minLength": 1, "maxLength": 200 },
           "audio": { "type": "string", "minLength": 1, "maxLength": 300 },
           "assets": { "type": "array", "items": { "type": "string", "maxLength": 120 } },
-          "engineApproach": { "type": "string", "enum": ["project-video", "custom-remotion", "external-footage"] }
+          "engineApproach": { "type": "string", "enum": ["project-video", "custom-remotion", "external-footage"] },
+          "implementationNotes": { "type": "string", "maxLength": 500 }
         }
       }
     },
