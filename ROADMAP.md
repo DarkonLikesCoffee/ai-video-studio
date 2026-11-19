@@ -217,3 +217,8 @@ The recent work has established important pipeline foundations: media QA diagnos
 
 The largest gap is not basic rendering. It is the **production intelligence and audiovisual quality** between a user's prompt and the final edit.
 \n\n## 2026-11-19 — Visual strategy report JSON (completed)\n\n- [x] PR #82 adds machine-readable, versioned JSON output to `storyboard:strategy` alongside Markdown, including optional file output.\n- CI passed for PR head `b12bd9cf`; PR #82 merged as `25e946045f00764142fb26c9c8e305bdd511e8c5`; post-merge main CI passed.\n- This remains deterministic, advisory QA—not semantic understanding, automatic creative revision or autonomous Production Director behavior.\n- Next slice: review the existing revision-artifact workflow and design a non-duplicative, reviewable bridge from visual-strategy findings to explicit revision suggestions/edits.\n
+
+## Render evidence workflow
+
+- [ ] Automatically attach a contact sheet and JSON evidence report to every GitHub Actions render artifact (implementation PR in progress; verify CI before marking complete).
+- [ ] Inspect actual render artifacts across motion and listen to audio; contact sheets alone are insufficient acceptance.
