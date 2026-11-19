@@ -131,7 +131,7 @@ Read `START_HERE.md`, this file, `ROADMAP.md`, `PROGRESS_LOG.md`, `AGENTS.md`, `
 
 ## Media QA true-peak measurement correction (PR #80 in progress)
 
-The report had true-peak thresholds/parser tests, but FFmpeg EBU R128 was not configured with `peak=true`, so the real benchmark report omitted true peak. The parser also expected a one-line `True peak: -1.5 dBFS` layout, while FFmpeg emits `True peak:\n  Peak: -1.5 dBFS. PR #80 enables true-peak mode, parses the actual summary, and adds regression tests. A local rerun of benchmark v4 with the corrected filter measured -1.5 dBFS. Official CI is pending; audio was not listened to.
+The report had true-peak thresholds/parser tests, but FFmpeg EBU R128 was not configured with `peak=true`, so the real benchmark report omitted true peak. The parser also expected a one-line `True peak: -1.5 dBFS` layout, while FFmpeg emits `True peak:\n  Peak: -1.5 dBFS`. PR #80 enables true-peak mode, parses the actual summary, and adds regression tests. A local rerun of benchmark v4 with the corrected filter measured -1.5 dBFS. Official CI is pending; audio was not listened to.
 
 
 ## Trailing-silence QA improvement (PR #75 merged)
