@@ -54,7 +54,9 @@
       "cameraMovement": "Slow push-in or drifting orbital view.",
       "transition": "Open directly on motion; carry a bright highlight into the next shot.",
       "audio": "Soft atmospheric swell; keep source footage audio muted.",
-      "engineApproach": "external-footage-with-3d-inset"
+      "engineApproach": "external-footage-with-3d-inset",
+      "visualMethod": "Documentary footage",
+      "visualProgression": "Start: sunrise or sunlight begins at the edge of the frame. Development: cloud and light movement establish scale. End: a bright atmospheric highlight leads into the atmosphere shot."
     },
     {
       "id": "molecular-atmosphere",
@@ -68,7 +70,9 @@
       "cameraMovement": "Gentle lateral drift or slow aerial approach.",
       "transition": "Match the cloud texture to the molecular 3D visualization.",
       "audio": "Low airy texture under narration; source footage muted.",
-      "engineApproach": "external-footage-with-3d-inset"
+      "engineApproach": "external-footage-with-3d-inset",
+      "visualMethod": "Documentary footage with 3D scientific inset",
+      "visualProgression": "Start: broad cloud field. Development: lateral drift reveals atmospheric depth. End: the blue atmospheric layer becomes the bridge to the light demonstration."
     },
     {
       "id": "blue-wavelength",
@@ -82,7 +86,9 @@
       "cameraMovement": "Controlled macro push or short lateral slide.",
       "transition": "Cut on the blue portion of the spectrum into scattered light.",
       "audio": "A restrained tonal accent marks the color comparison; source footage muted.",
-      "engineApproach": "external-footage-with-3d-inset"
+      "engineApproach": "external-footage-with-3d-inset",
+      "visualMethod": "Macro footage or scientific light demonstration",
+      "visualProgression": "Start: white light enters the demonstration. Development: light refracts or separates into colors. End: the blue portion is isolated for the next shot."
     },
     {
       "id": "rayleigh-scattering",
@@ -96,7 +102,9 @@
       "cameraMovement": "Slow upward tilt or continuous cloud drift.",
       "transition": "Use a short luminous wipe into the final horizon.",
       "audio": "Soft airy sweep; source footage muted.",
-      "engineApproach": "external-footage-with-3d-inset"
+      "engineApproach": "external-footage-with-3d-inset",
+      "visualMethod": "Atmospheric footage with explanatory 3D visualization",
+      "visualProgression": "Start: wide blue sky. Development: visible light/atmospheric movement with the scientific inset explaining scattering. End: sky blue fills the frame and transitions toward the horizon."
     },
     {
       "id": "blue-horizon",
@@ -110,7 +118,9 @@
       "cameraMovement": "Slow push-in easing to a calm hold.",
       "transition": "Dissolve into the final caption and hold through the end.",
       "audio": "Score resolves with a gentle low impact; source footage muted.",
-      "engineApproach": "external-footage-with-3d-inset"
+      "engineApproach": "external-footage-with-3d-inset",
+      "visualMethod": "Cinematic Earth or sky footage with restrained graphics",
+      "visualProgression": "Start: dark blue horizon. Development: the atmospheric glow and sunrise grow brighter. End: calm hold on the resolved blue horizon."
     }
   ],
   "acceptanceCriteria": [

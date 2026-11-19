@@ -26,6 +26,9 @@ type Plan = {
     durationSeconds?: unknown;
     purpose?: unknown;
     visual?: unknown;
+    visualMethod?: unknown;
+    action?: unknown;
+    visualProgression?: unknown;
     framing?: unknown;
     cameraMovement?: unknown;
     transition?: unknown;
@@ -108,7 +111,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
       if (Number.isFinite(start) && Number.isFinite(duration) && start + duration > totalDurationSeconds + 1e-6) {
         errors.push(`shots[${index}] extends beyond the delivery duration.`);
       }
-      for (const field of ["purpose", "visual", "framing", "cameraMovement", "transition", "audio"] as const) {
+      for (const field of ["purpose", "visual", "visualMethod", "action", "visualProgression", "framing", "cameraMovement", "transition", "audio"] as const) {
         const fieldValue = shot[field];
         if (typeof fieldValue !== "string" || !fieldValue.trim()) {
           errors.push(`shots[${index}].${field} is required.`);

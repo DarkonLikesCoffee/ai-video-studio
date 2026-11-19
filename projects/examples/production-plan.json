@@ -55,7 +55,10 @@
       "assets": [
         "macro-metal-detail"
       ],
-      "engineApproach": "external-footage"
+      "engineApproach": "external-footage",
+      "visualMethod": "3D macro product scene",
+      "action": "The camera advances toward the brushed metal edge while a narrow highlight travels across it; the full object stays concealed.",
+      "visualProgression": "Start: nearly black with only a sliver of metal. Development: the highlight sweeps and reveals texture. End: the edge becomes a visual bridge to the product silhouette."
     },
     {
       "id": "form-reveal",
@@ -71,7 +74,10 @@
       "assets": [
         "product-hero"
       ],
-      "engineApproach": "custom-remotion"
+      "engineApproach": "custom-remotion",
+      "visualMethod": "3D product animation",
+      "action": "The headphones rotate into a three-quarter view as highlights travel across the headband and earcups.",
+      "visualProgression": "Start: the object is only partially visible. Development: the orbit reveals the full silhouette and material. End: the product settles into a clear three-quarter composition."
     },
     {
       "id": "detail-proof",
@@ -87,7 +93,10 @@
       "assets": [
         "control-detail"
       ],
-      "engineApproach": "external-footage"
+      "engineApproach": "external-footage",
+      "visualMethod": "3D macro animation",
+      "action": "A close-up isolates a control or seam while a light sweep exposes its finish.",
+      "visualProgression": "Start: enter on a cropped, ambiguous detail. Development: the lateral camera move and light sweep reveal the construction. End: hold on the readable detail."
     },
     {
       "id": "hero-payoff",
@@ -104,7 +113,10 @@
         "product-hero",
         "brand-lockup"
       ],
-      "engineApproach": "custom-remotion"
+      "engineApproach": "custom-remotion",
+      "visualMethod": "3D hero product scene",
+      "action": "The complete product settles into the hero composition and the brand lockup appears.",
+      "visualProgression": "Start: product is still moving into frame. Development: it settles as the background simplifies. End: the lockup and product hold in a clean final frame."
     }
   ],
   "assetManifestPath": "projects/launch-film-example/production/asset-manifest.json",

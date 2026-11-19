@@ -118,3 +118,24 @@ Append one entry per meaningful development session:
 - **Known issues:**
 - **Next action:** one clear highest-priority next step.
 - **Current branch / commit:**
+
+## 2026-11-19 — Visual storytelling production guidance (in progress)
+
+- Goal: begin implementing the roadmap direction by making the agent production process explicitly story-first and anti-slideshow, before attempting a broad renderer rewrite.
+- Created branch `feature/visual-storytelling-production-guidelines` from roadmap commit `1341df8aa1f391024d5f30d25ecadc6048b9bebb`.
+- Updated `agent/skills/creative-director/SKILL.md`: visual storytelling over animating information, concrete events/actions, per-shot visual-method selection, and effects only when motivated.
+- Updated `agent/skills/storyboard/SKILL.md`: each shot must define method, action, start→development→end progression, motion, assets/fallback, and a slideshow-risk review before production.
+- Updated `agent/README.md`: clarified production-method selection and added a production-intelligence checklist before scene building.
+- No renderer or production-plan schema changes yet. This is the first workflow-guidance slice, not an implemented autonomous Director or new engine capability.
+- Validation: changes are documentation-only; no tests or render were run. Validate links/content and open PR for review; CI should still be checked before merge.
+- Next: open PR, inspect its CI; then build a small testable storyboard-quality validator that can identify missing shot actions/progression and warn about slideshow risk without overclaiming semantic AI QA.
+- Current branch: `feature/visual-storytelling-production-guidelines`.
+
+## 2026-11-19 — Production-plan shot requirements added (PR #66, validation pending)
+
+- Added required `visualMethod`, `action`, and `visualProgression` shot fields to `validateProductionPlan`.
+- Added regression tests for omitted method, action and progression.
+- Enriched all four existing production-plan examples with the new fields. Each shot now describes method selection, a concrete action and start/development/end visual progression.
+- The validator currently checks presence/non-empty strings only; it does not claim to judge creative quality or automatically detect slide-like output.
+- CI run #44498960909 is validating the latest branch head. No render was performed.
+- Next: resolve CI; then consider deterministic storyboard-risk warnings as a separate, testable slice.

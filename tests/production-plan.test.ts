@@ -37,3 +37,20 @@ test("production plan rejects out-of-order shots", () => {
   shots[2]!.startSeconds = 2;
   assert.ok(validateProductionPlan(invalid).some((error) => error.includes("ordered")));
 });
+
+test("production plan requires a selected visual method for every shot", () => {
+  const invalid = structuredClone(example);
+  const shots = invalid.shots as Array<Record<string, unknown>>;
+  delete shots[0]!.visualMethod;
+  assert.ok(validateProductionPlan(invalid).some((error) => error.includes("visualMethod")));
+});
+
+test("production plan requires concrete action and visual progression", () => {
+  const invalid = structuredClone(example);
+  const shots = invalid.shots as Array<Record<string, unknown>>;
+  delete shots[1]!.action;
+  shots[2]!.visualProgression = " ";
+  const errors = validateProductionPlan(invalid);
+  assert.ok(errors.some((error) => error.includes("action")));
+  assert.ok(errors.some((error) => error.includes("visualProgression")));
+});
