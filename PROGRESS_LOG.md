@@ -347,4 +347,12 @@ Append one entry per meaningful development session:
 - `storyboard:strategy` currently emits Markdown by default. New branch `feat/storyboard-strategy-json` adds a versioned JSON output envelope with `schemaVersion`, `reportType`, `planTitle`, the full report payload, and `generatedBy`.
 - CLI adds `--json`; optional file output remains supported, enabling future agent/workflow consumption without scraping Markdown.
 - Regression test validates JSON envelope and report content. CI pending.
-\n\n## 2026-11-19 — PR #82 merged; state docs reconciliation\n\n- PR #82 `Add machine-readable storyboard strategy reports` merged by squash to main as `25e946045f00764142fb26c9c8e305bdd511e8c5`.\n- PR CI run #44520734383 passed for head `b12bd9cf6ff06442fa6ef91e82bd53f720e5b8ec`; post-merge main CI run #44521207902 passed for merge commit.\n- Added `--json` to `storyboard:strategy`, producing a versioned envelope while retaining Markdown default.\n- Reconciled PROJECT_STATE's commit snapshot and fixed an earlier escaped-newline formatting artifact in the strategy-report section.\n- Next: examine the existing `storyboard:revision` artifact workflow before designing any integration; avoid duplicating the critic's existing suggestions.\n
+
+
+## 2026-11-19 — PR #82 merged; state docs reconciliation
+
+- PR #82 `Add machine-readable storyboard strategy reports` merged by squash to main as `25e946045f00764142fb26c9c8e305bdd511e8c5`.
+- PR CI run #44520734383 passed for head `b12bd9cf6ff06442fa6ef91e82bd53f720e5b8ec`; post-merge main CI run #44521207902 passed for merge commit.
+- Added `--json` to `storyboard:strategy`, producing a versioned envelope while retaining Markdown default.
+- Reconciled PROJECT_STATE's commit snapshot and fixed an earlier escaped-newline formatting artifact in the strategy-report section.
+- Next: examine the existing `storyboard:revision` artifact workflow before designing any integration; avoid duplicating the critic's existing suggestions.
