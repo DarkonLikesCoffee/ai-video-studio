@@ -162,3 +162,11 @@ Prioritize a small working vertical slice over a large architecture rewrite. Bef
 - Production-plan validator requires `visualMethod`, `action`, and `visualProgression` for every shot. All four checked-in production-plan examples were updated. Tests cover missing method/action/progression.
 - These checks validate plan completeness, not creative quality or semantic slideshow detection. No renderer changes or render were made.
 - Next implementation slice: add a deterministic storyboard-risk report with transparent heuristic warnings (long holds, repeated adjacent visual method/framing/motion, static cues), without treating warnings as failures or pretending to understand story semantics.
+
+## 10. Development update — deterministic storyboard risk report (in progress, 2026-11-19)
+
+- Branch `feature/storyboard-risk-report` started from current main after PR #66 and its documentation follow-ups.
+- Added `scripts/storyboard-qa.ts`, exporting `analyzeStoryboardRisks` and a CLI that prints review warnings for long shots (8s+), static/locked camera holds (5s+), repeated adjacent framing (2+), repeated visual methods (3+) and repeated camera movement (3+).
+- Warnings are intentionally non-fatal and transparent; they identify patterns for review and do not claim semantic understanding or prove that a storyboard is bad.
+- Added tests for long/static shots, repeated framing, repeated method/movement and a varied short sequence. Added `npm run storyboard:qa` and a CI invocation against the example production plan.
+- CI validation is pending for this branch; no render was run.
