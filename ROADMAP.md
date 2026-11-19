@@ -235,15 +235,15 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 - The render workflow packaging/integration milestone is demonstrated; the broader P0 repeatable QA and human creative-acceptance checklist remains open.
 - Run: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383 ; artifact: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383/artifacts/14532466761
 
-## Production-plan schema contract correction (in progress)
+## Production-plan schema contract correction (completed)
 
 - The JSON Schema was missing the validator-required `visualMethod`, `action`, and `visualProgression` shot fields, and it omitted optional `narrativeBeat` labels accepted by runtime validation. Because `shots.items.additionalProperties` is false, schema consumers could reject or fail to request fields that the CLI requires.
-- Branch `fix/production-plan-schema-runtime-contract` adds the missing required fields, the optional narrative-beat enum, and a regression test comparing the runtime shot contract to the schema. CI pending; no video render needed for this schema-only correction.
+- PR #96 merged as `98a972911052fa8a3381c4852e1f6f38c1d94398`; CI run #44538121663 passed. The missing required fields, optional narrative-beat enum and schema/runtime contract regression test are integrated. No video render was needed for this schema-only correction.
 
 
-## 2026-11-19 — Production-plan schema correction merged; storyboard import in progress
+## 2026-11-19 — PR #95 merged; production-plan import compatibility fix
 
-- [x] PR #96 aligns the production-plan JSON Schema with the runtime-required shot fields and narrative-beat enum. CI run #332 (`44538121663`) passed; merge commit `98a972911052fa8a3381c4852e1f6f38c1d94398`.
-- [ ] PR #97 (`feat/director-production-plan-import`) implements the next small vertical slice: convert a model-authored storyboard JSON into a validated production plan, carry the Creative Brief's acceptance criteria, and require exact criterion-to-shot mappings with rationale. It also checks delivery consistency, contiguous timing and frame alignment, and preserves free-form implementation notes. PR #97 is open on head `2face7f8acfc96340800f6e363c650208c2a625e`; check suites are queued. No render is needed for this planning-only slice.
-- [ ] PR #95 (Creative Brief storyboard handoff) remains open, rebased on main `98a972911052fa8a3381c4852e1f6f38c1d94398` at head `7bd50163aa29f284eedc5775891c743f085592cf`. It is mergeable, but check suites are queued with zero check runs reported; ensure checks actually execute before merging.
-- Next: integrate the validated production plan with asset/build stages and review the mapped acceptance evidence against storyboard preview and rendered output; coverage mappings are author claims, not semantic verification.
+- [x] PR #96 schema/runtime correction merged (`98a972911052fa8a3381c4852e1f6f38c1d94398`), CI #44538121663 passed.
+- [x] PR #95 storyboard handoff merged as `76b9b99fdd49c7f95ce35b01301170ab9658a4dd`; PR CI #44550178698 passed on exact head `6209942bdfa08cfeabac0c4f74849e59182db11b`; post-merge main CI #44554881017 passed.
+- [ ] PR #97 converts model-authored storyboard JSON to validated production-plan JSON. Its initial CI #44550086585 exposed legacy free-form `engineApproach` values in the narrated-explainer sample. The five values are preserved as `implementationNotes`, and a regression test validates the migrated plan. CI is rerunning on the branch updated to include PR #95.
+- Next: after PR #97 passes and merges, connect criterion-to-shot evidence to asset selection/build validation with a small testable vertical slice. Coverage mappings remain authored claims and need visual QA.
