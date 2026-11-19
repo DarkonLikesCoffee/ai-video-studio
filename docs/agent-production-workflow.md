@@ -29,16 +29,16 @@ Define how an AI agent turns a natural-language brief into a finished video usin
 ## Agent operating loop
 
 1. Read the user's prompt and all supplied references. Preserve factual details and distinguish verified facts from assumptions.
-2. Apply the Creative Director skill and record the selected direction.
-3. Produce the shot-level storyboard JSON from the creative handoff (or author it directly). Import it with npm run director:production-plan -- <creative-brief.json> <storyboard.json> <production-plan.json>. The importer requires exact delivery settings, frame-aligned contiguous timing, and complete acceptance-criterion mappings to known shot IDs with rationale. Coverage is an authored claim, not semantic proof; review each mapped shot against its criterion.
-4. Apply the Storyboard skill. Check adjacent-shot variety and use the preview as a review checkpoint. Where useful, label shots with narrativeBeat and run storyboard:beats; treat its prompts as review guidance, not a fixed narrative formula. If revisions are needed, initialize a revision artifact, select recommendations, export a Markdown report, and author explicit edits separately. Selection alone does not change the plan. For selected critiques, use storyboard:revision prompt to create a model-neutral handoff containing only affected shots and selected findings. Treat returned JSON edits as suggestions: import them with storyboard:revision import-edits. The importer limits edits to selected shot IDs, rejects duplicate/unknown IDs and unsupported fields, then validate/apply to a separate plan copy.
-5. Apply Asset Producer and Audio Designer. Create local assets and provenance/cue manifests.
-6. Map the storyboard into the existing project schema. If a requested shot needs unsupported 3D or other features, decide whether to implement a reusable engine feature or choose a different visual solution.
-7. Validate before rendering. Do not render all showcase videos for a project-specific change.
-8. Render only the selected output.
-9. Download and inspect the exact MP4 artifact from that run. Generate contact sheets and keyframes, and watch the full video if playback is available.
-10. Apply Visual QA. If it fails, change the fewest high-impact things and rerender.
-11. Deliver only the inspected final artifact, with the source commit and render-run link.
+2. Validate the brief with `npm run director:brief -- <creative-brief.json>`. Use `npm run director:storyboard-prompt -- <creative-brief.json> [handoff.md]` to create the shot-level handoff. Submit it to a creative model/agent, then review the storyboard against the output contract and brief; the CLI creates instructions, not the storyboard itself.
+3. Apply the Creative Director skill and record the selected direction.
+4. Produce the shot-level storyboard JSON from the creative handoff (or author it directly). Import it with npm run director:production-plan -- <creative-brief.json> <storyboard.json> <production-plan.json>. The importer requires exact delivery settings, frame-aligned contiguous timing, and complete acceptance-criterion mappings to known shot IDs with rationale. Coverage is an authored claim, not semantic proof; review each mapped shot against its criterion.
+5. Apply the Storyboard skill. Check adjacent-shot variety and use the preview as a review checkpoint. Where useful, label shots with narrativeBeat and run storyboard:beats; treat its prompts as review guidance, not a fixed narrative formula. If revisions are needed, initialize a revision artifact, select recommendations, export a Markdown report, and author explicit edits separately. Selection alone does not change the plan. For selected critiques, use storyboard:revision prompt to create a model-neutral handoff containing only affected shots and selected findings. Treat returned JSON edits as suggestions: import them with storyboard:revision import-edits. The importer limits edits to selected shot IDs, rejects duplicate/unknown IDs and unsupported fields, then validate/apply to a separate plan copy.
+6. Apply Asset Producer and Audio Designer. Create local assets and provenance/cue manifests.
+7. Map the storyboard into the existing project schema. If a requested shot needs unsupported 3D or other features, decide whether to implement a reusable engine feature or choose a different visual solution.
+8. Validate before rendering. Do not render all showcase videos for a project-specific change.
+9. Render only the selected output.
+10. Download and inspect the exact MP4 artifact from that run. Generate contact sheets and keyframes, and watch the full video if playback is available.
+11. Apply Visual QA. If it fails, change the fewest high-impact things and rerender.
 
 ## Current capability truth
 
