@@ -236,13 +236,11 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Next: review current CI/diff, fix any remaining failures, merge only after checks pass, then connect production-plan criteria to asset/build evidence and visual QA.
 
 
-## Creative Brief → asset evidence report (development branch)
+## Creative Brief → asset evidence report (merged)
 
-- PR #98 merged: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98 as `73807bad31f133a0a2819cdd084286903f963645` (required CI #44608513408 passed).
-- New `director:asset-evidence` CLI maps manifest entries to shot IDs and criterion coverage; checks local file presence/path safety and provenance/rights metadata; surfaces unresolved planned asset references and unknown shot IDs.
-- Report is review-only. Asset links are not semantic proof; procedural shots may intentionally have no manifest assets. `--strict` is opt-in.
-- Tests are added for linked files, missing file/provenance/rights, `all` assignments, unknown IDs, unsafe paths, unresolved plan references and missing coverage.
-- CI history: #44577136550 failed typecheck (fixed); #44585662593 failed tests due to a missing closing parenthesis in the shared-asset test at line 80; #44591887176 failed on the same test file at line 88, where `assert.ok(...some(...))` was missing its final closing parenthesis. The test syntax was corrected on the same branch in commit `42bdb0366e3a3ffa8063b5bde982cf4d559f3c6a`; a new CI run is required for this exact commit. Main CI #44574582076 passed. CI remains the validation gate; no render is applicable to this report-only planning slice. No full video playback or audio listening was performed.
+- PR #98 merged: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98 as `73807bad31f133a0a2819cdd084286903f963645` (required CI #44608513408 passed; post-merge main CI succeeded).
+- `director:asset-evidence` maps criterion→shot→manifest assets and checks local file/path safety, unresolved references and provenance/rights metadata. It remains report-only; asset links do not establish semantic relevance, and procedural shots may intentionally have no assets.
+- This planning/report CLI requires no video render. No playback or audio listening was performed.
 
 
 ## 2026-11-19 — PR #98 merged; A/V start-offset QA follow-up
