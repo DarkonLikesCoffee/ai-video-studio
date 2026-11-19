@@ -22,7 +22,7 @@ const alternativesByCode: Partial<Record<StoryboardRiskFinding["code"], string[]
   REPEATED_VISUAL_DESCRIPTION: ["Replace the adjacent shot with a new event, consequence, location, or subject.", "Change what is revealed—not merely the adjectives or camera move.", "Use a contrast or match-cut only if the relationship is clear."],
   STATIC_HOLD: ["Add meaningful subject/environment change, not decorative particles.", "Cut to a new visual beat if the frame has no reason to hold.", "Keep stillness only as an intentional pause or emphasis."],
   LONG_SHOT: ["Split into distinct visual beats if the shot does not evolve.", "Shorten the shot or give it clear staged progression.", "Retain the duration when the action genuinely develops."],
-  VAGUE_VISUAL_DESCRIPTION: ["Specify a concrete subject, setting, composition, and visible event.", "Choose footage, an object demonstration, or a diagram based on what must be shown."],
+  VAGUE_VISUAL_DESCRIPTION: ["Specify a concrete subject, setting, composition, and visible event.", "Choose footage, an object demonstration, a visual demonstration, or a diagram based on what must be shown."],
   VAGUE_ACTION: ["Describe an observable action with a visible change or result.", "Replace abstract explanation with a physical demonstration or reveal."],
   INCOMPLETE_VISUAL_PROGRESSION: ["Define the opening state, what changes, and the final state.", "Use a reveal, transformation, movement, or consequence to create progression."],
 };
