@@ -232,3 +232,14 @@ Append one entry per meaningful development session:
 - PR is merged. No video render was performed because this is a pre-production QA CLI change.
 - Limitations: token similarity and phrase patterns can miss weak shots or produce false positives; they do not semantically evaluate story or inspect video.
 - Next: improve the quality signals with shot-size/layout change and text-vs-visual balance where measurable, then prototype a review/repair loop. Keep actual rendered video QA separate.
+
+
+## 2026-11-19 — Shot-scale variety signals merged (PR #70)
+
+- PR #70 https://github.com/DarkonLikesCoffee/ai-video-studio/pull/70 merged by squash as `50a3e81d2bb29e72307772ba96ec22735af10ccb`.
+- `storyboard:qa` recognizes common shot-scale descriptions (extreme close-up, macro, close-up, medium, wide) and adds warning-only `REPEATED_SHOT_SCALE` (three adjacent shots) and `LOW_SHOT_SCALE_VARIETY` (5+ shots, at least 60% recognizable, no more than two recognized scales).
+- Unknown framings are excluded from scale variety, avoiding warnings based solely on unrecognized terminology.
+- Regression tests added; README and agent guide updated.
+- CI run #44505337143 passed for final head `b7a3a86f322cfeab5a96556cdfa3131c708b948c`: Python narration tests, typecheck, Node tests, plan validation, storyboard previews and QA, all project validations, FFmpeg/FFprobe/audio checks, and studio build. No render was run (pre-production QA only).
+- Next: prototype a separate critique report with prioritized, specific revisions for weak shots. Keep it review-only initially; do not silently rewrite a plan. Validate revised plans with the existing validator and QA, then evaluate an explicit approval/repair loop.
+- Main merge commit: `50a3e81d2bb29e72307772ba96ec22735af10ccb`.
