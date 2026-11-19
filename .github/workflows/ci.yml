@@ -48,6 +48,14 @@ jobs:
         run: npm test
       - name: Validate example production plan
         run: npm run validate:plan -- projects/examples/production-plan.json
+      - name: Run storyboard risk report on launch-film example
+        run: npm run storyboard:qa -- projects/examples/production-plan.json
+      - name: Run storyboard risk report on narrated explainer
+        run: npm run storyboard:qa -- projects/examples/narrated-explainer/production/production-plan.json
+      - name: Run storyboard risk report on SORA
+        run: npm run storyboard:qa -- projects/sora/production/production-plan.json
+      - name: Run storyboard risk report on VALORANT
+        run: npm run storyboard:qa -- projects/valorant-immortal-decision-making/production/production-plan.json
       - name: Validate narrated explainer footage storyboard
         run: npm run validate:plan -- projects/examples/narrated-explainer/production/production-plan.json
       - name: Validate SORA production plan
