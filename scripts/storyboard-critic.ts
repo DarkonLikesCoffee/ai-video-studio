@@ -48,7 +48,7 @@ export const renderStoryboardCritiqueMarkdown = (plan: unknown, items = critique
   if (items.length === 0) return lines.concat("No deterministic critique items were produced. This is not a creative approval.").join("\\n");
   lines.push(`## Suggested revisions (${items.length})`, "");
   items.forEach((item, index) => {
-    lines.push(`### ${index + 1}. [${item.priority.toUpperCase()}] — ${item.shotIds.join(", ")} `, "", `**Issue:** ${item.issue}`, "", `**Suggested revision:** ${item.revision}`, "", `**Why:** ${item.rationale`, "");
+    lines.push(`### ${index + 1}. [${item.priority.toUpperCase()}] — ${item.shotIds.join(", ")} `, "", `**Issue:** ${item.issue}`, "", `**Suggested revision:** ${item.revision}`, "", `**Why:** ${item.rationale}`, "");
   });
   lines.push("## Next step", "", "Apply selected revisions manually to a copy of the plan, then run `npm run validate:plan` and `npm run storyboard:qa`. Do not treat this report as automatic approval.");
   return lines.join("\\n");
