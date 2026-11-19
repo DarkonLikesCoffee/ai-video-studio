@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createStoryboardRevision, applyStoryboardRevisionEdits, validateStoryboardRevision } from "../scripts/storyboard-revision";
+import { createStoryboardRevision, applyStoryboardRevisionEdits, validateStoryboardRevision, setStoryboardRevisionSuggestionSelection, renderStoryboardRevisionReviewMarkdown } from "../scripts/storyboard-revision";
 
 const example = JSON.parse(await readFile(new URL("../projects/examples/production-plan.json", import.meta.url), "utf8"));
 
@@ -14,6 +14,28 @@ test("revision artifact preserves the complete source plan and starts suggestion
   assert.ok(artifact.suggestions.every((suggestion) => suggestion.selected === false));
   assert.deepEqual(artifact.edits, []);
   assert.equal(artifact.validation, null);
+});
+
+test("revision suggestions can be selected and deselected without creating plan edits", () => {
+  const artifact = createStoryboardRevision("example.json", JSON.stringify(example));
+  const first = artifact.suggestions[0];
+  const selected = setStoryboardRevisionSuggestionSelection(artifact, first.id, true);
+  assert.equal(selected.suggestions[0].selected, true);
+  assert.equal(artifact.suggestions[0].selected, false);
+  assert.deepEqual(selected.edits, []);
+  const deselected = setStoryboardRevisionSuggestionSelection(selected, first.id, false);
+  assert.equal(deselected.suggestions[0].selected, false);
+  assert.throws(() => setStoryboardRevisionSuggestionSelection(artifact, "unknown-suggestion"), /Unknown suggestion ID/);
+});
+
+test("revision review markdown distinguishes selections from explicit edits", () => {
+  const artifact = createStoryboardRevision("example.json", JSON.stringify(example));
+  const selected = setStoryboardRevisionSuggestionSelection(artifact, artifact.suggestions[0].id, true);
+  const report = renderStoryboardRevisionReviewMarkdown(selected);
+  assert.match(report, /Selected suggestions:\*\* 1 \/ /);
+  assert.match(report, /SELECTED/);
+  assert.match(report, /Selections are review decisions only/);
+  assert.match(report, /No edits have been authored yet/);
 });
 
 test("applies explicit edits to a copy without mutating the embedded original", () => {
