@@ -74,7 +74,7 @@ export const renderStoryboardRevisionReviewMarkdown = (artifact: StoryboardRevis
   if (artifact.suggestions.length === 0) lines.push("No suggestions were generated.");
   artifact.suggestions.forEach((suggestion) => {
     const item = suggestion.item;
-    lines.push(`### ${suggestion.id} — ${suggestion.selected ? "SELECTED" : "not selected"} (${item.priority.toUpperCase()})`, "", `**Shots:** ${item.shotIds.join(", ")}`, "", `**Issue:** ${item.issue}`, "", `**Proposed direction:** ${item.revision}`, "", `**Rationale:** ${item.rationale`, "");
+    lines.push(`### ${suggestion.id} — ${suggestion.selected ? "SELECTED" : "not selected"} (${item.priority.toUpperCase()})`, "", `**Shots:** ${item.shotIds.join(", ")}`, "", `**Issue:** ${item.issue}`, "", `**Proposed direction:** ${item.revision}`, "", `**Rationale:** ${item.rationale}`, "");
   });
   lines.push("## Explicit edits", "");
   if (!artifact.edits.length) lines.push("No edits have been authored yet.");
@@ -86,7 +86,7 @@ export const renderStoryboardRevisionReviewMarkdown = (artifact: StoryboardRevis
     artifact.validation.errors.forEach((error) => lines.push(`- ERROR: ${error}`));
     artifact.validation.warnings.forEach((warning) => lines.push(`- WARNING: ${warning}`));
   }
-  return lines.join("\\n");
+  return lines.join("\n");
 };
 
 export const applyStoryboardRevisionEdits = (artifact: StoryboardRevisionArtifact): unknown => {
