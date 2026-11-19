@@ -15,6 +15,7 @@ export type StoryboardRevisionArtifact = {
   schemaVersion: 1;
   sourcePlanPath: string;
   sourcePlanSha256: string;
+  sourcePlanText: string;
   sourcePlan: unknown;
   suggestions: Array<{ id: string; selected: boolean; item: ReturnType<typeof critiqueStoryboard>[number] }>;
   edits: StoryboardRevisionEdit[];
@@ -30,6 +31,7 @@ export const createStoryboardRevision = (sourcePath: string, sourceContent: stri
     schemaVersion: 1,
     sourcePlanPath: sourcePath,
     sourcePlanSha256: sha256(sourceContent),
+    sourcePlanText: sourceContent,
     sourcePlan,
     suggestions: critique.map((item, index) => ({ id: `suggestion-${String(index + 1).padStart(3, "0")}`, selected: false, item })),
     edits: [],
@@ -75,7 +77,8 @@ const run = async (): Promise<void> => {
         : "Usage: npm run storyboard:revision -- validate <revision.json>");
       const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
       const source = await readFile(artifact.sourcePlanPath, "utf8");
-      if (sha256(source) !== artifact.sourcePlanSha256) throw new Error("Source plan changed since artifact creation; create a new revision artifact to avoid silently overwriting newer work.");
+      if (sha256(source) !== artifact.sourcePlanSha256 || sha256(artifact.sourcePlanText) !== artifact.sourcePlanSha256) throw new Error("Source plan changed or embedded source text was altered since artifact creation; create a new revision artifact to avoid silently overwriting newer work.");
+      if (JSON.stringify(JSON.parse(artifact.sourcePlanText)) !== JSON.stringify(artifact.sourcePlan)) throw new Error("Embedded source plan object does not match the preserved source text.");
       const result = validateStoryboardRevision(artifact);
       artifact.validation = { valid: result.valid, errors: result.errors, warnings: result.warnings };
       await writeFile(input, JSON.stringify(artifact, null, 2) + "\n", "utf8");
