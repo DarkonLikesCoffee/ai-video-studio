@@ -111,12 +111,12 @@ export const renderStoryboardRevisionPromptMarkdown = (artifact: StoryboardRevis
   ];
   selected.forEach((suggestion) => {
     const item = suggestion.item;
-    lines.push(`### ${suggestion.id} [${item.priority.toUpperCase()}]`, `Shots: ${item.shotIds.join(", ")}`, `Issue: ${item.issue}`, `Direction: ${item.revision}`, `Rationale: ${item.rationale`, "");
+    lines.push(`### ${suggestion.id} [${item.priority.toUpperCase()}]`, `Shots: ${item.shotIds.join(", ")}`, `Issue: ${item.issue}`, `Direction: ${item.revision}`, `Rationale: ${item.rationale}`, "");
   });
   lines.push("## Original shot data (context; do not change unselected shots)", "", JSON.stringify(relevantShots, null, 2), "");
   lines.push("## Output schema", "", JSON.stringify({ edits: [{ shotId: "existing-shot-id", changeNote: "Explain the concrete creative improvement", fields: { visual: "updated visual description", action: "observable action", visualProgression: "Start: ... Development: ... End: ..." } }] }, null, 2), "");
   lines.push("Return edits only for the listed shot IDs. Include only fields that actually need changing. Make each change specific enough to stage, source, animate and review. If a selected critique should not be applied, omit that edit and explain nothing (the user will review the result).");
-  return lines.join("\\n");
+  return lines.join("\n");
 };
 
 export const applyStoryboardRevisionEdits = (artifact: StoryboardRevisionArtifact): unknown => {
@@ -165,10 +165,10 @@ const run = async (): Promise<void> => {
       const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
       const prompt = renderStoryboardRevisionPromptMarkdown(artifact);
       if (output) {
-        await writeFile(output, prompt + "\\n", "utf8");
-        process.stdout.write(`Revision prompt written: ${output}\\n`);
+        await writeFile(output, prompt + "\n", "utf8");
+        process.stdout.write(`Revision prompt written: ${output}\n`);
       } else {
-        process.stdout.write(prompt + "\\n");
+        process.stdout.write(prompt + "\n");
       }
       return;
     }
