@@ -30,7 +30,8 @@
     "storyboard:qa": "tsx scripts/storyboard-qa.ts",
     "storyboard:preview": "tsx scripts/storyboard-preview.ts",
     "storyboard:critic": "tsx scripts/storyboard-critic.ts",
-    "storyboard:revision": "tsx scripts/storyboard-revision.ts"
+    "storyboard:revision": "tsx scripts/storyboard-revision.ts",
+    "qa:contact-sheet": "tsx scripts/qa-contact-sheet.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.6",
