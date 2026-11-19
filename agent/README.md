@@ -15,6 +15,11 @@ This directory defines the operating procedure for an AI agent producing complet
 9. **Iterate** — fix the highest-impact issues, rerender only the target project, and repeat until it passes.
 10. **Deliver** — provide the MP4/artifact, a concise change log and known limitations.
 
+## Deterministic storyboard risk review
+
+The `npm run storyboard:qa -- <production-plan.json>` command provides warning-only signals for long shots, static camera holds and repeated adjacent visual method/framing/camera movement. It is a transparent heuristic review aid, not semantic QA or a creative verdict. Do not automatically fail or rewrite a plan from these warnings alone.
+
+
 ## Production intelligence checklist
 
 Before building scenes, the plan must answer:
