@@ -3,7 +3,7 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `e7988966b6783ff0cf4e0f92bcd656859b9cafc3` — “feat(storyboard): add pre-production planning preview”
+**Last verified main commit:** `f2f54d121279944a19a5fe187efba6b6aeccc066` — latest storyboard preview handoff documentation
 **Current development branch:** `feat/storyboard-animatic-preview` (based on that main commit; pre-production review preview work in progress)
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
