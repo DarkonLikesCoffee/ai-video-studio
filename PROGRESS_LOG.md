@@ -450,3 +450,12 @@ Append one entry per meaningful development session:
 - Tests/typecheck have **not** been executed locally because this connector cannot run the repository. CI must verify. No render gate is applicable to this non-rendering planning/import feature. No video playback or audio listening performed.
 - PR #97 is now open: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/97, head `2face7f8acfc96340800f6e363c650208c2a625e`, base `98a972911052fa8a3381c4852e1f6f38c1d94398`. Its three check suites are queued and no run has completed yet. The diff was reviewed for scope; no render gate applies.
 - Next: monitor #95 and #97 CI, fix failures on their existing branches, merge only after all required checks pass, then connect the production plan to asset/build stages with acceptance-criterion evidence review.
+
+
+## 2026-11-19 — PR #95 merged; PR #97 compatibility failure fixed
+
+- PR #95 storyboard handoff reviewed and merged as `76b9b99fdd49c7f95ce35b01301170ab9658a4dd`. Its required `validate` CI run #44550178698 passed on head `6209942bdfa08cfeabac0c4f74849e59182db11b`. Post-merge main CI #44554881017 passed.
+- PR #97's initial CI #44550086585 failed in the narrated-explainer production-plan validation: five legacy shots used free-form `engineApproach: external-footage-with-3d-inset`, which the new validator rejects because the schema only permits three normalized engine enum values.
+- Compatibility fix preserves each legacy string as `implementationNotes`, removes unsupported `engineApproach`, and adds a regression test asserting the migrated example passes `validateProductionPlan`. The converter already maps unknown storyboard engineApproach strings to implementationNotes.
+- Reconciled PR #97 with PR #95's main merge and combined README/package/agent-workflow docs so the handoff CLI precedes production-plan import. PROJECT_STATE and ROADMAP now record current evidence.
+- No render gate is applicable to this planning/import slice. Local tests/typecheck cannot be executed through the GitHub connector; the updated CI run is required.
