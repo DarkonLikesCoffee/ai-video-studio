@@ -157,3 +157,8 @@ Media QA is being extended to treat a final `silence_start` without a correspond
 ## Contact-sheet review utility (PR #76 merged)
 
 `npm run qa:contact-sheet -- video.mp4` generates a JPEG contact sheet using FFmpeg/FFprobe, sampling frames at a configurable interval and arranging them in a configurable grid. Options include `--interval`, `--columns`, `--width`, and `--output`. PR #76 CI passed and the feature is merged. Unit tests cover layout and option validation, but an actual MP4 contact sheet has not yet been generated and visually inspected in this work.
+
+
+## 2026-11-19 — Render contact-sheet evidence integration (PR in progress)
+
+GitHub Actions renders are being extended to generate a 5-second contact sheet and its JSON evidence report after media QA, and upload both alongside the MP4 and media-QA report. This provides a repeatable visual-review artifact for each GH Actions render. Sparse contact sheets do not replace continuous playback or audio listening. See PR for CI/merge status.

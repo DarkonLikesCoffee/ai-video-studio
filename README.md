@@ -792,3 +792,7 @@ npm run qa:contact-sheet -- render.mp4 --interval 3 --columns 5 --width 360 --ou
 ```
 
 Defaults: one thumbnail every 5 seconds, 4 columns, 320 px width. Requires FFmpeg and FFprobe. Output is JPEG; video is not modified.
+
+### Render artifacts
+
+GitHub Actions renders now also generate a contact sheet and a versioned JSON evidence report automatically after media QA. Both files are uploaded alongside the MP4 and media-QA report, making sparse visual review available for every GitHub Actions render without a manual command. The contact sheet samples at 5-second intervals by default; it is not a substitute for watching the full video.

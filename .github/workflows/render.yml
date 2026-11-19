@@ -163,6 +163,14 @@ jobs:
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
         run: npm run qa:media -- "render-output/$OUTPUT_NAME.mp4"
 
+      - name: Generate render contact sheet and JSON evidence
+        if: steps.request.outputs.provider == 'github-actions'
+        env:
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+        run: |
+          mkdir -p render-output/review
+          npm run qa:contact-sheet -- "render-output/$OUTPUT_NAME.mp4" --interval 5 --columns 4 --width 320 --output "render-output/review/$OUTPUT_NAME.contact-sheet.jpg" --report "render-output/review/$OUTPUT_NAME.contact-sheet.json"
+
       - name: Write footage attribution credits
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
         env:
@@ -181,6 +189,8 @@ jobs:
             render-output/${{ steps.request.outputs.output_name }}.mp4
             render-output/${{ steps.request.outputs.output_name }}-credits.txt
             render-output/${{ steps.request.outputs.output_name }}.qa.json
+            render-output/review/${{ steps.request.outputs.output_name }}.contact-sheet.jpg
+            render-output/review/${{ steps.request.outputs.output_name }}.contact-sheet.json
           if-no-files-found: error
           retention-days: 3
 
