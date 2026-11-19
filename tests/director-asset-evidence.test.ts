@@ -133,3 +133,16 @@ test("missing criterion coverage and empty manifest remain explicit", async () =
     assert.ok(report.issues.some((issue) => issue.code === "ASSET_MANIFEST_EMPTY"));
   });
 });
+
+test("whitespace-only shot and asset references are ignored", async () => {
+  await withProject(async (root) => {
+    const plan = makePlan();
+    plan.shots[1].assets = [" ", ""];
+    const manifest = { assets: [{ file: "one.svg", type: "art", shotIds: ["shot-one", " ", ""], provenance: "Test", license: "Original" }] };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
+    assert.deepEqual(report.assets[0]?.shotIds, ["shot-one"]);
+    assert.deepEqual(report.shots[1]?.plannedAssetRefs, []);
+    assert.deepEqual(report.shots[1]?.unresolvedPlannedAssetRefs, []);
+    assert.equal(report.summary.unknownManifestShotIds, 0);
+  });
+});
