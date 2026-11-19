@@ -95,7 +95,7 @@ test("media QA parses FFmpeg EBU R128 true peak summary format", () => {
   const report = buildMediaQaReport(
     "ebu-summary.mp4",
     probe,
-    "Integrated loudness:\\n  I: -16.0 LUFS\\n\\nTrue peak:\\n  Peak: -1.5 dBFS\\n",
+    "Integrated loudness:\n  I: -16.0 LUFS\n\nTrue peak:\n  Peak: -1.5 dBFS\n",
     "",
   );
   assert.equal(report.measurements.truePeakDbfs, -1.5);
@@ -124,7 +124,7 @@ test("media QA detects trailing silence that has no silence_end at EOF", () => {
   const report = buildMediaQaReport(
     "trailing-silence.mp4",
     probe,
-    "[silencedetect] silence_start: 55.0\\n",
+    "[silencedetect] silence_start: 55.0\n",
     "",
   );
   assert.deepEqual(report.measurements.silenceIntervals, [
@@ -135,11 +135,11 @@ test("media QA detects trailing silence that has no silence_end at EOF", () => {
 });
 
 test("media QA closes short trailing silence at EOF and skips zero-length trailing intervals", () => {
-  const short = buildMediaQaReport("short-trailing.mp4", probe, "silence_start: 58.2\\n", "");
+  const short = buildMediaQaReport("short-trailing.mp4", probe, "silence_start: 58.2\n", "");
   assert.deepEqual(short.measurements.silenceIntervals, [
     { startSeconds: 58.2, endSeconds: 60.1, durationSeconds: 1.9 },
   ]);
   assert.equal(short.passed, true);
-  const zeroLength = buildMediaQaReport("zero-trailing.mp4", probe, "silence_start: 60.1\\n", "");
+  const zeroLength = buildMediaQaReport("zero-trailing.mp4", probe, "silence_start: 60.1\n", "");
   assert.deepEqual(zeroLength.measurements.silenceIntervals, []);
 });
