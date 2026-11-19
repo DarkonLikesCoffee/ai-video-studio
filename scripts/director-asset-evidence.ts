@@ -119,6 +119,8 @@ export const buildAssetEvidenceReport = async (
   options: { projectRoot: string; planPath?: string; manifestPath?: string; generatedAt?: string },
 ): Promise<AssetEvidenceReport> => {
   if (!isRecord(planValue) || !Array.isArray(planValue.shots)) throw new Error("Production plan must contain a shots array.");
+  const planErrors = validateProductionPlan(planValue);
+  if (planErrors.length) throw new Error("Production plan invalid:\\n" + planErrors.map((error) => "- " + error).join("\\n"));
   if (!isRecord(manifestValue) || !Array.isArray(manifestValue.assets)) throw new Error("Asset manifest must contain an assets array.");
   const projectRoot = path.resolve(options.projectRoot);
   const shotsInput = planValue.shots.filter(isRecord);
@@ -141,7 +143,7 @@ export const buildAssetEvidenceReport = async (
     const local = await resolveLocalPath(value, projectRoot);
     const provenanceStatus = hasProvenance(value) ? "documented" : "missing";
     const rightsStatus = hasRights(value) ? "documented" : "missing";
-    const assetShotIds = Array.isArray(value.shotIds) ? value.shotIds.filter((id): id is string => typeof id === "string" && id.trim()) : [];
+    const assetShotIds = Array.isArray(value.shotIds) ? value.shotIds.filter((id): id is string => typeof id === "string" && id.trim()).map((id) => id.trim()) : [];
     if (!assetShotIds.length) addIssue({ code: "ASSET_SHOT_IDS_MISSING", severity: "warning", message: `Asset "${reference}" has no valid shotIds.`, assetRef: reference });
     for (const shotId of assetShotIds) {
       if (shotId !== "all" && !knownShots.has(shotId)) {
@@ -200,12 +202,13 @@ export const buildAssetEvidenceReport = async (
         continue;
       }
       const criterion = asText(value.criterion)!;
-      const criterionShotIds = value.shotIds.filter((id): id is string => typeof id === "string" && id.trim());
+      const criterionShotIds = value.shotIds.filter((id): id is string => typeof id === "string" && id.trim()).map((id) => id.trim());
+      if (!criterionShotIds.length) addIssue({ code: "CRITERION_SHOTS_MISSING", severity: "error", message: `Criterion "${criterion}" must reference at least one shot.`, criterion });
       const unknown = criterionShotIds.filter((id) => !knownShots.has(id));
       unknown.forEach((shotId) => addIssue({ code: "CRITERION_UNKNOWN_SHOT", severity: "error", message: `Criterion "${criterion}" references unknown shot "${shotId}".`, shotId, criterion });
       const linkedShotIds = criterionShotIds.filter((id) => (assetsByShot.get(id)?.length ?? 0) > 0);
       const unlinkedShotIds = criterionShotIds.filter((id) => !linkedShotIds.includes(id));
-      const assetStatus: CriterionEvidence["assetStatus"] = unknown.length ? "invalid" : linkedShotIds.length === criterionShotIds.length ? "linked" : linkedShotIds.length ? "partial" : "unlinked";
+      const assetStatus: CriterionEvidence["assetStatus"] = unknown.length || !criterionShotIds.length ? "invalid" : linkedShotIds.length === criterionShotIds.length ? "linked" : linkedShotIds.length ? "partial" : "unlinked";
       const linkedAssets = [...new Set(criterionShotIds.flatMap((id) => assetsByShot.get(id) ?? []))];
       const readiness: CriterionEvidence["readiness"] = linkedAssets.length === 0 ? "no-assets" : linkedAssets.every((asset) => asset.localStatus === "present" && asset.provenanceStatus === "documented" && asset.rightsStatus === "documented") ? "ready" : "needs-review";
       if (assetStatus === "unlinked") addIssue({ code: "CRITERION_ASSET_UNLINKED", severity: "warning", message: `Criterion "${criterion}" maps to shots with no manifest assets; this may be intentional for procedural visuals.`, criterion });
