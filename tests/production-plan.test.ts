@@ -20,6 +20,11 @@ test("production-plan JSON Schema matches runtime shot requirements and narrativ
   }
   assert.deepEqual(shotSchema.properties.narrativeBeat.enum, NARRATIVE_BEATS);
   assert.ok(!shotSchema.required.includes("narrativeBeat"), "narrativeBeat remains optional");
+  assert.ok(shotSchema.properties.implementationNotes, "free-form implementation notes must be preserved");
+  const coverageSchema = schema.properties.acceptanceCoverage;
+  assert.ok(coverageSchema, "schema must define optional acceptance coverage");
+  assert.ok(!schema.required.includes("acceptanceCoverage"), "legacy plans remain valid without coverage");
+  assert.deepEqual(coverageSchema.items.required, ["criterion", "shotIds", "rationale"]);
 });
 
 test("example production plan passes validation", () => {
