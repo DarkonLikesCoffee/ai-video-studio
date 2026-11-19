@@ -220,3 +220,15 @@ Append one entry per meaningful development session:
 - Added regression tests for all five signals; existing risk warnings remain unchanged.
 - Updated README and agent workflow guidance.
 - Pending validation/CI. No render yet; this change affects pre-production review only.
+
+
+## 2026-11-19 — Expanded storyboard quality signals merged (PR #69)
+
+- PR #69: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/69 merged by squash into main as `ac153121b0f7ec81a02dbec63e8c1b37fb205200`.
+- New warning-only heuristics: `VAGUE_VISUAL_DESCRIPTION`, `VAGUE_ACTION`, `INCOMPLETE_VISUAL_PROGRESSION`, `REPEATED_VISUAL_DESCRIPTION` and `TEXT_HEAVY_SHOT`.
+- Existing storyboard risk checks retained. No validation is weakened; the warnings do not fail plans.
+- CI run #44504229542 passed the full workflow: typecheck, test suite, production-plan validation, storyboard planning previews and QA reports, project validation, FFmpeg/FFprobe setup, audio processing validation and studio build.
+- The first CI attempt failed due to a syntax error in the new helper. Fixed regex escaping and the missing function closure; the succeeding full CI run passed. This is recorded rather than hidden.
+- PR is merged. No video render was performed because this is a pre-production QA CLI change.
+- Limitations: token similarity and phrase patterns can miss weak shots or produce false positives; they do not semantically evaluate story or inspect video.
+- Next: improve the quality signals with shot-size/layout change and text-vs-visual balance where measurable, then prototype a review/repair loop. Keep actual rendered video QA separate.
