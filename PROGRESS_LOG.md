@@ -380,3 +380,13 @@ Append one entry per meaningful development session:
 - EBU R128 filter enables `peak=true`; parser handles the actual two-line True peak summary. Added regression tests and a pure configurable audio-filter builder.
 - Main CI #44525255281 is in progress; confirm result before declaring merge validation complete.
 - PR #80 was not merged; its code fix was rebuilt and merged through PR #86.
+
+
+
+## 2026-11-19 — PR #88 merged; model-neutral storyboard revision prompt handoff underway
+
+- PR #88 merged as `5e7b019ce8487c7af067b4b8fe0ee1f9186f4fd3`; its PR CI and post-merge main CI run #44526796903 passed.
+- Implementing `storyboard:revision prompt`: export a ready-to-use creative revision prompt from selected critique items, including original data for only affected shots and explicit constraints to preserve unselected shots/source plan.
+- Prompt asks a downstream model to return structured `edits` JSON only, matching the revision artifact fields; it does not call an AI provider, alter the plan or auto-apply edits.
+- Added test coverage for selected critique context, output instructions, and refusal when no suggestion is selected. CI is required to verify these changes.
+- Branch: `feat/storyboard-revision-ai-handoff`. No render has been created for this slice.
