@@ -60,7 +60,7 @@ test("links acceptance criteria to shot assets and verifies local files/provenan
     assert.equal(report.criteria[0]?.readiness, "ready");
     assert.equal(report.criteria[1]?.readiness, "ready");
     assert.equal(report.criteria[2]?.readiness, "needs-review");
-    assert.equal(report.assets[0]?.localStatus, undefined);
+    assert.equal(report.assets[0]?.localStatus, "present");
     assert.equal(report.shots[0]?.manifestAssets[0]?.localStatus, "present");
     assert.equal(report.shots[1]?.manifestAssets[0]?.path, "assets/two.svg");
     assert.equal(report.summary.missingFiles, 1);
