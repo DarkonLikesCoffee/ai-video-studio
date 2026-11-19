@@ -4,7 +4,7 @@
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
 **Last verified main commit:** `93cec7fec2a4c8917bb6c231519b75181fb54d48` — `docs: reconcile contact sheet QA status after merge (#77)`
-**Current development branch:** `main`; PRs #72–#77 merged; contact-sheet CLI merged and used to inspect a real benchmark MP4
+**Current development branch:** `main`; PRs #72–#77 merged; contact-sheet CLI merged and used to inspect a real benchmark MP4; JSON evidence reports are being added
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
