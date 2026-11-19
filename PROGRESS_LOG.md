@@ -414,3 +414,19 @@ Append one entry per meaningful development session:
 - New branch `feat/creative-brief-contract` defines a versioned creative brief schema, deterministic validator/Markdown summary CLI, sample brief and tests. This separates director-level intent from the executable storyboard/render plan.
 - The CLI is groundwork only: it validates/summarizes an authored brief and does not call an LLM or claim autonomous direction.
 - CI pending; no render produced.
+
+
+## 2026-11-19 — Render contact-sheet workflow verified on a real artifact (run #42)
+
+- The render workflow's existing PR #84 integration was exercised on branch `fix/render-contact-sheet-artifact-validation-2026-11-19`. Run #41 failed validation because the output name was over 60 characters; the name was shortened on the same branch and run #42 completed successfully (commit `96846b5186558bb91a912ed1a0c82227cd06ec3c`).
+- Artifact #14532466761 was downloaded and its ZIP contents verified: `valorant-immortal-v4-contact-sheet-check.mp4`, `.qa.json`, `review/...contact-sheet.jpg`, and `review/...contact-sheet.json`. The credits file was skipped. The MP4 was not played back continuously and audio was not listened to.
+- Media-QA JSON reports 47.899s, 1920×1080 H.264, 30fps/1,431 frames, AAC stereo 96kHz, 0 findings, no silence/freeze/black intervals, -16.0 LUFS integrated, -1.5 dBFS true peak, and 0.199s A/V duration drift.
+- Contact-sheet report records 10 timestamps (0–45s every 5s), 4 columns, 320px thumbnails. The contact sheet image was retrieved and visually inspected: gameplay is present, but adjacent samples repeatedly show similar large text-overlay composition. Sparse samples cannot prove motion, pacing or synchronization, so this is evidence packaging plus limited visual review—not full creative acceptance.
+- Run #42: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383 ; artifact: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44527278383/artifacts/14532466761
+
+## 2026-11-19 — PR #93 creative-brief contract merged
+
+- PR #93 merged as `d643e752b4430165121072185ef41e8ad5fc940c`. CI run #327 (`44536804622`) passed on exact head `50ee419791c88338a1b8ac690176ba088e5fb2bb`.
+- First CI attempt #326 failed only because the frame-alignment fixture used 1.1s at 30fps, which is exactly 33 frames and therefore valid. Corrected fixture to 1.11s on the same PR branch; the rerun passed. This was a test-fixture error, not a validator failure.
+- The versioned creative-brief schema/validator and summary CLI are merged; they do not call an LLM or generate storyboards. No render gate was applicable to this schema/CLI slice.
+- Post-merge main CI run #328 (`44537158524`) is still running at this documentation update.
