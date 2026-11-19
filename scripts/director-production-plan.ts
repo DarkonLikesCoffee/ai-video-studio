@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { validateCreativeBrief } from "./director-brief";
-import { validateAcceptanceCoverage, validateProductionPlan } from "./validate-production-plan";
+import { validateProductionPlan } from "./validate-production-plan";
 
 type RecordValue = Record<string, unknown>;
 const isRecord = (value: unknown): value is RecordValue => typeof value === "object" && value !== null && !Array.isArray(value);
@@ -76,10 +76,11 @@ export const buildProductionPlanFromStoryboard = (briefInput: unknown, storyboar
       if (shot[field] !== undefined) mapped[field] = requiredText(shot[field], `shots[${index}].${field}`);
     }
     if (shot.engineApproach !== undefined) {
-      if (typeof shot.engineApproach !== "string" || !supportedEngineApproaches.includes(shot.engineApproach)) {
-        throw new Error(`shots[${index}].engineApproach must be one of: ${supportedEngineApproaches.join(", ")}.`);
+      if (typeof shot.engineApproach !== "string" || !shot.engineApproach.trim()) {
+        throw new Error(`shots[${index}].engineApproach must be a non-empty string when provided.`);
       }
-      mapped.engineApproach = shot.engineApproach;
+      if (supportedEngineApproaches.includes(shot.engineApproach)) mapped.engineApproach = shot.engineApproach;
+      else mapped.implementationNotes = shot.engineApproach.trim();
     }
     return mapped;
   });
