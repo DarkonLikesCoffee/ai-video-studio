@@ -79,3 +79,15 @@ The storyboard QA CLI includes warning-only signals for potentially vague visual
 ## Storyboard critique report
 
 Use `npm run storyboard:critic -- <production-plan.json> [output.md]` to turn existing deterministic QA warnings into prioritized, specific revision suggestions. The critic is review-only: it never edits the source plan, does not call an AI model, and does not approve creative quality. Apply changes to a separate copy and rerun plan validation and storyboard QA.
+
+
+## Traceable storyboard revision workflow
+
+Use the versioned revision artifact rather than editing the source plan in place:
+1. Run `npm run storyboard:revision -- init <production-plan.json> <revision.json>` to preserve source text/plan, SHA-256, and critic suggestions (unselected).
+2. Review the artifact; explicitly mark suggestions selected and add concrete edits under `edits` with `shotId`, `changeNote`, and field updates. Do not treat selection as auto-application.
+3. Run `npm run storyboard:revision -- validate <revision.json>` to store schema errors and QA warnings.
+4. Run `npm run storyboard:revision -- apply <revision.json> <revised-plan.json>` to write a separate revised plan; the original remains untouched.
+5. Run `npm run validate:plan -- <revised-plan.json>` and `npm run storyboard:qa -- <revised-plan.json>` before production.
+
+The CLI verifies that the source file and embedded source text still match the recorded SHA-256 and that the preserved source object matches its text. A source change requires a fresh artifact. Validation errors are hard failures; heuristic warnings are review prompts only.
