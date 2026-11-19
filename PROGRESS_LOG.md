@@ -363,3 +363,11 @@ Append one entry per meaningful development session:
 - Added a render-workflow step after media QA to create a 5-second contact sheet (4 columns, 320px thumbnails) and a JSON evidence report using the existing `qa:contact-sheet` CLI.
 - Expanded the render artifact to include both evidence files in addition to MP4, credits and media-QA JSON. This avoids manual contact-sheet generation for future GitHub Actions renders.
 - No render has been run with this workflow change yet; validation is pending CI. Contact sheets remain sparse review evidence and do not replace full playback or audio listening.
+
+
+## 2026-11-19 — Render contact-sheet evidence integration merged (PR #84)
+
+- PR #84 merged as `5cfcdc1d01067295ec2d76c2e7307905dbe678a6` after branch CI passed for exact head `58e68ccd8da334a481c2a825731338dbd6d7b2f5`.
+- GitHub Actions now generates a 5-second contact sheet (4 columns, 320px width) and JSON evidence report after Media QA and includes them in the render artifact.
+- Post-merge main CI run #44524069933 is running. No render has yet been run through the new workflow.
+- Next: verify main CI, then inspect the revision artifact/critic integration for the next production-intelligence slice.

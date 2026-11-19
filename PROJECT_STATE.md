@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `25e946045f00764142fb26c9c8e305bdd511e8c5` — `feat(storyboard): add JSON visual strategy reports (#82)`
-**Current development branch:** PRs #81 and #82 merged; main CI passed for commit `25e946045f00764142fb26c9c8e305bdd511e8c5`. The visual strategy report now supports both Markdown and versioned JSON output.
+**Last verified main commit:** `5cfcdc1d01067295ec2d76c2e7307905dbe678a6` — `feat(render): attach contact sheet evidence to render artifacts (#84)`
+**Current development branch:** PRs #81, #82 and #84 merged. PR #84 adds automatic 5-second contact sheets and JSON evidence to GitHub Actions render artifacts. Branch CI passed; post-merge main CI is currently running for `5cfcdc1d01067295ec2d76c2e7307905dbe678a6`.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -162,3 +162,12 @@ Media QA is being extended to treat a final `silence_start` without a correspond
 ## 2026-11-19 — Render contact-sheet evidence integration (PR in progress)
 
 GitHub Actions renders are being extended to generate a 5-second contact sheet and its JSON evidence report after media QA, and upload both alongside the MP4 and media-QA report. This provides a repeatable visual-review artifact for each GH Actions render. Sparse contact sheets do not replace continuous playback or audio listening. See PR for CI/merge status.
+
+
+## 2026-11-19 — Render evidence automation merged (PR #84)
+
+- PR #84 merged as `5cfcdc1d01067295ec2d76c2e7307905dbe678a6` after PR CI passed for head `58e68ccd8da334a481c2a825731338dbd6d7b2f5`.
+- GitHub Actions render workflow now generates a 5-second contact sheet (4 columns, 320px thumbnails) and a JSON evidence report after Media QA, then uploads both with the MP4, credits and QA report.
+- Post-merge main CI run #44524069933 is in progress; verify it before declaring main fully validated.
+- No render has yet exercised the newly merged workflow. The existing VALORANT v4 artifact remains a benchmark only.
+- Next development focus: investigate the traceable storyboard revision artifact and design the smallest integration that converts review findings into explicit, auditable revision edits without automatic approval or source-plan mutation.
