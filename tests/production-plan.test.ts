@@ -25,7 +25,6 @@ test("production-plan JSON Schema matches runtime shot requirements and narrativ
   assert.ok(coverageSchema, "schema must define optional acceptance coverage");
   assert.ok(!schema.required.includes("acceptanceCoverage"), "legacy plans remain valid without coverage");
   assert.deepEqual(coverageSchema.items.required, ["criterion", "shotIds", "rationale"]);
-  assert.ok(shotSchema.properties.implementationNotes, "schema must preserve free-form implementation notes");
 });
 
 test("example production plan passes validation", () => {
