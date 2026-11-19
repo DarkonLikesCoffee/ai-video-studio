@@ -57,7 +57,10 @@
       "assets": [
         "01-material.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "2D motion graphics / macro composite",
+      "action": "A cropped headphone rim emerges as a highlight travels along its edge.",
+      "visualProgression": "Start: near-black frame. Development: the moving highlight reveals material and rim shape. End: a clear edge shape becomes the match-cut cue."
     },
     {
       "id": "silhouette",
@@ -73,7 +76,10 @@
       "assets": [
         "02-silhouette.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "2D product motion graphics with layered parallax",
+      "action": "The full headphone silhouette appears and rotates through a three-quarter presentation.",
+      "visualProgression": "Start: only the earcup rim is visible. Development: headband and both earcups emerge as layers shift. End: the complete silhouette is readable."
     },
     {
       "id": "control",
@@ -89,7 +95,10 @@
       "assets": [
         "03-detail.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "2D motion graphics / detail composite",
+      "action": "The earcup control and cushion seam come into focus as the camera-like composition slides laterally.",
+      "visualProgression": "Start: tight crop obscures the control. Development: lateral movement exposes the control and seam. End: hold on the tactile detail."
     },
     {
       "id": "hero",
@@ -105,7 +114,10 @@
       "assets": [
         "04-hero.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "2D product hero composition",
+      "action": "The headphones settle on graphite and the wordmark appears.",
+      "visualProgression": "Start: product enters with residual movement. Development: it settles while the background simplifies. End: centered hero and wordmark hold."
     }
   ],
   "assetManifestPath": "projects/sora/production/asset-manifest.json",
