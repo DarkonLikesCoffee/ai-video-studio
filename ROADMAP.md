@@ -1,98 +1,171 @@
 # AI Video Studio — Roadmap
 
-This roadmap describes the intended product, not current implementation. Update checkboxes only after code and evidence demonstrate the capability.
+This roadmap describes the intended product, not current implementation. Update checkboxes only after code and evidence demonstrate the capability. Keep it aligned with the verified project state and actual renders.
 
 ## North-star outcome
 
-A user enters a free-form prompt and receives a polished, coherent, cinematic video with appropriate visuals, editing, narration, music and sound design. The system should work across topics and styles, use user-provided assets when requested, and improve weak results before delivery.
+A user describes a video in ordinary language and receives a polished, coherent, cinematic video with appropriate visuals, editing, narration, music and sound design. AI Video Studio should **visually tell a story**, not merely animate information. It must work across topics and styles, use user-provided assets when requested, and improve weak drafts before delivery.
 
-## P0 — Establish reliable production and quality gates
+> **Creative principle:** AI Video Studio should not decide how to animate information. It should decide how to visually tell a story, then use the appropriate production techniques to bring that story to life.
 
-**Goal:** Stop accepting technically successful but creatively weak videos.
+A successful render is not a successful video. Technical validity, narrative quality and creative acceptance are separate gates.
 
-- [ ] Diagnose and fix the silent audio intervals in the VALORANT render; add automated tests that detect unexpected silence and missing/short audio tracks.
-- [ ] Add a repeatable video QA report: duration, resolution, FPS, codecs, audio stream, loudness/true peak, black frames, freeze/static intervals, shot-boundary contact sheet and asset/caption coverage.
-- [ ] Define a measurable storyboard quality check: shot duration, shot-size/framing variety, visual-method variety, meaningful action per shot, and repeated composition detection.
-- [ ] Make render acceptance explicit: CI success is necessary but not sufficient; the MP4 must be inspected against the brief.
-- [ ] Preserve exact render provenance: source commit, project ID, request ID, workflow run, artifact ID and QA report.
-- [ ] Add a reusable quality benchmark project that tests actual footage + graphics + narration + continuous music/SFX, not only abstract vector animation.
+## Strategic direction
 
-**Exit criteria:** A deliberately weak/slideshow-like project is flagged by QA; a good benchmark passes technical checks and human-reviewed creative criteria; audio gaps are detected.
+The current slideshow-like output is a production-intelligence problem, not simply a shortage of effects. Avoid treating every scene as a text card, still image, diagram or background with generic motion.
 
-## P1 — Build the reusable AI production director
+A production should have:
+- A clear promise, narrative progression and intended audience.
+- Creative direction and a visual language appropriate to the topic.
+- A shot-by-shot plan where every shot has a purpose, action or visual development.
+- Per-shot visual-method selection instead of one universal scene template.
+- Purposeful camera, subject, object and environmental motion.
+- Editing, transitions and audio motivated by what is happening.
+- Review of the actual rendered video, followed by targeted improvements.
 
-**Goal:** Convert arbitrary user prompts into structured, editable production plans.
+Visual methods are selectable production capabilities—not mandatory ingredients. A shot may use real footage, user footage, generated video, still imagery, 2D animation, motion graphics, typography, diagrams, 3D, simulations or a hybrid. Select the simplest method that can produce the intended result at the required quality. Do not substitute unrelated stills/diagrams for requested footage without clearly reporting it.
 
-- [ ] Define stable schemas for brief, creative direction/style bible, script, shot list, asset requests, audio cue sheet and QA findings.
-- [ ] Implement a director workflow that maps a prompt into these artifacts and validates them.
-- [ ] For every shot, select the right visual approach (live footage, generated video, still image, 3D, motion graphics, diagram, typography or hybrid).
-- [ ] Generate a coherent shot list with timing, camera/framing, subject/action, transitions, overlays and sound cues.
-- [ ] Include explicit confidence/assumption/source fields; do not fabricate facts or claim unsupported capabilities.
-- [ ] Keep model/provider integration swappable; do not hard-code one AI vendor into the production model.
-- [ ] Support continuation/resume from saved project artifacts so a different model or conversation can continue.
+## P0 — Reliable production and quality gates
 
-**Exit criteria:** A new prompt for a topic not represented by existing demo projects creates a validated production package without hand-authoring each scene.
+**Goal:** Stop accepting technically successful but creatively weak videos and fix defects that invalidate current output.
+
+- [ ] Diagnose and fix unexpected audio gaps/silence in current benchmark renders; maintain tests for missing, short, silent or misaligned audio tracks.
+- [ ] Maintain repeatable media QA: duration, resolution, FPS, codecs, streams, loudness/true peak, silence, black frames, freeze/static intervals, shot-boundary contact sheets, asset/caption coverage and synchronization.
+- [ ] Define measurable storyboard checks: shot duration, framing/shot-size and visual-method variety, meaningful action/progression, repeated composition, text dependence and static/slideshow-like patterns.
+- [ ] Make render acceptance explicit: CI success is necessary, but creative acceptance requires inspection of the actual MP4 against the brief.
+- [ ] Preserve render provenance: source commit, project ID, request ID, workflow run, artifact ID and QA report.
+- [ ] Maintain a reusable end-to-end benchmark with real moving footage, graphics, narration, continuous music and SFX—not only abstract vector animation.
+- [ ] Update benchmark documentation and project state to reflect current evidence; remove stale claims and distinguish capability readiness from an actually verified render.
+
+**Exit criteria:** QA flags a deliberately weak/slideshow-like project; a benchmark passes technical checks and human-reviewed creative criteria; known audio defects are detected; the inspected artifact and evidence are traceable.
+
+## P1 — AI Production Director and visual storytelling
+
+**Goal:** Turn arbitrary prompts into a creative brief and deliberate audiovisual plan before production begins.
+
+- [ ] Define stable, editable schemas for brief, audience/purpose, creative direction/style bible, script, storyboard/shot plan, asset requests, audio cue sheet, assumptions/sources and QA findings.
+- [ ] Implement a Director workflow that interprets the prompt and chooses a narrative approach, tone, pacing, style and visual storytelling strategy.
+- [ ] Translate abstract concepts into concrete visual events, actions, demonstrations, comparisons, metaphors or reveals; avoid defaulting to explanatory text cards.
+- [ ] Establish a narrative structure appropriate to the format (e.g. hook, development, optional midpoint re-engagement, payoff/CTA) rather than forcing a fixed formula on every video.
+- [ ] Make every shot serve the story or explain why it is needed. Specify what the audience sees and what changes during the shot.
+- [ ] Select a visual method for each shot: footage, generated media, 3D, motion graphics, diagram, typography, 2D animation, simulation or hybrid.
+- [ ] Generate a coherent shot plan with duration, framing/shot size, camera position and motion, subject/action, visual progression, transition, overlay/text rationale and audio cues.
+- [ ] Add validation for vague, repetitive, static or text-heavy shot plans and revise them before rendering.
+- [ ] Include explicit confidence, assumptions and source fields; do not fabricate facts or claim unsupported capabilities.
+- [ ] Keep model/provider integration swappable; avoid coupling the production schema to one AI vendor.
+- [ ] Support save/resume from project artifacts so another model, agent or conversation can continue without re-planning everything.
+
+**Exit criteria:** An unfamiliar prompt produces a validated creative brief and executable shot plan with meaningful visual variety and a selected production method per shot, without hand-authoring every scene.
+
+## P1 — Storyboard approval and production planning
+
+**Goal:** Make the storyboard an executable plan, not a scene-title list.
+
+- [ ] Render a reviewable storyboard/animatic preview from the planned shots before full production.
+- [ ] Include shot ID, duration, narrative purpose, visual action/progression, method, composition, camera, asset dependencies and audio cues.
+- [ ] Support a review/approval checkpoint for expensive, complex or ambiguous production plans; do not make approval mandatory for every low-cost workflow unless configured.
+- [ ] Validate timing and transitions as a complete sequence, including pacing, continuity, repeated visual grammar and shot-to-shot variety.
+- [ ] Provide a clear path to revise individual shots without regenerating the entire plan.
+
+**Exit criteria:** A reviewer can understand the intended video and approve or change its shot plan before expensive asset generation or rendering; the approved plan drives production.
+
+## P1 — Expand reusable visual-production capabilities
+
+**Goal:** Enable the Director to produce different kinds of visual sequences, not just animated slide compositions.
+
+- [ ] Build reusable Remotion compositions and motion-graphics primitives for dynamic, layered visuals, data, maps, UI, typography and visual explanations.
+- [ ] Expand purposeful camera motion: pan, tilt, dolly, orbit, tracking, zoom, framing changes and parallax/depth where supported and appropriate.
+- [ ] Add subject/object/environment animation with explicit motion curves, keyframes and visual states.
+- [ ] Improve compositing and layered scene support, including foreground/background separation, occlusion and depth effects when assets and tooling support them.
+- [ ] Integrate Three.js scenes and imported 3D models as a selectable production method for shots that benefit from spatial environments, camera movement or object interaction.
+- [ ] Evaluate Blender for shots requiring complex modelling, lighting, simulation, rendering or capabilities that are not economical in the current web/Remotion engine. Use it as an optional specialist renderer, not a blanket dependency.
+- [ ] Support 2D character/rig animation and physical simulation only for projects where those techniques serve the brief.
+- [ ] Make generated/custom Remotion compositions first-class; ProjectVideo remains a useful compatibility renderer, not the creative ceiling.
+- [ ] Create a capability registry and method-selection interface so production plans can request capabilities without hard-coding a single engine.
+- [ ] Benchmark visual capabilities on several unrelated topics and formats.
+
+**Architecture policy:** Remotion is the current core composition/rendering path. Three.js, Blender, specialized animation tools and other renderers should be integrated selectively behind reusable interfaces. FFmpeg remains a post-processing, audio/video processing and export tool. Evaluate HyperFrames or other engines against concrete requirements before adopting; do not add technology merely because it appears in research.
+
+**Exit criteria:** Multiple unrelated prompts produce visibly different, purposeful visual sequences using more than one visual method; a scene can contain real motion/action and is not limited to text cards, still images or generic vector animation.
 
 ## P2 — Asset acquisition and generation
 
-**Goal:** Give each planned shot the right media.
+**Goal:** Give every planned shot the appropriate media with review, rights and provenance.
 
-- [ ] Unify asset discovery for still images and moving footage, including Openverse, Wikimedia Commons, NASA where relevant, and user-supplied assets.
+- [ ] Unify discovery of still images and moving footage, including Openverse, Wikimedia Commons, NASA where relevant, and user-provided assets.
 - [ ] Build an asset review/selection manifest with source URL, creator, license, restrictions, attribution, media type, dimensions/duration, codec and hash.
-- [ ] Add provider adapters for generative still/video media only after comparing quality, rights, latency, reliability and cost.
+- [ ] Add provider adapters for generated still/video media only after comparing quality, rights, latency, reliability, controllability and cost.
 - [ ] Support user-provided image, video, audio and 3D assets with clear import/validation rules.
 - [ ] Handle missing or unsuitable footage honestly; do not disguise diagrams or stills as real footage.
-- [ ] Add visual consistency controls for recurring subjects, locations, colors and art direction where the chosen providers support them.
+- [ ] Add visual consistency controls for recurring subjects, locations, palettes and art direction where selected providers support them.
+- [ ] Keep asset selection connected to shot intent and approved creative direction; avoid sourcing media solely to fill a scene.
 
-**Exit criteria:** The system can satisfy a mixed shot list using reviewed real footage, generated assets and user assets, with complete provenance and no silent substitutions.
+**Exit criteria:** The system satisfies a mixed shot list with reviewed real footage, generated assets and user assets, with complete provenance and no silent substitutions.
 
-## P3 — Cinematic editing and motion
+## P2 — Cinematic editing, motion and temporal control
 
-**Goal:** Move beyond slide-like compositions into authored audiovisual sequences.
+**Goal:** Develop a purposeful audiovisual edit rather than a collection of individually animated scenes.
 
-- [ ] Build reusable editing primitives for shot grammar, camera motion, parallax/depth, match cuts, motivated transitions, speed changes, compositing and kinetic typography.
-- [ ] Make custom Remotion compositions first-class; ProjectVideo remains a useful compatibility renderer, not the creative ceiling.
-- [ ] Improve integration of Three.js scenes and imported 3D models where a shot benefits from 3D.
-- [ ] Drive visual events from narration and audio beats without making every cut a generic beat cut.
-- [ ] Support varied visual styles through style definitions and reusable primitives, not one rigid template per style.
-- [ ] Benchmark on several unrelated topics and formats.
+- [ ] Build reusable editing primitives for shot grammar, camera movement, parallax/depth, match cuts, motivated transitions, speed changes, compositing, freeze frames and kinetic typography.
+- [ ] Support transitions motivated by content, composition, motion or narrative—not a default transition on every scene boundary.
+- [ ] Drive visual events from narration and audio beats when meaningful; do not force every cut to the beat.
+- [ ] Support controlled emphasis (punch-ins, reframing, holds and speed changes) with pacing safeguards; effects must be motivated by the scene, not applied at fixed intervals.
+- [ ] Build continuity-aware pacing and shot sequencing: contrast shot sizes, change visual method, maintain or intentionally break motion/composition continuity.
+- [ ] Provide style definitions and reusable primitives without enforcing one rigid template per style.
+- [ ] Add color grading as a configurable, shot/style-aware finishing stage. Avoid blanket filters that can damage the source or make every video look the same.
+- [ ] Evaluate techniques such as tracking, morphing, slow motion, speed ramps and advanced interpolation as capability-specific work with benchmarks and explicit limitations.
 
-**Exit criteria:** Multiple unrelated prompts produce visibly different, intentional edits with meaningful motion and no repeated slideshow grammar.
+**Exit criteria:** Several unrelated prompts produce intentionally edited, visually varied sequences with meaningful motion, transitions and pacing—not repeated slideshow grammar or indiscriminate effects.
 
-## P4 — Professional audio and narration
+## P2 — Professional audio and narration
 
-**Goal:** Make audio a designed part of the edit.
+**Goal:** Make audio an intentional part of storytelling and editing.
 
-- [ ] Diagnose silence/gaps, clipping, loudness and true peak automatically.
+- [ ] Diagnose silence/gaps, clipping, loudness, true peak and synchronization automatically.
 - [ ] Add a provider-neutral voice interface for supported providers/local engines, with voice/language selection and clear cost/consent gates.
 - [ ] Add reliable forced alignment for arbitrary imported narration, with honest phrase-level fallback if word alignment is unavailable.
-- [ ] Create sound-effect cueing tied to specific actions, not generic whooshes on every transition.
+- [ ] Create sound-effect cueing tied to specific visual actions; avoid generic whooshes on every transition.
 - [ ] Support continuous score, ambience, dynamic ducking, transitions, fades and platform-aware mastering.
+- [ ] Make silence trimming context-aware and configurable; preserve dramatic, expressive and natural pauses. Never impose one universal silence-margin rule without listening/review.
 - [ ] Add actual audio playback/listening to QA workflow where possible.
 
-**Exit criteria:** Voice, music, ambience and SFX form a balanced, continuous mix synchronized with the edit; automated checks flag silence and audio faults.
+**Exit criteria:** Voice, music, ambience and SFX form a balanced, continuous mix synchronized with the edit; automated checks flag defects and the audio is reviewed where possible.
 
-## P5 — Autonomous visual/audio quality review and iteration
+## P3 — Visual/audio QA, critique and iterative repair
 
-**Goal:** The system improves its own draft before delivery.
+**Goal:** The system evaluates its actual draft, identifies high-impact weaknesses and improves it before delivery.
 
-- [ ] Generate contact sheets and representative motion clips automatically.
-- [ ] Use frame/video understanding to review continuity, relevance, composition, repetition, motion and brief compliance.
+- [ ] Generate contact sheets, shot-boundary frames and representative motion clips automatically.
+- [ ] Use frame/video understanding to review continuity, relevance, composition, visual variety, repetition, motion, text dependence and brief compliance.
 - [ ] Review narration/script/caption consistency and audio/video synchronization.
-- [ ] Convert QA findings into prioritized, actionable edit changes.
-- [ ] Re-render only affected project(s) and compare revisions.
-- [ ] Keep an auditable record of what was inspected and what remains uncertain.
+- [ ] Detect and diagnose slideshow-like output, including long static shots, repeated layouts, meaningless motion and scenes that do not visually advance.
+- [ ] Convert QA findings into prioritized, specific and actionable edits—not vague scores alone.
+- [ ] Re-render only affected scenes/sections when feasible and compare revisions.
+- [ ] Keep an auditable record of inspected artifacts, evidence, corrections and remaining uncertainty.
+- [ ] Use explicit acceptance criteria and avoid pretending automated vision/audio analysis is infallible.
 
-**Exit criteria:** A poor draft is automatically identified, revised and re-rendered; final delivery includes a truthful QA summary.
+**Exit criteria:** A weak draft is identified with evidence, corrected and re-rendered; the final delivery includes a truthful QA summary and unresolved limitations.
 
-## P6 — Usable end-to-end product
+## P4 — End-to-end benchmark and capability validation
 
-**Goal:** Make the production system easy to use without manually editing JSON or GitHub files.
+**Goal:** Prove the architecture works across different content types before scaling complexity.
+
+- [ ] Maintain benchmark projects for distinct visual challenges (e.g. real footage/editing, 3D spatial explanation, motion-graphics explainer, screen/UI tutorial, character/action narrative).
+- [ ] Define briefs and acceptance criteria before rendering each benchmark.
+- [ ] Record the selected visual methods, engine paths, asset sources, cost/compute, render duration and QA outcomes.
+- [ ] Compare versions and preserve failures as regression cases.
+- [ ] Require a benchmark to demonstrate a new capability before declaring it production-ready.
+
+**Exit criteria:** The system has verified examples across unrelated topics and visual formats, with measurable technical results and documented creative review.
+
+## P5 — Usable end-to-end product
+
+**Goal:** Make production easy to use without manually editing JSON or GitHub files.
 
 - [ ] Provide a simple prompt and reference-input interface.
 - [ ] Let users select style, duration, format, language, voice and audio preferences without overwhelming them.
 - [ ] Support uploading and organizing personal assets.
-- [ ] Show production progress, decisions, asset review and render/QA status.
+- [ ] Show production progress, creative decisions, storyboard review, asset selection and render/QA status.
 - [ ] Allow targeted revisions (“make this section faster”, “replace this shot”, “change narration voice”) without rebuilding everything.
 - [ ] Deliver downloadable MP4 and editable project package with credits.
 
@@ -100,11 +173,16 @@ A user enters a free-form prompt and receives a polished, coherent, cinematic vi
 
 ## Priority policy
 
-1. Fix defects that invalidate current output (audio gaps, timing, broken assets).
+1. Fix defects that invalidate current output.
 2. Improve the actual audiovisual result with a tested end-to-end vertical slice.
-3. Build reusable production intelligence and asset workflows.
-4. Expand provider choices and product UI only when they advance the north-star outcome.
-5. Avoid adding more showcase templates unless they test a concrete capability or quality regression.
+3. Solve production intelligence and story/shot planning before adding superficial polish.
+4. Build reusable visual, motion, editing and audio capabilities guided by benchmark needs.
+5. Add QA and iteration that inspect the actual output.
+6. Expand providers and product UI only when they advance the north-star outcome.
+7. Adopt a new framework/tool only when it fills a verified capability gap or offers a substantial measured improvement.
+8. Avoid adding more showcase templates unless they test a concrete capability or quality regression.
+9. Prefer a small, working vertical slice over large architecture rewrites or speculative multi-agent complexity.
+10. Do not spend money on paid services or APIs without explicit user approval.
 
 ## Release gate for every video-producing milestone
 
@@ -112,15 +190,24 @@ Do not mark a milestone complete until:
 - Typecheck, tests and project validation pass.
 - The actual render succeeds from the intended source commit.
 - The exact artifact is downloaded and verified.
-- The video is inspected across its full timeline or with sufficient representative motion review.
+- The video is inspected across its timeline or with sufficient representative motion review.
 - Audio is listened to when possible; otherwise clearly state that only technical measurements were performed.
-- The result is judged against the original brief and the acceptance criteria.
+- The result is judged against the original brief and acceptance criteria.
 - Any known defects and limitations are documented.
+- Provenance and QA evidence are saved with the project.
 
+## Current implementation focus — transition from rendering reliability to production intelligence
 
-## Current implementation focus — visual motion after v6
+The recent work has established important pipeline foundations: media QA diagnostics, narration/timeline synchronization, per-scene camera motion and integration of user-authorized footage into the narrated ProjectVideo path. Verify live code, CI, PRs, renders and artifacts before treating this snapshot as current.
 
-- [x] Verify PR #57's per-scene camera motion in a fresh rendered VALORANT artifact; v9 has zero freeze warnings and the contact sheet was inspected.
-- [x] Synchronize narration and visuals on one shared timeline; v9 video duration is 47.733s for a 47.31s narration, with a 0.4s visual landing.
-- [x] Integrate shot-matched local footage into the narrated ProjectVideo path, including explicit user-owned/permission-granted rights metadata and separate credits (PR #58).\n- [ ] Add actual gameplay clips to the VALORANT project and verify a rendered edit with real action; the pipeline is ready but no clips have been supplied yet.
-- [ ] Review shot variety, action relevance and pacing across the complete rendered timeline before accepting the video.
+- [x] Establish automated media diagnostics for rendered MP4s (metadata, silence, loudness, freeze and black-frame analysis) and attach reports to render artifacts.
+- [x] Synchronize narrated visuals and timelines and add regression coverage for boundary/timing issues.
+- [x] Add per-scene camera-motion capability and verify a fresh render, subject to the evidence recorded in project-state docs.
+- [x] Integrate authorized local footage into the narrated ProjectVideo production path with rights metadata and separate credits.
+- [ ] Verify and document the latest real render against its creative brief; do not equate motion diagnostics or technical synchronization with creative acceptance.
+- [ ] Update the project-state, continuity and progress docs so stale benchmark/footage claims do not contradict verified current evidence.
+- [ ] Begin the next quality-first vertical slice with the Production Director → storyboard/shot plan → visual-method selection → production → actual-video QA loop.
+- [ ] Use the existing VALORANT project as a regression/creative-quality case, not as justification to repeat its diagram-heavy visual approach.
+- [ ] Choose the first implementation task only after inspecting the current director, storyboard, production schema, render path and QA code. Favor a focused, testable improvement.
+
+The largest gap is not basic rendering. It is the **production intelligence and audiovisual quality** between a user's prompt and the final edit.
