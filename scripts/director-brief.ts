@@ -88,14 +88,14 @@ export const renderCreativeBriefSummary = (brief: CreativeBrief): string => {
     "",
     "> This document is creative direction, not a storyboard or a verified production plan."
   ];
-  return lines.join("\\n");
+  return lines.join("\n");
 };
 
 const main = async (): Promise<void> => {
   const input = process.argv[2];
   const output = process.argv[3];
   if (!input) {
-    process.stderr.write("Usage: npm run director:brief -- <creative-brief.json> [summary.md]\\n");
+    process.stderr.write("Usage: npm run director:brief -- <creative-brief.json> [summary.md]\n");
     process.exitCode = 2;
     return;
   }
@@ -103,14 +103,14 @@ const main = async (): Promise<void> => {
     const brief = JSON.parse(await readFile(input, "utf8")) as unknown;
     const errors = validateCreativeBrief(brief);
     if (errors.length) {
-      process.stderr.write(errors.map((error) => `- ${error}`).join("\\n") + "\\n");
+      process.stderr.write(errors.map((error) => `- ${error}`).join("\n") + "\n");
       process.exitCode = 1;
       return;
     }
-    if (output) await (await import("node:fs/promises")).writeFile(output, renderCreativeBriefSummary(brief as CreativeBrief) + "\\n", "utf8");
-    else process.stdout.write(renderCreativeBriefSummary(brief as CreativeBrief) + "\\n");
+    if (output) await (await import("node:fs/promises")).writeFile(output, renderCreativeBriefSummary(brief as CreativeBrief) + "\n", "utf8");
+    else process.stdout.write(renderCreativeBriefSummary(brief as CreativeBrief) + "\n");
   } catch (error) {
-    process.stderr.write(`Could not read creative brief: ${error instanceof Error ? error.message : String(error)}\\n`);
+    process.stderr.write(`Could not read creative brief: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
   }
 };
