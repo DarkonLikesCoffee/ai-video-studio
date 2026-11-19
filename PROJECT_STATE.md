@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `8c3c2dbf1ca8a819c7203cc3d4572c1e4cccce2f` — `feat(storyboard): safely import revision edits from AI (#90)`
-**Current development branch:** PRs #81, #82, #84, #85, #86, #88, #89 and #90 merged. PR #84 adds automatic 5-second contact sheets and JSON evidence to render artifacts; PR #86 fixes FFmpeg EBU R128 True Peak measurement and parsing. Post-merge main CI is running for `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d`.
+**Last verified main commit:** `85d1ab0fd4d211365e2dec2fb0213cdf4fda2296` — `feat(storyboard): add explicit narrative beat review (#91)`
+**Current development branch:** PRs #81, #82, #84, #85, #86, #88, #89, #90 and #91 merged. PR #84 adds automatic 5-second contact sheets and JSON evidence to render artifacts; PR #86 fixes FFmpeg EBU R128 True Peak measurement and parsing. PR #91 CI run #44534929322 passed; post-merge main CI status is not exposed by the current connector.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -199,9 +199,9 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Imported revisions are still reviewed and validated; apply writes to a separate revised plan. No automatic source-plan mutation and no render was produced.
 
 
-## Storyboard narrative beats (PR #91 in progress)
+## Storyboard narrative beats (PR #91 merged)
 
 - Optional `narrativeBeat` shot labels are supported: hook, setup, context, development, escalation, reveal, payoff, CTA, transition and pause. Validator rejects unknown labels but does not require a tag on every shot.
 - `npm run storyboard:beats` groups explicitly labeled shots, sums durations, lists unlabeled shots and generates review prompts for missing opening/development/payoff coverage when a sequence is sufficiently labeled.
 - The report does not infer narrative meaning from shot text, force a formula, or approve creative quality. JSON output is available for future agent workflows.
-- PR #90 safe revision import is merged; tests/CI verified its import whitelist and selected-shot guardrails. No render was produced for the tooling changes.
+- PR #90 safe revision import and PR #91 narrative beat review are merged. PR #91 CI run #44534929322 passed; no render was produced for these planning-tool changes.
