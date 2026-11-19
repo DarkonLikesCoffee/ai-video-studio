@@ -130,3 +130,12 @@ Append one entry per meaningful development session:
 - Validation: changes are documentation-only; no tests or render were run. Validate links/content and open PR for review; CI should still be checked before merge.
 - Next: open PR, inspect its CI; then build a small testable storyboard-quality validator that can identify missing shot actions/progression and warn about slideshow risk without overclaiming semantic AI QA.
 - Current branch: `feature/visual-storytelling-production-guidelines`.
+
+## 2026-11-19 — Production-plan shot requirements added (PR #66, validation pending)
+
+- Added required `visualMethod`, `action`, and `visualProgression` shot fields to `validateProductionPlan`.
+- Added regression tests for omitted method, action and progression.
+- Enriched all four existing production-plan examples with the new fields. Each shot now describes method selection, a concrete action and start/development/end visual progression.
+- The validator currently checks presence/non-empty strings only; it does not claim to judge creative quality or automatically detect slide-like output.
+- CI run #44498960909 is validating the latest branch head. No render was performed.
+- Next: resolve CI; then consider deterministic storyboard-risk warnings as a separate, testable slice.
