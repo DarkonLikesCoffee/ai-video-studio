@@ -149,3 +149,12 @@ Append one entry per meaningful development session:
 - This validates planning completeness only; it does not semantically judge video/story quality or detect slideshow-like renders.
 - No render was run.
 - Next: implement a transparent deterministic storyboard-risk report with warnings only, backed by tests.
+
+## 2026-11-19 — Deterministic storyboard risk report (PR pending)
+
+- Started branch `feature/storyboard-risk-report` from current main.
+- Added `scripts/storyboard-qa.ts`: warning-only deterministic signals for long shots, explicit static holds, repeated adjacent framing, repeated visual method and repeated camera movement. Output explicitly says these heuristics do not judge story meaning or prove quality.
+- Added tests, package command `storyboard:qa`, and CI execution against the example plan.
+- Added a roadmap check for this limited deterministic QA slice. The larger semantic storyboard/visual QA milestone remains incomplete.
+- Tests/CI not yet confirmed; no video render performed.
+- Next: inspect CI and fix failures, then update docs and merge only if green.
