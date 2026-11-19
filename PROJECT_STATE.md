@@ -4,7 +4,7 @@
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
 **Last verified main commit:** `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354` — PR #97 storyboard-to-production-plan import merged
-**Current development branch:** `feat/director-asset-evidence-report` (asset evidence report in progress; PR not yet opened). PRs #95, #96 and #97 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 passed; merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; post-merge main CI #44574582076 is in progress. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
+**Current development branch:** `feat/director-asset-evidence-report` (PR #98 open; required CI rerunning after a TypeScript syntax fix). PRs #95, #96 and #97 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 passed; merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; post-merge main CI #44574582076 passed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -238,8 +238,8 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 
 ## Creative Brief → asset evidence report (development branch)
 
-- Branch `feat/director-asset-evidence-report` starts from PR #97 merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`.
+- PR #98: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98 on branch `feat/director-asset-evidence-report`, based on PR #97 merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`.
 - New `director:asset-evidence` CLI maps manifest entries to shot IDs and criterion coverage; checks local file presence/path safety and provenance/rights metadata; surfaces unresolved planned asset references and unknown shot IDs.
 - Report is review-only. Asset links are not semantic proof; procedural shots may intentionally have no manifest assets. `--strict` is opt-in.
 - Tests are added for linked files, missing file/provenance/rights, `all` assignments, unknown IDs, unsafe paths, unresolved plan references and missing coverage.
-- CI is required. No render is applicable to this report-only planning slice. No full video playback or audio listening was performed.
+- Initial CI run #44576694962 failed at typecheck with two missing closing parentheses in the report script; fixed on the same branch. Latest check for head `9574ff6fdb1cbc719011d2c5a1f196422a44f388` is queued in run #44576913230. CI is required. No render is applicable to this report-only planning slice. No full video playback or audio listening was performed.
