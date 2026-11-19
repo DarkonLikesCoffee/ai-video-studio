@@ -32,5 +32,5 @@ test("handoff warns against generic slide-like visual defaults", () => {
   const prompt = buildStoryboardDirectorPrompt(brief);
   assert.match(prompt, /Do not default to text cards, diagrams/);
   assert.match(prompt, /visual story/);
-  assert.match(prompt, /sound is editorial/);
+  assert.match(prompt, /sound is editorial/i);
 });
