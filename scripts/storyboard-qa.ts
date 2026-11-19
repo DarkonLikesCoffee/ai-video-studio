@@ -48,15 +48,15 @@ const similarity = (left: unknown, right: unknown): number => {
 
 const isVague = (value: unknown): boolean => {
   const text = normalize(value);
-  return !text || /\\b(show|display|visualize|illustrate|represent) (the|this|concept|idea|topic|point)\\b|\\b(abstract visual|generic visuals|something relevant|various visuals|dynamic scene)\\b/.test(text);
+  return !text || /\b(show|display|visualize|illustrate|represent) (the|this|concept|idea|topic|point)\b|\b(abstract visual|generic visuals|something relevant|various visuals|dynamic scene)\b/.test(text);
 };
 
 const hasProgressionMarker = (value: unknown): boolean => {
   const text = normalize(value);
-  return /\\b(start|begin|opening)\\s*:/i.test(text)
-    && /\\b(development|develop|middle|progress)\\s*:/i.test(text)
-    && /\\b(end|finish|final|resolve)\\s*:/i.test(text);
-
+  return /\b(start|begin|opening)\s*:/i.test(text)
+    && /\b(development|develop|middle|progress)\s*:/i.test(text)
+    && /\b(end|finish|final|resolve)\s*:/i.test(text);
+};
 
 const repeatedAdjacent = (
   shots: ShotLike[],
@@ -109,7 +109,7 @@ export const analyzeStoryboardRisks = (plan: unknown): StoryboardRiskFinding[] =
       findings.push({ code: "INCOMPLETE_VISUAL_PROGRESSION", severity: "warning", shotIds: [id], message: "Progression is missing explicit Start, Development and End markers; describe how the shot visibly evolves." });
     }
     const copy = typeof shot.onScreenText === "string" ? shot.onScreenText.trim() : "";
-    if (copy.length >= 55 || copy.split(/\\s+/).length >= 10) {
+    if (copy.length >= 55 || copy.split(/\s+/).length >= 10) {
       findings.push({ code: "TEXT_HEAVY_SHOT", severity: "warning", shotIds: [id], message: "On-screen copy is lengthy. Review whether the visual carries the idea and whether the text can be read comfortably." });
     }
     if (Number.isFinite(duration) && duration >= 8) {
