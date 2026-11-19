@@ -25,10 +25,20 @@ test("production-plan JSON Schema matches runtime shot requirements and narrativ
   assert.ok(coverageSchema, "schema must define optional acceptance coverage");
   assert.ok(!schema.required.includes("acceptanceCoverage"), "legacy plans remain valid without coverage");
   assert.deepEqual(coverageSchema.items.required, ["criterion", "shotIds", "rationale"]);
+  assert.ok(shotSchema.properties.implementationNotes, "schema must preserve free-form implementation notes");
 });
 
 test("example production plan passes validation", () => {
   assert.deepEqual(validateProductionPlan(example), []);
+});
+
+test("production plan preserves bounded free-form implementation notes", () => {
+  const withNotes = structuredClone(example);
+  const shots = withNotes.shots as Array<Record<string, unknown>>;
+  shots[0]!.implementationNotes = "Use a custom Remotion composition.";
+  assert.deepEqual(validateProductionPlan(withNotes), []);
+  shots[0]!.implementationNotes = "x".repeat(501);
+  assert.ok(validateProductionPlan(withNotes).some((error) => error.includes("implementationNotes")));
 });
 
 test("production plan accepts supported narrative beat tags", () => {
