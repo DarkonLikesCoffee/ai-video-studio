@@ -1,9 +1,9 @@
 # AI Video Studio — Project State
 
-**Last verified:** 2026-11-18  
+**Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `baeabc412b2a52be48e69d41b6709936b265cc6c` — “feat(footage): integrate user gameplay clips”
+**Last verified main commit:** `40f38b7a7576bb061e5f0318e265358a759829f3` — “feat: add deterministic storyboard risk review”
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -170,3 +170,13 @@ Prioritize a small working vertical slice over a large architecture rewrite. Bef
 - Warnings are intentionally non-fatal and transparent; they identify patterns for review and do not claim semantic understanding or prove that a storyboard is bad.
 - Added tests for long/static shots, repeated framing, repeated method/movement and a varied short sequence. Added `npm run storyboard:qa` and a CI invocation against the example production plan.
 - CI validation is pending for this branch; no render was run.
+
+## 10. Development update — storyboard risk review merged (2026-11-19)
+
+- PR #67: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/67 merged by squash into main as `40f38b7a7576bb061e5f0318e265358a759829f3`.
+- CI run #44499955017 passed: typecheck, unit tests, production-plan validation, storyboard-risk CLI on all four plans, project validation, audio preparation and studio build.
+- New `npm run storyboard:qa -- <production-plan.json>` command reports warning-only deterministic signals: long shots (8s+), static camera holds (5s+), repeated adjacent framing, visual-method runs (3+) and camera-movement runs (3+).
+- All four checked-in plans were analyzed in CI. The launch-film, narrated-explainer and SORA examples had no deterministic patterns. VALORANT's six 10-second shots were reported as long-shot pacing review warnings. This is a prompt for editorial review, not a quality failure.
+- The command is documented in README and agent guidance. The analyzer does not semantically understand story content or inspect rendered video.
+- No render was performed.
+- Next: build a more useful shot-sequence planning/validation layer that can inspect visual-method distribution and action/progression completeness, then prototype storyboard-to-animatic review before adding new renderer effects.
