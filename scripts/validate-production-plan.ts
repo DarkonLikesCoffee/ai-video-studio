@@ -34,6 +34,7 @@ type Plan = {
     transition?: unknown;
     audio?: unknown;
     narrativeBeat?: unknown;
+    implementationNotes?: unknown;
   }>;
   acceptanceCriteria?: unknown;
 };
@@ -47,6 +48,7 @@ export const validateAcceptanceCoverage = (value: unknown): string[] => {
   if (!Array.isArray(value.acceptanceCriteria) || !Array.isArray(value.shots)) return errors;
   if (!Array.isArray(value.acceptanceCoverage)) return ["acceptanceCoverage must be an array when provided."];
   const criteria = value.acceptanceCriteria.filter((item): item is string => typeof item === "string");
+  if (new Set(criteria).size !== criteria.length) errors.push("acceptanceCriteria must not contain duplicates.");
   const knownShots = new Set(value.shots.flatMap((shot) => isRecord(shot) && typeof shot.id === "string" ? [shot.id] : []));
   const covered = new Set<string>();
   value.acceptanceCoverage.forEach((entry, index) => {
@@ -71,6 +73,7 @@ export const validateAcceptanceCoverage = (value: unknown): string[] => {
       shotIds.forEach((id) => {
         if (local.has(id)) errors.push(`${prefix}.shotIds contains duplicate ID "${id}".`);
         local.add(id);
+        if (!/^[a-z0-9][a-z0-9-]{1,63}$/.test(id)) errors.push(`${prefix}.shotIds contains invalid shot ID "${id}".`);
         if (!knownShots.has(id)) errors.push(`${prefix}.shotIds references unknown shot "${id}".`);
       });
     }
