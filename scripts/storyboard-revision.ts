@@ -206,8 +206,8 @@ const run = async (): Promise<void> => {
       const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
       const payload = JSON.parse(await readFile(output, "utf8")) as unknown;
       const updated = importStoryboardRevisionEdits(artifact, payload);
-      await writeFile(input, JSON.stringify(updated, null, 2) + "\\n", "utf8");
-      process.stdout.write(`Imported ${updated.edits.length - artifact.edits.length} edits into ${input} (plan not modified)\\n`);
+      await writeFile(input, JSON.stringify(updated, null, 2) + "\n", "utf8");
+      process.stdout.write(`Imported ${updated.edits.length - artifact.edits.length} edits into ${input} (plan not modified)\n`);
       return;
     }
     if (command === "review") {
