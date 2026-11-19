@@ -220,5 +220,5 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 
 ## Render evidence workflow
 
-- [ ] Automatically attach a contact sheet and JSON evidence report to every GitHub Actions render artifact (implementation PR in progress; verify CI before marking complete).
+- [x] Automatically attach a contact sheet and JSON evidence report to every GitHub Actions render artifact (PR #84 merged; post-merge main CI pending and no render has yet exercised this workflow).
 - [ ] Inspect actual render artifacts across motion and listen to audio; contact sheets alone are insufficient acceptance.
