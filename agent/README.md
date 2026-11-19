@@ -71,3 +71,7 @@ Do not ask the user whether to merge a PR. Merge only after required tests pass 
 ## Quality principle
 
 A successful render is not necessarily a successful video. CI proves reproducibility and technical validity; visual QA proves whether the result communicates, looks and sounds intentional. For narrated work, the voice track is the timing master: align the actual spoken audio first, then build shots, captions and SFX around it. Do not ship slide-like sequences, repeated static title cards or music-only output when narration is part of the brief. Optimize for the brief and audience, not for the number of effects, scenes or technologies used.
+
+## Expanded deterministic storyboard quality review
+
+The storyboard QA CLI includes warning-only signals for potentially vague visual/action descriptions, progression that lacks explicit Start/Development/End phases, highly similar adjacent visual descriptions and lengthy on-screen copy. Treat these as prompts to rewrite the weakest shots—not hard rules. The heuristics cannot understand narrative intent or judge rendered creative quality.

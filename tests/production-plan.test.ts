@@ -97,3 +97,35 @@ test("storyboard QA returns no findings for a varied short sequence", () => {
   });
   assert.deepEqual(analyzeStoryboardRisks(plan), []);
 });
+
+test("storyboard QA flags placeholder-like visual and action descriptions", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots[0]!.visual = "Show this concept";
+  shots[0]!.action = "Show the idea";
+  const findings = analyzeStoryboardRisks(plan);
+  assert.ok(findings.some((finding) => finding.code === "VAGUE_VISUAL_DESCRIPTION" && finding.shotIds.includes("opening-macro")));
+  assert.ok(findings.some((finding) => finding.code === "VAGUE_ACTION" && finding.shotIds.includes("opening-macro")));
+});
+
+test("storyboard QA warns when progression lacks explicit phases", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots[2]!.visualProgression = "A detail moves into frame and the light changes.";
+  assert.ok(analyzeStoryboardRisks(plan).some((finding) => finding.code === "INCOMPLETE_VISUAL_PROGRESSION" && finding.shotIds.includes("detail-proof")));
+});
+
+test("storyboard QA flags highly similar adjacent visual descriptions", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots[1]!.visual = shots[0]!.visual;
+  const findings = analyzeStoryboardRisks(plan);
+  assert.ok(findings.some((finding) => finding.code === "REPEATED_VISUAL_DESCRIPTION" && finding.shotIds.length === 2));
+});
+
+test("storyboard QA warns on unusually long on-screen copy without failing validation", () => {
+  const plan = structuredClone(example);
+  const shots = plan.shots as Array<Record<string, unknown>>;
+  shots[0]!.onScreenText = "A very long headline that may overwhelm the visual and take too long to read on screen";
+  assert.ok(analyzeStoryboardRisks(plan).some((finding) => finding.code === "TEXT_HEAVY_SHOT"));
+});

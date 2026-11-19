@@ -6,7 +6,12 @@ export type StoryboardRiskCode =
   | "STATIC_HOLD"
   | "REPEATED_VISUAL_METHOD"
   | "REPEATED_FRAMING"
-  | "REPEATED_CAMERA_MOVEMENT";
+  | "REPEATED_CAMERA_MOVEMENT"
+  | "VAGUE_VISUAL_DESCRIPTION"
+  | "VAGUE_ACTION"
+  | "INCOMPLETE_VISUAL_PROGRESSION"
+  | "REPEATED_VISUAL_DESCRIPTION"
+  | "TEXT_HEAVY_SHOT";
 
 export type StoryboardRiskFinding = {
   code: StoryboardRiskCode;
@@ -29,6 +34,29 @@ const getShots = (plan: unknown): ShotLike[] => {
 
 const getShotId = (shot: ShotLike, index: number): string =>
   typeof shot.id === "string" && shot.id.trim() ? shot.id : `shot-${index + 1}`;
+
+const tokens = (value: unknown): Set<string> =>
+  new Set(normalize(value).match(/[a-z0-9]{3,}/g) ?? []);
+
+const similarity = (left: unknown, right: unknown): number => {
+  const a = tokens(left);
+  const b = tokens(right);
+  if (a.size === 0 || b.size === 0) return 0;
+  const intersection = [...a].filter((token) => b.has(token)).length;
+  return intersection / new Set([...a, ...b]).size;
+};
+
+const isVague = (value: unknown): boolean => {
+  const text = normalize(value);
+  return !text || /\b(show|display|visualize|illustrate|represent) (the|this|concept|idea|topic|point)\b|\b(abstract visual|generic visuals|something relevant|various visuals|dynamic scene)\b/.test(text);
+};
+
+const hasProgressionMarker = (value: unknown): boolean => {
+  const text = normalize(value);
+  return /\b(start|begin|opening)\s*:/i.test(text)
+    && /\b(development|develop|middle|progress)\s*:/i.test(text)
+    && /\b(end|finish|final|resolve)\s*:/i.test(text);
+};
 
 const repeatedAdjacent = (
   shots: ShotLike[],
@@ -71,6 +99,19 @@ export const analyzeStoryboardRisks = (plan: unknown): StoryboardRiskFinding[] =
   shots.forEach((shot, index) => {
     const duration = Number(shot.durationSeconds);
     const id = getShotId(shot, index);
+    if (isVague(shot.visual)) {
+      findings.push({ code: "VAGUE_VISUAL_DESCRIPTION", severity: "warning", shotIds: [id], message: "Visual description may be generic or placeholder-like. Specify a concrete subject, environment and visible event." });
+    }
+    if (isVague(shot.action)) {
+      findings.push({ code: "VAGUE_ACTION", severity: "warning", shotIds: [id], message: "Action may be vague. Describe what the subject/object does and how it changes the frame." });
+    }
+    if (!hasProgressionMarker(shot.visualProgression)) {
+      findings.push({ code: "INCOMPLETE_VISUAL_PROGRESSION", severity: "warning", shotIds: [id], message: "Progression is missing explicit Start, Development and End markers; describe how the shot visibly evolves." });
+    }
+    const copy = typeof shot.onScreenText === "string" ? shot.onScreenText.trim() : "";
+    if (copy.length >= 55 || copy.split(/\s+/).length >= 10) {
+      findings.push({ code: "TEXT_HEAVY_SHOT", severity: "warning", shotIds: [id], message: "On-screen copy is lengthy. Review whether the visual carries the idea and whether the text can be read comfortably." });
+    }
     if (Number.isFinite(duration) && duration >= 8) {
       findings.push({
         code: "LONG_SHOT",
@@ -94,6 +135,20 @@ export const analyzeStoryboardRisks = (plan: unknown): StoryboardRiskFinding[] =
   findings.push(...repeatedAdjacent(shots, "visualMethod", 3, "REPEATED_VISUAL_METHOD", "visual method"));
   findings.push(...repeatedAdjacent(shots, "framing", 2, "REPEATED_FRAMING", "framing"));
   findings.push(...repeatedAdjacent(shots, "cameraMovement", 3, "REPEATED_CAMERA_MOVEMENT", "camera movement"));
+
+  for (let index = 1; index < shots.length; index += 1) {
+    const previous = shots[index - 1]!;
+    const current = shots[index]!;
+    const visualSimilarity = similarity(previous.visual, current.visual);
+    if (visualSimilarity >= 0.82 && tokens(previous.visual).size >= 5 && tokens(current.visual).size >= 5) {
+      findings.push({
+        code: "REPEATED_VISUAL_DESCRIPTION",
+        severity: "warning",
+        shotIds: [getShotId(previous, index - 1), getShotId(current, index)],
+        message: `Adjacent visual descriptions are highly similar (token similarity ${visualSimilarity.toFixed(2)}). Review whether the next shot adds a new visual event or composition.`,
+      });
+    }
+  }
 
   return findings;
 };
