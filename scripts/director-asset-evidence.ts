@@ -224,7 +224,7 @@ export const buildAssetEvidenceReport = async (
   const shotsWithAssets = shots.filter((shot) => shot.manifestAssets.length > 0).length;
   const hasWarnings = issues.some((issue) => issue.severity === "warning");
   const hasErrors = issues.some((issue) => issue.severity === "error");
-  const status: AssetEvidenceReport["summary"]["status"] = hasErrors ? "invalid" : hasWarnings ? "needs-review" : assets.length ? "ready" : "no-assets";
+  const status: AssetEvidenceReport["summary"]["status"] = hasErrors ? "invalid" : !assets.length ? "no-assets" : hasWarnings ? "needs-review" : criteriaUnavailable ? "criteria-unavailable" : "ready";
   const criteriaUnavailable = !Array.isArray(coverageInput) || coverageInput.length === 0;
   return {
     schemaVersion: 1,
