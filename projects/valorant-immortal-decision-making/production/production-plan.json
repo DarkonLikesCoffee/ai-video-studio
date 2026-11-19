@@ -64,7 +64,10 @@
       "assets": [
         "scene-01-pressure.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "Motion graphics / illustrative tactical animation",
+      "action": "Pressure lines close around a drifting reticle, then the question headline resolves.",
+      "visualProgression": "Start: open pressure corridor. Development: lines converge and the reticle drifts off-centre. End: the headline lands as the visual pressure point."
     },
     {
       "id": "aim-isnt-everything",
@@ -80,7 +83,10 @@
       "assets": [
         "scene-02-aim.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "Motion graphics / target animation with gameplay insert if approved footage is available",
+      "action": "The reticle tracks toward a target, tracer connects, and the impact ring expands then clears.",
+      "visualProgression": "Start: target and reticle are separated. Development: reticle sweeps, corrects, and the tracer reaches the target. End: impact ring expands and becomes the map transition."
     },
     {
       "id": "read-the-round",
@@ -96,7 +102,10 @@
       "assets": [
         "scene-03-read.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "Animated tactical map / motion graphics with footage insert where available",
+      "action": "Teammate nodes move into crossfire positions as routes draw and threat information pulses.",
+      "visualProgression": "Start: map with separated team nodes. Development: routes draw and players reposition into coordinated spacing. End: threat pulse reveals the next decision."
     },
     {
       "id": "the-ego-peek",
@@ -112,7 +121,10 @@
       "assets": [
         "scene-04-mistake.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "Illustrative tactical animation with authentic gameplay footage only if available",
+      "action": "A lone player route pushes into a danger zone as threat lines converge, then the action freezes on the exposed position.",
+      "visualProgression": "Start: player is approaching an angle. Development: the route enters the danger zone and threat lines converge. End: movement freezes with the warning state visible."
     },
     {
       "id": "the-better-play",
@@ -128,7 +140,10 @@
       "assets": [
         "scene-05-execute.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "Tactical motion graphics with authorized gameplay footage",
+      "action": "Team routes converge in staggered timing, utility expands and allied markers establish a crossfire.",
+      "visualProgression": "Start: routes and team positions are separated. Development: utility expands and routes converge. End: the team holds coordinated space."
     },
     {
       "id": "play-smarter",
@@ -144,7 +159,10 @@
       "assets": [
         "scene-06-finale.svg"
       ],
-      "engineApproach": "project-video"
+      "engineApproach": "project-video",
+      "visualMethod": "Motion-graphics finale / kinetic typography",
+      "action": "Tactical geometry resolves into an emblem while the final message arrives and holds.",
+      "visualProgression": "Start: tactical paths converge. Development: geometry collapses into the emblem and the final line locks in. End: motion settles and the message holds before fade."
     }
   ],
   "acceptanceCriteria": [
