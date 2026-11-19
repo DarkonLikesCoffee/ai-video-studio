@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `f621b018facaa1f37ed48d34d35d342fe788b32b` — `feat(storyboard): add visual strategy report (#81)`
-**Current development branch:** PR #81 merged; contact-sheet evidence JSON and advisory visual-strategy report are on main. Current work adds a machine-readable strategy-report envelope; CI is required before merge.
+**Last verified main commit:** `25e946045f00764142fb26c9c8e305bdd511e8c5` — `feat(storyboard): add JSON visual strategy reports (#82)`
+**Current development branch:** PRs #81 and #82 merged; main CI passed for commit `25e946045f00764142fb26c9c8e305bdd511e8c5`. The visual strategy report now supports both Markdown and versioned JSON output.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -98,7 +98,7 @@ Creative QA result: **not accepted as a successful cinematic explainer**.
 
 The next agent should use this project as a regression/quality case, not simply produce another similar SVG slideshow.
 
-## 6. Verified current repository snapshot — 2026-11-19
+## 7. Verified current repository snapshot — 2026-11-19
 
 - Main HEAD: `93cec7fec2a4c8917bb6c231519b75181fb54d48` (PR #77 merged).
 - PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
