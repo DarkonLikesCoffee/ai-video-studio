@@ -73,6 +73,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 - [x] Add a traceable revision artifact/workflow that records the source plan text/object and SHA-256, critic suggestions and selection state, explicit edits, and validation errors/warnings while preserving the original plan. Selection and edits are manual/agent-explicit; no silent auto-repair.
 - [x] Export a model-neutral revision handoff prompt from selected suggestions, including only affected shot context and strict JSON edit-output instructions. This is prompt packaging, not an LLM integration.
 - [x] Import model-returned revision JSON with strict checks for selected shot IDs, duplicate edits and supported fields; validate and apply only to a separate revised plan.
+- [x] Support optional explicit narrative-beat labels and a review report that groups beat coverage/duration and flags gaps without inferring story meaning or enforcing a fixed arc.
 
 **Exit criteria:** A reviewer can understand the intended video and approve or change its shot plan before expensive asset generation or rendering; the approved plan drives production.
 

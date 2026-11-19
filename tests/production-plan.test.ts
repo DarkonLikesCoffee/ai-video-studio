@@ -13,6 +13,20 @@ test("example production plan passes validation", () => {
   assert.deepEqual(validateProductionPlan(example), []);
 });
 
+test("production plan accepts supported narrative beat tags", () => {
+  const tagged = structuredClone(example);
+  const shots = tagged.shots as Array<Record<string, unknown>>;
+  shots[0]!.narrativeBeat = "hook";
+  shots[1]!.narrativeBeat = "development";
+  assert.deepEqual(validateProductionPlan(tagged), []);
+});
+
+test("production plan rejects unknown narrative beat tags", () => {
+  const invalid = structuredClone(example);
+  (invalid.shots as Array<Record<string, unknown>>)[0]!.narrativeBeat = "random";
+  assert.ok(validateProductionPlan(invalid).some((error) => error.includes("narrativeBeat")));
+});
+
 test("production plan requires a meaningful acceptance checklist", () => {
   const invalid = structuredClone(example);
   invalid.acceptanceCriteria = ["Only one criterion"];

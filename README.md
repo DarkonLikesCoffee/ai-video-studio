@@ -818,3 +818,22 @@ Defaults: one thumbnail every 5 seconds, 4 columns, 320 px width. Requires FFmpe
 ### Render artifacts
 
 GitHub Actions renders now also generate a contact sheet and a versioned JSON evidence report automatically after media QA. Both files are uploaded alongside the MP4 and media-QA report, making sparse visual review available for every GitHub Actions render without a manual command. The contact sheet samples at 5-second intervals by default; it is not a substitute for watching the full video.
+
+
+## Narrative beat review
+
+Production plans may optionally label shots with `narrativeBeat`: `hook`, `setup`, `context`, `development`, `escalation`, `reveal`, `payoff`, `cta`, `transition` or `pause`. These labels are explicit author/director choices; the system does not infer story roles from prose.
+
+Generate a review report:
+
+```bash
+npm run storyboard:beats -- projects/examples/production-plan.json
+```
+
+Write a Markdown report to a file, or use `--json` for a versioned machine-readable report:
+
+```bash
+npm run storyboard:beats -- projects/examples/production-plan.json beats.json --json
+```
+
+The report groups tagged shots, totals their durations, shows untagged shots and offers review prompts for missing opening/development/payoff labels when at least 60% of a sequence of three or more shots is labeled. These are optional creative guidelines—not validation errors or an approval score. Formats that do not use a conventional narrative arc may omit tags or ignore the prompts.
