@@ -41,6 +41,49 @@ type Plan = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+export const validateAcceptanceCoverage = (value: unknown): string[] => {
+  if (!isRecord(value) || value.acceptanceCoverage === undefined) return [];
+  const errors: string[] = [];
+  if (!Array.isArray(value.acceptanceCriteria) || !Array.isArray(value.shots)) return errors;
+  if (!Array.isArray(value.acceptanceCoverage)) return ["acceptanceCoverage must be an array when provided."];
+  const criteria = value.acceptanceCriteria.filter((item): item is string => typeof item === "string");
+  const knownShots = new Set(value.shots.flatMap((shot) => isRecord(shot) && typeof shot.id === "string" ? [shot.id] : []));
+  const covered = new Set<string>();
+  value.acceptanceCoverage.forEach((entry, index) => {
+    const prefix = `acceptanceCoverage[${index}]`;
+    if (!isRecord(entry)) {
+      errors.push(`${prefix} must be an object.`);
+      return;
+    }
+    const criterion = entry.criterion;
+    if (typeof criterion !== "string" || !criteria.includes(criterion)) {
+      errors.push(`${prefix}.criterion must exactly match an acceptanceCriteria entry.`);
+    } else if (covered.has(criterion)) {
+      errors.push(`${prefix}.criterion is duplicated.`);
+    } else {
+      covered.add(criterion);
+    }
+    const shotIds = entry.shotIds;
+    if (!Array.isArray(shotIds) || shotIds.length === 0 || shotIds.some((id) => typeof id !== "string" || !id.trim())) {
+      errors.push(`${prefix}.shotIds must contain at least one non-empty shot ID.`);
+    } else {
+      const local = new Set<string>();
+      shotIds.forEach((id) => {
+        if (local.has(id)) errors.push(`${prefix}.shotIds contains duplicate ID "${id}".`);
+        local.add(id);
+        if (!knownShots.has(id)) errors.push(`${prefix}.shotIds references unknown shot "${id}".`);
+      });
+    }
+    if (typeof entry.rationale !== "string" || !entry.rationale.trim()) {
+      errors.push(`${prefix}.rationale must be a non-empty string.`);
+    }
+  });
+  criteria.forEach((criterion) => {
+    if (!covered.has(criterion)) errors.push(`acceptanceCoverage is missing criterion: ${criterion}`);
+  });
+  return errors;
+};
+
 export const validateProductionPlan = (value: unknown): string[] => {
   const errors: string[] = [];
   if (!isRecord(value)) return ["Plan must be a JSON object."];
@@ -134,6 +177,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
     errors.push("acceptanceCriteria must contain 3–10 non-empty strings.");
   }
 
+  errors.push(...validateAcceptanceCoverage(plan));
   return errors;
 };
 
