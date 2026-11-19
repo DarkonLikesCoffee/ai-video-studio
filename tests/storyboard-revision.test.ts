@@ -87,7 +87,7 @@ test("imports AI edits only for selected suggestions and existing shots", () => 
   assert.equal(imported.edits[0].shotId, targetShotId);
   assert.equal(imported.validation, null);
   assert.throws(() => importStoryboardRevisionEdits(selected, { edits: [{ shotId: "not-a-shot", changeNote: "x", fields: { visual: "y" } }] }), /unknown shot ID/);
-  const unselectedShot = artifact.sourcePlan.shots.find((shot) => !artifact.suggestions[0].item.shotIds.includes(shot.id));
+  const sourceShots = (artifact.sourcePlan as { shots: Array<{ id: string }> }).shots;\n  const unselectedShot = sourceShots.find((shot) => !artifact.suggestions[0].item.shotIds.includes(shot.id));
   if (unselectedShot) assert.throws(() => importStoryboardRevisionEdits(selected, { edits: [{ shotId: unselectedShot.id, changeNote: "x", fields: { visual: "y" } }] }), /not covered by a selected critique/);
   assert.throws(() => importStoryboardRevisionEdits(selected, { edits: [{ shotId: targetShotId, changeNote: "x", fields: { unsupported: "y" } }] }), /Unsupported revision field/);
 });
