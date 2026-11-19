@@ -64,11 +64,11 @@ const hasProgressionMarker = (value: unknown): boolean => {
 const shotScale = (value: unknown): string | null => {
   const text = normalize(value);
   const patterns: Array<[string, RegExp]> = [
-    ["extreme-close-up", /\\b(extreme close[- ]?up|extreme macro)\\b/],
-    ["macro", /\\b(macro|detail shot|detail close[- ]?up)\\b/],
-    ["close-up", /\\b(close[- ]?up|tight shot)\\b/],
-    ["medium", /\\b(medium shot|mid shot|waist shot|medium close)\\b/],
-    ["wide", /\\b(wide shot|long shot|full shot|establishing shot|aerial wide)\\b/],
+    ["extreme-close-up", /\b(extreme close[- ]?up|extreme macro)\b/],
+    ["macro", /\b(macro|detail shot|detail close[- ]?up)\b/],
+    ["close-up", /\b(close[- ]?up|tight shot)\b/],
+    ["medium", /\b(medium shot|mid shot|waist shot|medium close)\b/],
+    ["wide", /\b(wide shot|long shot|full shot|establishing shot|aerial wide)\b/],
   ];
   for (const [scale, pattern] of patterns) if (pattern.test(text)) return scale;
   return null;
