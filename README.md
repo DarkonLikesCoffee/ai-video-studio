@@ -105,6 +105,17 @@ npm run qa:media -- render-output/my-video.mp4
 
 This writes `render-output/my-video.qa.json` (or a supplied report path) with ffprobe metadata, audio silence intervals, video freeze intervals, black-frame intervals and EBU R128 loudness diagnostics. Missing audio/video streams or invalid duration fail the command. Silence, freeze and black intervals are warnings because a deliberate pause, fade or black transition may be legitimate; compare timestamps with the brief and inspect/listen to the MP4. This is a technical first-pass gate, not semantic or creative approval. See [Media QA skill](agent/skills/media-qa/SKILL.md).
 
+## Storyboard risk review
+
+Run a deterministic first-pass review against a production plan:
+
+```bash
+npm run storyboard:qa -- projects/examples/production-plan.json
+```
+
+It reports transparent review signals such as long shots, explicit static camera holds and repeated adjacent framing/visual methods/camera movement. These are non-failing heuristics—not a semantic storyboard evaluator, creative score or approval gate. Review the findings against the brief; intentional repetition and long holds may be appropriate.
+
+
 ## Example project
 
 The repository keeps [projects/examples/three-scene-story/scene.json](projects/examples/three-scene-story/scene.json) as a compatibility sample for local SVG and remote MP4 assets.
