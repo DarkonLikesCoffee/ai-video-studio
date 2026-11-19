@@ -182,3 +182,18 @@ Append one entry per meaningful development session:
 - No render was run in this session. The last reported VALORANT v4 run #44485488551 was technically successful (47.86s, 1080p/30fps); creative acceptance remains open and the uploaded conversation reports frame-based review, not full-timeline playback/audio listening in this session.
 - **Next:** inspect the full storyboard/production-plan format and implement the smallest reusable preview generator plus tests, then run CI and inspect the produced preview. Keep the renderer and `render-request.json` untouched unless an end-to-end render becomes necessary for acceptance.
 - Current branch: `feat/storyboard-animatic-preview`; base: `a30be87792a5bc0646e4c4dc3b1bf04d42a8dd92`.
+
+
+## 2026-11-19 — Storyboard planning preview implementation (PR preparation)
+
+- Added `scripts/storyboard-preview.ts`, a dependency-free TypeScript utility that converts an existing production plan into a timeline-ordered HTML review page.
+- The preview surfaces shot timing, visual method, purpose, visual description, concrete action, start/development/end progression, framing, camera movement, transition, audio, text and asset references.
+- The utility validates the preview's basic sequence bounds (starts at 0, shots ordered/non-overlapping, no shot past runtime, final shot ends at declared runtime) so the review page cannot silently imply an invalid sequence.
+- The output explicitly labels itself as a planning preview, not a rendered video or animated animatic. It does not load footage, generate assets or claim semantic creative approval.
+- Added `tests/storyboard-preview.test.ts` for data coverage, invalid timing/overlap and HTML escaping. Added `npm run storyboard:preview`.
+- Documented the review step in README and agent workflow guidance.
+- CI now generates planning previews for the launch-film and VALORANT production plans and uploads them as the `storyboard-planning-previews` artifact (7-day retention).
+- This is an inspectable pre-production planning aid; it does not yet show thumbnails or generated motion. The next iteration can add asset thumbnails/representative media only after a reliable, rights-aware preview path exists.
+- Branch: `feat/storyboard-animatic-preview`, based on `a30be87792a5bc0646e4c4dc3b1bf04d42a8dd92`.
+- Validation: awaiting PR CI. No full video render was initiated because this feature produces a planning artifact only, not a video-producing engine change.
+- Next: inspect CI, download and inspect the HTML artifact, resolve any issues, then open/complete the PR review and update state with exact CI/artifact evidence.
