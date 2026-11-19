@@ -95,6 +95,16 @@ For projects that need authentic gameplay rather than illustrative diagrams, add
 
 The narration application now injects approved video assets into matching `ProjectVideo` scene IDs as muted full-frame backgrounds, retaining vector overlays and timed captions. Scene duration follows the narration-retimed timeline. Add manifest entries with `type: "user-provided-gameplay"`, a local `file`, `shotIds`, and either `rightsBasis: "user-owned"` or `"permission-granted"` plus a meaningful `rightsNote`. User-supplied footage is not mislabeled as Creative Commons or public domain. Unmatched scenes retain their original visuals. The render artifact includes a credits/provenance text file.
 
+## Creative brief to storyboard handoff
+
+Validate a creative brief and generate a model-neutral, shot-level storyboard director handoff:
+
+```bash
+npm run director:storyboard-prompt -- projects/examples/creative-brief.json /tmp/storyboard-director.md
+```
+
+The handoff carries the complete brief and requests a coherent timed sequence with specific visual/action progression, per-shot visual-method selection, framing, motivated movement, transitions and sound, asset needs, frame-aligned timing, and acceptance-criteria coverage. It explicitly discourages generic text-card/diagram defaults and requires JSON output compatible with the storyboard-preview contract. This command prepares instructions for a creative model/agent; it does not itself generate the storyboard or call an LLM. The JSON output also includes a structured `acceptanceCoverage` array: one entry per criterion with the exact criterion text, one or more shot IDs, and a rationale. The map is a reviewable claim, not semantic verification.
+
 ## Creative Brief → production-plan import
 
 Once a creative model returns a storyboard JSON following the director handoff contract, convert it into a validated production plan and preserve criterion-to-shot traceability:
