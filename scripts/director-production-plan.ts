@@ -37,7 +37,16 @@ export const buildProductionPlanFromStoryboard = (briefInput: unknown, storyboar
     }
   }
   const direction = record(storyboard.creativeDirection);
-  const visualSystem = record(direction.visualSystem);
+  const visualSource = record(direction.visualSystem);
+  const visualSystem: RecordValue = {
+    palette: visualSource.palette,
+    typography: visualSource.typography,
+    composition: visualSource.composition,
+    lighting: visualSource.lighting,
+    ...(typeof visualSource.textureAndMaterials === "string"
+      ? { textureAndMaterials: visualSource.textureAndMaterials }
+      : typeof visualSource.texture === "string" ? { textureAndMaterials: visualSource.texture } : {}),
+  };
   for (const field of ["palette", "typography", "composition", "lighting"] as const) {
     const value = visualSystem[field];
     if (field === "palette") {
@@ -45,6 +54,9 @@ export const buildProductionPlanFromStoryboard = (briefInput: unknown, storyboar
         throw new Error("Storyboard creativeDirection.visualSystem.palette must contain at least two non-empty strings.");
       }
     } else requiredText(value, `Storyboard creativeDirection.visualSystem.${field}`);
+  }
+  if (visualSystem.textureAndMaterials !== undefined && (typeof visualSystem.textureAndMaterials !== "string" || visualSystem.textureAndMaterials.length > 500)) {
+    throw new Error("Storyboard creativeDirection.visualSystem.textureAndMaterials must be a string of at most 500 characters.");
   }
   const shotsInput = storyboard.shots;
   if (!Array.isArray(shotsInput) || shotsInput.length === 0) throw new Error("Storyboard must contain at least one shot.");
