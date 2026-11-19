@@ -94,12 +94,6 @@ export const buildStoryboardPreview = (input: unknown): StoryboardPreview => {
     if (shot.startSeconds + shot.durationSeconds > durationSeconds + 1e-6) {
       throw new Error(`Shot "${shot.id}" extends beyond the declared runtime.`);
     }
-    if (index > 0) {
-      const previous = shots[index - 1]!;
-      if (shot.startSeconds < previous.startSeconds + previous.durationSeconds - 1e-6) {
-        throw new Error(`Shot "${shot.id}" overlaps the previous shot. Review previews require a non-overlapping shot list.`);
-      }
-    }
   }
   const finalShot = shots.at(-1)!;
   if (Math.abs(finalShot.startSeconds + finalShot.durationSeconds - durationSeconds) > 1e-6) {
@@ -175,7 +169,7 @@ export const renderStoryboardPreviewHtml = (preview: StoryboardPreview): string 
           <span class="method">${escapeHtml(shot.visualMethod)}</span>
         </header>
         <div class="progress">
-          <span>${timestamp(shot.startSeconds)}</span><div><i style="width:${Math.max(0, Math.min(100, shot.startSeconds / preview.delivery.durationSeconds * 100))}%"></i><b style="width:${Math.max(0, Math.min(100, shot.durationSeconds / preview.delivery.durationSeconds * 100))}%"></b></div><span>${timestamp(end)}</span>
+          <span>${timestamp(shot.startSeconds)}</span><div><i style="left:0;width:${Math.max(0, Math.min(100, shot.startSeconds / preview.delivery.durationSeconds * 100))}%"></i><b style="left:${Math.max(0, Math.min(100, shot.startSeconds / preview.delivery.durationSeconds * 100))}%;width:${Math.max(0, Math.min(100, shot.durationSeconds / preview.delivery.durationSeconds * 100))}%"></b></div><span>${timestamp(end)}</span>
         </div>
         <dl>${details.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl>
       </article>`;
