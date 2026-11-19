@@ -791,4 +791,4 @@ npm run qa:contact-sheet -- render.mp4
 npm run qa:contact-sheet -- render.mp4 --interval 3 --columns 5 --width 360 --output review.jpg
 ```
 
-Defaults: one thumbnail every 5 seconds, 4 columns, 320 px width. For detailed review of short videos, use `--interval 1` (one sample per second) and increase `--width` for legibility. Requires FFmpeg and FFprobe. Output is JPEG; video is not modified. A contact sheet is sampled imagery only; full playback is still needed to judge motion, timing and audio.
+Defaults: one thumbnail every 5 seconds, 4 columns, 320 px width. For detailed review of short videos, use `--interval 1` (one sample per second) and increase `--width` for legibility. Optional `--report report.json` writes exact sampled timestamps, options, input, duration, grid and output path. Requires FFmpeg and FFprobe. Output is JPEG; video is not modified. A contact sheet is sampled imagery only; full playback is still needed to judge motion, timing and audio.
