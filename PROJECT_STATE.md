@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `f2f54d121279944a19a5fe187efba6b6aeccc066` — latest storyboard preview handoff documentation
-**Current development branch:** `feat/storyboard-animatic-preview` (based on that main commit; pre-production review preview work in progress)
+**Last verified main commit:** `ac153121b0f7ec81a02dbec63e8c1b37fb205200` — “feat(storyboard-qa): add visual specificity warnings”
+**Current development branch:** `main` (PR #69 merged; no open PRs at handoff)
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -193,3 +193,13 @@ Prioritize a small working vertical slice over a large architecture rewrite. Bef
 - Artifact #14516579993 was downloaded and checked: `launch-film.html` (4 shots) and `valorant.html` (6 shots).
 - This is **not** an animated animatic or final video. It does not play footage, inspect actual assets, generate missing media or semantically judge creative quality.
 - Roadmap HTML planning-preview task is complete. Remaining: true media-backed animatic/shot preview, Production Director, richer per-shot method selection/capability mapping, semantic rendered-video QA, review latest VALORANT render creatively.
+
+
+## 12. Expanded storyboard QA signals — merged 2026-11-19
+
+- PR #69 merged by squash into main: `ac153121b0f7ec81a02dbec63e8c1b37fb205200`.
+- Added warning-only lexical/structural checks for placeholder-like visual descriptions, vague actions, missing explicit Start/Development/End markers, highly similar adjacent visual descriptions and lengthy on-screen copy.
+- Existing checks remain: long shots, static holds and repeated adjacent method/framing/camera movement.
+- PR CI #44504229542 passed the complete workflow: typecheck, tests, production-plan validations, storyboard preview generation, all storyboard QA commands, project validations, audio preparation, FFmpeg/FFprobe and studio build.
+- These are heuristic prompts only; no semantic understanding or render inspection is implemented. No render was required or run for this pre-production CLI change.
+- The latest snapshot updates this development milestone, but the larger P0 storyboard-quality exit criteria and P1 autonomous Director remain incomplete.
