@@ -239,3 +239,11 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 
 - The JSON Schema was missing the validator-required `visualMethod`, `action`, and `visualProgression` shot fields, and it omitted optional `narrativeBeat` labels accepted by runtime validation. Because `shots.items.additionalProperties` is false, schema consumers could reject or fail to request fields that the CLI requires.
 - Branch `fix/production-plan-schema-runtime-contract` adds the missing required fields, the optional narrative-beat enum, and a regression test comparing the runtime shot contract to the schema. CI pending; no video render needed for this schema-only correction.
+
+
+## 2026-11-19 — Production-plan schema correction merged; storyboard import in progress
+
+- [x] PR #96 aligns the production-plan JSON Schema with the runtime-required shot fields and narrative-beat enum. CI run #332 (`44538121663`) passed; merge commit `98a972911052fa8a3381c4852e1f6f38c1d94398`.
+- [ ] Branch `feat/director-production-plan-import` implements the next small vertical slice: convert a model-authored storyboard JSON into a validated production plan, carry the Creative Brief's acceptance criteria, and require exact criterion-to-shot mappings with rationale. It also checks delivery consistency, contiguous timing and frame alignment, and preserves free-form implementation notes. CI pending; no render is needed for this planning-only slice.
+- [ ] PR #95 (Creative Brief storyboard handoff) remains open but its check suites are queued with zero check runs reported; its base SHA is stale after PR #96. Reconcile its head/base and ensure checks actually execute before merging.
+- Next: integrate the validated production plan with asset/build stages and review the mapped acceptance evidence against storyboard preview and rendered output; coverage mappings are author claims, not semantic verification.
