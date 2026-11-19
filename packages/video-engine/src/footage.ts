@@ -43,7 +43,7 @@ const hasExplicitUserRights = (value: Record<string, unknown>): boolean =>
 
 /**
  * Resolve reviewed local footage assets onto matching storyboard shots.
- * The first manifest asset assigned to a shot wins.
+ * Multiple assets assigned to a shot are placed sequentially across that shot.
  */
 export const buildNarratedFootageTimeline = (
   manifestValue: unknown,
@@ -141,10 +141,14 @@ export const applyNarratedFootageToProject = (
   );
   const clipsByShotId = new Map<string, NarratedFootageTimelineClip[]>();
   const shotsStartSeconds = new Map<string, number>();
+  const shotsDurationFrames = new Map<string, number>();
   if (isRecord(planValue) && Array.isArray(planValue.shots)) {
     for (const shot of planValue.shots) {
       if (isRecord(shot) && typeof shot.id === "string" && typeof shot.startSeconds === "number") {
         shotsStartSeconds.set(shot.id, shot.startSeconds);
+        if (typeof shot.durationSeconds === "number" && Number.isFinite(shot.durationSeconds) && shot.durationSeconds > 0) {
+          shotsDurationFrames.set(shot.id, Math.round(shot.durationSeconds * project.composition.fps));
+        }
       }
     }
   }
@@ -160,6 +164,8 @@ export const applyNarratedFootageToProject = (
       if (!shotClips?.length) return scene;
       const { media: _legacyMedia, ...sceneWithoutLegacyMedia } = scene;
       const shotStartInFrames = Math.round((shotsStartSeconds.get(scene.id) ?? 0) * project.composition.fps);
+      const originalShotDurationInFrames = shotsDurationFrames.get(scene.id) ?? scene.durationInFrames;
+      const scale = originalShotDurationInFrames > 0 ? scene.durationInFrames / originalShotDurationInFrames : 1;
       return {
         ...sceneWithoutLegacyMedia,
         mediaLayers: shotClips.map((clip, index) => ({
@@ -171,8 +177,8 @@ export const applyNarratedFootageToProject = (
           opacity: 0.82,
           muted: true,
           zIndex: index,
-          startInFrames: clip.startInFrames - shotStartInFrames,
-          durationInFrames: clip.durationInFrames,
+          startInFrames: Math.max(0, Math.round((clip.startInFrames - shotStartInFrames) * scale)),
+          durationInFrames: Math.max(1, Math.round(clip.durationInFrames * scale)),
           ...(clip.trimBefore === undefined ? {} : { trimBefore: clip.trimBefore }),
         })),
       };
