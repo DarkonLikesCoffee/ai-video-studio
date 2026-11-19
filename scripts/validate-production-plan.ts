@@ -33,6 +33,7 @@ type Plan = {
     cameraMovement?: unknown;
     transition?: unknown;
     audio?: unknown;
+    narrativeBeat?: unknown;
   }>;
   acceptanceCriteria?: unknown;
 };
