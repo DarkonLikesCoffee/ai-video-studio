@@ -304,3 +304,13 @@ Append one entry per meaningful development session:
 - PR #75 CI passed and was merged to main as `faacfbe097b1ac933052de9e6a7070d5fa9d6d28`. It detects trailing silence with an unmatched final `silence_start` by closing it at EOF.
 - Started a reusable FFmpeg contact-sheet CLI on `feat/media-qa-contact-sheet`: samples frames at configurable intervals, creates a JPEG grid and supports interval/columns/width/output options.
 - Added unit tests for grid layout and option validation. CI is pending; no real MP4 contact sheet has been generated/inspected in this session yet.
+
+
+## 2026-11-19 — Contact-sheet CLI merged (PR #76)
+
+- PR #76 https://github.com/DarkonLikesCoffee/ai-video-studio/pull/76 merged by squash as `712b5b864a437f87501a735bfb718293abe9ad62`.
+- CI run #44516361047 passed after fixing invalid TypeScript escaping in the CLI output strings. The initial run failed at `scripts/qa-contact-sheet.ts` lines 53–59; the failure was diagnosed from logs, corrected in commit `c1f19f153af097ca8f0f47158476aa72ef26c92e`, and the final CI passed.
+- The CLI uses FFprobe to obtain duration and FFmpeg to sample frames into a JPEG grid. Options include interval, columns, thumbnail width and output path. Unit tests cover grid calculation and validation.
+- Post-merge main CI run #44516765269 is running; check its result before considering the merge fully verified.
+- No real MP4 contact sheet has been generated/visually inspected yet. This is implemented tooling, not completed rendered-video QA.
+- Next: verify post-merge main CI; then use the contact-sheet CLI plus existing `qa:media` report on an actual benchmark MP4 and record the artifact/evidence. Improve automation only after validating this real workflow.
