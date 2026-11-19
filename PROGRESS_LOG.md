@@ -438,3 +438,14 @@ Append one entry per meaningful development session:
 - Found a contract mismatch: `validateProductionPlan` requires `visualMethod`, `action`, and `visualProgression`, but the JSON Schema omitted those fields from both `properties` and `required`. It also omitted `narrativeBeat`, which runtime accepts as an optional supported label; `additionalProperties:false` made the schema incompatible with the validator/example.
 - Branch `fix/production-plan-schema-runtime-contract` adds those properties, makes them required, adds the optional narrative-beat enum, and adds a regression test asserting schema/runtime-required fields and enum alignment.
 - This is a schema-only correction; no render was produced or needed. CI pending.
+
+
+## 2026-11-19 — PR #80 status reconciled; PR #96 merged; storyboard import implementation
+
+- PR #80 (`fix/qa: enable true-peak measurement`) is **closed, not merged**. Its CI run #44519259478 succeeded, but the correction was superseded and integrated via PR #86, merge commit `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d`. No attempt to reopen or duplicate the fix.
+- PR #84 contact-sheet workflow integration remains verified by real render run #42 / artifact #14532466761. This is already in main; no duplicate workflow work was started.
+- PR #96 production-plan schema/runtime correction merged as `98a972911052fa8a3381c4852e1f6f38c1d94398`. PR CI run #332 (`44538121663`) passed on head `ebd53bec9f260af31b0d9c7e6e391eb426837057`. Post-merge main CI run #44547338478 is in progress.
+- PR #95 is open on head `63c8c3c43a39b06025d5be8df5ff287deb6dff53`, base `7fc374fc8c96cd617bd490da5cff5fe8ea49fa0a`. Its two check suites are queued; no check runs exist yet. It is stale against the merged #96 base and is not ready to merge.
+- Branch `feat/director-production-plan-import` (based on #96 merge commit) adds a CLI to convert Creative Brief + storyboard JSON into a production plan. It validates brief, matching delivery fields, shot descriptions, contiguous/frame-aligned timing and complete exact criterion-to-shot coverage with rationale. The plan schema optionally supports coverage while preserving legacy plans; free-form implementation notes are preserved in a bounded field. Added six regression tests and updated README/agent workflow/state/roadmap.
+- Tests/typecheck have **not** been executed locally because this connector cannot run the repository. CI must verify. No render gate is applicable to this non-rendering planning/import feature. No video playback or audio listening performed.
+- Next: finish PR #95 CI/base reconciliation, open the import branch as a focused PR, review its current diff and CI, then merge only after checks pass. Afterward connect the production plan to asset/build stages with acceptance-criterion evidence review.
