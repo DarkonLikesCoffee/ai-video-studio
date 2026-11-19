@@ -111,6 +111,18 @@ test("planned asset references absent from the manifest are reported", async () 
   });
 });
 
+test("planned reference must be assigned to the same shot", async () => {
+  await withProject(async (root) => {
+    const plan = makePlan();
+    plan.shots[1].assets = ["one.svg"];
+    const manifest = { assets: [{ file: "one.svg", type: "art", shotIds: ["shot-one"], provenance: "Test", license: "Original" }] };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
+    assert.deepEqual(report.shots[1]?.matchedPlannedAssetRefs, []);
+    assert.deepEqual(report.shots[1]?.unresolvedPlannedAssetRefs, ["one.svg"]);
+    assert.ok(report.issues.some((issue) => issue.code === "PLAN_ASSET_UNRESOLVED" && issue.shotId === "shot-two"));
+  });
+});
+
 test("missing criterion coverage and empty manifest remain explicit", async () => {
   await withProject(async (root) => {
     const plan = makePlan();
