@@ -207,7 +207,7 @@ export const buildAssetEvidenceReport = async (
       const criterionShotIds = value.shotIds.filter((id): id is string => typeof id === "string" && id.trim()).map((id) => id.trim());
       if (!criterionShotIds.length) addIssue({ code: "CRITERION_SHOTS_MISSING", severity: "error", message: `Criterion "${criterion}" must reference at least one shot.`, criterion });
       const unknown = criterionShotIds.filter((id) => !knownShots.has(id));
-      unknown.forEach((shotId) => addIssue({ code: "CRITERION_UNKNOWN_SHOT", severity: "error", message: `Criterion "${criterion}" references unknown shot "${shotId}".`, shotId, criterion });
+      unknown.forEach((shotId) => addIssue({ code: "CRITERION_UNKNOWN_SHOT", severity: "error", message: `Criterion "${criterion}" references unknown shot "${shotId}".`, shotId, criterion }));
       const linkedShotIds = criterionShotIds.filter((id) => (assetsByShot.get(id)?.length ?? 0) > 0);
       const unlinkedShotIds = criterionShotIds.filter((id) => !linkedShotIds.includes(id));
       const assetStatus: CriterionEvidence["assetStatus"] = unknown.length || !criterionShotIds.length ? "invalid" : linkedShotIds.length === criterionShotIds.length ? "linked" : linkedShotIds.length ? "partial" : "unlinked";
@@ -298,7 +298,7 @@ const main = async () => {
       await writeFile(path.resolve(outputPath), output, "utf8");
       process.stdout.write(`Asset evidence report written: ${outputPath}\n`);
     } else process.stdout.write(output);
-    if (strict && (report.issues.some((issue) => issue.severity === "warning" || issue.severity === "error") || report.summary.status === "criteria-unavailable" || report.summary.status === "no-assets") process.exitCode = 1;
+    if (strict && (report.issues.some((issue) => issue.severity === "warning" || issue.severity === "error") || report.summary.status === "criteria-unavailable" || report.summary.status === "no-assets")) process.exitCode = 1;
   } catch (error) {
     process.stderr.write(`Could not create asset evidence report: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
