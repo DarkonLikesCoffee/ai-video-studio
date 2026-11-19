@@ -197,3 +197,17 @@ Append one entry per meaningful development session:
 - Branch: `feat/storyboard-animatic-preview`, based on `a30be87792a5bc0646e4c4dc3b1bf04d42a8dd92`.
 - Validation: awaiting PR CI. No full video render was initiated because this feature produces a planning artifact only, not a video-producing engine change.
 - Next: inspect CI, download and inspect the HTML artifact, resolve any issues, then open/complete the PR review and update state with exact CI/artifact evidence.
+
+
+## 2026-11-19 — Storyboard planning preview merged (PR #68)
+
+- PR #68: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/68 merged to main using squash.
+- Merge commit: `e7988966b6783ff0cf4e0f92bcd656859b9cafc3`.
+- Branch CI run #44502735050 passed all steps: Python narration tests, TypeScript typecheck, 151 Node tests, production-plan validations, new storyboard preview generation, storyboard risk reports, FFmpeg/FFprobe setup, media/project validations and studio build.
+- CI artifact #14516579993 (`storyboard-planning-previews`) was downloaded and inspected. It contains `launch-film.html` (4 shots) and `valorant.html` (6 shots); both files are non-empty standalone HTML outputs.
+- The preview is an HTML pre-production planning page, not an animated animatic or rendered video. It shows the authored shot timeline and creative fields; it does not play the clips or semantically evaluate story quality.
+- Tests revealed valid projects can contain transition overlaps. The preview now preserves overlaps instead of rejecting them. The project-wide validator, not this display helper, remains authoritative for timeline legality.
+- Roadmap updated to mark the HTML planning-preview milestone complete. Future work remains to create a true visual animatic with representative media/motion, a persistent/assisted Production Director, and actual semantic visual QA.
+- Main CI after merge: run #44502943805 was queued at the time of this update; do not mark the post-merge CI complete until its result is checked.
+- No MP4 render was started: this PR changes pre-production planning review only and deliberately leaves the render request and renderer untouched.
+- Current main at documentation update start: `e7988966b6783ff0cf4e0f92bcd656859b9cafc3`.
