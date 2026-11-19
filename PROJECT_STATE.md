@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `5cfcdc1d01067295ec2d76c2e7307905dbe678a6` — `feat(render): attach contact sheet evidence to render artifacts (#84)`
-**Current development branch:** PRs #81, #82 and #84 merged. PR #84 adds automatic 5-second contact sheets and JSON evidence to GitHub Actions render artifacts. Branch CI passed; post-merge main CI is currently running for `5cfcdc1d01067295ec2d76c2e7307905dbe678a6`.
+**Last verified main commit:** `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d` — `fix(qa): enable true-peak measurement in media QA (#86)`
+**Current development branch:** PRs #81, #82, #84, #85 and #86 merged. PR #84 adds automatic 5-second contact sheets and JSON evidence to render artifacts; PR #86 fixes FFmpeg EBU R128 True Peak measurement and parsing. Post-merge main CI is running for `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d`.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -171,3 +171,13 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Post-merge main CI run #44524069933 is in progress; verify it before declaring main fully validated.
 - No render has yet exercised the newly merged workflow. The existing VALORANT v4 artifact remains a benchmark only.
 - Next development focus: investigate the traceable storyboard revision artifact and design the smallest integration that converts review findings into explicit, auditable revision edits without automatic approval or source-plan mutation.
+
+
+## 2026-11-19 — Media QA true-peak fix merged (PR #86)
+
+- PR #86 merged as `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d` after CI passed for head `4e6ce4db751ed8fd307a631c68efda0ada990512`.
+- FFmpeg filter now enables EBU R128 true peak via `ebur128=peak=true:framelog=verbose`; parser accepts the actual `True peak:` / `Peak: -x dBFS` summary form.
+- Exported `buildMediaQaAudioFilter()` and added regression coverage for the summary and configurable silence detection thresholds.
+- Main CI run #44525255281 is in progress; verify it before considering main validated.
+- PR #80 remains closed/unmerged; its implementation was selectively rebuilt into PR #86 on current main, without stale docs.
+- Next creative development should focus on production director/revision workflow, not more QA infrastructure unless it directly improves creative output.
