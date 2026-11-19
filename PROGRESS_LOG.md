@@ -390,3 +390,11 @@ Append one entry per meaningful development session:
 - Prompt asks a downstream model to return structured `edits` JSON only, matching the revision artifact fields; it does not call an AI provider, alter the plan or auto-apply edits.
 - Added test coverage for selected critique context, output instructions, and refusal when no suggestion is selected. CI is required to verify these changes.
 - Branch: `feat/storyboard-revision-ai-handoff`. No render has been created for this slice.
+
+
+## 2026-11-19 — PR #89 merged; guarded revision-edit import underway
+
+- PR #89 merged as `bd1b0b5c62dddfd9c246af0da54c93f26cc6ace4`; validation check succeeded.
+- Follow-up slice: add `import-edits` to accept model JSON response and import only edits for existing shots covered by selected critique items.
+- Guardrails: reject unknown shot IDs, duplicate edits per shot, unselected shots and unsupported fields. Import clears validation state; plan remains untouched until validate/apply creates a separate output.
+- Added tests for accepted import and rejection paths. CI is required before merge. No video render created.
