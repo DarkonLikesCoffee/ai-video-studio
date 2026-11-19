@@ -289,3 +289,11 @@ Append one entry per meaningful development session:
 - Default warning threshold is -1.0 dBFS; readings above it warn, readings above 0.0 dBFS fail. Both values configurable.
 - Added tests for safe, warning, and over-limit readings; updated README and roadmap to distinguish partial implementation from full audio QA.
 - CI is pending. No render or listening session was performed for this change.
+
+
+## 2026-11-19 — Trailing silence through EOF (PR preparation)
+
+- Confirmed the silence parser currently pairs only `silence_start` and `silence_end`, leaving an EOF-trailing silence unreported when FFmpeg emits only a final `silence_start`.
+- Added a parser path to close unmatched final silence at the probed media duration, preserving interval duration precision and skipping zero-length intervals.
+- Added regression tests for a long trailing silence that must fail, a short trailing silence warning, and an EOF zero-length edge case.
+- CI pending. No benchmark render or audio listening was performed.
