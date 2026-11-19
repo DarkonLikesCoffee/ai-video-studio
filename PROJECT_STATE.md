@@ -3,7 +3,7 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `a30be87792a5bc0646e4c4dc3b1bf04d42a8dd92` — “docs: log storyboard QA report merge”
+**Last verified main commit:** `a30be87792a5bc0646e4c4dc3b1bf04d42a8dd92` — “docs: log storyboard QA report merge”\n**Current development branch:** `feat/storyboard-animatic-preview` (based on that main commit; pre-production review preview work in progress)
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
