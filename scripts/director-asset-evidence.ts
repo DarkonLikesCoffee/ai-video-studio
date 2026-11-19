@@ -69,7 +69,7 @@ export type AssetEvidenceReport = {
 };
 
 const isRecord = (value: unknown): value is RecordValue => typeof value === "object" && value !== null && !Array.isArray(value);
-const asText = (value: unknown): string | null => typeof value === "string" && value.trim() ? value.trim() : null;
+const asText = (value: unknown): string | null => typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
 const normalizeRef = (value: string) => value.replace(/\\/g, "/").replace(/^\.\//, "").replace(/^assets\//i, "").toLowerCase();
 const basename = (value: string) => value.replace(/\\/g, "/").split("/").filter(Boolean).pop()?.toLowerCase() ?? "";
 const isWithin = (root: string, target: string) => {
@@ -185,7 +185,7 @@ export const buildAssetEvidenceReport = async (
 
   const shots: ShotEvidence[] = shotsInput.map((shot) => {
     const shotId = asText(shot.id) ?? "unknown-shot";
-    const plannedAssetRefs = Array.isArray(shot.assets) ? shot.assets.filter((value): value is string => typeof value === "string" && value.trim()) : [];
+    const plannedAssetRefs = Array.isArray(shot.assets) ? shot.assets.filter((value): value is string => typeof value === "string" && value.trim().length > 0) : [];
     const shotManifestAssets = assetsByShot.get(shotId) ?? [];
     const matchedPlannedAssetRefs = plannedAssetRefs.filter((reference) => shotManifestAssets.some((asset) => assetMatchesRef(asset, reference)));
     const unresolvedPlannedAssetRefs = plannedAssetRefs.filter((reference) => !matchedPlannedAssetRefs.includes(reference));
