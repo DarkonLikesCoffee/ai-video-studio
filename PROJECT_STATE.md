@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `93cec7fec2a4c8917bb6c231519b75181fb54d48` — `docs: reconcile contact sheet QA status after merge (#77)`
-**Current development branch:** `main`; PRs #72–#77 merged; contact-sheet CLI merged and used to inspect a real benchmark MP4; JSON evidence reports are being added
+**Last verified main commit:** `6f200389bbfb0ca4124755e881d9b821d272156e` — PR #79 contact-sheet evidence report
+**Current development branch:** `fix/media-qa-true-peak-mode-v3` (PR #80 in progress); PRs #72–#79 merged
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -100,10 +100,10 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 6. Verified current repository snapshot — 2026-11-19
 
-- Main HEAD: `93cec7fec2a4c8917bb6c231519b75181fb54d48` (PR #77 merged).
-- PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
-- PRs #66–#77 are merged.
-- A real MP4 from render run #44485488551 (artifact #14511125907) was retrieved and inspected with a contact sheet. Its bundled media-QA report passed with no detected silence, frozen video, black frames or audio/video duration drift beyond thresholds. See the new benchmark entry in `PROGRESS_LOG.md`.
+- Main HEAD: `6f200389bbfb0ca4124755e881d9b821d272156e` (PR #79 contact-sheet evidence report merged).
+- PR #76 CI #44516361047, PR #77 CI #44517012780, PR #78 CI #44518679053 and post-merge main CI #44518723407 all passed.
+- PRs #66–#79 are merged. PR #80 (true-peak measurement correction) is in progress on `fix/media-qa-true-peak-mode-v3`.
+- Real MP4 QA and contact-sheet inspection are documented in `PROGRESS_LOG.md`; contact-sheet JSON evidence reports now include exact sampled timestamps, options and output path.
 - Recheck live branches, PRs, CI and commit SHAs before relying on this snapshot.
 
 ### Storyboard milestones on main
@@ -122,24 +122,16 @@ These features are deterministic and heuristic. They do not semantically underst
 
 ## 7. Immediate development direction
 
-The next reusable slice is a **traceable storyboard revision workflow**:
-1. Preserve the original production plan.
-2. Capture the critic report and its findings.
-3. Let a user/agent select suggestions explicitly.
-4. Record each applied edit in a separate revision artifact.
-5. Validate the revised plan and retain the validation result.
-6. Keep the original plan untouched and make the revision reviewable/rollbackable.
-
-Start with a small versioned artifact schema and deterministic tests. Do not auto-apply critique silently. After this, evaluate model-assisted semantic review only with a clear no-paid-call/consent gate and auditable outputs. Keep P0 quality gates and the broader P1 Production Director goals in view; do not mistake additional heuristics for the finished product.
+The traceable storyboard revision workflow is implemented and merged (PR #73). Real benchmark QA and contact-sheet evidence are implemented (PRs #78–#79). The next P0 gap found by the benchmark is true-peak measurement: PR #80 enables FFmpeg peak mode and parses its actual summary format. After #80 merges, integrate contact-sheet generation and its optional JSON report into the render workflow artifact so each render carries reviewable visual evidence alongside technical QA. Full video playback and audio listening remain separate acceptance requirements.
 
 ## Resume checklist
 
 Read `START_HERE.md`, this file, `ROADMAP.md`, `PROGRESS_LOG.md`, `AGENTS.md`, `README.md`, and relevant source/tests/skills. Verify live GitHub state before doing work. Prefer small end-to-end slices with tests and concrete validation evidence. Never claim a render or creative inspection without evidence.
 
 
-## Media QA true-peak addition (merged)
+## Media QA true-peak measurement correction (PR #80 in progress)
 
-The `scripts/media-qa.ts` report now extracts `True peak` from the FFmpeg EBU R128 log when present. It warns above -1.0 dBFS and fails above 0.0 dBFS. Both thresholds are configurable; absent readings are omitted. Unit tests cover safe, warning and over-limit readings. This is an additive audio QA improvement and does not claim audio listening or creative acceptance.
+The report had true-peak thresholds/parser tests, but FFmpeg EBU R128 was not configured with `peak=true`, so the real benchmark report omitted true peak. The parser also expected a one-line `True peak: -1.5 dBFS` layout, while FFmpeg emits `True peak:\n  Peak: -1.5 dBFS. PR #80 enables true-peak mode, parses the actual summary, and adds regression tests. A local rerun of benchmark v4 with the corrected filter measured -1.5 dBFS. Official CI is pending; audio was not listened to.
 
 
 ## Trailing-silence QA improvement (PR #75 merged)
@@ -147,6 +139,16 @@ The `scripts/media-qa.ts` report now extracts `True peak` from the FFmpeg EBU R1
 Media QA is being extended to treat a final `silence_start` without a corresponding `silence_end` as silence through the probed media duration (EOF). This addresses a gap in the current log parser and is being regression-tested. PR #75 CI passed and the change was merged. The parser closes a final unmatched silence interval at the probed duration; regression tests cover long/short trailing silence and zero-length EOF cases.
 
 
-## Contact-sheet review utility (PR #76 merged)
+## Contact-sheet review utility (PR #76 merged; evidence report PR #79 merged)
 
-`npm run qa:contact-sheet -- video.mp4` generates a JPEG contact sheet using FFmpeg/FFprobe, sampling frames at a configurable interval and arranging them in a configurable grid. Options include `--interval`, `--columns`, `--width`, and `--output`. PR #76 CI passed and the feature is merged. Unit tests cover layout and option validation, but an actual MP4 contact sheet has not yet been generated and visually inspected in this work.
+`npm run qa:contact-sheet -- video.mp4` generates a JPEG contact sheet using FFmpeg/FFprobe, sampling frames at a configurable interval and arranging them in a configurable grid. Options include `--interval`, `--columns`, `--width`, `--output`, and optional `--report` for JSON evidence containing exact sampled timestamps, options, layout, input and output paths. The CLI was exercised on benchmark v4 at 5s (10 samples, PR #78) and 1fps (48 samples, this session). Contact sheets are sparse review aids, not continuous-motion or audio acceptance. The report CLI is implemented; render workflow artifact integration is still pending.
+
+## Benchmark QA follow-up — 2026-11-19
+
+- PR #79 contact-sheet evidence report merged as `6f200389bbfb0ca4124755e881d9b821d272156e`; PR CI #44518679053 and post-merge main CI #44518723407 passed.
+- Generated an additional contact sheet from artifact #14511125907 using the CLI at 1fps, 4 columns and 400px thumbnails: 48 frames. This supplements the 5s/10-frame sheet documented by PR #78 and improves sample coverage without proving continuous motion.
+- Reran the existing media QA core locally. Base filter: pass, 0 findings, no detected silence/freeze/black intervals, integrated -16.0 LUFS, A/V duration drift 0.123s, true peak omitted. Audio listening remains undone.
+- FFmpeg's EBU R128 summary exposed two true-peak gaps: peak mode must be enabled with `peak=true`, and the output is `True peak:\n  Peak: -1.5 dBFS`, not the one-line format expected by the parser. Direct FFmpeg with peak mode measured -1.5 dBFS.
+- PR #80 on `fix/media-qa-true-peak-mode-v3` enables peak mode, parses the actual output and adds regression tests. A local Node 22 strip-types copy of the QA core/test suite passed 12/12; official CI remains the gate.
+- Local files: `/mnt/data/ai-video-studio-qa/contact-sheet-cli-1fps.jpg`, `contact-sheet-1fps.json`, `qa-rerun-peak-enabled.json`; not committed/uploaded as workflow artifacts.
+
