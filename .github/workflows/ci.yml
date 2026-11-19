@@ -48,6 +48,17 @@ jobs:
         run: npm test
       - name: Validate example production plan
         run: npm run validate:plan -- projects/examples/production-plan.json
+      - name: Generate storyboard planning previews
+        run: |
+          mkdir -p review-output
+          npm run storyboard:preview -- projects/examples/production-plan.json review-output/launch-film.html
+          npm run storyboard:preview -- projects/valorant-immortal-decision-making/production/production-plan.json review-output/valorant.html
+      - name: Upload storyboard planning previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: storyboard-planning-previews
+          path: review-output/*.html
+          retention-days: 7
       - name: Run storyboard risk report on launch-film example
         run: npm run storyboard:qa -- projects/examples/production-plan.json
       - name: Run storyboard risk report on narrated explainer
