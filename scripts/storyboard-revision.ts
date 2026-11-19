@@ -83,6 +83,11 @@ const run = async (): Promise<void> => {
       artifact.validation = { valid: result.valid, errors: result.errors, warnings: result.warnings };
       await writeFile(input, JSON.stringify(artifact, null, 2) + "\n", "utf8");
       if (command === "apply") {
+        if (!result.valid) {
+          process.stderr.write("Revised plan has validation errors; output was not written. Fix the edits and retry.\n");
+          process.exitCode = 1;
+          return;
+        }
         await writeFile(output, JSON.stringify(result.revisedPlan, null, 2) + "\n", "utf8");
         process.stdout.write(`Revised plan written: ${output}\n`);
       } else {
