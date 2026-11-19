@@ -127,7 +127,7 @@ export const importStoryboardRevisionEdits = (artifact: StoryboardRevisionArtifa
   const selectedShotIds = new Set(artifact.suggestions.filter((suggestion) => suggestion.selected).flatMap((suggestion) => suggestion.item.shotIds));
   const sourceShots = Array.isArray((artifact.sourcePlan as Record<string, unknown>)?.shots) ? (artifact.sourcePlan as { shots: Array<Record<string, unknown>> }).shots : [];
   const existingIds = new Set(sourceShots.map((shot) => String(shot.id)));
-  const allowedFields = new Set(["visual", "action", "visualProgression", "framing", "cameraMovement", "transition", "onScreenText", "visualMethod", "engineApproach"]);
+  const allowedFields = new Set(["visual", "action", "visualProgression", "framing", "cameraMovement", "transition", "onScreenText", "visualMethod", "engineApproach", "narrativeBeat"]);
   const imported: StoryboardRevisionEdit[] = [];
   const seen = new Set<string>();
   for (const raw of edits) {
