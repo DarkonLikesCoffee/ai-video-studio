@@ -105,6 +105,19 @@ npm run director:storyboard-prompt -- projects/examples/creative-brief.json /tmp
 
 The handoff carries the complete brief and requests a coherent timed sequence with specific visual/action progression, per-shot visual-method selection, framing, motivated movement, transitions and sound, asset needs, frame-aligned timing, and acceptance-criteria coverage. It explicitly discourages generic text-card/diagram defaults and requires JSON output compatible with the storyboard-preview contract. This command prepares instructions for a creative model/agent; it does not itself generate the storyboard or call an LLM. The JSON output also includes a structured `acceptanceCoverage` array: one entry per criterion with the exact criterion text, one or more shot IDs, and a rationale. The map is a reviewable claim, not semantic verification.
 
+## Creative Brief → production-plan import
+
+Once a creative model returns a storyboard JSON following the director handoff contract, convert it into a validated production plan and preserve criterion-to-shot traceability:
+
+```bash
+npm run director:production-plan -- creative-brief.json storyboard.json production-plan.json
+npm run validate:plan -- production-plan.json
+npm run storyboard:preview -- production-plan.json storyboard-review.html
+npm run storyboard:qa -- production-plan.json
+```
+
+The importer requires the storyboard delivery settings to match the Creative Brief, all required shot descriptions, frame-aligned contiguous timing that ends at the requested runtime, and a complete `acceptanceCoverage` map. Each entry uses the exact brief criterion text, one or more known shot IDs, and a short rationale. This is an authored traceability contract—not semantic proof that the shots actually satisfy the criterion. The importer maps free-form `engineApproach` notes to `implementationNotes` and preserves recognized engine enum values. It writes a separate production-plan JSON; it does not modify the brief or storyboard, create assets, or render video.
+
 ## Automated rendered-media QA
 
 After a render, run a technical diagnostic pass on the actual MP4:

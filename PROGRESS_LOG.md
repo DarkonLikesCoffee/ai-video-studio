@@ -438,3 +438,24 @@ Append one entry per meaningful development session:
 - Found a contract mismatch: `validateProductionPlan` requires `visualMethod`, `action`, and `visualProgression`, but the JSON Schema omitted those fields from both `properties` and `required`. It also omitted `narrativeBeat`, which runtime accepts as an optional supported label; `additionalProperties:false` made the schema incompatible with the validator/example.
 - Branch `fix/production-plan-schema-runtime-contract` adds those properties, makes them required, adds the optional narrative-beat enum, and adds a regression test asserting schema/runtime-required fields and enum alignment.
 - This is a schema-only correction; no render was produced or needed. CI pending.
+
+
+## 2026-11-19 — PR #80 status reconciled; PR #96 merged; storyboard import implementation
+
+- PR #80 (`fix/qa: enable true-peak measurement`) is **closed, not merged**. Its CI run #44519259478 succeeded, but the correction was superseded and integrated via PR #86, merge commit `4ea4cbdeda0b1be480bfe0c3b52653ed23f7011d`. No attempt to reopen or duplicate the fix.
+- PR #84 contact-sheet workflow integration remains verified by real render run #42 / artifact #14532466761. This is already in main; no duplicate workflow work was started.
+- PR #96 production-plan schema/runtime correction merged as `98a972911052fa8a3381c4852e1f6f38c1d94398`. PR CI run #332 (`44538121663`) passed on head `ebd53bec9f260af31b0d9c7e6e391eb426837057`. Post-merge main CI run #44547338478 is in progress.
+- PR #95 was rebased/squashed onto current main `98a972911052fa8a3381c4852e1f6f38c1d94398`; current head `7bd50163aa29f284eedc5775891c743f085592cf` is mergeable. Two check suites are queued with zero check runs, so do not merge until CI actually completes.
+- Branch `feat/director-production-plan-import` (based on #96 merge commit) adds a CLI to convert Creative Brief + storyboard JSON into a production plan. It validates brief, matching delivery fields, shot descriptions, contiguous/frame-aligned timing and complete exact criterion-to-shot coverage with rationale. The plan schema optionally supports coverage while preserving legacy plans; free-form implementation notes are preserved in a bounded field. Added six regression tests and updated README/agent workflow/state/roadmap.
+- Tests/typecheck have **not** been executed locally because this connector cannot run the repository. CI must verify. No render gate is applicable to this non-rendering planning/import feature. No video playback or audio listening performed.
+- PR #97 is now open: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/97, head `2face7f8acfc96340800f6e363c650208c2a625e`, base `98a972911052fa8a3381c4852e1f6f38c1d94398`. Its three check suites are queued and no run has completed yet. The diff was reviewed for scope; no render gate applies.
+- Next: monitor #95 and #97 CI, fix failures on their existing branches, merge only after all required checks pass, then connect the production plan to asset/build stages with acceptance-criterion evidence review.
+
+
+## 2026-11-19 — PR #95 merged; PR #97 compatibility failure fixed
+
+- PR #95 storyboard handoff reviewed and merged as `76b9b99fdd49c7f95ce35b01301170ab9658a4dd`. Its required `validate` CI run #44550178698 passed on head `6209942bdfa08cfeabac0c4f74849e59182db11b`. Post-merge main CI #44554881017 passed.
+- PR #97's initial CI #44550086585 failed in the narrated-explainer production-plan validation: five legacy shots used free-form `engineApproach: external-footage-with-3d-inset`, which the new validator rejects because the schema only permits three normalized engine enum values.
+- Compatibility fix preserves each legacy string as `implementationNotes`, removes unsupported `engineApproach`, and adds a regression test asserting the migrated example passes `validateProductionPlan`. The converter already maps unknown storyboard engineApproach strings to implementationNotes.
+- Reconciled PR #97 with PR #95's main merge and combined README/package/agent-workflow docs so the handoff CLI precedes production-plan import. PROJECT_STATE and ROADMAP now record current evidence.
+- No render gate is applicable to this planning/import slice. Local tests/typecheck cannot be executed through the GitHub connector; the updated CI run is required.

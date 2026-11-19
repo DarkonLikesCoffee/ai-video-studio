@@ -34,12 +34,63 @@ type Plan = {
     transition?: unknown;
     audio?: unknown;
     narrativeBeat?: unknown;
+    implementationNotes?: unknown;
+    engineApproach?: unknown;
+    assets?: unknown;
   }>;
   acceptanceCriteria?: unknown;
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+export const validateAcceptanceCoverage = (value: unknown): string[] => {
+  if (!isRecord(value) || value.acceptanceCoverage === undefined) return [];
+  const errors: string[] = [];
+  if (!Array.isArray(value.acceptanceCriteria) || !Array.isArray(value.shots)) return errors;
+  if (!Array.isArray(value.acceptanceCoverage)) return ["acceptanceCoverage must be an array when provided."];
+  if (value.acceptanceCoverage.length < 3 || value.acceptanceCoverage.length > 10) errors.push("acceptanceCoverage must contain 3–10 entries when provided.");
+  const criteria = value.acceptanceCriteria.filter((item): item is string => typeof item === "string");
+  if (criteria.some((criterion) => criterion.length > 300)) errors.push("acceptanceCriteria entries must be at most 300 characters.");
+  if (new Set(criteria).size !== criteria.length) errors.push("acceptanceCriteria must not contain duplicates.");
+  const knownShots = new Set(value.shots.flatMap((shot) => isRecord(shot) && typeof shot.id === "string" ? [shot.id] : []));
+  const covered = new Set<string>();
+  value.acceptanceCoverage.forEach((entry, index) => {
+    const prefix = `acceptanceCoverage[${index}]`;
+    if (!isRecord(entry)) {
+      errors.push(`${prefix} must be an object.`);
+      return;
+    }
+    const criterion = entry.criterion;
+    if (typeof criterion !== "string" || !criteria.includes(criterion)) {
+      errors.push(`${prefix}.criterion must exactly match an acceptanceCriteria entry.`);
+    } else if (covered.has(criterion)) {
+      errors.push(`${prefix}.criterion is duplicated.`);
+    } else {
+      covered.add(criterion);
+    }
+    const shotIds = entry.shotIds;
+    if (typeof criterion === "string" && criterion.length > 300) errors.push(`${prefix}.criterion must be at most 300 characters.`);
+    if (!Array.isArray(shotIds) || shotIds.length === 0 || shotIds.length > 80 || shotIds.some((id) => typeof id !== "string" || !id.trim())) {
+      errors.push(`${prefix}.shotIds must contain 1–80 non-empty shot IDs.`);
+    } else {
+      const local = new Set<string>();
+      shotIds.forEach((id) => {
+        if (local.has(id)) errors.push(`${prefix}.shotIds contains duplicate ID "${id}".`);
+        local.add(id);
+        if (!/^[a-z0-9][a-z0-9-]{1,63}$/.test(id)) errors.push(`${prefix}.shotIds contains invalid shot ID "${id}".`);
+        if (!knownShots.has(id)) errors.push(`${prefix}.shotIds references unknown shot "${id}".`);
+      });
+    }
+    if (typeof entry.rationale !== "string" || !entry.rationale.trim() || entry.rationale.length > 500) {
+      errors.push(`${prefix}.rationale must be a non-empty string of at most 500 characters.`);
+    }
+  });
+  criteria.forEach((criterion) => {
+    if (!covered.has(criterion)) errors.push(`acceptanceCoverage is missing criterion: ${criterion}`);
+  });
+  return errors;
+};
 
 export const validateProductionPlan = (value: unknown): string[] => {
   const errors: string[] = [];
@@ -119,6 +170,9 @@ export const validateProductionPlan = (value: unknown): string[] => {
           errors.push(`shots[${index}].${field} is required.`);
         }
       }
+      if (shot.engineApproach !== undefined && !["project-video", "custom-remotion", "external-footage"].includes(String(shot.engineApproach))) errors.push(`shots[${index}].engineApproach is unsupported.`);
+      if (shot.implementationNotes !== undefined && (typeof shot.implementationNotes !== "string" || shot.implementationNotes.length > 500)) errors.push(`shots[${index}].implementationNotes must be a string of at most 500 characters.`);
+      if (shot.assets !== undefined && (!Array.isArray(shot.assets) || shot.assets.some((asset) => typeof asset !== "string" || asset.length > 120))) errors.push(`shots[${index}].assets must be an array of strings (each at most 120 characters).`);
     });
     const first = plan.shots[0];
     const last = plan.shots[plan.shots.length - 1];
@@ -130,10 +184,11 @@ export const validateProductionPlan = (value: unknown): string[] => {
   }
 
   if (!Array.isArray(plan.acceptanceCriteria) || plan.acceptanceCriteria.length < 3 || plan.acceptanceCriteria.length > 10 ||
-      plan.acceptanceCriteria.some((item) => typeof item !== "string" || !item.trim())) {
+      plan.acceptanceCriteria.some((item) => typeof item !== "string" || !item.trim() || item.length > 300)) {
     errors.push("acceptanceCriteria must contain 3–10 non-empty strings.");
   }
 
+  errors.push(...validateAcceptanceCoverage(plan));
   return errors;
 };
 
