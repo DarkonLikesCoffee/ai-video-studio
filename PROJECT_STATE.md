@@ -207,8 +207,9 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - PR #90 safe revision import and PR #91 narrative beat review are merged. PR #91 CI run #44534929322 passed; no render was produced for these planning-tool changes.
 
 
-## Creative brief contract (PR #93 in progress)
+## Creative brief contract (PR #93 merged)
 
+- PR #93 merged as `d643e752b4430165121072185ef41e8ad5fc940c`; CI #44536804622 and post-merge main CI #44537158524 passed.
 - Adds a version-1 creative brief schema and validator covering source prompt, objective, audience, response, delivery, thesis, emotional arc, visual language, story/motion/sound strategy, constraints, assumptions and measurable acceptance criteria.
 - `npm run director:brief` validates a brief and prints or writes a Markdown summary. This is schema/contract groundwork; no LLM creates briefs yet.
 
