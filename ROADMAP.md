@@ -100,6 +100,8 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 
 **Goal:** Give every planned shot the appropriate media with review, rights and provenance.
 
+- [ ] Connect acceptance-criterion → shot mappings to asset-manifest entries and local build evidence. **Partial implementation:** `director:asset-evidence` reports linked assets, unresolved plan references, file presence, provenance/rights fields and unknown shot IDs; it is review-only and does not judge semantic suitability.
+
 - [ ] Unify discovery of still images and moving footage, including Openverse, Wikimedia Commons, NASA where relevant, and user-provided assets.
 - [ ] Build an asset review/selection manifest with source URL, creator, license, restrictions, attribution, media type, dimensions/duration, codec and hash.
 - [ ] Add provider adapters for generated still/video media only after comparing quality, rights, latency, reliability, controllability and cost.
@@ -214,7 +216,7 @@ The recent work has established important pipeline foundations: media QA diagnos
 - [x] Integrate authorized local footage into the narrated ProjectVideo production path with rights metadata and separate credits.
 - [ ] Verify and document the latest real render against its creative brief; do not equate motion diagnostics or technical synchronization with creative acceptance.
 - [ ] Update the project-state, continuity and progress docs so stale benchmark/footage claims do not contradict verified current evidence.
-- [ ] Begin the next quality-first vertical slice with the Production Director → storyboard/shot plan → visual-method selection → production → actual-video QA loop.
+- [ ] Continue the quality-first vertical slice with the Production Director → storyboard/shot plan → asset evidence → build → actual-video QA loop. PR #97 imports a storyboard into a validated production plan; PR #98 implements a report-only criterion/shot-to-manifest bridge with local file/path, provenance and rights checks, pending CI after test-syntax corrections.
 - [ ] Use the existing VALORANT project as a regression/creative-quality case, not as justification to repeat its diagram-heavy visual approach.
 - [ ] Choose the first implementation task only after inspecting the current director, storyboard, production schema, render path and QA code. Favor a focused, testable improvement.
 
@@ -223,7 +225,7 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 
 ## Render evidence workflow
 
-- [x] Automatically attach a contact sheet and JSON evidence report to every GitHub Actions render artifact (PR #84 merged; post-merge main CI pending and no render has yet exercised this workflow).
+- [x] Automatically attach a contact sheet and JSON evidence report to GitHub Actions render artifacts (PR #84 merged; verified by real render run #42, artifact #14532466761).
 - [ ] Inspect actual render artifacts across motion and listen to audio; contact sheets alone are insufficient acceptance.
 
 
@@ -245,5 +247,5 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 
 - [x] PR #96 schema/runtime correction merged (`98a972911052fa8a3381c4852e1f6f38c1d94398`), CI #44538121663 passed.
 - [x] PR #95 storyboard handoff merged as `76b9b99fdd49c7f95ce35b01301170ab9658a4dd`; PR CI #44550178698 passed on exact head `6209942bdfa08cfeabac0c4f74849e59182db11b`; post-merge main CI #44554881017 passed.
-- [ ] PR #97 converts model-authored storyboard JSON to validated production-plan JSON. Its initial CI #44550086585 exposed legacy free-form `engineApproach` values in the narrated-explainer sample. The five values are preserved as `implementationNotes`, and a regression test validates the migrated plan. CI is rerunning on the branch updated to include PR #95.
-- Next: after PR #97 passes and merges, connect criterion-to-shot evidence to asset selection/build validation with a small testable vertical slice. Coverage mappings remain authored claims and need visual QA.
+- [x] PR #97 converts model-authored storyboard JSON to validated production-plan JSON. Its initial CI #44550086585 exposed legacy free-form `engineApproach` values in the narrated-explainer sample. The five values are preserved as `implementationNotes`, and a regression test validates the migrated plan. PR #97 merged as `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; required CI #44556330379 and post-merge main CI #44574582076 passed.
+- [ ] PR #98 adds the criterion-to-asset evidence CLI/report. CI #44577136550 failed typecheck and #44585662593/#44591887176 failed test-file parsing due to missing closing parentheses in assertions. The shared-asset assertion and unknown-shot assertion were corrected on the same branch; latest correction commit is `42bdb0366e3a3ffa8063b5bde982cf4d559f3c6a`, with CI pending for the updated branch/docs. No render gate applies; criteria-to-shot mappings are authored claims and still require visual QA.

@@ -11,7 +11,7 @@ Define how an AI agent turns a natural-language brief into a finished video usin
 | Brief | User prompt, references, constraints | Creative brief | Goal, audience and deliverable understood |
 | Direction | Creative brief | Creative direction | One coherent, producible concept |
 | Storyboard | Creative Brief + model storyboard JSON | Validated production plan + criterion-to-shot trace | Every criterion maps to known shot IDs; delivery matches the brief; timing is contiguous and frame-aligned |
-| Assets | Shot list | Local assets + asset manifest | Every required asset exists and has known provenance |
+| Assets | Shot list + production plan | Local assets + asset manifest + criterion/shot asset-evidence report | Planned references resolve; manifest shot IDs are valid; local files, provenance and rights are reviewed |
 | Build | Storyboard + assets | `scene.json` or custom composition | Typecheck/tests/project validation pass |
 | Render | Valid project | MP4 artifact | Exact render request completes |
 | QA | MP4 artifact | Timestamped issue report | Actual video inspected against criteria |
@@ -33,7 +33,7 @@ Define how an AI agent turns a natural-language brief into a finished video usin
 3. Apply the Creative Director skill and record the selected direction.
 4. Produce the shot-level storyboard JSON from the creative handoff (or author it directly). Import it with npm run director:production-plan -- <creative-brief.json> <storyboard.json> <production-plan.json>. The importer requires exact delivery settings, frame-aligned contiguous timing, and complete acceptance-criterion mappings to known shot IDs with rationale. Coverage is an authored claim, not semantic proof; review each mapped shot against its criterion.
 5. Apply the Storyboard skill. Check adjacent-shot variety and use the preview as a review checkpoint. Where useful, label shots with narrativeBeat and run storyboard:beats; treat its prompts as review guidance, not a fixed narrative formula. If revisions are needed, initialize a revision artifact, select recommendations, export a Markdown report, and author explicit edits separately. Selection alone does not change the plan. For selected critiques, use storyboard:revision prompt to create a model-neutral handoff containing only affected shots and selected findings. Treat returned JSON edits as suggestions: import them with storyboard:revision import-edits. The importer limits edits to selected shot IDs, rejects duplicate/unknown IDs and unsupported fields, then validate/apply to a separate plan copy.
-6. Apply Asset Producer and Audio Designer. Create local assets and provenance/cue manifests.
+6. Apply Asset Producer and Audio Designer. Create local assets and provenance/cue manifests. Run `npm run director:asset-evidence -- <production-plan.json> [asset-manifest.json] [report.json]` to map criterion→shots→manifest assets and verify local file/path safety plus provenance/rights fields. Use `--strict` only when incomplete evidence should block the build; procedural shots may intentionally have no asset. The report is not semantic proof that an asset satisfies a criterion.
 7. Map the storyboard into the existing project schema. If a requested shot needs unsupported 3D or other features, decide whether to implement a reusable engine feature or choose a different visual solution.
 8. Validate before rendering. Do not render all showcase videos for a project-specific change.
 9. Render only the selected output.

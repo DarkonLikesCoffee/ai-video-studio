@@ -118,6 +118,18 @@ npm run storyboard:qa -- production-plan.json
 
 The importer requires the storyboard delivery settings to match the Creative Brief, all required shot descriptions, frame-aligned contiguous timing that ends at the requested runtime, and a complete `acceptanceCoverage` map. Each entry uses the exact brief criterion text, one or more known shot IDs, and a short rationale. This is an authored traceability contract—not semantic proof that the shots actually satisfy the criterion. The importer maps free-form `engineApproach` notes to `implementationNotes` and preserves recognized engine enum values. It writes a separate production-plan JSON; it does not modify the brief or storyboard, create assets, or render video.
 
+## Creative Brief → asset evidence report
+
+Link a production plan's authored acceptance-criterion → shot mapping to the project's asset manifest and local files:
+
+```bash
+npm run director:asset-evidence -- projects/<slug>/production/production-plan.json [asset-manifest.json] [report.json]
+```
+
+The command uses `assetManifestPath` from the plan when available; otherwise it looks beside the plan for `asset-manifest.json`. The manifest path may be passed explicitly. It reports planned asset references that are absent from the manifest, manifest assets assigned to each shot (including the `all` sentinel), local file existence, provenance/rights metadata, unknown shot IDs, and the assets linked to each acceptance criterion. Local paths are checked inside the project root; absolute paths and traversal are rejected.
+
+Use `--strict` to return a failing exit code when warnings/errors are present or asset/criterion evidence is unavailable. Without strict mode, the report is review-only and does not fail for incomplete evidence. A linked asset does not prove it visually satisfies the shot or acceptance criterion, and procedural shots may intentionally have no manifest assets.
+
 ## Automated rendered-media QA
 
 After a render, run a technical diagnostic pass on the actual MP4:

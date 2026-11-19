@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `76b9b99fdd49c7f95ce35b01301170ab9658a4dd` — PR #95 storyboard handoff merged
-**Current development branch:** `feat/director-production-plan-import` (PR #97 open; branch reconciled with PR #95 merge and compatibility migration; CI rerunning). PR #96 and #95 are merged. PR #95 CI #44550178698 passed on head `6209942bdfa08cfeabac0c4f74849e59182db11b`; post-merge main CI #44554881017 passed on `76b9b99fdd49c7f95ce35b01301170ab9658a4dd`. PR #80 remains closed without merge; its true-peak correction is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
+**Last verified main commit:** `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354` — PR #97 storyboard-to-production-plan import merged
+**Current development branch:** `feat/director-asset-evidence-report` (PR #98 open; required CI rerunning after a TypeScript syntax fix). PRs #95, #96 and #97 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 passed; merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; post-merge main CI #44574582076 passed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -129,15 +129,9 @@ These features are deterministic and heuristic. They do not semantically underst
 
 ## 7. Immediate development direction
 
-The next reusable slice is a **traceable storyboard revision workflow**:
-1. Preserve the original production plan.
-2. Capture the critic report and its findings.
-3. Let a user/agent select suggestions explicitly.
-4. Record each applied edit in a separate revision artifact.
-5. Validate the revised plan and retain the validation result.
-6. Keep the original plan untouched and make the revision reviewable/rollbackable.
+The traceable storyboard revision workflow is now implemented through PRs #88–#90: source plans remain immutable, critiques can be selected, model-neutral prompts exported, and imported edits are constrained to selected shots/fields and applied to a separate validated plan. PR #91 adds explicit narrative-beat review. PR #95 now provides a model-neutral storyboard handoff from Creative Brief, and PR #97 imports storyboard JSON into a validated production plan with exact acceptance-criterion → shot mapping.
 
-Start with a small versioned artifact schema and deterministic tests. Do not auto-apply critique silently. After this, evaluate model-assisted semantic review only with a clear no-paid-call/consent gate and auditable outputs. Keep P0 quality gates and the broader P1 Production Director goals in view; do not mistake additional heuristics for the finished product.
+Next, connect this criterion/shot mapping to asset selection and build evidence. A report-only CLI should resolve manifest assets per shot, check local files and provenance/rights fields, surface unlinked criterion shots and unresolved references, and preserve honest limitations: it cannot semantically determine whether an asset satisfies the creative criterion.
 
 ## Resume checklist
 
@@ -233,10 +227,19 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - PR #95 merged as `76b9b99fdd49c7f95ce35b01301170ab9658a4dd`. CI #44550178698 passed on exact head `6209942bdfa08cfeabac0c4f74849e59182db11b`; post-merge main CI #44554881017 passed.
 - `director:storyboard-prompt` validates a brief and emits model-neutral storyboard instructions; it does not call an LLM or generate a storyboard.
 
-## Creative Brief → production-plan import (PR #97 in progress)
+## Creative Brief → production-plan import (PR #97 merged)
 
-- PR #97 adds a CLI to convert model-authored storyboard JSON into a validated production plan, checking delivery, frame-aligned contiguous timing and complete exact criterion-to-shot coverage with rationale.
+- PR #97 merged as `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; its required `validate` run #44556330379 passed. The CLI converts model-authored storyboard JSON into a validated production plan, checking delivery, frame-aligned contiguous timing and complete exact criterion-to-shot coverage with rationale.
 - Optional `acceptanceCoverage` is schema/runtime validated; legacy plans without coverage remain valid. Free-form `engineApproach` is retained in bounded `implementationNotes`, while recognized enum values remain normalized.
 - Initial CI run #44550086585 failed because the validator's strict enum check rejected five legacy `external-footage-with-3d-inset` values in the narrated-explainer plan. Those values are now preserved as `implementationNotes`, and a regression test validates the migrated example.
-- The branch has been reconciled with PR #95's main merge commit. New CI is pending; no render gate applies to this planning/import slice. Local tests/typecheck are unavailable through the GitHub connector.
+- The final PR diff was reviewed, including compatibility migration of legacy `engineApproach` notes and restoration of the storyboard handoff files; no render gate applies to this planning/import slice. Local tests/typecheck were not run outside CI. Post-merge main CI #44574582076 is in progress.
 - Next: review current CI/diff, fix any remaining failures, merge only after checks pass, then connect production-plan criteria to asset/build evidence and visual QA.
+
+
+## Creative Brief → asset evidence report (development branch)
+
+- PR #98: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98 on branch `feat/director-asset-evidence-report`, based on PR #97 merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`.
+- New `director:asset-evidence` CLI maps manifest entries to shot IDs and criterion coverage; checks local file presence/path safety and provenance/rights metadata; surfaces unresolved planned asset references and unknown shot IDs.
+- Report is review-only. Asset links are not semantic proof; procedural shots may intentionally have no manifest assets. `--strict` is opt-in.
+- Tests are added for linked files, missing file/provenance/rights, `all` assignments, unknown IDs, unsafe paths, unresolved plan references and missing coverage.
+- CI history: #44577136550 failed typecheck (fixed); #44585662593 failed tests due to a missing closing parenthesis in the shared-asset test at line 80; #44591887176 failed on the same test file at line 88, where `assert.ok(...some(...))` was missing its final closing parenthesis. The test syntax was corrected on the same branch in commit `42bdb0366e3a3ffa8063b5bde982cf4d559f3c6a`; a new CI run is required for this exact commit. Main CI #44574582076 passed. CI remains the validation gate; no render is applicable to this report-only planning slice. No full video playback or audio listening was performed.
