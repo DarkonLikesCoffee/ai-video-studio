@@ -61,7 +61,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 
 **Goal:** Make the storyboard an executable plan, not a scene-title list.
 
-- [ ] Require every shot to include a selected visual method, concrete action and start/development/end visual progression in the production-plan schema; validate these fields and keep example plans updated.
+- [x] Require every shot to include a selected visual method, concrete action and start/development/end visual progression in the production-plan schema; validate these fields and keep example plans updated.
 - [ ] Render a reviewable storyboard/animatic preview from the planned shots before full production.
 - [ ] Include shot ID, duration, narrative purpose, visual action/progression, method, composition, camera, asset dependencies and audio cues.
 - [ ] Support a review/approval checkpoint for expensive, complex or ambiguous production plans; do not make approval mandatory for every low-cost workflow unless configured.
