@@ -111,6 +111,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
       if (Number.isFinite(start) && Number.isFinite(duration) && start + duration > totalDurationSeconds + 1e-6) {
         errors.push(`shots[${index}] extends beyond the delivery duration.`);
       }
+      if (shot.narrativeBeat !== undefined && (typeof shot.narrativeBeat !== "string" || !["hook", "setup", "context", "development", "escalation", "reveal", "payoff", "cta", "transition", "pause"].includes(shot.narrativeBeat))) errors.push(`shots[${index}].narrativeBeat must be one of the supported narrative beat labels.`);
       for (const field of ["purpose", "visual", "visualMethod", "action", "visualProgression", "framing", "cameraMovement", "transition", "audio"] as const) {
         const fieldValue = shot[field];
         if (typeof fieldValue !== "string" || !fieldValue.trim()) {
