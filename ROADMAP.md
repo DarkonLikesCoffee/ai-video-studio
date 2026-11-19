@@ -216,7 +216,7 @@ The recent work has established important pipeline foundations: media QA diagnos
 - [x] Integrate authorized local footage into the narrated ProjectVideo production path with rights metadata and separate credits.
 - [ ] Verify and document the latest real render against its creative brief; do not equate motion diagnostics or technical synchronization with creative acceptance.
 - [ ] Update the project-state, continuity and progress docs so stale benchmark/footage claims do not contradict verified current evidence.
-- [ ] Continue the quality-first vertical slice with the Production Director → storyboard/shot plan → asset evidence → build → actual-video QA loop. PRs #97 and #98 are merged: the storyboard import and report-only criterion/shot-to-manifest bridge are implemented. Follow-up branch `feat/media-qa-av-start-offset` adds a technical A/V start-time offset gate; CI is pending.
+- [ ] Continue the quality-first vertical slice with the Production Director → storyboard/shot plan → asset evidence → build → actual-video QA loop. PRs #97 and #98 are merged: the storyboard import and report-only criterion/shot-to-manifest bridge are implemented. PR #99 (branch `feat/media-qa-av-start-offset`) adds a technical A/V start-time offset gate; CI is pending after parser corrections.
 - [ ] Use the existing VALORANT project as a regression/creative-quality case, not as justification to repeat its diagram-heavy visual approach.
 - [ ] Choose the first implementation task only after inspecting the current director, storyboard, production schema, render path and QA code. Favor a focused, testable improvement.
 
@@ -254,7 +254,7 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 ## 2026-11-19 — A/V stream start-offset diagnostics (PR pending)
 
 - PR #98 merged as `73807bad31f133a0a2819cdd084286903f963645`; required `validate` run #44608513408 passed on the merge commit.
-- Follow-up branch `feat/media-qa-av-start-offset` adds signed audio-minus-video stream start-time measurement from ffprobe when both streams report `start_time`. Positive values indicate audio starts late; negative values indicate audio starts early.
+- PR #99 is open: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/99 on branch `feat/media-qa-av-start-offset`. It adds signed audio-minus-video stream start-time measurement from ffprobe when both streams report `start_time`. Positive values indicate audio starts late; negative values indicate audio starts early.
 - The default 0.5-second absolute start-offset threshold is a hard QA error and is separately configurable from the existing duration-drift threshold. Missing stream start timestamps are omitted rather than guessed.
 - Added regression coverage for clean alignment, late audio with equal durations, early audio, configurable tolerance and absent start-time metadata. CI is required; no local test execution or render/audio listening is available in this connector session.
 - This is a technical synchronization diagnostic, not proof that narration or sound effects align with picture events. Next priority remains improving repeatable benchmark QA and creative acceptance evidence.
