@@ -5,6 +5,7 @@ import { buildProductionPlanFromStoryboard } from "../scripts/director-productio
 import { validateAcceptanceCoverage, validateProductionPlan } from "../scripts/validate-production-plan";
 
 const brief = JSON.parse(await readFile(new URL("../projects/examples/creative-brief.json", import.meta.url), "utf8"));
+const narratedPlan = JSON.parse(await readFile(new URL("../projects/examples/narrated-explainer/production/production-plan.json", import.meta.url), "utf8"));
 
 const storyboard = () => ({
   schemaVersion: 1,
@@ -123,4 +124,11 @@ test("legacy plans without acceptanceCoverage remain valid", async () => {
   assert.equal(legacy.acceptanceCoverage, undefined);
   assert.deepEqual(validateAcceptanceCoverage(legacy), []);
   assert.deepEqual(validateProductionPlan(legacy), []);
+});
+
+
+test("migrated narrated explainer preserves legacy implementation notes and validates", () => {
+  assert.deepEqual(validateProductionPlan(narratedPlan), []);
+  assert.equal(narratedPlan.shots.length, 5);
+  assert.ok(narratedPlan.shots.every((shot: Record<string, unknown>) => shot.engineApproach === undefined && shot.implementationNotes === "external-footage-with-3d-inset"));
 });
