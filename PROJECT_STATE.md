@@ -3,7 +3,7 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `ac153121b0f7ec81a02dbec63e8c1b37fb205200` — “feat(storyboard-qa): add visual specificity warnings”
+**Last verified main commit:** `50a3e81d2bb29e72307772ba96ec22735af10ccb` — “feat(storyboard-qa): add shot-scale variety signals”
 **Current development branch:** `main` (PR #69 merged; no open PRs at handoff)
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
@@ -203,3 +203,13 @@ Prioritize a small working vertical slice over a large architecture rewrite. Bef
 - PR CI #44504229542 passed the complete workflow: typecheck, tests, production-plan validations, storyboard preview generation, all storyboard QA commands, project validations, audio preparation, FFmpeg/FFprobe and studio build.
 - These are heuristic prompts only; no semantic understanding or render inspection is implemented. No render was required or run for this pre-production CLI change.
 - The latest snapshot updates this development milestone, but the larger P0 storyboard-quality exit criteria and P1 autonomous Director remain incomplete.
+
+
+## 13. Shot-scale variety signals — merged 2026-11-19
+
+- PR #70: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/70 merged by squash as `50a3e81d2bb29e72307772ba96ec22735af10ccb`.
+- `storyboard:qa` now recognizes common framing labels for extreme close-up, macro, close-up, medium and wide shot scales.
+- Adds warning-only `REPEATED_SHOT_SCALE` for 3+ adjacent shots using the same recognized scale and `LOW_SHOT_SCALE_VARIETY` for sequences of at least five shots when at least 60% have recognizable scale labels and the recognized variety is two or fewer.
+- Unknown framing descriptions are excluded from recognized-scale counts. These are transparent heuristics and do not prove poor composition.
+- PR CI run #44505337143 passed. Typecheck, tests, all production-plan/storyboard/project/audio checks and studio build passed. No render was performed because this is a planning QA CLI change.
+- Current next direction: prototype a storyboard critique/repair artifact with concrete, prioritized suggested shot revisions, but keep suggestions separate from source plans and require re-validation before production. Longer term, introduce model-assisted semantic review only when it can be run without unapproved paid calls and with auditable findings.
