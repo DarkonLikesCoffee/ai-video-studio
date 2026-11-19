@@ -10,6 +10,7 @@ test("revision artifact preserves the complete source plan and starts suggestion
   const artifact = createStoryboardRevision("example.json", source);
   assert.deepEqual(artifact.sourcePlan, example);
   assert.equal(artifact.sourcePlanSha256.length, 64);
+  assert.equal(artifact.sourcePlanText, source);
   assert.ok(artifact.suggestions.every((suggestion) => suggestion.selected === false));
   assert.deepEqual(artifact.edits, []);
   assert.equal(artifact.validation, null);
@@ -20,7 +21,7 @@ test("applies explicit edits to a copy without mutating the embedded original", 
   artifact.edits.push({ shotId: "opening-macro", changeNote: "Clarify reveal", fields: { visual: "A close-up reveals the metal edge." } });
   const revised = applyStoryboardRevisionEdits(artifact) as Record<string, any>;
   assert.equal(revised.shots[0].visual, "A close-up reveals the metal edge.");
-  assert.equal(artifact.sourcePlan.shots[0].visual, example.shots[0].visual);
+  assert.equal((artifact.sourcePlan as Record<string, any>).shots[0].visual, example.shots[0].visual);
 });
 
 test("rejects edits referencing unknown shots", () => {
