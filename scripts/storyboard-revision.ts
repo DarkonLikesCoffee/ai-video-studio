@@ -126,8 +126,8 @@ const run = async (): Promise<void> => {
       const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
       const selected = !process.argv.includes("--off");
       const updated = setStoryboardRevisionSuggestionSelection(artifact, output, selected);
-      await writeFile(input, JSON.stringify(updated, null, 2) + "\\n", "utf8");
-      process.stdout.write(`Suggestion ${output} ${selected ? "selected" : "deselected"} in ${input} (no plan edits applied)\\n`);
+      await writeFile(input, JSON.stringify(updated, null, 2) + "\n", "utf8");
+      process.stdout.write(`Suggestion ${output} ${selected ? "selected" : "deselected"} in ${input} (no plan edits applied)\n`);
       return;
     }
     if (command === "review") {
@@ -135,10 +135,10 @@ const run = async (): Promise<void> => {
       const artifact = JSON.parse(await readFile(input, "utf8")) as StoryboardRevisionArtifact;
       const report = renderStoryboardRevisionReviewMarkdown(artifact);
       if (output) {
-        await writeFile(output, report + "\\n", "utf8");
-        process.stdout.write(`Revision review written: ${output}\\n`);
+        await writeFile(output, report + "\n", "utf8");
+        process.stdout.write(`Revision review written: ${output}\n`);
       } else {
-        process.stdout.write(report + "\\n");
+        process.stdout.write(report + "\n");
       }
       return;
     }
