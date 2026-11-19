@@ -51,6 +51,18 @@ export const createVisualStrategyReport = (plan: unknown): VisualStrategyReport 
   return { shotCount: shots.length, methodCounts, findings, recommendations };
 };
 
+export const renderVisualStrategyJson = (plan: unknown, report = createVisualStrategyReport(plan)): string => {
+  const title = plan && typeof plan === "object" && typeof (plan as Record<string, unknown>).title === "string"
+    ? (plan as Record<string, unknown>).title as string : "Untitled storyboard";
+  return JSON.stringify({
+    schemaVersion: 1,
+    reportType: "storyboard-visual-strategy",
+    planTitle: title,
+    report,
+    generatedBy: "ai-video-studio/storyboard:strategy",
+  }, null, 2);
+};
+
 export const renderVisualStrategyMarkdown = (plan: unknown, report = createVisualStrategyReport(plan)): string => {
   const title = plan && typeof plan === "object" && typeof (plan as Record<string, unknown>).title === "string"
     ? (plan as Record<string, unknown>).title as string : "Untitled storyboard";
@@ -70,16 +82,19 @@ export const renderVisualStrategyMarkdown = (plan: unknown, report = createVisua
 };
 
 const run = async () => {
-  const inputPath = process.argv[2];
-  const outputPath = process.argv[3];
-  if (!inputPath) {
-    process.stderr.write("Usage: npm run storyboard:strategy -- <production-plan.json> [output.md]\n");
+  const args = process.argv.slice(2);
+  const jsonMode = args.includes("--json");
+  const filteredArgs = args.filter((arg) => arg !== "--json");
+  const inputPath = filteredArgs[0];
+  const outputPath = filteredArgs[1];
+  if (!inputPath || filteredArgs.length > 2) {
+    process.stderr.write("Usage: npm run storyboard:strategy -- <production-plan.json> [output.md|output.json] [--json]\n");
     process.exitCode = 2;
     return;
   }
   try {
     const plan = JSON.parse(await readFile(inputPath, "utf8")) as unknown;
-    const report = renderVisualStrategyMarkdown(plan);
+    const report = jsonMode ? renderVisualStrategyJson(plan) : renderVisualStrategyMarkdown(plan);
     if (outputPath) {
       const { writeFile } = await import("node:fs/promises");
       await writeFile(outputPath, report + "\n", "utf8");
