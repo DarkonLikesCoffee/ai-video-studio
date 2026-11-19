@@ -64,6 +64,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 
 - [x] Require every shot to include a selected visual method, concrete action and start/development/end visual progression in the production-plan schema; validate these fields and keep example plans updated.
 - [x] Generate a reviewable HTML storyboard planning preview from production plans before full production (timeline-ordered shot cards, visual method/action/progression, framing/camera/transition/audio cues; not an animated animatic).
+- [x] Add a review-only storyboard critic report that converts deterministic QA findings into prioritized revision suggestions; it does not modify plans or approve creative quality.
 
 - [ ] Include shot ID, duration, narrative purpose, visual action/progression, method, composition, camera, asset dependencies and audio cues.
 - [ ] Support a review/approval checkpoint for expensive, complex or ambiguous production plans; do not make approval mandatory for every low-cost workflow unless configured.
