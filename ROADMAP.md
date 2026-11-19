@@ -70,6 +70,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 - [ ] Support a review/approval checkpoint for expensive, complex or ambiguous production plans; do not make approval mandatory for every low-cost workflow unless configured.
 - [ ] Validate timing and transitions as a complete sequence, including pacing, continuity, repeated visual grammar and shot-to-shot variety.
 - [ ] Provide a clear path to revise individual shots without regenerating the entire plan.
+- [ ] Add a traceable revision artifact/workflow that records the source plan, critique, selected suggestions, explicit edits and validation results while preserving the original plan.
 
 **Exit criteria:** A reviewer can understand the intended video and approve or change its shot plan before expensive asset generation or rendering; the approved plan drives production.
 

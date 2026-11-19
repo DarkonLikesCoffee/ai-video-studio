@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `c18b1be0e79f25e6b14b3d49838f31b9c683044d` — “feat(storyboard): add review-only critic report”
-**Current development branch:** `main` (PR #71 merged; no open PRs at handoff)
+**Last verified main commit:** `40ffe8fd8a21466fa4cca607ace6ecc422c7ab35` — `docs(progress): log storyboard critic merge`
+**Current development branch:** `main`; PR #71 merged; PR #72 is the current documentation reconciliation proposal
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -74,7 +74,7 @@ The repository is **not yet a fully autonomous prompt-to-video AI product**. In 
 
 Some related pieces exist as manual scripts, examples, playbooks or limited adapters. Do not confuse those with end-to-end product capabilities.
 
-## 5. Recent end-to-end test: VALORANT explainer
+## 5. Historical end-to-end test: VALORANT explainer
 
 Project: `projects/valorant-immortal-decision-making/`  
 PR #50: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/50  
@@ -98,130 +98,39 @@ Creative QA result: **not accepted as a successful cinematic explainer**.
 
 The next agent should use this project as a regression/quality case, not simply produce another similar SVG slideshow.
 
-## 6. Latest GitHub state snapshot
+## 6. Verified current repository snapshot — 2026-11-19
 
-Verified on 2026-11-18:
-- main is `baeabc412b2a52be48e69d41b6709936b265cc6c`, the squash merge of PR #58. PR #58's CI run #44397239973 passed before merge.
-- PR #57 merged as `2bd52e9f0830600718fcb60fc5bd6f5cf6b4677`; narration-aware retiming and per-scene camera motion are on main.
-- PR #56 merged as `338b55a2bf45e39e096ac722a740f73b9562a5f1`; looped music/sidechain-tail fix removed the late digital-silence intervals.
-- V7 render #44387937003 exposed the original narration mismatch: voice 47.31s, video 60.0s.
-- V9 branch render #44393399283 and post-merge main render #44394465979 both succeeded. Main artifact #14469659407: 1920x1080, 30fps, H.264/AAC stereo, video 47.733s, audio 47.8s, -16.1 LUFS, zero silence/freeze/black intervals. Contact sheet inspected. This proves technical synchronization, not creative acceptance.
-- PR #58 fixed a missing integration: the existing footage timeline helper was used by the custom NarratedSkyExplainer branch, but not by the main narrated ProjectVideo path. It now injects approved clips as muted full-frame scene backgrounds, preserving vector overlays and captions.
-- The footage manifest accepts either approved CC0/Public Domain/CC BY 2/3/4 assets or user-provided clips with explicit `rightsBasis` (`user-owned` or `permission-granted`) and a meaningful `rightsNote`. User-provided footage is credited separately and is not mislabeled as a public license.
-- Added `projects/valorant-immortal-decision-making/production/USER_FOOTAGE.md` with shot IDs, clip preparation, manifest format and privacy/rights guidance.
-- PR #58 CI #44397239973 passed; PR #58 merged as `baeabc412b2a52be48e69d41b6709936b265cc6c`. The post-merge main CI should be checked before next render.
-- No gameplay clips have been added to the repository yet. The pipeline is ready, but no new gameplay render has been performed. The current video still uses illustrative SVGs and is not accepted as a cinematic VALORANT explainer.
+- Main HEAD: `40ffe8fd8a21466fa4cca607ace6ecc422c7ab35`.
+- Main CI run #44507106494 completed successfully.
+- PRs #66–#71 are merged.
+- At the initial snapshot, main had no open PRs; documentation reconciliation PR #72 is now open.
+- Recheck branches, PRs, CI and commit SHAs before relying on this snapshot.
+
+### Storyboard milestones on main
+
+- **PR #66 — Story-first production guidance:** every shot requires a visual method, concrete action and start/development/end progression. Validator and examples were updated.
+- **PR #67 — Storyboard risk CLI:** `storyboard:qa` produces deterministic, warning-only signals for long/static shots and repeated framing, visual method or camera movement.
+- **PR #68 — Storyboard planning preview:** `storyboard:preview` creates standalone HTML shot cards with production-plan information. It is not a video animatic.
+- **PR #69 — Expanded heuristic QA:** warnings for placeholder/vague descriptions and actions, incomplete progression, similar adjacent descriptions and text-heavy shots.
+- **PR #70 — Shot-scale variety signals:** recognized framing labels and warning-only repeated/low shot-scale variety signals.
+- **PR #71 — Storyboard critic:** `storyboard:critic` turns existing QA findings into prioritized revision suggestions. It is review-only; it does not mutate plans, use an AI provider, or approve creative quality.
+
+### Verified limitations
+
+These features are deterministic and heuristic. They do not semantically understand the story, inspect rendered media or guarantee cinematic quality. A planning preview is not a footage-backed animatic. Do not claim a persistent autonomous Production Director or automatic repair loop exists.
 
 ## 7. Immediate development direction
 
-1. Verify post-merge main CI for PR #58.
-2. Add a small set of actual VALORANT gameplay selects recorded by the project owner or supplied with explicit permission, mapped to the six shot IDs in `production/USER_FOOTAGE.md`.
-3. Keep player names/chat/account identifiers out of the final edit unless explicitly wanted; crop or blur them before use.
-4. Render with the new footage injection, then inspect the full MP4 for visual relevance, motion, crop, pacing, caption legibility and audio sync.
-5. If clips cannot be supplied, search only genuinely reusable public-license footage; do not pretend unrelated stock video is VALORANT gameplay.
-6. Extend semantic visual QA and shot variety checks once real footage is present.
+The next reusable slice is a **traceable storyboard revision workflow**:
+1. Preserve the original production plan.
+2. Capture the critic report and its findings.
+3. Let a user/agent select suggestions explicitly.
+4. Record each applied edit in a separate revision artifact.
+5. Validate the revised plan and retain the validation result.
+6. Keep the original plan untouched and make the revision reviewable/rollbackable.
 
-The biggest gap is not basic rendering. It is the **production intelligence and audiovisual quality** between a user's prompt and the final edit.
+Start with a small versioned artifact schema and deterministic tests. Do not auto-apply critique silently. After this, evaluate model-assisted semantic review only with a clear no-paid-call/consent gate and auditable outputs. Keep P0 quality gates and the broader P1 Production Director goals in view; do not mistake additional heuristics for the finished product.
 
-Start by examining the current implementation and building a quality-first, reusable production workflow that can:
-1. Turn a prompt into a detailed creative brief and a shot-level production plan.
-2. Match every shot to an appropriate visual method: footage, generated media, 3D, motion graphics, diagrams or typography.
-3. Validate that the storyboard has real shot variety and meaningful action, not just different text cards.
-4. Resolve assets with provenance and explicit rights checks; never silently substitute an unrelated still image for requested moving footage.
-5. Build a timeline with narration, visuals, captions, music and SFX coordinated together.
-6. Render a representative video and run measurable plus human/AI-assisted quality review.
-7. Iterate on high-impact defects before accepting delivery.
+## Resume checklist
 
-Prioritize a small working vertical slice over a large architecture rewrite. Before choosing a video-generation provider or paid service, compare viable options and costs; do not spend money without explicit user approval.
-
-## 8. Development update — visual storytelling production guidance (2026-11-19)
-
-
-- Work started on branch `feature/visual-storytelling-production-guidelines`, based on the roadmap update commit `1341df8aa1f391024d5f30d25ecadc6048b9bebb`.
-- Creative Director guidance now requires concrete visual events, per-shot method choice, subject/action, producibility and effects motivated by the story.
-- Storyboard guidance now requires a shot's visual method, action and start/development/end progression, plus a pre-production slideshow-risk review. It explicitly rejects scene-title lists as storyboards.
-- Agent production workflow now has a production-intelligence checklist and warns against defaulting to title cards, static diagrams or repeated layouts.
-- These changes strengthen agent orchestration guidance only. They do **not** implement a persistent AI Director, automatic storyboard generation, semantic slideshow detection or new render-engine capabilities.
-- No tests or renders run yet (documentation-only changes).
-- Next: open PR and validate CI, then implement a focused storyboard-quality validator with tests as the next code slice.
-
-## 9. Development update — required shot action/progression fields (2026-11-19)
-
-- Extended the production-plan validator to require `visualMethod`, `action`, and `visualProgression` on every shot, alongside existing purpose/visual/framing/camera/transition/audio fields.
-- Added tests for missing visual-method selection, action, and progression.
-- Updated all four checked-in production-plan examples (launch film, narrated sky explainer, SORA product film, VALORANT explainer) with per-shot method, action and start→development→end progression.
-- This enforces planning completeness, not semantic quality: it cannot yet detect whether descriptions are genuinely compelling, repetitive or slideshow-like. The fields can still be poorly authored and need later heuristic/AI-assisted review.
-- CI for the latest branch head is in progress; tests are not yet confirmed passing. No render was run because this changes production planning/validation, not the render engine.
-- Next: wait for CI, fix failures if any, then merge only after checks pass. Follow-up code task is a deterministic slideshow-risk report (duration/static visual progression/shot-variety signals), with warnings rather than subjective hard failures.
-
-## 9. Development update — visual storytelling requirements merged (2026-11-19)
-
-- PR #66: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/66 merged by squash into main.
-- Merge commit: `bbfce5c68d9a4c4a84b918285b23ac07f26b52f6`.
-- CI run #44499140921 passed for the PR head `8a1bf5bbca568792332972bc89b852c58ef00950`.
-- Creative Director, Storyboard and agent production workflow playbooks now emphasize story-first planning, per-shot method selection, concrete action, start/development/end progression and pre-production slideshow-risk review.
-- Production-plan validator requires `visualMethod`, `action`, and `visualProgression` for every shot. All four checked-in production-plan examples were updated. Tests cover missing method/action/progression.
-- These checks validate plan completeness, not creative quality or semantic slideshow detection. No renderer changes or render were made.
-- Next implementation slice: add a deterministic storyboard-risk report with transparent heuristic warnings (long holds, repeated adjacent visual method/framing/motion, static cues), without treating warnings as failures or pretending to understand story semantics.
-
-## 10. Development update — deterministic storyboard risk report (in progress, 2026-11-19)
-
-- Branch `feature/storyboard-risk-report` started from current main after PR #66 and its documentation follow-ups.
-- Added `scripts/storyboard-qa.ts`, exporting `analyzeStoryboardRisks` and a CLI that prints review warnings for long shots (8s+), static/locked camera holds (5s+), repeated adjacent framing (2+), repeated visual methods (3+) and repeated camera movement (3+).
-- Warnings are intentionally non-fatal and transparent; they identify patterns for review and do not claim semantic understanding or prove that a storyboard is bad.
-- Added tests for long/static shots, repeated framing, repeated method/movement and a varied short sequence. Added `npm run storyboard:qa` and a CI invocation against the example production plan.
-- CI validation is pending for this branch; no render was run.
-
-## 10. Development update — storyboard risk review merged (2026-11-19)
-
-- PR #67: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/67 merged by squash into main as `40f38b7a7576bb061e5f0318e265358a759829f3`.
-- CI run #44499955017 passed: typecheck, unit tests, production-plan validation, storyboard-risk CLI on all four plans, project validation, audio preparation and studio build.
-- New `npm run storyboard:qa -- <production-plan.json>` command reports warning-only deterministic signals: long shots (8s+), static camera holds (5s+), repeated adjacent framing, visual-method runs (3+) and camera-movement runs (3+).
-- All four checked-in plans were analyzed in CI. The launch-film, narrated-explainer and SORA examples had no deterministic patterns. VALORANT's six 10-second shots were reported as long-shot pacing review warnings. This is a prompt for editorial review, not a quality failure.
-- The command is documented in README and agent guidance. The analyzer does not semantically understand story content or inspect rendered video.
-- No render was performed.
-- Next: build a more useful shot-sequence planning/validation layer that can inspect visual-method distribution and action/progression completeness, then prototype storyboard-to-animatic review before adding new renderer effects.
-
-
-## 11. Storyboard review preview — merged 2026-11-19
-
-- Main merge commit: `e7988966b6783ff0cf4e0f92bcd656859b9cafc3` (PR #68).
-- New command: `npm run storyboard:preview -- <production-plan.json> <output.html>`.
-- Produces a standalone HTML planning page with ordered shot cards, time ranges, visual method, purpose, visual description, action, start/development/end progression, framing, camera movement, on-screen copy, transition, audio cues, asset references and optional engine approach.
-- Validates first-shot start, shot/runtime bounds and final-shot end. Preserves authored transition overlaps rather than rejecting them.
-- CI run #44502735050 passed all steps, including typecheck, tests, project validations, both preview generations and build.
-- Artifact #14516579993 was downloaded and checked: `launch-film.html` (4 shots) and `valorant.html` (6 shots).
-- This is **not** an animated animatic or final video. It does not play footage, inspect actual assets, generate missing media or semantically judge creative quality.
-- Roadmap HTML planning-preview task is complete. Remaining: true media-backed animatic/shot preview, Production Director, richer per-shot method selection/capability mapping, semantic rendered-video QA, review latest VALORANT render creatively.
-
-
-## 12. Expanded storyboard QA signals — merged 2026-11-19
-
-- PR #69 merged by squash into main: `ac153121b0f7ec81a02dbec63e8c1b37fb205200`.
-- Added warning-only lexical/structural checks for placeholder-like visual descriptions, vague actions, missing explicit Start/Development/End markers, highly similar adjacent visual descriptions and lengthy on-screen copy.
-- Existing checks remain: long shots, static holds and repeated adjacent method/framing/camera movement.
-- PR CI #44504229542 passed the complete workflow: typecheck, tests, production-plan validations, storyboard preview generation, all storyboard QA commands, project validations, audio preparation, FFmpeg/FFprobe and studio build.
-- These are heuristic prompts only; no semantic understanding or render inspection is implemented. No render was required or run for this pre-production CLI change.
-- The latest snapshot updates this development milestone, but the larger P0 storyboard-quality exit criteria and P1 autonomous Director remain incomplete.
-
-
-## 13. Shot-scale variety signals — merged 2026-11-19
-
-- PR #70: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/70 merged by squash as `50a3e81d2bb29e72307772ba96ec22735af10ccb`.
-- `storyboard:qa` now recognizes common framing labels for extreme close-up, macro, close-up, medium and wide shot scales.
-- Adds warning-only `REPEATED_SHOT_SCALE` for 3+ adjacent shots using the same recognized scale and `LOW_SHOT_SCALE_VARIETY` for sequences of at least five shots when at least 60% have recognizable scale labels and the recognized variety is two or fewer.
-- Unknown framing descriptions are excluded from recognized-scale counts. These are transparent heuristics and do not prove poor composition.
-- PR CI run #44505337143 passed. Typecheck, tests, all production-plan/storyboard/project/audio checks and studio build passed. No render was performed because this is a planning QA CLI change.
-- Current next direction: prototype a storyboard critique/repair artifact with concrete, prioritized suggested shot revisions, but keep suggestions separate from source plans and require re-validation before production. Longer term, introduce model-assisted semantic review only when it can be run without unapproved paid calls and with auditable findings.
-
-
-## 14. Review-only storyboard critic — merged 2026-11-19
-
-- PR #71: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/71 merged by squash as `c18b1be0e79f25e6b14b3d49838f31b9c683044d`.
-- Added `npm run storyboard:critic -- <production-plan.json> [output.md]`, a deterministic critique-report command that converts existing storyboard QA findings into prioritized revision suggestions.
-- Guidance covers vague visuals/actions, missing progression, similar adjacent descriptions, text-heavy shots, long duration, static holds, shot-scale repetition/variety, framing, visual method and camera movement.
-- Report is review-only. It never modifies source plans, makes no model/provider calls, and does not represent creative approval. Suggestions must be applied to a copy and revalidated.
-- Tests cover priority/actionability, report output, non-mutation and the no-findings case. CI smoke-generates a report for the launch-film example.
-- First PR CI run #44506671305 failed because a report-output test assumed the sample plan would produce findings; the test was corrected to make a deliberately weak shot. Final PR CI run #44506823215 passed (159/160 Node tests initially, then corrected test suite passed; verify logs for final count if needed), including typecheck, all tests, storyboard preview/QA, project validation, audio processing and studio build. No video render was required or run.
-- This remains deterministic rule-based guidance—not an LLM semantic critic or automatic repair loop.
-- Next: introduce a model/provider-neutral review interface only after defining input/output schemas and a no-cost/consent gate; alternatively first build a revision artifact format that preserves original plan, selected edits and validation results. Do not silently apply recommendations.
+Read `START_HERE.md`, this file, `ROADMAP.md`, `PROGRESS_LOG.md`, `AGENTS.md`, `README.md`, and relevant source/tests/skills. Verify live GitHub state before doing work. Prefer small end-to-end slices with tests and concrete validation evidence. Never claim a render or creative inspection without evidence.
