@@ -5,6 +5,11 @@ import { createStoryboardRevision, applyStoryboardRevisionEdits, validateStorybo
 
 const example = JSON.parse(await readFile(new URL("../projects/examples/production-plan.json", import.meta.url), "utf8"));
 
+const revisionExample = structuredClone(example);
+revisionExample.shots[0].visual = "Show this concept";
+revisionExample.shots[0].action = "Show the concept";
+revisionExample.shots[0].visualProgression = "";
+
 test("revision artifact preserves the complete source plan and starts suggestions unselected", () => {
   const source = JSON.stringify(example, null, 2);
   const artifact = createStoryboardRevision("example.json", source);
@@ -17,7 +22,7 @@ test("revision artifact preserves the complete source plan and starts suggestion
 });
 
 test("revision suggestions can be selected and deselected without creating plan edits", () => {
-  const artifact = createStoryboardRevision("example.json", JSON.stringify(example));
+  const artifact = createStoryboardRevision("example.json", JSON.stringify(revisionExample));
   const first = artifact.suggestions[0];
   const selected = setStoryboardRevisionSuggestionSelection(artifact, first.id, true);
   assert.equal(selected.suggestions[0].selected, true);
@@ -29,7 +34,7 @@ test("revision suggestions can be selected and deselected without creating plan 
 });
 
 test("revision review markdown distinguishes selections from explicit edits", () => {
-  const artifact = createStoryboardRevision("example.json", JSON.stringify(example));
+  const artifact = createStoryboardRevision("example.json", JSON.stringify(revisionExample));
   const selected = setStoryboardRevisionSuggestionSelection(artifact, artifact.suggestions[0].id, true);
   const report = renderStoryboardRevisionReviewMarkdown(selected);
   assert.match(report, /Selected suggestions:\*\* 1 \/ /);
