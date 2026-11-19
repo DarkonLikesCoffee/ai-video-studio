@@ -39,6 +39,6 @@ test("beat report prompts review for missing development and payoff in sufficien
 test("markdown report is transparent about heuristics and limitations", () => {
   const markdown = renderStoryboardBeatReportMarkdown(createStoryboardBeatReport(plan));
   assert.match(markdown, /Narrative Beat Review/);
-  assert.match(markdown, /No explicit narrativeBeat labels/);
+  assert.match(markdown, /No narrative-beat review prompts were generated/);
   assert.match(markdown, /does not infer story meaning/);
 });
