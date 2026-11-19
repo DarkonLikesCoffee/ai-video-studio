@@ -32,6 +32,7 @@
     "storyboard:critic": "tsx scripts/storyboard-critic.ts",
     "storyboard:strategy": "tsx scripts/storyboard-strategy.ts",
     "storyboard:revision": "tsx scripts/storyboard-revision.ts",
+    "storyboard:beats": "tsx scripts/storyboard-beats.ts",
     "qa:contact-sheet": "tsx scripts/qa-contact-sheet.ts"
   },
   "devDependencies": {
