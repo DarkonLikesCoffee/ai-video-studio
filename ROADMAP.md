@@ -29,6 +29,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 
 **Goal:** Stop accepting technically successful but creatively weak videos and fix defects that invalidate current output.
 
+- [x] Add a deterministic storyboard-risk report with warnings for long shots, static camera holds, repeated adjacent framing, visual method and camera movement; warnings are transparent heuristics, not creative verdicts.
 - [ ] Diagnose and fix unexpected audio gaps/silence in current benchmark renders; maintain tests for missing, short, silent or misaligned audio tracks.
 - [ ] Maintain repeatable media QA: duration, resolution, FPS, codecs, streams, loudness/true peak, silence, black frames, freeze/static intervals, shot-boundary contact sheets, asset/caption coverage and synchronization.
 - [ ] Define measurable storyboard checks: shot duration, framing/shot-size and visual-method variety, meaningful action/progression, repeated composition, text dependence and static/slideshow-like patterns.
