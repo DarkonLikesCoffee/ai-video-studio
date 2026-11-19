@@ -127,6 +127,7 @@ export const buildAssetEvidenceReport = async (
   const addIssue = (issue: Issue) => issues.push(issue);
   const assets: AssetEvidence[] = [];
   const unknownShotIds = new Set<string>();
+  if (manifestValue.assets.length === 0) addIssue({ code: "ASSET_MANIFEST_EMPTY", severity: "warning", message: "Asset manifest contains no assets." });
 
   for (const [index, value] of manifestValue.assets.entries()) {
     if (!isRecord(value)) {
@@ -135,6 +136,7 @@ export const buildAssetEvidenceReport = async (
     }
     const reference = getReference(value, index);
     const aliases = getAliases(value);
+    if (!asText(value.type)) addIssue({ code: "ASSET_TYPE_MISSING", severity: "warning", message: `Asset "${reference}" has no type.`, assetRef: reference });
     const local = await resolveLocalPath(value, projectRoot);
     const provenanceStatus = hasProvenance(value) ? "documented" : "missing";
     const rightsStatus = hasRights(value) ? "documented" : "missing";
@@ -146,7 +148,8 @@ export const buildAssetEvidenceReport = async (
         addIssue({ code: "UNKNOWN_MANIFEST_SHOT_ID", severity: "warning", message: `Asset "${reference}" references unknown shot "${shotId}".`, shotId, assetRef: reference });
       }
     }
-    if (local.status === "unsafe") addIssue({ code: "ASSET_PATH_UNSAFE", severity: "error", message: `Asset "${reference}" resolves outside the project root or uses an absolute path.`, assetRef: reference });
+    if (local.status === "not-local") addIssue({ code: "ASSET_LOCAL_PATH_MISSING", severity: "warning", message: `Asset "${reference}" has no local file or path.`, assetRef: reference });
+    else if (local.status === "unsafe") addIssue({ code: "ASSET_PATH_UNSAFE", severity: "error", message: `Asset "${reference}" resolves outside the project root or uses an absolute path.`, assetRef: reference });
     else if (local.status === "missing") addIssue({ code: "ASSET_FILE_MISSING", severity: "warning", message: `Asset "${reference}" does not exist at ${local.path ?? "its declared path"}.`, assetRef: reference });
     else if (local.status === "empty") addIssue({ code: "ASSET_FILE_EMPTY", severity: "warning", message: `Asset "${reference}" exists but is empty.`, assetRef: reference });
     if (provenanceStatus === "missing") addIssue({ code: "ASSET_PROVENANCE_MISSING", severity: "warning", message: `Asset "${reference}" has no source/provenance note or URL.`, assetRef: reference });
@@ -222,7 +225,7 @@ export const buildAssetEvidenceReport = async (
   const hasWarnings = issues.some((issue) => issue.severity === "warning");
   const hasErrors = issues.some((issue) => issue.severity === "error");
   const status: AssetEvidenceReport["summary"]["status"] = hasErrors ? "invalid" : hasWarnings ? "needs-review" : assets.length ? "ready" : "no-assets";
-  const criteriaUnavailable = !Array.isArray(coverageInput);
+  const criteriaUnavailable = !Array.isArray(coverageInput) || coverageInput.length === 0;
   return {
     schemaVersion: 1,
     reportType: "production-asset-evidence",
@@ -286,7 +289,7 @@ const main = async () => {
       await writeFile(path.resolve(outputPath), output, "utf8");
       process.stdout.write(`Asset evidence report written: ${outputPath}\n`);
     } else process.stdout.write(output);
-    if (strict && report.issues.some((issue) => issue.severity === "warning" || issue.severity === "error")) process.exitCode = 1;
+    if (strict && (report.issues.some((issue) => issue.severity === "warning" || issue.severity === "error") || report.summary.status === "criteria-unavailable" || report.summary.status === "no-assets") process.exitCode = 1;
   } catch (error) {
     process.stderr.write(`Could not create asset evidence report: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
