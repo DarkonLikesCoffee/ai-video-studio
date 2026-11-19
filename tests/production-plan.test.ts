@@ -24,7 +24,7 @@ test("production plan accepts supported narrative beat tags", () => {
 test("production plan rejects unknown narrative beat tags", () => {
   const invalid = structuredClone(example);
   (invalid.shots as Array<Record<string, unknown>>)[0]!.narrativeBeat = "random";
-  assert.ok(validateProductionPlan(invalid).some((error) => error.includes("narrativeBeat"));
+  assert.ok(validateProductionPlan(invalid).some((error) => error.includes("narrativeBeat")));
 });
 
 test("production plan requires a meaningful acceptance checklist", () => {
