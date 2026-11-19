@@ -226,7 +226,7 @@ export const buildAssetEvidenceReport = async (
   const hasWarnings = issues.some((issue) => issue.severity === "warning");
   const hasErrors = issues.some((issue) => issue.severity === "error");
   const criteriaUnavailable = !Array.isArray(coverageInput) || coverageInput.length === 0;
-  const status: AssetEvidenceReport["summary"]["status"] = hasErrors ? "invalid" : !assets.length ? "no-assets" : hasWarnings ? "needs-review" : criteriaUnavailable ? "criteria-unavailable" : "ready;
+  const status: AssetEvidenceReport["summary"]["status"] = hasErrors ? "invalid" : !assets.length ? "no-assets" : hasWarnings ? "needs-review" : criteriaUnavailable ? "criteria-unavailable" : "ready";
   return {
     schemaVersion: 1,
     reportType: "production-asset-evidence",
