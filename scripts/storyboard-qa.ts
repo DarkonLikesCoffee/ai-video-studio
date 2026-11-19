@@ -149,7 +149,7 @@ export const analyzeStoryboardRisks = (plan: unknown): StoryboardRiskFinding[] =
   });
 
   const knownScales = shots.map((shot) => shotScale(shot.framing)).filter((scale): scale is string => scale !== null);
-  if (shots.length >= 5 && new Set(knownScales).size <= 2) {
+  if (shots.length >= 5 && knownScales.length >= Math.ceil(shots.length * 0.6) && new Set(knownScales).size <= 2) {
     findings.push({
       code: "LOW_SHOT_SCALE_VARIETY",
       severity: "warning",
