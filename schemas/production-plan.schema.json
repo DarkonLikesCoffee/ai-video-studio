@@ -5,174 +5,50 @@
   "description": "A non-renderable, agent-facing plan that precedes a VideoProject.",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schemaVersion",
-    "id",
-    "title",
-    "delivery",
-    "creativeDirection",
-    "shots",
-    "acceptanceCriteria"
-  ],
+  "required": ["schemaVersion", "id", "title", "delivery", "creativeDirection", "shots", "acceptanceCriteria"],
   "properties": {
-    "schemaVersion": {
-      "const": 1
-    },
-    "id": {
-      "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
-    },
-    "title": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 120
-    },
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
     "delivery": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "durationSeconds",
-        "width",
-        "height",
-        "fps",
-        "format"
-      ],
+      "required": ["durationSeconds", "width", "height", "fps", "format"],
       "properties": {
-        "durationSeconds": {
-          "type": "number",
-          "exclusiveMinimum": 0,
-          "maximum": 300
-        },
-        "width": {
-          "type": "integer",
-          "minimum": 320,
-          "maximum": 7680
-        },
-        "height": {
-          "type": "integer",
-          "minimum": 320,
-          "maximum": 4320
-        },
-        "fps": {
-          "type": "integer",
-          "enum": [
-            24,
-            25,
-            30,
-            50,
-            60
-          ]
-        },
-        "format": {
-          "const": "mp4"
-        },
-        "platform": {
-          "type": "string",
-          "maxLength": 80
-        },
-        "language": {
-          "type": "string",
-          "maxLength": 40
-        }
+        "durationSeconds": { "type": "number", "exclusiveMinimum": 0, "maximum": 300 },
+        "width": { "type": "integer", "minimum": 320, "maximum": 7680 },
+        "height": { "type": "integer", "minimum": 320, "maximum": 4320 },
+        "fps": { "type": "integer", "enum": [24, 25, 30, 50, 60] },
+        "format": { "const": "mp4" },
+        "platform": { "type": "string", "maxLength": 80 },
+        "language": { "type": "string", "maxLength": 40 }
       }
     },
     "creativeDirection": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "objective",
-        "audience",
-        "concept",
-        "visualSystem",
-        "motionLanguage",
-        "soundDirection"
-      ],
+      "required": ["objective", "audience", "concept", "visualSystem", "motionLanguage", "soundDirection"],
       "properties": {
-        "objective": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 500
-        },
-        "audience": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 300
-        },
-        "concept": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 1000
-        },
-        "emotionalArc": {
-          "type": "array",
-          "minItems": 2,
-          "maxItems": 8,
-          "items": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          }
-        },
+        "objective": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "audience": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "concept": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "emotionalArc": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "type": "string", "minLength": 1, "maxLength": 200 } },
         "visualSystem": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "palette",
-            "typography",
-            "composition",
-            "lighting"
-          ],
+          "required": ["palette", "typography", "composition", "lighting"],
           "properties": {
-            "palette": {
-              "type": "array",
-              "minItems": 2,
-              "maxItems": 8,
-              "items": {
-                "type": "string"
-              }
-            },
-            "typography": {
-              "type": "string",
-              "maxLength": 300
-            },
-            "composition": {
-              "type": "string",
-              "maxLength": 500
-            },
-            "lighting": {
-              "type": "string",
-              "maxLength": 500
-            },
-            "textureAndMaterials": {
-              "type": "string",
-              "maxLength": 500
-            }
+            "palette": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "type": "string" } },
+            "typography": { "type": "string", "maxLength": 300 },
+            "composition": { "type": "string", "maxLength": 500 },
+            "lighting": { "type": "string", "maxLength": 500 },
+            "textureAndMaterials": { "type": "string", "maxLength": 500 }
           }
         },
-        "motionLanguage": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 700
-        },
-        "soundDirection": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 500
-        },
-        "assumptions": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxLength": 300
-          }
-        },
-        "rightsAndFactualConstraints": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxLength": 300
-          }
-        }
+        "motionLanguage": { "type": "string", "minLength": 1, "maxLength": 700 },
+        "soundDirection": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 300 } },
+        "rightsAndFactualConstraints": { "type": "array", "items": { "type": "string", "maxLength": 300 } }
       }
     },
     "shots": {
@@ -182,128 +58,33 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "id",
-          "startSeconds",
-          "durationSeconds",
-          "purpose",
-          "visual",
-          "visualMethod",
-          "action",
-          "visualProgression",
-          "framing",
-          "cameraMovement",
-          "transition",
-          "audio"
-        ],
+        "required": ["id", "startSeconds", "durationSeconds", "purpose", "visual", "visualMethod", "action", "visualProgression", "framing", "cameraMovement", "transition", "audio"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
-          },
-          "startSeconds": {
-            "type": "number",
-            "minimum": 0
-          },
-          "durationSeconds": {
-            "type": "number",
-            "exclusiveMinimum": 0
-          },
-          "purpose": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 300
-          },
-          "visual": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 1000
-          },
-          "framing": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          },
-          "cameraMovement": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 300
-          },
-          "onScreenText": {
-            "type": "string",
-            "maxLength": 300
-          },
-          "transition": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          },
-          "audio": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 300
-          },
-          "assets": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "maxLength": 120
-            }
-          },
-          "engineApproach": {
-            "type": "string",
-            "enum": [
-              "project-video",
-              "custom-remotion",
-              "external-footage"
-            ]
-          },
-          "visualMethod": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 300
-          },
-          "action": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 500
-          },
-          "visualProgression": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 1000
-          },
-          "narrativeBeat": {
-            "type": "string",
-            "enum": [
-              "hook",
-              "setup",
-              "context",
-              "development",
-              "escalation",
-              "reveal",
-              "payoff",
-              "cta",
-              "transition",
-              "pause"
-            ]
-          }
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
+          "startSeconds": { "type": "number", "minimum": 0 },
+          "durationSeconds": { "type": "number", "exclusiveMinimum": 0 },
+          "purpose": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "visual": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "visualMethod": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "action": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "visualProgression": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "narrativeBeat": { "type": "string", "enum": ["hook", "setup", "context", "development", "escalation", "reveal", "payoff", "cta", "transition", "pause"] },
+          "framing": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "cameraMovement": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "onScreenText": { "type": "string", "maxLength": 300 },
+          "transition": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "audio": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "assets": { "type": "array", "items": { "type": "string", "maxLength": 120 } },
+          "engineApproach": { "type": "string", "enum": ["project-video", "custom-remotion", "external-footage"] }
         }
       }
     },
-    "assetManifestPath": {
-      "type": "string",
-      "pattern": "^projects/[a-z0-9-]+/production/asset-manifest\\.json$"
-    },
+    "assetManifestPath": { "type": "string", "pattern": "^projects/[a-z0-9-]+/production/asset-manifest\\.json$" },
     "acceptanceCriteria": {
       "type": "array",
       "minItems": 3,
       "maxItems": 10,
-      "items": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 300
-      }
+      "items": { "type": "string", "minLength": 1, "maxLength": 300 }
     }
   }
 }
