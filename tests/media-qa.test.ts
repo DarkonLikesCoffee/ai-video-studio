@@ -75,3 +75,25 @@ test("media QA fails when video or audio stream is missing", () => {
   assert.equal(report.passed, false);
   assert.ok(report.findings.some(f => f.code === "missing-audio-stream"));
 });
+
+
+test("media QA reports true peak and warns above -1 dBFS without failing", () => {
+  const report = buildMediaQaReport("near-peak.mp4", probe, "Integrated loudness: -16.0 LUFS\nTrue peak: -0.5 dBFS\n", "");
+  assert.equal(report.measurements.truePeakDbfs, -0.5);
+  assert.equal(report.passed, true);
+  assert.ok(report.findings.some(f => f.code === "true-peak-near-limit" && f.severity === "warning"));
+});
+
+test("media QA fails true peak above 0 dBFS ceiling", () => {
+  const report = buildMediaQaReport("clipped.mp4", probe, "Integrated loudness: -15.0 LUFS\nTrue peak: 0.3 dBFS\n", "");
+  assert.equal(report.measurements.truePeakDbfs, 0.3);
+  assert.equal(report.passed, false);
+  assert.ok(report.findings.some(f => f.code === "true-peak-over-limit" && f.severity === "error"));
+});
+
+test("media QA accepts true peak at or below recommended ceiling", () => {
+  const report = buildMediaQaReport("safe-peak.mp4", probe, "True peak: -1.2 dBFS\n", "");
+  assert.equal(report.measurements.truePeakDbfs, -1.2);
+  assert.equal(report.passed, true);
+  assert.equal(report.findings.length, 0);
+});

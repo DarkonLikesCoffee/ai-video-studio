@@ -281,3 +281,11 @@ Append one entry per meaningful development session:
 - Edits are explicit per shot (`shotId`, `changeNote`, `fields`). Applying writes a separate revised plan and never overwrites the original. Schema errors and heuristic warnings are recorded separately.
 - Added regression tests for source preservation, edits without source mutation, unknown shot IDs, and separating validation errors from QA warnings. Updated CLI docs, agent workflow and roadmap.
 - This is a deterministic review/edit artifact, not AI auto-repair or creative approval. CI is required for test/typecheck verification; no render is needed for this pre-production-only capability.
+
+
+## 2026-11-19 — True-peak measurement in media QA (PR preparation)
+
+- Added extraction of EBU R128 `True peak` from FFmpeg audio-analysis logs into `measurements.truePeakDbfs`.
+- Default warning threshold is -1.0 dBFS; readings above it warn, readings above 0.0 dBFS fail. Both values configurable.
+- Added tests for safe, warning, and over-limit readings; updated README and roadmap to distinguish partial implementation from full audio QA.
+- CI is pending. No render or listening session was performed for this change.

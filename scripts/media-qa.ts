@@ -13,6 +13,8 @@ export type MediaQaOptions = {
   maxFreezeDurationSeconds?: number;
   maxBlackDurationSeconds?: number;
   maxAudioVideoDriftSeconds?: number;
+  maxTruePeakDbfs?: number;
+  warningTruePeakDbfs?: number;
 };
 
 export type MediaStream = {
@@ -43,6 +45,8 @@ export type MediaQaReport = {
     maxFreezeDurationSeconds: number;
     maxBlackDurationSeconds: number;
     maxAudioVideoDriftSeconds: number;
+    maxTruePeakDbfs: number;
+    warningTruePeakDbfs: number;
   };
   format: {
     durationSeconds: number;
@@ -78,6 +82,7 @@ export type MediaQaReport = {
     blackIntervals: Array<{ startSeconds: number; endSeconds: number; durationSeconds: number }>;
     loudnessSummary?: string;
     audioVideoDurationDriftSeconds?: number;
+    truePeakDbfs?: number;
   };
 };
 
@@ -94,6 +99,8 @@ const defaults: Required<MediaQaOptions> = {
   maxFreezeDurationSeconds: 2.5,
   maxBlackDurationSeconds: 1,
   maxAudioVideoDriftSeconds: 0.5,
+  maxTruePeakDbfs: 0,
+  warningTruePeakDbfs: -1,
 };
 
 const run = (command: string, args: string[]): Promise<string> =>
@@ -222,6 +229,15 @@ export const buildMediaQaReport = (
   }
 
   const loudnessSummary = audioLog.match(/Integrated loudness:\s*([^\n]+)/)?.[1]?.trim();
+  const truePeakMatch = audioLog.match(/True peak:\s*(-?[0-9.]+)\s*dBFS/i);
+  const truePeakDbfs = truePeakMatch ? Number(truePeakMatch[1]) : undefined;
+  if (truePeakDbfs !== undefined && Number.isFinite(truePeakDbfs)) {
+    if (truePeakDbfs > config.maxTruePeakDbfs) {
+      findings.push({ severity: "error", code: "true-peak-over-limit", message: `True peak ${truePeakDbfs.toFixed(2)} dBFS exceeds the maximum ${config.maxTruePeakDbfs.toFixed(2)} dBFS.` });
+    } else if (truePeakDbfs > config.warningTruePeakDbfs) {
+      findings.push({ severity: "warning", code: "true-peak-near-limit", message: `True peak ${truePeakDbfs.toFixed(2)} dBFS is above the recommended warning threshold ${config.warningTruePeakDbfs.toFixed(2)} dBFS.` });
+    }
+  }
   const video = videoStream ? {
     codec: videoStream.codec_name ?? "unknown",
     width: Number(videoStream.width ?? 0),
@@ -255,6 +271,8 @@ export const buildMediaQaReport = (
       maxFreezeDurationSeconds: config.maxFreezeDurationSeconds,
       maxBlackDurationSeconds: config.maxBlackDurationSeconds,
       maxAudioVideoDriftSeconds: config.maxAudioVideoDriftSeconds,
+      maxTruePeakDbfs: config.maxTruePeakDbfs,
+      warningTruePeakDbfs: config.warningTruePeakDbfs,
     },
     format: {
       durationSeconds,
@@ -271,6 +289,7 @@ export const buildMediaQaReport = (
       frozenIntervals,
       blackIntervals,
       ...(loudnessSummary ? { loudnessSummary } : {}),
+      ...(truePeakDbfs === undefined || !Number.isFinite(truePeakDbfs) ? {} : { truePeakDbfs }),
       ...(audioVideoDurationDriftSeconds === undefined ? {} : { audioVideoDurationDriftSeconds }),
     },
   };
