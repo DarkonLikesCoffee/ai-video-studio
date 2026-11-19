@@ -168,3 +168,17 @@ Append one entry per meaningful development session:
 - Documentation added to README and agent guidance. This report is deterministic and does not claim semantic creative judgment or video inspection.
 - No render was run.
 - Next: improve shot-sequence planning/validation with transparent visual-method distribution and action/progression checks, then evaluate storyboard/animatic review before expanding renderer effects.
+
+
+## 2026-11-19 — Live repository audit and storyboard review vertical-slice kickoff
+
+- Re-read `START_HERE.md`, `PROJECT_STATE.md`, `ROADMAP.md`, `PROGRESS_LOG.md`, `AGENTS.md`, `README.md`, agent workflow guidance and the relevant Creative Director, Storyboard, Remotion Producer and Visual QA skills.
+- Verified live `main` at `a30be87792a5bc0646e4c4dc3b1bf04d42a8dd92`; latest main CI run #44500292909 succeeded. No open PRs were returned. PRs #66 and #67 are merged.
+- Read the attached continuation: after #66/#67 the project owner supplied NotebookLM research and chose to treat it as strategic input, not a shopping list. The agreed direction is story-first planning, per-shot visual-method selection and a reviewable sequence before expanding renderer effects.
+- Confirmed the current storyboard analyzer is deterministic warning-only QA. It does not semantically judge story content or render previews.
+- Confirmed the current production plan already records shot timing, visual method, action, start/development/end progression, framing, camera, transition and audio. The existing schema has no animatic renderer.
+- Created branch `feat/storyboard-animatic-preview` from verified main. No application code or render request has been changed yet.
+- Chosen next vertical slice: a lightweight, dependency-free storyboard/animatic review artifact derived from an existing production plan. It should show timed shot cards and the authored visual direction, clearly label itself as a planning preview (not a video render), and provide a way to inspect the full sequence before committing to asset production/rendering.
+- No render was run in this session. The last reported VALORANT v4 run #44485488551 was technically successful (47.86s, 1080p/30fps); creative acceptance remains open and the uploaded conversation reports frame-based review, not full-timeline playback/audio listening in this session.
+- **Next:** inspect the full storyboard/production-plan format and implement the smallest reusable preview generator plus tests, then run CI and inspect the produced preview. Keep the renderer and `render-request.json` untouched unless an end-to-end render becomes necessary for acceptance.
+- Current branch: `feat/storyboard-animatic-preview`; base: `a30be87792a5bc0646e4c4dc3b1bf04d42a8dd92`.
