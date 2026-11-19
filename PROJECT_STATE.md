@@ -233,7 +233,7 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Optional `acceptanceCoverage` is schema/runtime validated; legacy plans without coverage remain valid. Free-form `engineApproach` is retained in bounded `implementationNotes`, while recognized enum values remain normalized.
 - Initial CI run #44550086585 failed because the validator's strict enum check rejected five legacy `external-footage-with-3d-inset` values in the narrated-explainer plan. Those values are now preserved as `implementationNotes`, and a regression test validates the migrated example.
 - The final PR diff was reviewed, including compatibility migration of legacy `engineApproach` notes and restoration of the storyboard handoff files; no render gate applies to this planning/import slice. Local tests/typecheck were not run outside CI. Post-merge main CI #44574582076 passed.
-- Next: review current CI/diff, fix any remaining failures, merge only after checks pass, then connect production-plan criteria to asset/build evidence and visual QA.
+- Next step completed by PR #98: connect production-plan criteria to asset-manifest evidence; follow-up now adds first-stream start-offset diagnostics to media QA.
 
 
 ## Creative Brief → asset evidence report (merged)
