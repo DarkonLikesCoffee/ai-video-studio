@@ -140,7 +140,7 @@ export const importStoryboardRevisionEdits = (artifact: StoryboardRevisionArtifa
     if (typeof edit.changeNote !== "string" || !edit.changeNote.trim()) throw new Error(`Edit for ${edit.shotId} requires a changeNote.`);
     if (!edit.fields || typeof edit.fields !== "object" || Array.isArray(edit.fields) || Object.keys(edit.fields as object).length === 0) throw new Error(`Edit for ${edit.shotId} requires non-empty fields.`);
     const fields = edit.fields as Record<string, unknown>;
-    for (const key of Object.keys(fields)) if (!allowedFields.has(key) === false) throw new Error(`Unsupported revision field: ${key}`);
+    for (const key of Object.keys(fields)) if (!allowedFields.has(key)) throw new Error(`Unsupported revision field: ${key}`);
     seen.add(edit.shotId);
     imported.push({ shotId: edit.shotId, changeNote: edit.changeNote.trim(), fields: structuredClone(fields) });
   }
