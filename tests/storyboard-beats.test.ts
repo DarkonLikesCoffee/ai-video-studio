@@ -31,7 +31,7 @@ test("beat report warns about incomplete labels without guessing narrative roles
 });
 
 test("beat report prompts review for missing development and payoff in sufficiently tagged sequences", () => {
-  const report = createStoryboardBeatReport({ shots: [{ id: "a", startSeconds: 0, narrativeBeat: "setup" }, { id: "b", startSeconds: 1, narrativeBeat: "context" }, { id: "c", startSeconds: 2, narrativeBeat: "transition" }] });
+  const report = createStoryboardBeatReport({ shots: [{ id: "a", startSeconds: 0, narrativeBeat: "pause" }, { id: "b", startSeconds: 1, narrativeBeat: "context" }, { id: "c", startSeconds: 2, narrativeBeat: "transition" }] });
   assert.ok(report.warnings.some((warning) => warning.includes("Opening beat")));
   assert.ok(report.warnings.some((warning) => warning.includes("No development")));
   assert.ok(report.warnings.some((warning) => warning.includes("No payoff")));
