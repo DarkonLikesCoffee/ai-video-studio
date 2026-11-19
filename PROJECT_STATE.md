@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-19  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `50a3e81d2bb29e72307772ba96ec22735af10ccb` — “feat(storyboard-qa): add shot-scale variety signals”
-**Current development branch:** `main` (PR #69 merged; no open PRs at handoff)
+**Last verified main commit:** `c18b1be0e79f25e6b14b3d49838f31b9c683044d` — “feat(storyboard): add review-only critic report”
+**Current development branch:** `main` (PR #71 merged; no open PRs at handoff)
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -213,3 +213,15 @@ Prioritize a small working vertical slice over a large architecture rewrite. Bef
 - Unknown framing descriptions are excluded from recognized-scale counts. These are transparent heuristics and do not prove poor composition.
 - PR CI run #44505337143 passed. Typecheck, tests, all production-plan/storyboard/project/audio checks and studio build passed. No render was performed because this is a planning QA CLI change.
 - Current next direction: prototype a storyboard critique/repair artifact with concrete, prioritized suggested shot revisions, but keep suggestions separate from source plans and require re-validation before production. Longer term, introduce model-assisted semantic review only when it can be run without unapproved paid calls and with auditable findings.
+
+
+## 14. Review-only storyboard critic — merged 2026-11-19
+
+- PR #71: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/71 merged by squash as `c18b1be0e79f25e6b14b3d49838f31b9c683044d`.
+- Added `npm run storyboard:critic -- <production-plan.json> [output.md]`, a deterministic critique-report command that converts existing storyboard QA findings into prioritized revision suggestions.
+- Guidance covers vague visuals/actions, missing progression, similar adjacent descriptions, text-heavy shots, long duration, static holds, shot-scale repetition/variety, framing, visual method and camera movement.
+- Report is review-only. It never modifies source plans, makes no model/provider calls, and does not represent creative approval. Suggestions must be applied to a copy and revalidated.
+- Tests cover priority/actionability, report output, non-mutation and the no-findings case. CI smoke-generates a report for the launch-film example.
+- First PR CI run #44506671305 failed because a report-output test assumed the sample plan would produce findings; the test was corrected to make a deliberately weak shot. Final PR CI run #44506823215 passed (159/160 Node tests initially, then corrected test suite passed; verify logs for final count if needed), including typecheck, all tests, storyboard preview/QA, project validation, audio processing and studio build. No video render was required or run.
+- This remains deterministic rule-based guidance—not an LLM semantic critic or automatic repair loop.
+- Next: introduce a model/provider-neutral review interface only after defining input/output schemas and a no-cost/consent gate; alternatively first build a revision artifact format that preserves original plan, selected edits and validation results. Do not silently apply recommendations.
