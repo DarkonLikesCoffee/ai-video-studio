@@ -256,3 +256,11 @@ Append one entry per meaningful development session:
 - Final run passed typecheck, tests, plan validation, previews, critic report, all storyboard QA checks, project validation, FFmpeg/FFprobe, audio preparation and studio build. No render was performed because this is a pre-production review tool.
 - Main merge SHA: `c18b1be0e79f25e6b14b3d49838f31b9c683044d`.
 - Next: define a versioned revision artifact that preserves original plan, selected recommendations, applied edits and validation results. Then evaluate model-assisted semantic critique under an explicit no-paid-call constraint; do not implement auto-repair until review and rollback are auditable.
+
+
+## 2026-11-19 — Repository continuity snapshot reconciliation
+
+- Re-verified live main at `40ffe8fd8a21466fa4cca607ace6ecc422c7ab35`; latest main CI #44507106494 completed successfully; no open PRs.
+- Found `PROJECT_STATE.md` was stale and contradicted recent merged milestones. Replaced it with a current, evidence-based snapshot including PRs #66–#71 and explicit limits of the storyboard QA/critic tools.
+- Added the traceable storyboard revision artifact as a roadmap item: source plan, critique, selected suggestions, explicit edits and validation result, with original plan preserved.
+- This is documentation reconciliation only; no implementation or render was performed.
