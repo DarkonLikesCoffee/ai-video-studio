@@ -11,7 +11,9 @@ export type StoryboardRiskCode =
   | "VAGUE_ACTION"
   | "INCOMPLETE_VISUAL_PROGRESSION"
   | "REPEATED_VISUAL_DESCRIPTION"
-  | "TEXT_HEAVY_SHOT";
+  | "TEXT_HEAVY_SHOT"
+  | "LOW_SHOT_SCALE_VARIETY"
+  | "REPEATED_SHOT_SCALE";
 
 export type StoryboardRiskFinding = {
   code: StoryboardRiskCode;
@@ -56,6 +58,20 @@ const hasProgressionMarker = (value: unknown): boolean => {
   return /\b(start|begin|opening)\s*:/i.test(text)
     && /\b(development|develop|middle|progress)\s*:/i.test(text)
     && /\b(end|finish|final|resolve)\s*:/i.test(text);
+};
+
+
+const shotScale = (value: unknown): string | null => {
+  const text = normalize(value);
+  const patterns: Array<[string, RegExp]> = [
+    ["extreme-close-up", /\\b(extreme close[- ]?up|extreme macro)\\b/],
+    ["macro", /\\b(macro|detail shot|detail close[- ]?up)\\b/],
+    ["close-up", /\\b(close[- ]?up|tight shot)\\b/],
+    ["medium", /\\b(medium shot|mid shot|waist shot|medium close)\\b/],
+    ["wide", /\\b(wide shot|long shot|full shot|establishing shot|aerial wide)\\b/],
+  ];
+  for (const [scale, pattern] of patterns) if (pattern.test(text)) return scale;
+  return null;
 };
 
 const repeatedAdjacent = (
@@ -131,6 +147,17 @@ export const analyzeStoryboardRisks = (plan: unknown): StoryboardRiskFinding[] =
       });
     }
   });
+
+  const knownScales = shots.map((shot) => shotScale(shot.framing)).filter((scale): scale is string => scale !== null);
+  if (shots.length >= 5 && new Set(knownScales).size <= 2) {
+    findings.push({
+      code: "LOW_SHOT_SCALE_VARIETY",
+      severity: "warning",
+      shotIds: shots.map((shot, index) => getShotId(shot, index)),
+      message: `Only ${new Set(knownScales).size} recognizable shot scales appear across ${shots.length} shots. Review whether the sequence benefits from stronger scale contrast; unknown framings are excluded.`,
+    });
+  }
+  findings.push(...repeatedAdjacent(shots.map((shot) => ({ ...shot, __shotScale: shotScale(shot.framing) ?? "" })), "__shotScale" as "visualMethod", 3, "REPEATED_SHOT_SCALE", "shot scale"));
 
   findings.push(...repeatedAdjacent(shots, "visualMethod", 3, "REPEATED_VISUAL_METHOD", "visual method"));
   findings.push(...repeatedAdjacent(shots, "framing", 2, "REPEATED_FRAMING", "framing"));
