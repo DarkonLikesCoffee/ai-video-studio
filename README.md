@@ -837,3 +837,18 @@ npm run storyboard:beats -- projects/examples/production-plan.json beats.json --
 ```
 
 The report groups tagged shots, totals their durations, shows untagged shots and offers review prompts for missing opening/development/payoff labels when at least 60% of a sequence of three or more shots is labeled. These are optional creative guidelines—not validation errors or an approval score. Formats that do not use a conventional narrative arc may omit tags or ignore the prompts.
+
+
+## Creative brief contract (AI Production Director groundwork)
+
+Before a storyboard, capture the video's objective, audience, desired response, creative thesis, emotional arc, visual language, storytelling strategy, motion, sound and production-method strategy in a model-neutral JSON creative brief. The version-1 schema is `schemas/creative-brief.schema.json`; a sample is `projects/examples/creative-brief.json`.
+
+
+Validate and render a Markdown summary:
+
+```bash
+npm run director:brief -- projects/examples/creative-brief.json
+npm run director:brief -- projects/examples/creative-brief.json creative-brief-summary.md
+```
+
+This is a contract/validation stage, not an autonomous LLM director. It does not generate the brief, storyboard or assets.
