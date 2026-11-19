@@ -147,7 +147,7 @@ const parseSilenceIntervals = (output: string, mediaDurationSeconds: number) => 
     /silence_start:\s*(-?[0-9.]+)[\s\S]*?silence_end:\s*([0-9.]+)/g,
   );
   const starts = [...output.matchAll(/silence_start:\s*(-?[0-9.]+)/g)];
-  const ends = [...output.matchAll(/silence_end:\s*([0-9.]+)/g)];
+  const ends = [...output.matchAll(/silence_end:\s*(-?[0-9.]+)/g)];
   const lastStart = starts.length ? Number(starts[starts.length - 1]![1]) : undefined;
   const lastEnd = ends.length ? Number(ends[ends.length - 1]![1]) : undefined;
   if (lastStart !== undefined && Number.isFinite(lastStart) &&
@@ -274,7 +274,7 @@ export const buildMediaQaReport = (
   }
 
   const loudnessSummary = audioLog.match(/Integrated loudness:\s*([^\n]+)/)?.[1]?.trim();
-  const truePeakMatch = audioLog.match(/True peak:\s*(?:Peak:\s*)?(-?[0-9.]+)\s*dBFS/i;
+  const truePeakMatch = audioLog.match(/True peak:\s*(?:Peak:\s*)?(-?[0-9.]+)\s*dBFS/i);
   const truePeakDbfs = truePeakMatch ? Number(truePeakMatch[1]) : undefined;
   if (truePeakDbfs !== undefined && Number.isFinite(truePeakDbfs)) {
     if (truePeakDbfs > config.maxTruePeakDbfs) {
