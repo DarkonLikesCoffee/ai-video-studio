@@ -400,9 +400,9 @@ Append one entry per meaningful development session:
 - Added tests for accepted import and rejection paths. CI is required before merge. No video render created.
 
 
-## 2026-11-19 — PR #90 merged; narrative beat review in PR #91
+## 2026-11-19 — PR #90 and #91 merged; narrative beat review completed
 
-- PR #90 `feat(storyboard): safely import revision edits from AI` merged as `8c3c2dbf1ca8a819c7203cc3d4572c1e4cccce2f` after CI run #44533984018 passed.
-- The initial CI failure was a literal escaped newline in a test plus an inverted allowlist condition. Both were corrected; regression coverage checks allowed fields, unsupported fields and duplicate shot edits.
-- New branch `feat/storyboard-narrative-beats` adds optional explicit `narrativeBeat` labels and a report/CLI grouping beat counts and duration, showing unlabeled shots and suggesting review for arc gaps. It does not infer story meaning or force a fixed structure.
-- No render was produced. CI pending for PR #91.
+- PR #90 `feat(storyboard): safely import revision edits from AI` merged as `8c3c2dbf1ca8a819c7203cc3d4572c1e4cccce2f` after CI run #44533984018 passed. Its first CI failure was corrected (test syntax and inverted allowlist logic); regression tests now cover permitted/unsupported fields and duplicate edits.
+- PR #91 `feat(storyboard): add explicit narrative beat review` merged as `85d1ab0fd4d211365e2dec2fb0213cdf4fda2296`; CI run #44534929322 passed after fixing a test fixture whose opening beat did not trigger the intended warning.
+- Production plans now optionally label shot beats; `storyboard:beats` reports counts, duration totals, unlabeled shots and arc review prompts. Example plan tags hook → development → reveal → payoff.
+- The report is explicit-label only, advisory and not semantic story QA. No render was produced for these planning-tool changes.
