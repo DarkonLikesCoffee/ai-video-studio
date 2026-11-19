@@ -62,6 +62,7 @@ export type AssetEvidenceReport = {
     unknownManifestShotIds: number;
   };
   shots: ShotEvidence[];
+  assets: AssetEvidence[];
   criteria: CriterionEvidence[];
   issues: Issue[];
 };
@@ -252,6 +253,7 @@ export const buildAssetEvidenceReport = async (
       unknownManifestShotIds: unknownShotIds.size,
     },
     shots,
+    assets,
     criteria,
     issues,
   };
