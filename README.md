@@ -775,3 +775,8 @@ The CLI refuses to proceed if the original source file changed or the embedded s
 ### True-peak audio QA
 
 The media QA report extracts EBU R128 true-peak readings from FFmpeg's `ebur128` summary when available. A reading above the recommended `-1.0 dBFS` threshold is reported as a warning; above `0.0 dBFS` is an error. Missing true-peak data is not treated as a pass or failure and is omitted from the report. These thresholds are configurable through `inspectMedia` options (`warningTruePeakDbfs`, `maxTruePeakDbfs`).
+
+
+### Trailing-silence detection
+
+Media QA now treats an unmatched final FFmpeg `silence_start` as an interval ending at the probed file duration (EOF). This catches audio that becomes silent and remains silent through the end of the video, even when FFmpeg does not emit a matching `silence_end` event. A zero-length interval at EOF is ignored.
