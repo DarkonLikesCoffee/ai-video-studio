@@ -188,5 +188,5 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - PR #88 `feat(storyboard): add revision selection and review workflow` merged as `5e7b019ce8487c7af067b4b8fe0ee1f9186f4fd3`.
 - PR CI passed and post-merge main CI run #44526796903 passed.
 - Revision artifacts support selecting/deselecting critique suggestions and generating a Markdown review without changing the source plan.
-- Live verified main commit: `5e7b019ce8487c7af067b4bfe0ee1f9186f4fd3`.
+- Live verified main commit: `5e7b019ce8487c7af067b4b8fe0ee1f9186f4fd3`.
 - No new video render was produced or inspected as part of PR #88.
