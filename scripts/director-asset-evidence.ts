@@ -54,6 +54,7 @@ export type AssetEvidenceReport = {
     partialCriteria: number;
     unlinkedCriteria: number;
     missingFiles: number;
+    assetsNotLocal: number;
     emptyFiles: number;
     unsafePaths: number;
     missingProvenance: number;
@@ -217,6 +218,7 @@ export const buildAssetEvidenceReport = async (
   }
 
   const missingFiles = assets.filter((asset) => asset.localStatus === "missing").length;
+  const assetsNotLocal = assets.filter((asset) => asset.localStatus === "not-local").length;
   const emptyFiles = assets.filter((asset) => asset.localStatus === "empty").length;
   const unsafePaths = assets.filter((asset) => asset.localStatus === "unsafe").length;
   const missingProvenance = assets.filter((asset) => asset.provenanceStatus === "missing").length;
@@ -248,6 +250,7 @@ export const buildAssetEvidenceReport = async (
       partialCriteria,
       unlinkedCriteria,
       missingFiles,
+      assetsNotLocal,
       emptyFiles,
       unsafePaths,
       missingProvenance,
