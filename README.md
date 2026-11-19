@@ -723,3 +723,14 @@ The pipeline writes `assets/audio/narration.wav` and `production/narration-align
 ### Custom narrated 3D composition benchmark
 
 The narrated explainer also registers `NarratedSkyExplainer`, a bespoke five-shot Three.js composition. It uses the same narration script/alignment workflow but consumes `projects/examples/narrated-explainer/composition.json` as composition metadata rather than the ProjectVideo scene schema. The render worker stages the original score and transition whoosh beside the generated narration, then supplies the timed subtitle cues as Remotion props. This benchmark deliberately uses a different visual scene for each chapter (solar-system wide shot, molecule macro, wavelength visualization, scattering particle field and a luminous horizon) rather than the reusable ProjectVideo title-card layout.
+
+
+## Storyboard planning preview
+
+Generate a reviewable HTML overview from a production plan before committing to asset production or a full render:
+
+```bash
+npm run storyboard:preview -- projects/<project>/production/production-plan.json /tmp/storyboard-review.html
+```
+
+The page presents shot order, time ranges, selected visual methods, concrete actions, start/development/end progression, framing, camera movement, transitions, text, asset references and audio cues. It is a **planning review artifact**, not an MP4, animated animatic, generated footage or semantic creative approval. It does not render or load referenced assets. Use it to review whether the authored sequence tells a coherent visual story before production.
