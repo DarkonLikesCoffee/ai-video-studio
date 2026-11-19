@@ -95,6 +95,19 @@ For projects that need authentic gameplay rather than illustrative diagrams, add
 
 The narration application now injects approved video assets into matching `ProjectVideo` scene IDs as muted full-frame backgrounds, retaining vector overlays and timed captions. Scene duration follows the narration-retimed timeline. Add manifest entries with `type: "user-provided-gameplay"`, a local `file`, `shotIds`, and either `rightsBasis: "user-owned"` or `"permission-granted"` plus a meaningful `rightsNote`. User-supplied footage is not mislabeled as Creative Commons or public domain. Unmatched scenes retain their original visuals. The render artifact includes a credits/provenance text file.
 
+## Creative Brief → production-plan import
+
+Once a creative model returns a storyboard JSON following the director handoff contract, convert it into a validated production plan and preserve criterion-to-shot traceability:
+
+```bash
+npm run director:production-plan -- creative-brief.json storyboard.json production-plan.json
+npm run validate:plan -- production-plan.json
+npm run storyboard:preview -- production-plan.json storyboard-review.html
+npm run storyboard:qa -- production-plan.json
+```
+
+The importer requires the storyboard delivery settings to match the Creative Brief, all required shot descriptions, frame-aligned contiguous timing that ends at the requested runtime, and a complete `acceptanceCoverage` map. Each entry uses the exact brief criterion text, one or more known shot IDs, and a short rationale. This is an authored traceability contract—not semantic proof that the shots actually satisfy the criterion. The importer maps free-form `engineApproach` notes to `implementationNotes` and preserves recognized engine enum values. It writes a separate production-plan JSON; it does not modify the brief or storyboard, create assets, or render video.
+
 ## Automated rendered-media QA
 
 After a render, run a technical diagnostic pass on the actual MP4:
