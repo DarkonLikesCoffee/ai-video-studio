@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` — PR #99 A/V stream start-offset diagnostic merged; required validate CI #44646093493 passed, post-merge main CI #44654418400 is in progress
-**Current development branch:** `test/media-qa-ffmpeg-offset-integration` (PR #100 open; CI pending). PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` from exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`; its required validate CI #44646093493 passed and post-merge main CI #44654418400 is in progress. PRs #95, #96, #97, #98 and #99 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed; PR #97 CI #44556330379 and post-merge main CI #44574582076 passed; PR #98 CI #44608513408 and post-merge main CI passed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
+**Last verified main commit:** `ad5746fbf07053116786b5d4c9c8c1a72137296a` — PR #100 real-MP4 A/V offset integration merged; PR CI #44654898138 passed (the integration test was skipped); post-merge main CI #44662134081 passed
+**Current development branch:** `test/media-qa-real-silence-fixtures` (PR #101 in progress). PR #100 merged as `ad5746fbf07053116786b5d4c9c8c1a72137296a`; CI #44654898138 succeeded, but log review showed its delayed-audio integration test was skipped because FFmpeg setup ran after `npm test`. Post-merge main CI #44662134081 passed. PR #101 moves FFmpeg setup/verification before tests and adds real-MP4 silence warning/error integration cases. PRs #95–#100 are merged. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -107,7 +107,7 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 7. Verified current repository snapshot — 2026-11-20
 
-- Main HEAD: `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` (PR #99 A/V stream start-offset diagnostic merged; main CI #44654418400 is in progress).
+- Main HEAD: `ad5746fbf07053116786b5d4c9c8c1a72137296a` (PR #100 merged; PR #100 CI #44654898138 passed but the FFmpeg-backed integration test was skipped; post-merge main CI #44662134081 passed).
 - PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
 - PRs #66–#77 are merged.
 - A real MP4 from render run #44485488551 (artifact #14511125907) was retrieved and inspected with a contact sheet. Its bundled media-QA report passed with no detected silence, frozen video, black frames or audio/video duration drift beyond thresholds. See the new benchmark entry in `PROGRESS_LOG.md`.
@@ -129,10 +129,11 @@ These features are deterministic and heuristic. They do not semantically underst
 
 ## 8. Immediate development direction
 
-The traceable storyboard revision workflow through PRs #88–#90 remains implemented, with explicit narrative-beat review (#91), Creative Brief → storyboard handoff (#95), storyboard-to-production-plan import (#97) and criterion-to-asset evidence report (#98) now merged. The report is review-only and does not establish semantic asset relevance.
+The traceable storyboard revision workflow through PRs #88–#90 remains implemented, with explicit narrative-beat review (#91), Creative Brief → storyboard handoff (#95), storyboard-to-production-plan import (#97) and criterion-to-asset evidence report (#98) merged. The report is review-only and does not establish semantic asset relevance.
 
 
-The criterion→shot→asset evidence bridge (PR #98) and the independent signed A/V stream-start-offset check (PR #99) are merged. PR #99 required CI #44646093493 passed on its exact head; post-merge main CI #44654418400 is still running. The next P0 slice is PR #100: an FFmpeg-generated real MP4 integration regression that exercises the actual `inspectMedia` pipeline with late audio while stream-duration drift remains under threshold. This strengthens technical QA, but timestamps do not prove narration/SFX alignment with visual events or creative acceptance.
+PR #99 added signed A/V stream start-offset diagnostics; PR #100 added a real MP4 late-audio integration test, but CI log #44654898138 revealed that test was skipped because FFmpeg setup was placed after `npm test`. PR #101 fixes the test-ordering gate and adds real MP4 silence-warning and excessive-silence failure cases. This is the highest-priority actionable QA follow-up: verify the real-media tests execute, not merely that the test suite exits green.
+
 
 ## Resume checklist
 
@@ -245,13 +246,15 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 
 ## 2026-11-20 — A/V stream start-offset diagnostics (PR #99 merged)
 
-- PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8`; required validate CI #44646093493 passed on exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`. Post-merge main CI #44654418400 is in progress.
+- PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8`; required validate CI #44646093493 passed on exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`. Post-merge main CI #44654418400 passed.
 - Reports signed audio-minus-video first-stream `start_time` offset, with a configurable 0.5s default hard-failure threshold separate from duration drift. Missing timestamps are omitted rather than guessed.
 - Regression tests cover aligned starts, late and early audio with equal stream durations, threshold configuration and missing timestamps. No render gate applies; no local test run, full playback or audio listening was performed.
 
 
-## 2026-11-20 — Real MP4 start-offset integration test (PR #100 pending)
+## 2026-11-20 — PR #100 merged; integration test initially skipped
 
-- PR #100 on `test/media-qa-ffmpeg-offset-integration` adds a generated 3.6-second MP4 with 0.65s delayed audio and calls the real `inspectMedia` pipeline. It asserts that the start-offset finding is raised while stream-duration drift stays below 0.5s.
-- FFmpeg/FFprobe fixture recipe was manually verified: video start `0.000000`, audio start `0.628000`, stream durations `3.600000` and `3.621333` (0.021333s drift); the diagnostic filters produced no silence/freeze/black findings. The repository integration test itself has not yet run locally; CI is pending.
-- This is QA integration hardening only; no render, full playback or audio listening was performed.
+- PR #100 merged as `ad5746fbf07053116786b5d4c9c8c1a72137296a`; its required CI run #44654898138 passed and post-merge main CI #44662134081 passed.
+- Log inspection showed `npm test` reported 216 passing and 1 skipped; subtest 57, “inspectMedia detects delayed audio in a real MP4…”, was skipped because FFmpeg setup ran after the test step. Therefore the test code was not actually exercised in CI on PR #100.
+- PR #101 moves FFmpeg setup and version verification ahead of `npm test` and adds real MP4 silence fixtures to verify moderate silence is a warning and excessive silence is a hard error.
+- Fixture recipes were manually tested with FFmpeg/FFprobe: the warning case measured 1.215667s of silence; the error case measured 2.516979s. Both used aligned audio/video streams and emitted no freeze/black findings. Repository integration tests await CI.
+- No render gate applies to this test-only workflow correction. No full playback or audio listening was performed.
