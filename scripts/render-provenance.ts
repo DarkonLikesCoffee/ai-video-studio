@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { readFile, stat, writeFile } from "node:fs/promises";
-import { basename, dirname, resolve } from "node:path";
+import { basename, dirname, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 type JsonRecord = Record<string, unknown>;
@@ -22,7 +22,7 @@ const asRecord = (value: unknown): JsonRecord => isRecord(value) ? value : {};
 const stringValue = (value: unknown): string | undefined => typeof value === "string" && value.trim() ? value : undefined;
 const numberValue = (value: unknown): number | undefined => typeof value === "number" && Number.isFinite(value) ? value : undefined;
 
-export const sha256File = (filePath: string): Promise<string> =>
+export const normalizeArtifactPath = (filePath: string, workspace = process.cwd()): string =>\n  relative(resolve(workspace), resolve(workspace, filePath)).replace(/\\\\/g, "/");\n\nexport const sha256File = (filePath: string): Promise<string> =>
   new Promise((resolveHash, reject) => {
     const hash = createHash("sha256");
     const stream = createReadStream(filePath);
@@ -172,7 +172,8 @@ const main = async () => {
   const contactSheetReportPath = resolve(process.env.CONTACT_SHEET_REPORT_PATH ?? `render-output/review/${outputName}.contact-sheet.json`);
   const creditsPath = resolve(process.env.CREDITS_PATH ?? `render-output/${outputName}-credits.txt`);
   const manifestPath = resolve(process.env.PROVENANCE_MANIFEST_PATH ?? `render-output/${outputName}.provenance.json`);
-  const artifactPath = (path: string) => path.replace(/\\/g, "/");
+  const workspacePath = resolve(process.env.GITHUB_WORKSPACE ?? process.cwd());
+  const artifactPath = normalizeArtifactPath;
 
   const files = await collectArtifactFiles([
     { filePath: outputPath, artifactPath: `render-output/${outputName}.mp4`, required: true },
