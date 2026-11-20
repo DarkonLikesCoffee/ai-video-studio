@@ -24,19 +24,19 @@
         "src": "assets/01-arm-blueprint.svg",
         "placement": "right",
         "fit": "contain",
-        "opacity": 0.94,
+        "opacity": 0.97,
         "zIndex": 1,
         "animations": {
           "x": {
             "keyframes": [
               {
                 "frame": 0,
-                "value": 65,
+                "value": 62,
                 "easing": "ease-out"
               },
               {
                 "frame": 120,
-                "value": 57
+                "value": 54
               }
             ]
           },
@@ -44,12 +44,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -57,12 +57,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -81,155 +81,7 @@
           }
         }
       },
-      "graphics": [
-        {
-          "id": "pressure-line-a",
-          "type": "path",
-          "x": 56,
-          "y": 12,
-          "width": 39,
-          "height": 76,
-          "d": "M0 0 L48 48 L100 0",
-          "stroke": "#FF4655",
-          "strokeWidth": 2.8,
-          "opacity": 0.75,
-          "lineCap": "round",
-          "animations": {
-            "pathProgress": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 0,
-                  "easing": "ease-out"
-                },
-                {
-                  "frame": 110,
-                  "value": 1
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "pressure-line-b",
-          "type": "path",
-          "x": 56,
-          "y": 12,
-          "width": 39,
-          "height": 76,
-          "d": "M0 100 L48 48 L100 100",
-          "stroke": "#FF4655",
-          "strokeWidth": 2.8,
-          "opacity": 0.65,
-          "lineCap": "round",
-          "animations": {
-            "pathProgress": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 0,
-                  "easing": "ease-out"
-                },
-                {
-                  "frame": 110,
-                  "value": 1
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "hook-reticle",
-          "type": "ellipse",
-          "x": 72,
-          "y": 32,
-          "width": 12,
-          "height": 20,
-          "stroke": "#FFFFFF",
-          "strokeWidth": 1.5,
-          "opacity": 0.7,
-          "animations": {
-            "rotation": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": -20
-                },
-                {
-                  "frame": 180,
-                  "value": 25
-                }
-              ]
-            },
-            "scaleX": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 0.8
-                },
-                {
-                  "frame": 180,
-                  "value": 1.1
-                }
-              ]
-            },
-            "scaleY": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 0.8
-                },
-                {
-                  "frame": 180,
-                  "value": 1.1
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "hook-tag",
-          "type": "text",
-          "x": 61,
-          "y": 82,
-          "width": 32,
-          "height": 5,
-          "text": "THE ROUND IS BIGGER THAN THE DUEL",
-          "fill": "#FF8790",
-          "fontSize": 17,
-          "fontWeight": 800,
-          "fontFamily": "Arial, Helvetica, sans-serif",
-          "letterSpacing": 2,
-          "opacity": 0,
-          "animations": {
-            "opacity": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 0
-                },
-                {
-                  "frame": 18,
-                  "value": 1
-                }
-              ]
-            },
-            "y": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 85,
-                  "easing": "ease-out"
-                },
-                {
-                  "frame": 32,
-                  "value": 82
-                }
-              ]
-            }
-          }
-        }
-      ],
+      "graphics": [],
       "particleSystems": [
         {
           "id": "opening-sparks",
@@ -278,19 +130,19 @@
         "src": "assets/02-anatomy.svg",
         "placement": "right",
         "fit": "contain",
-        "opacity": 0.94,
+        "opacity": 0.97,
         "zIndex": 1,
         "animations": {
           "x": {
             "keyframes": [
               {
                 "frame": 0,
-                "value": 65,
+                "value": 62,
                 "easing": "ease-out"
               },
               {
                 "frame": 120,
-                "value": 57
+                "value": 54
               }
             ]
           },
@@ -298,12 +150,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -311,12 +163,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -387,32 +239,6 @@
               ]
             }
           }
-        },
-        {
-          "id": "anatomy-label-biceps",
-          "type": "text",
-          "x": 61,
-          "y": 24,
-          "width": 30,
-          "height": 5,
-          "text": "BICEPS BRACHII",
-          "fill": "#F6B39A",
-          "fontSize": 20,
-          "fontWeight": 800,
-          "letterSpacing": 2
-        },
-        {
-          "id": "anatomy-label-brachialis",
-          "type": "text",
-          "x": 61,
-          "y": 78,
-          "width": 32,
-          "height": 5,
-          "text": "BRACHIALIS",
-          "fill": "#A8E2D4",
-          "fontSize": 20,
-          "fontWeight": 800,
-          "letterSpacing": 2
         }
       ],
       "particleSystems": [
@@ -467,19 +293,19 @@
         "src": "assets/03-curl.svg",
         "placement": "right",
         "fit": "contain",
-        "opacity": 0.94,
+        "opacity": 0.97,
         "zIndex": 1,
         "animations": {
           "x": {
             "keyframes": [
               {
                 "frame": 0,
-                "value": 65,
+                "value": 62,
                 "easing": "ease-out"
               },
               {
                 "frame": 120,
-                "value": 57
+                "value": 54
               }
             ]
           },
@@ -487,12 +313,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -500,12 +326,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -600,34 +426,6 @@
               ]
             }
           }
-        },
-        {
-          "id": "curl-rep-counter",
-          "type": "text",
-          "x": 65,
-          "y": 83,
-          "width": 30,
-          "height": 6,
-          "text": "CONTROL THE ECCENTRIC",
-          "fill": "#F8C9B3",
-          "fontSize": 17,
-          "fontWeight": 800,
-          "letterSpacing": 2,
-          "opacity": 0,
-          "animations": {
-            "opacity": {
-              "keyframes": [
-                {
-                  "frame": 0,
-                  "value": 0
-                },
-                {
-                  "frame": 35,
-                  "value": 1
-                }
-              ]
-            }
-          }
         }
       ],
       "particleSystems": [
@@ -682,19 +480,19 @@
         "src": "assets/04-incline.svg",
         "placement": "right",
         "fit": "contain",
-        "opacity": 0.94,
+        "opacity": 0.97,
         "zIndex": 1,
         "animations": {
           "x": {
             "keyframes": [
               {
                 "frame": 0,
-                "value": 65,
+                "value": 62,
                 "easing": "ease-out"
               },
               {
                 "frame": 120,
-                "value": 57
+                "value": 54
               }
             ]
           },
@@ -702,12 +500,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -715,12 +513,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -802,19 +600,6 @@
               ]
             }
           }
-        },
-        {
-          "id": "incline-tag",
-          "type": "text",
-          "x": 60,
-          "y": 84,
-          "width": 38,
-          "height": 5,
-          "text": "LONG-LENGTH POSITION",
-          "fill": "#EAD0B3",
-          "fontSize": 17,
-          "fontWeight": 800,
-          "letterSpacing": 2
         }
       ],
       "particleSystems": [
@@ -869,19 +654,19 @@
         "src": "assets/05-hammer.svg",
         "placement": "right",
         "fit": "contain",
-        "opacity": 0.94,
+        "opacity": 0.97,
         "zIndex": 1,
         "animations": {
           "x": {
             "keyframes": [
               {
                 "frame": 0,
-                "value": 65,
+                "value": 62,
                 "easing": "ease-out"
               },
               {
                 "frame": 120,
-                "value": 57
+                "value": 54
               }
             ]
           },
@@ -889,12 +674,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -902,12 +687,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -966,19 +751,6 @@
               ]
             }
           }
-        },
-        {
-          "id": "hammer-tag",
-          "type": "text",
-          "x": 60,
-          "y": 84,
-          "width": 39,
-          "height": 5,
-          "text": "NEUTRAL GRIP / NO SWING",
-          "fill": "#B7E8DE",
-          "fontSize": 16,
-          "fontWeight": 800,
-          "letterSpacing": 2
         }
       ],
       "particleSystems": [
@@ -1034,19 +806,19 @@
         "src": "assets/06-finale.svg",
         "placement": "right",
         "fit": "contain",
-        "opacity": 0.94,
+        "opacity": 0.97,
         "zIndex": 1,
         "animations": {
           "x": {
             "keyframes": [
               {
                 "frame": 0,
-                "value": 65,
+                "value": 62,
                 "easing": "ease-out"
               },
               {
                 "frame": 120,
-                "value": 57
+                "value": 54
               }
             ]
           },
@@ -1054,12 +826,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
@@ -1067,12 +839,12 @@
             "keyframes": [
               {
                 "frame": 0,
-                "value": 0.9,
+                "value": 0.82,
                 "easing": "ease-out"
               },
               {
                 "frame": 130,
-                "value": 1.04
+                "value": 0.91
               }
             ]
           },
