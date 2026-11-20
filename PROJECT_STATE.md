@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `d6e5314c320b01a24e8161f2ff59c7a313e03be3` — PR #103 merged; exact-head CI #44675048271 passed (226 tests passed, 0 failed, 0 skipped, FFmpeg/FFprobe verified); post-merge main CI #44681010124 passed
-**Current development branch:** `feat/render-provenance-manifest` (PR #104 in progress). PR #103 merged as `d6e5314c320b01a24e8161f2ff59c7a313e03be3`; exact-head CI #44675048271 passed with 226 tests and 0 skipped, confirming the CI-required media integration suite ran with FFmpeg/FFprobe. Post-merge main CI #44681010124 completed successfully. PR #104 adds a render provenance JSON manifest and post-upload artifact ID/URL/digest summary to the GitHub Actions render workflow. CI #44695855199 passed on code head `78d58e5febe56f1b42be1215828fb932e52c3938` (231 tests, 0 skipped, typecheck, validation and build); this documentation refresh requires a new CI run. No render has yet exercised the provenance workflow.
+**Last verified main commit:** `dd25e95c7853bc298f744e3eb6b5e891a66a9eba` — PR #104 merged; exact-head CI #44704302163 passed (231 tests passed, 0 failed, 0 skipped); post-merge main CI #44717786935 passed (231 tests passed, 0 failed, 0 skipped)
+**Current development branch:** `feat/render-asset-evidence-gate` (PR #105 in progress). PR #104 merged as `dd25e95c7853bc298f744e3eb6b5e891a66a9eba`; exact-head CI #44704302163 passed with 231 tests and 0 skipped, including typecheck, project validation and build. Post-merge main CI #44717786935 passed with 231 tests and 0 skipped. Render run #44717916331 is in progress on `fix/render-provenance-benchmark-v5` to exercise the provenance manifest on a real artifact; its result and artifact inspection are pending. PR #105 adds a strict criterion-to-asset evidence gate before rendering, corrects the VALORANT benchmark manifest's shot IDs/rights metadata, and includes the report in the provenance manifest; its CI and render validation are pending.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -107,7 +107,7 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 7. Verified current repository snapshot — 2026-11-20
 
-- Main HEAD: `d6e5314c320b01a24e8161f2ff59c7a313e03be3` (PR #103 merged; exact-head CI #44675048271 passed with 226 tests and 0 skipped; post-merge main CI #44681010124 passed).
+- Main HEAD: `dd25e95c7853bc298f744e3eb6b5e891a66a9eba` (PR #104 merged; exact-head CI #44704302163 passed with 231 tests and 0 skipped; post-merge main CI #44717786935 passed with 231 tests and 0 skipped).
 - PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
 - PRs #66–#77 are merged.
 - A real MP4 from render run #44485488551 (artifact #14511125907) was retrieved and inspected with a contact sheet. Its bundled media-QA report passed with no detected silence, frozen video, black frames or audio/video duration drift beyond thresholds. See the new benchmark entry in `PROGRESS_LOG.md`.
@@ -128,11 +128,12 @@ The next agent should use this project as a regression/quality case, not simply 
 These features are deterministic and heuristic. They do not semantically understand the story, inspect motion continuously, listen to the audio, or guarantee cinematic quality. A contact sheet is a sparse visual sample, not full-video creative approval. Do not claim a persistent autonomous Production Director or automatic repair loop exists.
 
 ## 8. Immediate development direction
-The traceable storyboard revision workflow through PRs #88–#90 remains implemented, with explicit narrative-beat review (#91), Creative Brief → storyboard handoff (#95), storyboard-to-production-plan import (#97) and criterion-to-asset evidence report (#98) merged. The report is review-only and does not establish semantic asset relevance.
+PR #104 is merged and its provenance code is validated by exact-head CI #44704302163 (231 passed, 0 failed, 0 skipped) and post-merge main CI #44717786935 (231 passed, 0 failed, 0 skipped). Render run #44717916331 on `fix/render-provenance-benchmark-v5` is still in progress; provenance has not yet been verified on the uploaded artifact.
 
-PR #99 added signed A/V stream-start-offset diagnostics; PR #100 added a real MP4 delayed-audio test whose CI run skipped it because FFmpeg setup followed `npm test`. PR #101 corrected the order and exact-head CI #44662651944 passed 219 tests, 0 failed, 0 skipped; post-merge main CI #44669560240 passed. PR #102 merged as `5483728b441847a7e9cd1ac7b7f659dc71d81dd6`; exact-head CI #44669898766 passed 223 tests with 0 skipped, including real-MP4 freeze and black-frame warning/error cases; post-merge main CI #44674647378 passed. PR #103 merged as `d6e5314c320b01a24e8161f2ff59c7a313e03be3`; exact-head CI #44675048271 passed 226 tests with 0 skipped and verified FFmpeg/FFprobe, preventing CI from silently skipping media integration tests. Post-merge main CI #44681010124 remains in progress.
+PR #105 (`feat/render-asset-evidence-gate`) is in progress. It adds a strict criterion→shot→asset evidence report before render, includes the report in the artifact and provenance manifest, and fixes the VALORANT asset-manifest shot IDs and rights metadata. CI and the v6 render gate are pending. The project-data regression stages placeholder files and validates mapping/metadata only; it does not decode the real media.
 
-PR #104 adds render provenance: the artifact will include a manifest linking source commit/ref, workflow run/attempt, render request and project identity, file hashes/sizes, Media QA measurements/findings and contact-sheet sample timestamps. The post-upload workflow summary records artifact ID, URL and digest. No render has yet exercised the new provenance workflow.
+No full playback or audio listening was performed during this work.
+
 
 ## Resume checklist
 
