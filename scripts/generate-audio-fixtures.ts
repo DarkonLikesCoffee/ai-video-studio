@@ -208,7 +208,7 @@ await writeMonoWav(resolve(soraDirectory, "score.wav"), soraDuration, (time) => 
 
 
 const madridTravelDirectory = resolve("packages/video-engine/public/audio");
-const madridTravelDuration = 30;
+const madridTravelDuration = 24;
 const madridTravelChords = [
   [110, 164.81, 220, 261.63],
   [98, 146.83, 196, 246.94],
@@ -217,7 +217,7 @@ const madridTravelChords = [
 ];
 await writeMonoWav(resolve(madridTravelDirectory, "madrid-travel-score.wav"), madridTravelDuration, (time) => {
   const fadeIn = Math.min(1, time / 2.2);
-  const fadeOut = Math.min(1, (madridTravelDuration - time) / 2.5);
+  const fadeOut = Math.min(1, (madridTravelDuration - time) / 2.2);
   const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
   const chord = madridTravelChords[Math.min(3, Math.floor(time / 7.5))]!;
   const pad = chord.reduce((sum, frequency, index) => {
