@@ -39,8 +39,11 @@ const scaleTimelineValue = (value: unknown, ratio: number, parentKey = ""): unkn
   }
   if (typeof value !== "object" || value === null) return value;
 
+  const record = value as Record<string, unknown>;
   return Object.fromEntries(
-    Object.entries(value as Record<string, unknown>).map(([key, child]) => {
+    Object.entries(record).map(([key, child]) => {
+      // Cut transitions are structural boundaries, not timed effects. Retiming must preserve zero.
+      if (record.type === "cut" && key === "durationInFrames") return [key, 0];
       if (typeof child === "number" && FRAME_FIELDS.has(key)) {
         return [key, scaleFrameValue(child, ratio, key)];
       }
