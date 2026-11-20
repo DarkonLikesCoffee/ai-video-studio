@@ -142,9 +142,10 @@ export const validateProductionPlan = (value: unknown): string[] => {
   if (!Array.isArray(plan.shots) || plan.shots.length === 0 || plan.shots.length > 80) {
     errors.push("shots must contain between 1 and 80 entries.");
   } else if (totalDurationSeconds !== null) {
+    const shots = plan.shots;
     const ids = new Set<string>();
     let previousStart = -1;
-    plan.shots.forEach((shot, index) => {
+    shots.forEach((shot, index) => {
       if (!isRecord(shot)) {
         errors.push(`shots[${index}] must be an object.`);
         return;
@@ -160,7 +161,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
       if (!Number.isFinite(duration) || duration <= 0) errors.push(`shots[${index}].durationSeconds must be greater than zero.`);
       if (Number.isFinite(start) && start < previousStart) errors.push("shots must be ordered by startSeconds.");
       if (index > 0 && Number.isFinite(start)) {
-        const previousShot = plan.shots[index - 1];
+        const previousShot = shots[index - 1];
         if (isRecord(previousShot)) {
           const previousEnd = Number(previousShot.startSeconds) + Number(previousShot.durationSeconds);
           if (Number.isFinite(previousEnd) && Math.abs(start - previousEnd) > 1e-6) {
@@ -183,8 +184,8 @@ export const validateProductionPlan = (value: unknown): string[] => {
       if (shot.implementationNotes !== undefined && (typeof shot.implementationNotes !== "string" || shot.implementationNotes.length > 500)) errors.push(`shots[${index}].implementationNotes must be a string of at most 500 characters.`);
       if (shot.assets !== undefined && (!Array.isArray(shot.assets) || shot.assets.some((asset) => typeof asset !== "string" || asset.length > 120))) errors.push(`shots[${index}].assets must be an array of strings (each at most 120 characters).`);
     });
-    const first = plan.shots[0];
-    const last = plan.shots[plan.shots.length - 1];
+    const first = shots[0];
+    const last = shots[shots.length - 1];
     if (first && Number(first.startSeconds) !== 0) errors.push("The first shot must start at 0 seconds.");
     if (last && Number.isFinite(Number(last.startSeconds)) && Number.isFinite(Number(last.durationSeconds)) &&
         Math.abs(Number(last.startSeconds) + Number(last.durationSeconds) - totalDurationSeconds) > 1e-6) {
