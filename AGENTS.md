@@ -22,6 +22,18 @@ Help build AI Video Studio into a prompt-to-finished-video production system. Do
 - Do not ask whether to merge. Merge when required CI, render and quality gates pass. If a gate fails, diagnose and fix it first.
 - Do not hide failures, skip failed tests, weaken validation merely to get green CI, or call a failed/partial run successful.
 
+## Render discipline — mandatory
+
+- **A normal project commit is a development checkpoint, not permission to render.** The Render video workflow is triggered by changes to `render-request.json`; do not edit or commit that file during ordinary build iterations.
+- Build the entire selected video first: creative brief, direction, storyboard/production plan, assets and rights/provenance, scene/composition, narration, timing, transitions, captions and audio.
+- During BUILD/ITERATION, use non-render checks only: tests, typecheck, project validation, production-plan validation, asset-evidence validation, storyboard/QA reports and previews. Fix every blocking issue before requesting a render.
+- Do not create a render request until you have explicitly reviewed the complete project and declared the candidate **RENDER-READY**. A render request is a deliberate production action, not a progress update or debugging probe.
+- Before requesting a render, validate the exact candidate and confirm: all files are committed; no planned edits remain; project path/composition/narration paths are correct; plan duration and frame count agree; shots are contiguous, frame-aligned and end exactly at delivery duration; all asset references resolve; asset evidence/rights checks pass; project and narration validation pass; and request ID is unique.
+- **One render request per frozen candidate commit.** Record the candidate commit SHA and request ID. Do not change the project while that render is running. Do not create another request just because the first is still queued or running.
+- If a render fails, inspect its logs and QA evidence first. Make only the necessary fixes, run all non-render checks again, commit the corrected candidate, and request another render only when the corrected candidate is render-ready. Never rerun the same request or make speculative render attempts to discover errors that local/CI validation can catch.
+- After a render completes, download and inspect that exact artifact. A successful job is not creative acceptance. For a QA failure, use the actual QA findings to drive a targeted revision.
+- Keep render-request commits out of the build loop. Avoid repeatedly updating `render-request.json` to trigger CI or renders.
+
 ## Definition of done
 
 For code changes: relevant tests, typecheck, validation and CI pass; the implementation matches its documentation.
