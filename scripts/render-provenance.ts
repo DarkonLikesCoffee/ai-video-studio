@@ -152,7 +152,7 @@ export const buildRenderProvenance = (input: {
       source: summarizeProject(input.sourceProject, input.sourceProjectPath),
       rendered: summarizeProject(input.renderProject, input.renderProjectPath),
     },
-    artifact: { name: input.request.outputName, files: input.files },
+    artifact: { name: input.request.outputName, manifestPath: `${input.request.outputName}.provenance.json`, files: input.files },
     mediaQa: summarizeMediaQa(input.mediaQa, input.mediaQaPath),
     contactSheet: summarizeContactSheet(input.contactSheet, input.contactSheetImagePath, input.contactSheetReportPath),
   };
@@ -179,11 +179,11 @@ const main = async () => {
   const artifactPath = (path: string) => normalizeArtifactPath(path, workspacePath);
 
   const files = await collectArtifactFiles([
-    { filePath: outputPath, artifactPath: `render-output/${outputName}.mp4`, required: true },
-    { filePath: mediaQaPath, artifactPath: `render-output/${outputName}.qa.json`, required: true },
-    { filePath: contactSheetImagePath, artifactPath: `render-output/review/${outputName}.contact-sheet.jpg`, required: true },
-    { filePath: contactSheetReportPath, artifactPath: `render-output/review/${outputName}.contact-sheet.json`, required: true },
-    { filePath: creditsPath, artifactPath: `render-output/${outputName}-credits.txt`, required: false },
+    { filePath: outputPath, artifactPath: `${outputName}.mp4`, required: true },
+    { filePath: mediaQaPath, artifactPath: `${outputName}.qa.json`, required: true },
+    { filePath: contactSheetImagePath, artifactPath: `review/${outputName}.contact-sheet.jpg`, required: true },
+    { filePath: contactSheetReportPath, artifactPath: `review/${outputName}.contact-sheet.json`, required: true },
+    { filePath: creditsPath, artifactPath: `${outputName}-credits.txt`, required: false },
   ]);
 
   const sourceProject = await readOptionalJson(sourceProjectPath);
@@ -213,10 +213,10 @@ const main = async () => {
     renderProject,
     files,
     mediaQa,
-    mediaQaPath: artifactPath(mediaQaPath),
+    mediaQaPath: `${outputName}.qa.json`,
     contactSheet,
-    contactSheetImagePath: artifactPath(contactSheetImagePath),
-    contactSheetReportPath: artifactPath(contactSheetReportPath),
+    contactSheetImagePath: `review/${outputName}.contact-sheet.jpg`,
+    contactSheetReportPath: `review/${outputName}.contact-sheet.json`,
   });
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf8");
   process.stdout.write(`Render provenance manifest: ${manifestPath}\n`);
