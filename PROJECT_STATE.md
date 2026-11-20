@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `3f3dd846e59a02c0d0f9101ced794ee87357d2e3` — PR #105 merged; post-merge CI #44749739555 passed.  
-**Current development branch:** `fix/benchmark-duration-contract-v2` — head `d914fa18249c009cc449e7410f501ee0e866da72`, 12 commits ahead of main, 0 behind. Branch CI #44750874075 passed: 234 tests, 0 failed, 0 skipped; typecheck, project validation and studio build passed.
+**Last verified main commit:** `e64278320c3e59695f5f8cd1ba6170c4104f158b` — verified 2026-11-20 as the current `main` branch head.  
+**Current development branch:** `feat/solar-system-orbital-motion` — head `a0d930cd49efcc128a47b3f077aee08d00e8db9e`, based on main `e64278320c3e59695f5f8cd1ba6170c4104f158b`; PR #113 is open and mergeable. Latest CI #44776295360 passed: 242 tests, 0 failed, 0 skipped; typecheck and studio build passed.
 
 PR #105 added the strict production asset-evidence gate and merged as `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`. Its exact-head CI #44719701055 passed 233 tests with 0 skipped. Render v6 (#44719959584, artifact #14622220762) proved the gate reports `ready` for the benchmark: 6/6 acceptance criteria linked, 18 assets, and zero unresolved refs, missing files, unsafe paths, rights/provenance gaps or issues.
 
@@ -13,6 +13,18 @@ The current branch fixes the previously verified 60-second plan versus 47.899-se
 The v7 contact sheet was inspected at 5-second intervals (12 sampled frames). It shows the supplied gameplay clips across all six chapters, but large chapter headlines remain overlaid on gameplay. This is evidence of scene coverage, not full playback or listening; creative acceptance remains open pending a complete audio/video review and likely typography/pacing refinement.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
+
+## Latest verified update — 2026-11-20 — Solar System Orbital Motion (PR #113)
+
+- Added two Remotion compositions in `packages/video-engine`: `SolarSystemOrbitalMotion` (1920×1080, 30fps, 900 frames, 30 seconds, one Earth mean-longitude orbital period) and `InnerPlanets` (Mercury–Mars, 2.5× zoom, 90 simulated days).
+- The custom Canvas 2D renderer draws 500 deterministic stars, the Sun, eight gradient/glow planets, circular orbit guides, Saturn's rings, Earth's Moon, permanent HTML title/subtitle and a 2025 date pill. The simulation uses NASA/JPL approximate J2000 mean-longitude values/rates; Earth uses the JPL Earth–Moon barycenter row. It is a stylized circular-orbit visualization, not a precision ephemeris.
+- CI run #44776295360 passed: 242 tests, 0 failures, 0 skipped; TypeScript typecheck, FFmpeg integration tests and studio build completed successfully.
+- Render run #44776287685 succeeded from commit `a0d930cd49efcc128a47b3f077aee08d00e8db9e`; final artifact #14649538324 (`solar-system-orbital-motion`) contains the MP4, Media QA, contact sheet and provenance manifest.
+- Media QA passed with no findings: H.264 1920×1080, 30fps, 900 frames, 30.000s video; AAC stereo 96kHz, 30.100s audio; A/V duration drift 0.100s, start offset 0s; no detected silence, frozen intervals or black intervals; integrated loudness −18.1 LUFS and true peak −9.2 dBFS. MP4 SHA-256: `66715c82917303530ceca325a47194dc1ce741e9165ba674da48da59d8f7559e`.
+- Inspected the generated 7-frame contact sheet (0–30s, 5s interval) and separate start/middle/end frames. They show the full composition and changing orbital positions. This is sampled visual review, not complete frame-by-frame playback; the soundtrack was measured by Media QA but not independently listened to.
+- The first render attempt (#44775795697) completed Remotion but failed at the audio-mastering step because of an escaped workflow variable. The output was preserved pre-QA; the workflow variable was corrected and the v2 render above completed all gates successfully.
+- PR: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/113. Render: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44776287685. CI: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44776295360.
+
 
 ## 1. Product vision
 
