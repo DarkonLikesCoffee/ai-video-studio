@@ -279,3 +279,12 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 - PR #102 adds four generated-MP4 integration cases through `inspectMedia`: short freeze (warning/pass), excessive freeze (error/fail), short black interval (warning/pass), and excessive black interval (error/fail). Tests assert only the intended finding, continuous audio, aligned stream starts and duration drift below the independent threshold.
 - FFmpeg/FFprobe fixture recipes were manually executed on version 7.1.5: frozen intervals measured 2.0s and 3.0s; black intervals measured 0.8s and 1.4s. The repository tests/typecheck are not run locally through this connector-only workflow; CI is pending.
 - No video render, full playback or audio listening is applicable to these test-only changes.
+
+
+## 2026-11-20 — Solar System orbital-motion benchmark (PR #113)
+
+- Implemented a reusable procedural Canvas 2D scientific-visualization composition with JPL-based mean-longitude motion, deterministic stars, eight planets, Sun, Moon, labels, orbit guides, fixed title/date overlays and an original generated soundtrack.
+- Registered both \`SolarSystemOrbitalMotion\` (one Earth mean-longitude year, 30 seconds) and \`InnerPlanets\` (90 days, 2.5× zoom).
+- Exact-head CI #44776295360 passed (242 tests, no failures or skips; typecheck and build passed). Render #44776287685 and Media QA passed; artifact #14649538324 contains the MP4, report and contact sheet.
+- The contact sheet plus start/middle/end frames were sampled and inspected. Full continuous playback and independent audio listening were not performed. This verifies this specific procedural 2D composition, not a general prompt-to-video director or precision astronomical ephemeris.
+- PR: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/113
