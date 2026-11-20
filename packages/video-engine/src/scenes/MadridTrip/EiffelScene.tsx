@@ -34,11 +34,11 @@ export const EiffelScene: React.FC = () => {
     ...clamp,
     easing: Easing.inOut(Easing.cubic),
   });
-  const dolly = interpolate(frame, [0, durationInFrames], [20, 15.5], {
+  const dolly = interpolate(frame, [0, durationInFrames], [22, 19.5], {
     ...clamp,
     easing: Easing.out(Easing.cubic),
   });
-  const camY = interpolate(frame, [0, 150], [8, 4.8], {
+  const camY = interpolate(frame, [0, 150], [7.5, 5.6], {
     ...clamp,
     easing: Easing.out(Easing.cubic),
   });
