@@ -563,3 +563,13 @@ Append one entry per meaningful development session:
 - Render run #44717916331 is in progress on `fix/render-provenance-benchmark-v5`; it uses the v5 request on the merged provenance code to validate the manifest on a real artifact. No artifact has been inspected yet.
 - PR #105 (`feat/render-asset-evidence-gate`) adds a strict pre-render asset-evidence report for projects with a production plan and manifest, includes the report in upload/provenance, corrects the VALORANT benchmark SVG shot IDs and rights metadata, and adds a fixture regression that checks all criterion/asset links. CI and a render using the new gate are pending.
 - The project regression stages placeholder files, so it validates mapping and metadata rather than media decoding or creative suitability. No full playback or audio listening was performed.
+
+
+## 2026-11-20 — Render v5 provenance verified; QA findings
+
+- Render run #44717916331 succeeded on `fix/render-provenance-benchmark-v5`. Artifact #14620562670 (`valorant-immortal-decision-making-v5`) was downloaded and inspected; the ZIP contains the 46,763,460-byte MP4, Media QA JSON, contact-sheet image/report and provenance manifest. ZIP SHA-256: `561a072317938846649988b74fc45f01a7a1ae6295b3e49e5023008dbc9053f0`. Artifact link: https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44717916331/artifacts/14620562670
+- Media QA passed: 1920×1080 H.264, 30 fps, 1,432 frames; AAC stereo 96 kHz; audio 47.856 s and video stream 47.733 s (0.123 s duration drift, 0 s start offset); no detected silence, freeze or black intervals; integrated loudness −16.0 LUFS and true peak −1.4 dBFS.
+- The provenance manifest was verified against source commit `0189ca97c40d7a34447193ff46deb028c9781c34`, request ID `valorant-immortal-gameplay-integration-v5`, run #44717916331, file sizes/hashes, QA and contact-sheet samples. The upload digest and artifact ID/URL were recorded in the workflow summary.
+- A 1-fps contact sheet (48 frames) was inspected. It shows real gameplay under persistent chapter-title overlays and six chapter transitions. This is not full video playback or audio listening; creative acceptance remains pending.
+- **Duration defect:** the project and production plan specify 60 s (six 10 s scenes), but v5 is 47.856 s. The video stream is 47.733 s and the audio stream 47.856 s. Investigate whether audio mastering trims to the shorter narration and add an expected-duration check. Do not claim the previous silence source is fixed; v5 simply reports no detected silence intervals.
+- PR #105 adds the strict asset-evidence gate and corrected shot/rights mapping. Its CI and render v6 validation remain pending; v5 predates the gate and therefore does not contain an asset-evidence report.
