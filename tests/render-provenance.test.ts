@@ -4,7 +4,25 @@ import { createHash } from "node:crypto";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { buildRenderProvenance, collectArtifactFiles, normalizeArtifactPath, summarizeMediaQa } from "../scripts/render-provenance";
+import { buildRenderMetadata, buildRenderProvenance, collectArtifactFiles, normalizeArtifactPath, summarizeMediaQa } from "../scripts/render-provenance";
+
+test("workflow metadata omits unavailable environment values", () => {
+  const metadata = buildRenderMetadata({
+    repository: "owner/repo",
+    commit: undefined,
+    ref: "refs/heads/main",
+    branch: "main",
+    runId: undefined,
+    runAttempt: "1",
+    runUrl: "",
+  });
+  assert.deepEqual(metadata, {
+    repository: "owner/repo",
+    ref: "refs/heads/main",
+    branch: "main",
+    runAttempt: "1",
+  });
+});
 
 test("render provenance records source, request, project, artifact hashes and QA", () => {
   const mediaQa = {
