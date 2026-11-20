@@ -37,7 +37,7 @@ Define how an AI agent turns a natural-language brief into a finished video usin
 7. Map the storyboard into the existing project schema. If a requested shot needs unsupported 3D or other features, decide whether to implement a reusable engine feature or choose a different visual solution.
 8. Validate before rendering. Do not render all showcase videos for a project-specific change.
 9. Render only the selected output.
-10. Download and inspect the exact MP4 artifact from that run. Generate contact sheets and keyframes, and watch the full video if playback is available.
+10. Download and inspect the exact MP4 artifact from that run. Read the included `*.provenance.json` manifest and workflow summary for source commit, request/project IDs, workflow run/attempt, artifact ID/URL/digest and QA-report linkage. Generate contact sheets and keyframes, and watch the full video if playback is available.
 11. Apply Visual QA. If it fails, change the fewest high-impact things and rerender.
 
 ## Current capability truth

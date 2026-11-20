@@ -180,7 +180,16 @@ jobs:
           PROJECT_DIR="$(dirname "$PROJECT_PATH")"
           npx tsx scripts/write-footage-credits.ts "$PROJECT_DIR/production/asset-manifest.json" "render-output/$OUTPUT_NAME-credits.txt"
 
+      - name: Generate render provenance manifest
+        if: steps.request.outputs.provider == 'github-actions'
+        env:
+          SOURCE_PROJECT_PATH: ${{ steps.request.outputs.project_path }}
+          RENDER_PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+        run: npm run render:provenance
+
       - name: Upload MP4 artifact
+        id: render-artifact
         if: steps.request.outputs.provider == 'github-actions'
         uses: actions/upload-artifact@v4
         with:
@@ -191,8 +200,29 @@ jobs:
             render-output/${{ steps.request.outputs.output_name }}.qa.json
             render-output/review/${{ steps.request.outputs.output_name }}.contact-sheet.jpg
             render-output/review/${{ steps.request.outputs.output_name }}.contact-sheet.json
+            render-output/${{ steps.request.outputs.output_name }}.provenance.json
           if-no-files-found: error
           retention-days: 3
+
+      - name: Write render artifact summary
+        if: steps.request.outputs.provider == 'github-actions'
+        env:
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+          REQUEST_ID: ${{ steps.request.outputs.request_id }}
+          ARTIFACT_ID: ${{ steps.render-artifact.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.render-artifact.outputs.artifact-url }}
+          ARTIFACT_DIGEST: ${{ steps.render-artifact.outputs.artifact-digest }}
+        run: |
+          {
+            echo "## Render artifact provenance"
+            echo "- Source commit: \`$GITHUB_SHA\`"
+            echo "- Request ID: \`$REQUEST_ID\`"
+            echo "- Artifact ID: \`$ARTIFACT_ID\`"
+            if [[ -n "$ARTIFACT_URL" ]]; then echo "- Artifact URL: $ARTIFACT_URL"; fi
+            if [[ -n "$ARTIFACT_DIGEST" ]]; then echo "- Artifact digest: \`$ARTIFACT_DIGEST\`"; fi
+            echo "- Provenance manifest: \`$OUTPUT_NAME.provenance.json\`"
+            echo "- Media QA report: \`render-output/$OUTPUT_NAME.qa.json\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Trigger CircleCI render
         if: steps.request.outputs.provider == 'circleci'

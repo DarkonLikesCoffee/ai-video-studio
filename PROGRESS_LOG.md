@@ -538,3 +538,20 @@ Append one entry per meaningful development session:
 - Post-merge main CI #44674647378 completed successfully on the merge commit.
 - PR #103 introduces a shared media-test helper and pure skip-policy regressions. Local integration runs still skip when tools are unavailable unless required; CI sets `MEDIA_QA_INTEGRATION_REQUIRED=1`, which disables skips and makes missing FFmpeg/FFprobe fail with a clear message. This directly prevents the silent skipped-test issue discovered in PR #100 from recurring.
 - Test-only changes require no render gate. No full render, playback or audio listening was performed.
+
+
+## 2026-11-20 — PR #103 merged; render provenance manifest underway (PR #104)
+
+- PR #103 merged as `d6e5314c320b01a24e8161f2ff59c7a313e03be3`. Exact-head CI #44675048271 passed on `58f13f776e989f0394f99e98821f7aac095919e7`: FFmpeg and FFprobe were verified before tests, `MEDIA_QA_INTEGRATION_REQUIRED=1` was present, and the suite reported 226 passed, 0 failed, 0 skipped. The validate job's remaining steps (example production-plan validation, preview generation, critic/risk reports, project validation and studio build) also passed.
+- Post-merge main CI #44681010124 was in progress when this entry was written. PR #103 was merged only after exact-head validation and diff review; no render gate applies to the skip-policy hardening.
+- Selected the next actionable P0 item: preserve traceable evidence for each GitHub Actions render. The existing artifact bundles MP4, Media QA JSON, contact-sheet image/report and optional credits, but lacks a source/request/run manifest and post-upload artifact identifiers in the run summary.
+- PR #104 adds `scripts/render-provenance.ts`, `render:provenance`, tests for metadata/QA summaries and SHA-256 file evidence, a manifest in the render artifact, and a post-upload workflow summary with artifact ID, URL and digest. Documentation is reconciled to PR #103's verified state.
+- This is render-workflow evidence tooling, not a new video-producing capability. CI tests the script/workflow changes; a subsequent render is still needed to verify the manifest against a real uploaded artifact. No render, playback or audio listening was performed during this work.
+
+
+## 2026-11-20 — PR #104 provenance CI passed; merge review
+
+- PR #98 is merged as `73807bad31f133a0a2819cdd084286903f963645`; required CI #44608513408 passed, and post-merge main CI #44620050018 passed. PR #103 post-merge main CI #44681010124 also passed on main commit `d6e5314c320b01a24e8161f2ff59c7a313e03be3`.
+- PR #104 (`feat/render-provenance-manifest`) is based on that main commit. Exact-head CI #44695855199 passed on code head `78d58e5febe56f1b42be1215828fb932e52c3938`: 231 tests passed, 0 failed, 0 skipped; TypeScript type-check, project validation, examples/preview/risk steps and studio build passed. Reviewed the provenance script, tests and workflow wiring: required render/evidence files are hashed and sized; optional credits are included when present; the manifest is uploaded; the run summary records the post-upload artifact ID, URL and digest. The manifest intentionally does not include its own artifact ID.
+- No render has exercised the provenance manifest. This remains workflow/code validation, not audiovisual acceptance. No full playback or audio listening was performed.
+- Updated project state and roadmap to reflect the main CI success and PR #104 validation. This documentation commit requires a fresh CI run before merge.
