@@ -5,17 +5,14 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { inspectMedia } from "../scripts/media-qa";
+import { assertMediaToolsAvailable, ffmpegPath, ffprobePath, skipMediaIntegration } from "./media-qa-integration-helpers";
 
-const ffmpegPath = process.env.FFMPEG_PATH ?? "ffmpeg";
-const ffprobePath = process.env.FFPROBE_PATH ?? "ffprobe";
-const mediaToolsAvailable =
-  spawnSync(ffmpegPath, ["-version"], { stdio: "ignore" }).status === 0 &&
-  spawnSync(ffprobePath, ["-version"], { stdio: "ignore" }).status === 0;
 
 test("inspectMedia detects delayed audio in a real MP4 without confusing it with duration drift", {
-  skip: !mediaToolsAvailable,
+  skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
+  assertMediaToolsAvailable();
   const directory = await mkdtemp(join(tmpdir(), "media-qa-offset-"));
   const file = join(directory, "delayed-audio.mp4");
 

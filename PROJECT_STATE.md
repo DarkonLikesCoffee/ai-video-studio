@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `a299ab13321df1399b3f7176292fb04d838ff211` — PR #101 merged; exact-head CI #44662651944 passed (219 tests passed, 0 failed, 0 skipped); post-merge main CI #44669560240 passed
-**Current development branch:** `test/media-qa-real-video-intervals` (PR #102 in progress). PR #101 merged as `a299ab13321df1399b3f7176292fb04d838ff211`; CI #44662651944 passed on exact head `8f4b2526dfe041e67693e85e3ae6e63da42459fb` with 219 passed, 0 failed, 0 skipped. Post-merge main CI #44669560240 passed. PR #102 adds real-MP4 frozen-video and black-frame warning/error severity coverage; FFmpeg fixture recipes were manually verified, repository CI is pending.
+**Last verified main commit:** `5483728b441847a7e9cd1ac7b7f659dc71d81dd6` — PR #102 merged; exact-head CI #44669898766 passed (223 tests passed, 0 failed, 0 skipped); post-merge main CI #44674647378 passed
+**Current development branch:** `test/media-qa-ci-no-skips` (PR #103 in progress). PR #102 merged as `5483728b441847a7e9cd1ac7b7f659dc71d81dd6`; exact-head CI #44669898766 passed with 223 tests and 0 skipped. Post-merge main CI #44674647378 passed. PR #103 makes real-media QA integration tests fail rather than skip when CI lacks FFmpeg/FFprobe; local runs still skip if tools are absent and integration mode is not required.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -130,7 +130,7 @@ These features are deterministic and heuristic. They do not semantically underst
 ## 8. Immediate development direction
 The traceable storyboard revision workflow through PRs #88–#90 remains implemented, with explicit narrative-beat review (#91), Creative Brief → storyboard handoff (#95), storyboard-to-production-plan import (#97) and criterion-to-asset evidence report (#98) merged. The report is review-only and does not establish semantic asset relevance.
 
-PR #99 added signed A/V stream-start-offset diagnostics and PR #100 added a real MP4 offset regression. PR #100's integration test was skipped in CI because FFmpeg setup followed `npm test`; PR #101 corrected the order and its exact-head CI #44662651944 passed with **219 tests, 0 failed, 0 skipped**. Post-merge main CI #44669560240 passed. PR #102 now adds real-MP4 freeze and black-frame tests for warning versus hard-failure thresholds. This test-only slice requires no render gate; the actual project test run remains pending CI.
+PR #99 added signed A/V stream-start-offset diagnostics; PR #100 added a real MP4 delayed-audio test whose CI run skipped it because FFmpeg setup followed `npm test`. PR #101 corrected the order and its exact-head CI #44662651944 passed with 219 tests, 0 failed, 0 skipped; post-merge main CI #44669560240 passed. PR #102 adds real MP4 freeze and black-frame warning/error tests and merged as `5483728b441847a7e9cd1ac7b7f659dc71d81dd6`; exact-head CI #44669898766 passed with 223 tests and 0 skipped. Post-merge main CI #44674647378 passed. PR #103 hardens the CI gate so missing media tools cannot silently skip these integration tests.
 
 
 

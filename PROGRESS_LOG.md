@@ -530,3 +530,11 @@ Append one entry per meaningful development session:
 - PR #102 branch `test/media-qa-real-video-intervals` adds four generated MP4 tests for frozen-video and black-frame intervals: short warning/pass and excessive error/fail. Tests isolate the intended finding and verify continuous audio, aligned starts and duration drift below 0.5s.
 - Manually executed fixture recipes with FFmpeg/FFprobe 7.1.5. Frozen segments measured 2.0s and 3.0s; black segments measured 0.8s and 1.4s; streams started at 0.000s and their durations matched. This verifies the fixture filters, not the TypeScript test pipeline.
 - PR #102 is pending CI. No render gate applies; no full playback or audio listening was performed.
+
+
+## 2026-11-20 — PR #102 merged; CI media-tool skip prevention (PR #103)
+
+- PR #102 merged as `5483728b441847a7e9cd1ac7b7f659dc71d81dd6`. Exact-head CI #44669898766 completed successfully: 223 tests passed, 0 failed, 0 skipped. Its four real-MP4 tests cover short/excessive freezes and black intervals through `inspectMedia`, isolating the expected finding while asserting clean A/V timing and continuous audio.
+- Post-merge main CI #44674647378 completed successfully on the merge commit.
+- PR #103 introduces a shared media-test helper and pure skip-policy regressions. Local integration runs still skip when tools are unavailable unless required; CI sets `MEDIA_QA_INTEGRATION_REQUIRED=1`, which disables skips and makes missing FFmpeg/FFprobe fail with a clear message. This directly prevents the silent skipped-test issue discovered in PR #100 from recurring.
+- Test-only changes require no render gate. No full render, playback or audio listening was performed.
