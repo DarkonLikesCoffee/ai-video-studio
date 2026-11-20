@@ -178,9 +178,9 @@ jobs:
           elif [[ -n "$PROJECT_PATH" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
-          elif [[ "$COMPOSITION_ID" == "MadridTrip" ]]; then
-            # Keep the single WebGL canvas below Chromium's per-runner context limit.
-            # GitHub-hosted Linux runners have no GPU: Remotion recommends swangle.
+          elif [[ "$COMPOSITION_ID" == "MadridTrip" || "$COMPOSITION_ID" == "SportsCarCinematic" ]]; then
+            # GitHub-hosted Linux runners have no GPU; use the same software
+            # WebGL backend for custom Three.js scenes.
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle"
           else
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
