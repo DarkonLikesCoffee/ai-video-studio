@@ -520,3 +520,13 @@ Append one entry per meaningful development session:
 - PR #101 moves FFmpeg setup and verification before the test step and adds real MP4 silence integration cases through `inspectMedia`: 1.2s silence should be a warning and keep the report passed; 2.5s silence should be an error and fail the report.
 - Manually generated and inspected the fixture recipes with local FFmpeg/FFprobe: warning case silence 1.215667s; excessive case 2.516979s. Both streams start aligned and video filters report no freeze/black intervals. This is fixture verification, not execution of the repository TypeScript tests.
 - No render gate applies. No full video playback or audio listening was performed.
+
+
+## 2026-11-20 — PR #101 merged; PR #102 real-video interval tests underway
+
+- PR #101 merged as `a299ab13321df1399b3f7176292fb04d838ff211`. Exact-head CI #44662651944 passed on `8f4b2526dfe041e67693e85e3ae6e63da42459fb`; the job log explicitly reported 219 tests passed, 0 failed, 0 skipped. Post-merge main CI #44669560240 passed.
+- Re-read `START_HERE.md`, PROJECT_STATE, ROADMAP, PROGRESS_LOG, AGENTS, README, agent README, production workflow and relevant Media QA, Visual QA, Remotion Producer and Creative Director skills. PR #101 is merged; no open PRs were present before PR #102 was created.
+- Selected the next P0 QA gap: the report's freeze/black detections were unit-tested using synthetic FFmpeg logs, but lacked real MP4 integration tests exercising the actual `inspectMedia` pipeline and severity thresholds.
+- PR #102 branch `test/media-qa-real-video-intervals` adds four generated MP4 tests for frozen-video and black-frame intervals: short warning/pass and excessive error/fail. Tests isolate the intended finding and verify continuous audio, aligned starts and duration drift below 0.5s.
+- Manually executed fixture recipes with FFmpeg/FFprobe 7.1.5. Frozen segments measured 2.0s and 3.0s; black segments measured 0.8s and 1.4s; streams started at 0.000s and their durations matched. This verifies the fixture filters, not the TypeScript test pipeline.
+- PR #102 is pending CI. No render gate applies; no full playback or audio listening was performed.
