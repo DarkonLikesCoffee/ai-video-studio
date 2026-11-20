@@ -231,4 +231,29 @@ await writeMonoWav(resolve(madridTravelDirectory, "madrid-travel-score.wav"), ma
   return (pad + airy) * pulse * envelope * 0.52;
 });
 
-console.log("Generated legacy samples, original Aether, PULSE, SORA, and Madrid travel audio fixtures.");
+
+const solarSystemDirectory = resolve("packages/video-engine/public/audio");
+const solarSystemDuration = 30;
+const solarSystemChords = [
+  [110, 164.81, 220, 261.63],
+  [98, 146.83, 196, 246.94],
+  [123.47, 185, 246.94, 293.66],
+  [110, 164.81, 220, 261.63],
+];
+await writeMonoWav(resolve(solarSystemDirectory, "solar-system-score.wav"), solarSystemDuration, (time) => {
+  const fadeIn = Math.min(1, time / 1.8);
+  const fadeOut = Math.min(1, (solarSystemDuration - time) / 2.2);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const chord = solarSystemChords[Math.min(3, Math.floor(time / 7.5))]!;
+  const warmPad = chord.reduce((sum, frequency, index) =>
+    sum + Math.sin(2 * Math.PI * frequency * time + Math.sin(time * 0.18 + index) * 0.06) *
+      (0.13 - index * 0.016), 0
+  );
+  const slowPulse = 0.9 + 0.1 * Math.sin(2 * Math.PI * 0.075 * time);
+  const shimmer = Math.sin(2 * Math.PI * 659.25 * time + Math.sin(time * 0.42)) * 0.018 +
+    Math.sin(2 * Math.PI * 987.77 * time) * 0.01 +
+    Math.sin(2 * Math.PI * 1318.5 * time + Math.sin(time * 0.23)) * 0.006;
+  return (warmPad + shimmer) * slowPulse * envelope * 0.62;
+});
+
+console.log("Generated legacy samples, original Aether, PULSE, SORA, Madrid travel, and solar-system audio fixtures.");
