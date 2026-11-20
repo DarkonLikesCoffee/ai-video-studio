@@ -150,7 +150,8 @@
       "shotIds": [
         "opening-hook",
         "protocol-finale"
-      ]
+      ],
+      "rationale": "The six-chapter composition is authored at 1920×1080 and 30 fps, with the closing card providing a stable final frame."
     },
     {
       "criterion": "Spanish narration with word-aligned captions.",
@@ -161,7 +162,8 @@
         "incline-curl",
         "hammer-curl",
         "protocol-finale"
-      ]
+      ],
+      "rationale": "The voiceover is generated in Spanish with Kokoro and applied as word-aligned timed captions across all six chapters."
     },
     {
       "criterion": "Six distinct chapters with purposeful motion.",
@@ -172,7 +174,8 @@
         "incline-curl",
         "hammer-curl",
         "protocol-finale"
-      ]
+      ],
+      "rationale": "Each chapter has its own visual plate, camera movement, animated overlays and transitions."
     },
     {
       "criterion": "Exercise depictions communicate joint action and grip.",
@@ -180,7 +183,8 @@
         "standing-curl",
         "incline-curl",
         "hammer-curl"
-      ]
+      ],
+      "rationale": "The three exercise plates show elbow flexion, the incline starting position and neutral hammer grip with wrist alignment."
     },
     {
       "criterion": "Visuals clearly identified as illustrative.",
@@ -190,20 +194,23 @@
         "standing-curl",
         "incline-curl",
         "hammer-curl"
-      ]
+      ],
+      "rationale": "All figures are custom vector illustrations and the production description explicitly states they are not live-action footage."
     },
     {
       "criterion": "Music beneath narration and mastered final mix.",
       "shotIds": [
         "opening-hook",
         "protocol-finale"
-      ]
+      ],
+      "rationale": "The original score is the sole music bed, ducked and mastered under the Spanish narration."
     },
     {
       "criterion": "Inspect MP4 and contact sheet.",
       "shotIds": [
         "protocol-finale"
-      ]
+      ],
+      "rationale": "The final production workflow includes MP4 diagnostics, a contact sheet and render provenance before delivery."
     }
   ]
 }
