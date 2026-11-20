@@ -4,7 +4,7 @@
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
 **Last verified main commit:** `73807bad31f133a0a2819cdd084286903f963645` — PR #98 criterion-to-asset evidence report merged; required validate CI #44608513408 and post-merge main CI passed
-**Current development branch:** `feat/media-qa-av-start-offset` (PR #99 open; required validate CI #44628990848 passed on exact head `78915bd48f3b55373a6a829a8473b7e55fdfcb70`; merge pending). PRs #95, #96, #97 and #98 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 and post-merge main CI #44574582076 passed. PR #98 merge commit `73807bad31f133a0a2819cdd084286903f963645`; PR CI #44608513408 passed and post-merge main CI completed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
+**Current development branch:** `feat/media-qa-av-start-offset` (PR #99 open; required validate CI #44643693225 passed on exact head `89c88a155c7b13bb699e15515de1871c625d066a`; merge pending). PRs #95, #96, #97 and #98 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 and post-merge main CI #44574582076 passed. PR #98 merge commit `73807bad31f133a0a2819cdd084286903f963645`; PR CI #44608513408 passed and post-merge main CI completed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
