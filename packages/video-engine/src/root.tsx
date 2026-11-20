@@ -4,6 +4,7 @@ import { getProjectDurationInFrames, type VideoProject } from "./project";
 import { DemoVideo } from "./scenes/DemoVideo";
 import { ProjectVideo } from "./scenes/ProjectVideo";
 import { ThreeDShowcase } from "./scenes/ThreeDShowcase";
+import { MadridNewYorkParis } from "./scenes/MadridNewYorkParis";
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
 import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
 
