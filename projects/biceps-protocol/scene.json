@@ -1284,34 +1284,6 @@
       "volume": 0.29,
       "fadeInFrames": 2,
       "fadeOutFrames": 18
-    },
-    {
-      "id": "anatomy-hit",
-      "role": "sfx",
-      "src": "assets/audio/impact.wav",
-      "startInFrames": 255,
-      "durationInFrames": 30,
-      "volume": 0.32,
-      "fadeOutFrames": 18
-    },
-    {
-      "id": "curl-hit",
-      "role": "sfx",
-      "src": "assets/audio/impact.wav",
-      "startInFrames": 540,
-      "durationInFrames": 30,
-      "volume": 0.22,
-      "fadeOutFrames": 18
-    },
-    {
-      "id": "final-chime",
-      "role": "sfx",
-      "src": "assets/audio/transition-chime.wav",
-      "startInFrames": 1620,
-      "durationInFrames": 48,
-      "volume": 0.34,
-      "fadeInFrames": 2,
-      "fadeOutFrames": 28
     }
   ],
   "audioMastering": {
