@@ -22,7 +22,10 @@ const asRecord = (value: unknown): JsonRecord => isRecord(value) ? value : {};
 const stringValue = (value: unknown): string | undefined => typeof value === "string" && value.trim() ? value : undefined;
 const numberValue = (value: unknown): number | undefined => typeof value === "number" && Number.isFinite(value) ? value : undefined;
 
-export const normalizeArtifactPath = (filePath: string, workspace = process.cwd()): string =>\n  relative(resolve(workspace), resolve(workspace, filePath)).replace(/\\\\/g, "/");\n\nexport const sha256File = (filePath: string): Promise<string> =>
+export const normalizeArtifactPath = (filePath: string, workspace = process.cwd()): string =>
+  relative(resolve(workspace), resolve(workspace, filePath)).replace(/\\/g, "/");
+
+export const sha256File = (filePath: string): Promise<string> =>
   new Promise((resolveHash, reject) => {
     const hash = createHash("sha256");
     const stream = createReadStream(filePath);
