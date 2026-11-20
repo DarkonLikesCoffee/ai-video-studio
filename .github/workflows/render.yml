@@ -220,7 +220,7 @@ jobs:
             echo "- Artifact ID: \`$ARTIFACT_ID\`"
             if [[ -n "$ARTIFACT_URL" ]]; then echo "- Artifact URL: $ARTIFACT_URL"; fi
             if [[ -n "$ARTIFACT_DIGEST" ]]; then echo "- Artifact digest: \`$ARTIFACT_DIGEST\`"; fi
-            echo "- Provenance manifest: \`render-output/$OUTPUT_NAME.provenance.json\`"
+            echo "- Provenance manifest: \`$OUTPUT_NAME.provenance.json\`"
             echo "- Media QA report: \`render-output/$OUTPUT_NAME.qa.json\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
