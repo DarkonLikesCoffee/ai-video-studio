@@ -121,6 +121,26 @@ export const summarizeContactSheet = (report: unknown, imagePath: string, report
   };
 };
 
+export const summarizeAssetEvidence = (report: unknown, reportPath: string) => {
+  const value = asRecord(report);
+  const summary = asRecord(value.summary);
+  const issues = Array.isArray(value.issues) ? value.issues.filter(isRecord) : [];
+  const countKeys = [
+    "shotCount", "assetCount", "criterionCount", "linkedCriteria", "partialCriteria", "unlinkedCriteria",
+    "missingFiles", "assetsNotLocal", "emptyFiles", "unsafePaths", "missingProvenance", "missingRights",
+    "unresolvedPlannedAssetRefs", "unknownManifestShotIds",
+  ];
+  return {
+    reportPath,
+    ...(stringValue(value.reportType) ? { reportType: value.reportType } : {}),
+    ...(stringValue(summary.status) ? { status: summary.status } : stringValue(value.status) ? { status: value.status } : {}),
+    ...Object.fromEntries(countKeys.filter(key => numberValue(summary[key]) !== undefined).map(key => [key, summary[key]])),
+    issueCount: issues.length,
+    warningCount: issues.filter(issue => issue.severity === "warning").length,
+    errorCount: issues.filter(issue => issue.severity === "error").length,
+  };
+};
+
 export const buildRenderProvenance = (input: {
   request: RenderRequest;
   metadata: RenderMetadata;
@@ -134,6 +154,8 @@ export const buildRenderProvenance = (input: {
   contactSheet: unknown;
   contactSheetImagePath: string;
   contactSheetReportPath: string;
+  assetEvidence: unknown;
+  assetEvidencePath: string;
   generatedAt?: string;
 }) => {
   const m = input.metadata;
@@ -168,6 +190,7 @@ export const buildRenderProvenance = (input: {
     },
     artifact: { name: input.request.outputName, manifestPath: `${input.request.outputName}.provenance.json`, files: input.files },
     mediaQa: summarizeMediaQa(input.mediaQa, input.mediaQaPath),
+    assetEvidence: summarizeAssetEvidence(input.assetEvidence, input.assetEvidencePath),
     contactSheet: summarizeContactSheet(input.contactSheet, input.contactSheetImagePath, input.contactSheetReportPath),
   };
 };
@@ -187,6 +210,7 @@ const main = async () => {
   const mediaQaPath = resolve(process.env.MEDIA_QA_REPORT_PATH ?? `render-output/${outputName}.qa.json`);
   const contactSheetImagePath = resolve(process.env.CONTACT_SHEET_IMAGE_PATH ?? `render-output/review/${outputName}.contact-sheet.jpg`);
   const contactSheetReportPath = resolve(process.env.CONTACT_SHEET_REPORT_PATH ?? `render-output/review/${outputName}.contact-sheet.json`);
+  const assetEvidencePath = resolve(process.env.ASSET_EVIDENCE_REPORT_PATH ?? `render-output/${outputName}.asset-evidence.json`);
   const creditsPath = resolve(process.env.CREDITS_PATH ?? `render-output/${outputName}-credits.txt`);
   const manifestPath = resolve(process.env.PROVENANCE_MANIFEST_PATH ?? `render-output/${outputName}.provenance.json`);
   const workspacePath = resolve(process.env.GITHUB_WORKSPACE ?? process.cwd());
@@ -197,6 +221,7 @@ const main = async () => {
     { filePath: mediaQaPath, artifactPath: `${outputName}.qa.json`, required: true },
     { filePath: contactSheetImagePath, artifactPath: `review/${outputName}.contact-sheet.jpg`, required: true },
     { filePath: contactSheetReportPath, artifactPath: `review/${outputName}.contact-sheet.json`, required: true },
+    { filePath: assetEvidencePath, artifactPath: `${outputName}.asset-evidence.json`, required: true },
     { filePath: creditsPath, artifactPath: `${outputName}-credits.txt`, required: false },
   ]);
 
@@ -204,6 +229,7 @@ const main = async () => {
   const renderProject = await readOptionalJson(renderProjectPath);
   const mediaQa = await readJson(mediaQaPath);
   const contactSheet = await readJson(contactSheetReportPath);
+  const assetEvidence = await readJson(assetEvidencePath);
   const server = process.env.GITHUB_SERVER_URL ?? "https://github.com";
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
@@ -231,6 +257,8 @@ const main = async () => {
     contactSheet,
     contactSheetImagePath: `review/${outputName}.contact-sheet.jpg`,
     contactSheetReportPath: `review/${outputName}.contact-sheet.json`,
+    assetEvidence,
+    assetEvidencePath: `${outputName}.asset-evidence.json`,
   });
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf8");
   process.stdout.write(`Render provenance manifest: ${manifestPath}\n`);
