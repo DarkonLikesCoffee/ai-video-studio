@@ -121,6 +121,41 @@ jobs:
           PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
         run: npm run audio:prepare -- "$PROJECT_PATH"
 
+      - name: Generate and enforce production asset evidence
+        if: steps.request.outputs.provider == 'github-actions'
+        env:
+          PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+        run: |
+          mkdir -p render-output
+          REPORT_PATH="render-output/$OUTPUT_NAME.asset-evidence.json"
+          if [[ -z "$PROJECT_PATH" ]]; then
+            printf '{"schemaVersion":1,"reportType":"production-asset-evidence-not-applicable","status":"not-applicable","reason":"No project path was selected."}\n' > "$REPORT_PATH"
+          else
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+            PLAN_PATH="$PROJECT_DIR/production/production-plan.json"
+            MANIFEST_PATH="$PROJECT_DIR/production/asset-manifest.json"
+            if [[ -f "$PLAN_PATH" ]]; then
+              if [[ ! -f "$MANIFEST_PATH" ]]; then
+                echo "Production plan exists but asset manifest is missing: $MANIFEST_PATH" >&2
+                exit 1
+              fi
+              npm run director:asset-evidence -- "$PLAN_PATH" "$MANIFEST_PATH" "$REPORT_PATH" --strict
+            else
+              printf '{"schemaVersion":1,"reportType":"production-asset-evidence-not-applicable","status":"not-applicable","reason":"Project has no production plan."}\n' > "$REPORT_PATH"
+            fi
+          fi
+          node - "$REPORT_PATH" <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+          const summary = report.summary;
+          const line = summary
+            ? `Asset evidence: ${summary.status}; ${summary.linkedCriteria}/${summary.criterionCount} criteria linked; ${summary.unresolvedPlannedAssetRefs} unresolved references; ${summary.missingFiles} missing files; ${summary.missingRights} missing rights.`
+            : `Asset evidence: ${report.status ?? "not-applicable"} — ${report.reason ?? "No production plan."}`;
+          console.log(line);
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${line}\n`);
+          NODE
+
       - name: Render MP4 with GitHub Actions
         if: steps.request.outputs.provider == 'github-actions'
         env:
@@ -186,6 +221,7 @@ jobs:
           SOURCE_PROJECT_PATH: ${{ steps.request.outputs.project_path }}
           RENDER_PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+          ASSET_EVIDENCE_REPORT_PATH: render-output/${{ steps.request.outputs.output_name }}.asset-evidence.json
         run: npm run render:provenance
 
       - name: Upload MP4 artifact
@@ -200,6 +236,7 @@ jobs:
             render-output/${{ steps.request.outputs.output_name }}.qa.json
             render-output/review/${{ steps.request.outputs.output_name }}.contact-sheet.jpg
             render-output/review/${{ steps.request.outputs.output_name }}.contact-sheet.json
+            render-output/${{ steps.request.outputs.output_name }}.asset-evidence.json
             render-output/${{ steps.request.outputs.output_name }}.provenance.json
           if-no-files-found: error
           retention-days: 3
@@ -212,6 +249,7 @@ jobs:
           ARTIFACT_ID: ${{ steps.render-artifact.outputs.artifact-id }}
           ARTIFACT_URL: ${{ steps.render-artifact.outputs.artifact-url }}
           ARTIFACT_DIGEST: ${{ steps.render-artifact.outputs.artifact-digest }}
+          ASSET_EVIDENCE_PATH: render-output/${{ steps.request.outputs.output_name }}.asset-evidence.json
         run: |
           {
             echo "## Render artifact provenance"
@@ -222,6 +260,7 @@ jobs:
             if [[ -n "$ARTIFACT_DIGEST" ]]; then echo "- Artifact digest: \`$ARTIFACT_DIGEST\`"; fi
             echo "- Provenance manifest: \`$OUTPUT_NAME.provenance.json\`"
             echo "- Media QA report: \`render-output/$OUTPUT_NAME.qa.json\`"
+            echo "- Asset evidence report: \`$ASSET_EVIDENCE_PATH\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Trigger CircleCI render
