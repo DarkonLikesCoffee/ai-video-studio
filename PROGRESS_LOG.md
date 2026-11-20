@@ -603,3 +603,13 @@ Append one entry per meaningful development session:
 - CI passed: #44801247196 for PR #115 and #44801549483 for PR #116 (typecheck, test suite and studio build all succeeded). PR #115 targets `main`; PR #116 applies the same protection to the active Biceps production branch.
 - The Biceps v10 request and its `render-request.json` were left untouched; this change did not trigger another render. Existing render run #44797815155 had already completed successfully.
 - Limitation: a machine cannot infer whether a creative concept is artistically finished. The new gate guarantees a separate frozen candidate, checks the technical request boundary and prevents duplicate submissions; the agent's render-ready review and existing project/asset/media QA remain required.
+
+
+## 2026-11-20 — Render freeze gate merged and post-merge CI verified
+
+- PR #115 merged into `main` as `c148c3002f8364926ad7a71e870ea41411aa5c56`. Post-merge CI #44802088534 passed, including typecheck, tests and studio build.
+- PR #116 merged into `feat/biceps-protocol-cinematic-video-20261120` as `41d2c209bf10ab7bd7461b943507968284031744`. Post-merge CI #44802118796 passed, including typecheck, tests and studio build.
+- Confirmed `render-candidate.mjs` and the frozen-candidate step exist in both workflows. The gate executes before dependency installation or Remotion.
+- Confirmed the Biceps `render-request.json` remains unchanged at v10. Neither merge triggered a Render workflow; the latest actual Biceps render remains #44797815155.
+- Next requests on these protected branches must use a fresh `requestId` and `candidateSha` equal to the pre-request remote tip, with a separate commit changing only `render-request.json`.
+- Limitation remains: CI can enforce a frozen, validated candidate and suppress duplicate submissions; creative readiness still requires the production checklist and human/agent review.

@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `3f3dd846e59a02c0d0f9101ced794ee87357d2e3` — PR #105 merged; post-merge CI #44749739555 passed.  
-**Current development branch:** `fix/benchmark-duration-contract-v2` — head `d914fa18249c009cc449e7410f501ee0e866da72`, 12 commits ahead of main, 0 behind. Branch CI #44750874075 passed: 234 tests, 0 failed, 0 skipped; typecheck, project validation and studio build passed.
+**Last verified main commit:** `c148c3002f8364926ad7a71e870ea41411aa5c56` — PR #115 merged; post-merge CI #44802088534 passed.  
+**Active Biceps production branch:** `feat/biceps-protocol-cinematic-video-20261120` — head `41d2c209bf10ab7bd7461b943507968284031744`; PR #116 merged and post-merge CI #44802118796 passed. Latest actual render remains v10 (#44797815155); the render request file was deliberately not changed by the gate rollout.
 
 PR #105 added the strict production asset-evidence gate and merged as `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`. Its exact-head CI #44719701055 passed 233 tests with 0 skipped. Render v6 (#44719959584, artifact #14622220762) proved the gate reports `ready` for the benchmark: 6/6 acceptance criteria linked, 18 assets, and zero unresolved refs, missing files, unsafe paths, rights/provenance gaps or issues.
 
@@ -14,11 +14,14 @@ The v7 contact sheet was inspected at 5-second intervals (12 sampled frames). It
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
-## 2026-11-20 — Render-request freeze gate (PRs pending merge)
+## 2026-11-20 — Render-request freeze gate (merged and verified)
 
-PR #115 targets main. Main was verified at e64278320c3e59695f5f8cd1ba6170c4104f158b. PR #115 CI run #44801247196 passed after the technical gate commit; PR remains open pending integration.
-
-The render workflow now runs `scripts/render-candidate.mjs` before dependency installation and Remotion. A valid request must carry `candidateSha` equal to the exact remote branch tip before the request-only commit; the triggering push must modify only `render-request.json`. Full Git history is fetched and duplicate candidate SHAs / request IDs are rejected deterministically. Regression coverage is in `tests/render-candidate.test.ts`. The gate prevents development pushes and duplicate submissions from reaching Remotion; it does not itself judge creative quality, so the existing production-readiness checklist and project/media QA remain necessary.
+- PR #115 merged into `main` as `c148c3002f8364926ad7a71e870ea41411aa5c56`; post-merge CI #44802088534 passed (typecheck, full tests and studio build).
+- PR #116 merged into `feat/biceps-protocol-cinematic-video-20261120` as `41d2c209bf10ab7bd7461b943507968284031744`; post-merge CI #44802118796 passed.
+- Both branches now run `scripts/render-candidate.mjs` before dependency installation and Remotion. A request must carry `candidateSha` equal to the exact remote branch tip immediately before the request-only commit; the triggering push must modify only `render-request.json`. Full Git history is fetched and repeated candidate SHAs / request IDs are rejected deterministically.
+- The Biceps v10 request and its `render-request.json` were deliberately left unchanged. No render was triggered by this rollout. The existing render #44797815155 remains the latest actual Biceps render.
+- The next Biceps render request must include `candidateSha` and use a fresh `requestId`; the old v10 request is legacy state and is not retroactively changed.
+- The gate guarantees an immutable candidate boundary and deduplication, not creative completion. The agent's render-ready review and existing project, asset-evidence and media-QA checks remain required.
 
 ## 1. Product vision
 
