@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "fix/**", "feat/**"]
     paths-ignore:
       - render-request.json
       - circleci-status-request.json
