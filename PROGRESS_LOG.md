@@ -555,3 +555,11 @@ Append one entry per meaningful development session:
 - PR #104 (`feat/render-provenance-manifest`) is based on that main commit. Exact-head CI #44695855199 passed on code head `78d58e5febe56f1b42be1215828fb932e52c3938`: 231 tests passed, 0 failed, 0 skipped; TypeScript type-check, project validation, examples/preview/risk steps and studio build passed. Reviewed the provenance script, tests and workflow wiring: required render/evidence files are hashed and sized; optional credits are included when present; the manifest is uploaded; the run summary records the post-upload artifact ID, URL and digest. The manifest intentionally does not include its own artifact ID.
 - No render has exercised the provenance manifest. This remains workflow/code validation, not audiovisual acceptance. No full playback or audio listening was performed.
 - Updated project state and roadmap to reflect the main CI success and PR #104 validation. This documentation commit requires a fresh CI run before merge.
+
+
+## 2026-11-20 — PR #104 merged; strict render asset-evidence gate (PR #105)
+
+- PR #104 merged as `dd25e95c7853bc298f744e3eb6b5e891a66a9eba`. Exact-head CI #44704302163 passed 231 tests, 0 failed, 0 skipped; post-merge main CI #44717786935 passed 231 tests, 0 failed, 0 skipped.
+- Render run #44717916331 is in progress on `fix/render-provenance-benchmark-v5`; it uses the v5 request on the merged provenance code to validate the manifest on a real artifact. No artifact has been inspected yet.
+- PR #105 (`feat/render-asset-evidence-gate`) adds a strict pre-render asset-evidence report for projects with a production plan and manifest, includes the report in upload/provenance, corrects the VALORANT benchmark SVG shot IDs and rights metadata, and adds a fixture regression that checks all criterion/asset links. CI and a render using the new gate are pending.
+- The project regression stages placeholder files, so it validates mapping and metadata rather than media decoding or creative suitability. No full playback or audio listening was performed.
