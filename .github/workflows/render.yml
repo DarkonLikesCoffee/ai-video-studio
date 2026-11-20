@@ -260,7 +260,7 @@ jobs:
             if [[ -n "$ARTIFACT_DIGEST" ]]; then echo "- Artifact digest: \`$ARTIFACT_DIGEST\`"; fi
             echo "- Provenance manifest: \`$OUTPUT_NAME.provenance.json\`"
             echo "- Media QA report: \`render-output/$OUTPUT_NAME.qa.json\`"
-            echo "- Asset evidence report: \`$ASSET_EVIDENCE_PATH\`""
+            echo "- Asset evidence report: \`$ASSET_EVIDENCE_PATH\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Trigger CircleCI render
