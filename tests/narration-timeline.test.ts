@@ -16,7 +16,7 @@ const fixture = (): VideoProject => ({
       graphics: [{ id: "g", type: "ellipse", x: 1, y: 1, width: 10, height: 10, startInFrames: 30, durationInFrames: 240 }],
       particleSystems: [{ id: "p", count: 2, seed: 1, originX: 50, originY: 50, lifeInFrames: 120, colors: ["#FFFFFF"] }],
     },
-    { id: "two", type: "outro", durationInFrames: 300, title: "Two" },
+    { id: "two", type: "outro", durationInFrames: 300, title: "Two", transitionIn: { type: "cut", durationInFrames: 0 } },
   ],
   subtitles: [{ id: "s", startInFrames: 300, durationInFrames: 60, text: "Hello", fadeInFrames: 6 }],
   audioTracks: [{ id: "music", role: "music", src: "assets/audio/music.wav", startInFrames: 0, durationInFrames: 600, fadeOutFrames: 60 }],
@@ -28,6 +28,8 @@ testCase("retimes scenes, animation, overlays and audio on one shared timeline",
   assert.equal(result.scenes.reduce((sum, scene) => sum + scene.durationInFrames, 0), 300);
   assert.equal(result.scenes[0]!.durationInFrames, 150);
   assert.equal(result.scenes[0]!.transitionIn?.durationInFrames, 15);
+  assert.equal(result.scenes[1]!.transitionIn?.type, "cut");
+  assert.equal(result.scenes[1]!.transitionIn?.durationInFrames, 0);
   assert.equal(result.scenes[0]!.titleAnimation?.opacity?.keyframes[1]?.frame, 60);
   assert.equal(result.scenes[0]!.graphics?.[0]?.startInFrames, 15);
   assert.equal(result.scenes[0]!.particleSystems?.[0]?.lifeInFrames, 60);
