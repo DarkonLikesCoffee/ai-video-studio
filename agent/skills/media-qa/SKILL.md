@@ -29,7 +29,7 @@ The command writes a sidecar `video.qa.json` unless a report path is supplied.
 
 - GitHub Actions render artifacts include a `*.provenance.json` manifest tying the render to its source commit/ref, workflow run/attempt, request ID and project identity.
 - The manifest records SHA-256 and size for the MP4, Media QA JSON, contact-sheet image/report and optional credits; it summarizes technical QA findings/measurements and contact-sheet sampling.
-- The post-upload workflow summary supplies the artifact ID, URL and upload digest. The manifest cannot include its own artifact ID because that ID exists only after upload.
+- The production asset-evidence report is also hashed and summarized (status, criteria/asset counts and issue counters); its full JSON remains in the artifact. The post-upload workflow summary supplies the artifact ID, URL and upload digest. The manifest cannot include its own artifact ID because that ID exists only after upload.
 
 ## Interpretation
 - Missing audio/video stream or invalid duration is a hard failure.
