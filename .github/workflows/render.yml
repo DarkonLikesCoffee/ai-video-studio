@@ -171,14 +171,6 @@ jobs:
           mkdir -p render-output/review
           npm run qa:contact-sheet -- "render-output/$OUTPUT_NAME.mp4" --interval 5 --columns 4 --width 320 --output "render-output/review/$OUTPUT_NAME.contact-sheet.jpg" --report "render-output/review/$OUTPUT_NAME.contact-sheet.json"
 
-      - name: Generate render provenance manifest
-        if: steps.request.outputs.provider == 'github-actions'
-        env:
-          SOURCE_PROJECT_PATH: ${{ steps.request.outputs.project_path }}
-          RENDER_PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
-          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
-        run: npm run render:provenance
-
       - name: Write footage attribution credits
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'NarratedSkyExplainer'
         env:
@@ -187,6 +179,14 @@ jobs:
         run: |
           PROJECT_DIR="$(dirname "$PROJECT_PATH")"
           npx tsx scripts/write-footage-credits.ts "$PROJECT_DIR/production/asset-manifest.json" "render-output/$OUTPUT_NAME-credits.txt"
+
+      - name: Generate render provenance manifest
+        if: steps.request.outputs.provider == 'github-actions'
+        env:
+          SOURCE_PROJECT_PATH: ${{ steps.request.outputs.project_path }}
+          RENDER_PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+        run: npm run render:provenance
 
       - name: Upload MP4 artifact
         id: render-artifact
