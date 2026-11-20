@@ -31,6 +31,7 @@ export const SOLAR_SYSTEM_PLANETS: PlanetData[] = [
     radiusPx: 9,
   },
   {
+    // JPL Table 1 labels this row "EM Bary" (Earth–Moon barycenter).
     name: "Earth",
     semiMajorAxisAU: 1.00000261,
     meanLongitudeJ2000Deg: 100.46457166,
