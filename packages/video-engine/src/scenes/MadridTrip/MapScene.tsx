@@ -51,11 +51,16 @@ const legProgress = (frame: number, [start, end]: readonly [number, number]) =>
 const getCamera = (frame: number) => {
   const p1 = legProgress(frame, T.leg1);
   const p2 = legProgress(frame, T.leg2);
-  const tip1 = getPointAtLength(ROUTE_1, p1 * ROUTE_1_LENGTH);
-  const tip2 = getPointAtLength(ROUTE_2, p2 * ROUTE_2_LENGTH);
+  const tip1 = getPointAtLength(ROUTE_1, p1 * ROUTE_1_LENGTH) ?? {
+    x: MADRID_XY[0],
+    y: MADRID_XY[1],
+  };
+  const tip2 = getPointAtLength(ROUTE_2, p2 * ROUTE_2_LENGTH) ?? {
+    x: NEW_YORK_XY[0],
+    y: NEW_YORK_XY[1],
+  };
 
-  // Center: follow the tip of whichever line is drawing.
-  // Before leg 1 the tip sits on Madrid, between legs it sits on New York.
+  // Center follows the tip of whichever line is drawing.
   const center = frame < T.leg2[0] ? tip1 : tip2;
 
   let scale: number;
@@ -141,15 +146,13 @@ const Plane: React.FC<{
 }> = ({ path, length, progress, zoom }) => {
   if (progress <= 0 || progress >= 1) return null;
   const at = progress * length;
-  const point = getPointAtLength(path, at);
-  const tangent = getTangentAtLength(path, at);
+  const point = getPointAtLength(path, at) ?? { x: 0, y: 0 };
+  const tangent = getTangentAtLength(path, at) ?? { x: 1, y: 0 };
   const heading = (Math.atan2(tangent.y, tangent.x) * 180) / Math.PI + 90;
 
   return (
     <g
-      transform={`translate(${point.x} ${point.y}) rotate(${heading}) scale(${
-        1.9 / zoom
-      })`}
+      transform={`translate(${point.x} ${point.y}) rotate(${heading}) scale(${1.9 / zoom})`}
     >
       <path
         d="M0,-12 L3,-3 L13,3 L13,5.5 L3,3.5 L2,9.5 L5.5,12 L5.5,13.5 L0,12 L-5.5,13.5 L-5.5,12 L-2,9.5 L-3,3.5 L-13,5.5 L-13,3 L-3,-3 Z"
@@ -169,7 +172,6 @@ const Route: React.FC<{
   const evolved = evolvePath(progress, path);
   return (
     <>
-      {/* ghost of the full route */}
       <path
         d={path}
         fill="none"
@@ -178,7 +180,6 @@ const Route: React.FC<{
         strokeDasharray={`${8 / zoom} ${12 / zoom}`}
         opacity={0.55}
       />
-      {/* soft halo + bright core, drawn with the evolving dash */}
       <path
         d={path}
         fill="none"
@@ -204,7 +205,6 @@ export const MapScene: React.FC = () => {
   const frame = useCurrentFrame();
   const cam = getCamera(frame);
 
-  // World -> screen: put the camera center in the middle of the frame.
   const transform = `translate(${WIDTH / 2 - cam.x * cam.scale} ${
     HEIGHT / 2 - cam.y * cam.scale
   }) scale(${cam.scale})`;
@@ -250,12 +250,7 @@ export const MapScene: React.FC = () => {
           <Route path={ROUTE_1} progress={cam.p1} zoom={cam.scale} />
           <Route path={ROUTE_2} progress={cam.p2} zoom={cam.scale} />
 
-          <Pin
-            xy={MADRID_XY}
-            name={CITIES.madrid.name}
-            appearAt={0}
-            zoom={cam.scale}
-          />
+          <Pin xy={MADRID_XY} name={CITIES.madrid.name} appearAt={0} zoom={cam.scale} />
           <Pin
             xy={NEW_YORK_XY}
             name={CITIES.newYork.name}
@@ -269,22 +264,11 @@ export const MapScene: React.FC = () => {
             zoom={cam.scale}
           />
 
-          <Plane
-            path={ROUTE_1}
-            length={ROUTE_1_LENGTH}
-            progress={cam.p1}
-            zoom={cam.scale}
-          />
-          <Plane
-            path={ROUTE_2}
-            length={ROUTE_2_LENGTH}
-            progress={cam.p2}
-            zoom={cam.scale}
-          />
+          <Plane path={ROUTE_1} length={ROUTE_1_LENGTH} progress={cam.p1} zoom={cam.scale} />
+          <Plane path={ROUTE_2} length={ROUTE_2_LENGTH} progress={cam.p2} zoom={cam.scale} />
         </g>
       </svg>
 
-      {/* vignette keeps the eye on the camera center */}
       <AbsoluteFill
         style={{
           background:

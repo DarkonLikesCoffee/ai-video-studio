@@ -3,10 +3,10 @@ import * as THREE from "three";
 import { random } from "remotion";
 
 // Tower proportions, in scene units (1 unit ~ 33 m).
-const H = 8.4; // height of the lattice body
-const W0 = 2.0; // half-width at the base
-const W1 = 0.13; // half-width where the body meets the spire
-const CURVE = 2.7; // how hard the legs sweep inward
+const H = 8.4;
+const W0 = 2.0;
+const W1 = 0.13;
+const CURVE = 2.7;
 const LEVELS = 22;
 
 export const TOWER_TOP = H + 1.8;
@@ -49,22 +49,21 @@ const buildLattice = (): BeamData[] => {
   );
   const corner = (k: number, y: number) => {
     const w = halfWidth(y);
-    return new THREE.Vector3(CORNERS[k][0] * w, y, CORNERS[k][1] * w);
+    const signs = CORNERS[k]!;
+    return new THREE.Vector3(signs[0] * w, y, signs[1] * w);
   };
 
   const beams: BeamData[] = [];
   for (let i = 0; i < LEVELS; i++) {
-    const y0 = ys[i];
-    const y1 = ys[i + 1];
+    const y0 = ys[i]!;
+    const y1 = ys[i + 1]!;
     const legRadius = 0.035 + 0.075 * (halfWidth(y0) / W0);
 
     for (let k = 0; k < 4; k++) {
       const next = (k + 1) % 4;
-      // legs
+      // Curved legs, horizontal rings and crossed structural braces.
       beams.push(beam(corner(k, y0), corner(k, y1), legRadius));
-      // horizontal ring
       beams.push(beam(corner(k, y0), corner(next, y0), 0.02));
-      // X bracing on each face
       beams.push(beam(corner(k, y0), corner(next, y1), 0.014));
       beams.push(beam(corner(next, y0), corner(k, y1), 0.014));
     }
