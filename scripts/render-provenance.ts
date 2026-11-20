@@ -15,12 +15,26 @@ type RenderRequest = {
 };
 type ArtifactFileSpec = { filePath: string; artifactPath: string; required?: boolean };
 type ArtifactFileEvidence = { path: string; sizeBytes: number; sha256: string };
+type RenderMetadata = { repository?: string; commit?: string; ref?: string; branch?: string; workflow?: string; actor?: string; runId?: string; runAttempt?: string; runUrl?: string };
+type RenderMetadataInput = { [Key in keyof RenderMetadata]?: RenderMetadata[Key] | undefined };
 
 const isRecord = (value: unknown): value is JsonRecord =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 const asRecord = (value: unknown): JsonRecord => isRecord(value) ? value : {};
 const stringValue = (value: unknown): string | undefined => typeof value === "string" && value.trim() ? value : undefined;
 const numberValue = (value: unknown): number | undefined => typeof value === "number" && Number.isFinite(value) ? value : undefined;
+
+export const buildRenderMetadata = (values: RenderMetadataInput): RenderMetadata => ({
+  ...(values.repository ? { repository: values.repository } : {}),
+  ...(values.commit ? { commit: values.commit } : {}),
+  ...(values.ref ? { ref: values.ref } : {}),
+  ...(values.branch ? { branch: values.branch } : {}),
+  ...(values.workflow ? { workflow: values.workflow } : {}),
+  ...(values.actor ? { actor: values.actor } : {}),
+  ...(values.runId ? { runId: values.runId } : {}),
+  ...(values.runAttempt ? { runAttempt: values.runAttempt } : {}),
+  ...(values.runUrl ? { runUrl: values.runUrl } : {}),
+});
 
 export const normalizeArtifactPath = (filePath: string, workspace = process.cwd()): string =>
   relative(resolve(workspace), resolve(workspace, filePath)).replace(/\\/g, "/");
@@ -109,7 +123,7 @@ export const summarizeContactSheet = (report: unknown, imagePath: string, report
 
 export const buildRenderProvenance = (input: {
   request: RenderRequest;
-  metadata: { repository?: string; commit?: string; ref?: string; branch?: string; workflow?: string; actor?: string; runId?: string; runAttempt?: string; runUrl?: string };
+  metadata: RenderMetadata;
   sourceProjectPath?: string;
   renderProjectPath?: string;
   sourceProject?: unknown;
@@ -196,7 +210,7 @@ const main = async () => {
   const runUrl = repository && runId ? `${server}/${repository}/actions/runs/${runId}` : undefined;
   const manifest = buildRenderProvenance({
     request,
-    metadata: {
+    metadata: buildRenderMetadata({
       repository,
       commit: process.env.GITHUB_SHA,
       ref: process.env.GITHUB_REF,
@@ -206,7 +220,7 @@ const main = async () => {
       runId,
       runAttempt: process.env.GITHUB_RUN_ATTEMPT,
       runUrl,
-    },
+    }),
     sourceProjectPath: sourceProjectPath ? artifactPath(sourceProjectPath) : undefined,
     renderProjectPath: renderProjectPath ? artifactPath(renderProjectPath) : undefined,
     sourceProject,
