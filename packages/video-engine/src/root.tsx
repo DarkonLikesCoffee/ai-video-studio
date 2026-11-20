@@ -83,14 +83,6 @@ export const RemotionRoot = () => (
       height={1080}
     />
     <Composition
-      id="SportsCarCinematic"
-      component={SportsCarCinematic}
-      durationInFrames={720}
-      fps={30}
-      width={1920}
-      height={1080}
-    />
-    <Composition
       id="NarratedSkyExplainer"
       component={NarratedSkyExplainer}
       durationInFrames={600}
