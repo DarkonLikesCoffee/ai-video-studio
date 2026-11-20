@@ -1,0 +1,1326 @@
+{
+  "schemaVersion": 1,
+  "id": "biceps-protocol",
+  "title": "BICEPS PROTOCOL — Build With Intent",
+  "description": "Spanish narrated training explainer with original vector exercise plates and anatomical callouts. Exercise figures are illustrative motion graphics, not live-action footage.",
+  "composition": {
+    "id": "ProjectVideo",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "scenes": [
+    {
+      "id": "opening-hook",
+      "type": "title",
+      "durationInFrames": 180,
+      "eyebrow": "BICEPS TRAINING / FIELD GUIDE 01",
+      "title": "BUILD YOUR\nBICEPS WITH INTENT.",
+      "body": "Three movements. One clear progression. Every rep has a purpose.",
+      "backgroundColor": "#080A0E",
+      "accentColor": "#F15B42",
+      "media": {
+        "type": "image",
+        "src": "assets/01-arm-blueprint.svg",
+        "placement": "right",
+        "fit": "contain",
+        "opacity": 0.94,
+        "zIndex": 1,
+        "animations": {
+          "x": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 65,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 120,
+                "value": 57
+              }
+            ]
+          },
+          "scaleX": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "scaleY": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "rotation": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 1.8,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 140,
+                "value": 0
+              }
+            ]
+          }
+        }
+      },
+      "graphics": [
+        {
+          "id": "pressure-line-a",
+          "type": "path",
+          "x": 56,
+          "y": 12,
+          "width": 39,
+          "height": 76,
+          "d": "M0 0 L48 48 L100 0",
+          "stroke": "#FF4655",
+          "strokeWidth": 2.8,
+          "opacity": 0.75,
+          "lineCap": "round",
+          "animations": {
+            "pathProgress": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0,
+                  "easing": "ease-out"
+                },
+                {
+                  "frame": 110,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "pressure-line-b",
+          "type": "path",
+          "x": 56,
+          "y": 12,
+          "width": 39,
+          "height": 76,
+          "d": "M0 100 L48 48 L100 100",
+          "stroke": "#FF4655",
+          "strokeWidth": 2.8,
+          "opacity": 0.65,
+          "lineCap": "round",
+          "animations": {
+            "pathProgress": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0,
+                  "easing": "ease-out"
+                },
+                {
+                  "frame": 110,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "hook-reticle",
+          "type": "ellipse",
+          "x": 72,
+          "y": 32,
+          "width": 12,
+          "height": 20,
+          "stroke": "#FFFFFF",
+          "strokeWidth": 1.5,
+          "opacity": 0.7,
+          "animations": {
+            "rotation": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": -20
+                },
+                {
+                  "frame": 180,
+                  "value": 25
+                }
+              ]
+            },
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.8
+                },
+                {
+                  "frame": 180,
+                  "value": 1.1
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.8
+                },
+                {
+                  "frame": 180,
+                  "value": 1.1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "hook-tag",
+          "type": "text",
+          "x": 61,
+          "y": 82,
+          "width": 32,
+          "height": 5,
+          "text": "THE ROUND IS BIGGER THAN THE DUEL",
+          "fill": "#FF8790",
+          "fontSize": 17,
+          "fontWeight": 800,
+          "fontFamily": "Arial, Helvetica, sans-serif",
+          "letterSpacing": 2,
+          "opacity": 0,
+          "animations": {
+            "opacity": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 18,
+                  "value": 1
+                }
+              ]
+            },
+            "y": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 85,
+                  "easing": "ease-out"
+                },
+                {
+                  "frame": 32,
+                  "value": 82
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "particleSystems": [
+        {
+          "id": "opening-sparks",
+          "count": 36,
+          "seed": 42117,
+          "originX": 76,
+          "originY": 48,
+          "spreadX": 45,
+          "spreadY": 68,
+          "lifeInFrames": 130,
+          "angleMinDeg": 190,
+          "angleMaxDeg": 350,
+          "speedMin": 0.12,
+          "speedMax": 0.9,
+          "gravity": 0,
+          "sizeMin": 1,
+          "sizeMax": 3.5,
+          "opacity": 0.48,
+          "colors": [
+            "#FF4655",
+            "#FFFFFF",
+            "#6AD9FF"
+          ],
+          "shape": "diamond",
+          "blendMode": "screen"
+        }
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": -0.7,
+        "panY": 0.1,
+        "easing": "ease-in-out"
+      }
+    },
+    {
+      "id": "anatomy-map",
+      "type": "content",
+      "durationInFrames": 240,
+      "eyebrow": "01 / THE ANATOMY",
+      "title": "TWO MUSCLES.\nDIFFERENT ROLES.",
+      "body": "The biceps bends the elbow and supinates the forearm. The brachialis adds upper-arm thickness.",
+      "backgroundColor": "#0A1018",
+      "accentColor": "#E8A56E",
+      "media": {
+        "type": "image",
+        "src": "assets/02-anatomy.svg",
+        "placement": "right",
+        "fit": "contain",
+        "opacity": 0.94,
+        "zIndex": 1,
+        "animations": {
+          "x": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 65,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 120,
+                "value": 57
+              }
+            ]
+          },
+          "scaleX": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "scaleY": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "rotation": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 1.8,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 140,
+                "value": 0
+              }
+            ]
+          }
+        }
+      },
+      "graphics": [
+        {
+          "id": "anatomy-leader-long",
+          "type": "path",
+          "x": 55,
+          "y": 26,
+          "width": 38,
+          "height": 27,
+          "d": "M0 80 L34 48 L100 18",
+          "stroke": "#F15B42",
+          "strokeWidth": 2,
+          "lineCap": "round",
+          "animations": {
+            "pathProgress": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 75,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "anatomy-leader-brach",
+          "type": "path",
+          "x": 55,
+          "y": 56,
+          "width": 40,
+          "height": 23,
+          "d": "M0 10 L44 42 L100 88",
+          "stroke": "#8BD1C3",
+          "strokeWidth": 2,
+          "lineCap": "round",
+          "animations": {
+            "pathProgress": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 85,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "anatomy-label-biceps",
+          "type": "text",
+          "x": 61,
+          "y": 24,
+          "width": 30,
+          "height": 5,
+          "text": "BICEPS BRACHII",
+          "fill": "#F6B39A",
+          "fontSize": 20,
+          "fontWeight": 800,
+          "letterSpacing": 2
+        },
+        {
+          "id": "anatomy-label-brachialis",
+          "type": "text",
+          "x": 61,
+          "y": 78,
+          "width": 32,
+          "height": 5,
+          "text": "BRACHIALIS",
+          "fill": "#A8E2D4",
+          "fontSize": 20,
+          "fontWeight": 800,
+          "letterSpacing": 2
+        }
+      ],
+      "particleSystems": [
+        {
+          "id": "map-dust",
+          "count": 36,
+          "seed": 42119,
+          "originX": 76,
+          "originY": 48,
+          "spreadX": 45,
+          "spreadY": 68,
+          "lifeInFrames": 130,
+          "angleMinDeg": 190,
+          "angleMaxDeg": 350,
+          "speedMin": 0.12,
+          "speedMax": 0.9,
+          "gravity": 0,
+          "sizeMin": 1,
+          "sizeMax": 3.5,
+          "opacity": 0.48,
+          "colors": [
+            "#6AD9FF",
+            "#FFFFFF"
+          ],
+          "shape": "diamond",
+          "blendMode": "screen"
+        }
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": 0.4,
+        "panY": -0.2,
+        "easing": "ease-in-out"
+      },
+      "transitionIn": {
+        "type": "zoom",
+        "durationInFrames": 18,
+        "easing": "ease-in-out"
+      }
+    },
+    {
+      "id": "standing-curl",
+      "type": "content",
+      "durationInFrames": 360,
+      "eyebrow": "02 / EXERCISE ONE",
+      "title": "DUMBBELL CURL",
+      "body": "3 sets · 8–12 reps. Keep the upper arm quiet. Curl, rotate the palm up, and lower with control.",
+      "backgroundColor": "#090D13",
+      "accentColor": "#F15B42",
+      "media": {
+        "type": "image",
+        "src": "assets/03-curl.svg",
+        "placement": "right",
+        "fit": "contain",
+        "opacity": 0.94,
+        "zIndex": 1,
+        "animations": {
+          "x": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 65,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 120,
+                "value": 57
+              }
+            ]
+          },
+          "scaleX": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "scaleY": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "rotation": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 1.8,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 140,
+                "value": 0
+              }
+            ]
+          }
+        }
+      },
+      "graphics": [
+        {
+          "id": "curl-angle",
+          "type": "path",
+          "x": 57,
+          "y": 18,
+          "width": 38,
+          "height": 68,
+          "d": "M10 5 L48 48 L90 90",
+          "stroke": "#F15B42",
+          "strokeWidth": 2.4,
+          "opacity": 0.88,
+          "lineCap": "round",
+          "animations": {
+            "pathProgress": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 92,
+                  "value": 1
+                },
+                {
+                  "frame": 170,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "curl-range-ring",
+          "type": "ellipse",
+          "x": 67,
+          "y": 25,
+          "width": 24,
+          "height": 48,
+          "stroke": "#F15B42",
+          "strokeWidth": 1.4,
+          "opacity": 0.46,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.78
+                },
+                {
+                  "frame": 165,
+                  "value": 1.18
+                },
+                {
+                  "frame": 300,
+                  "value": 0.85
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.78
+                },
+                {
+                  "frame": 165,
+                  "value": 1.18
+                },
+                {
+                  "frame": 300,
+                  "value": 0.85
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "curl-rep-counter",
+          "type": "text",
+          "x": 65,
+          "y": 83,
+          "width": 30,
+          "height": 6,
+          "text": "CONTROL THE ECCENTRIC",
+          "fill": "#F8C9B3",
+          "fontSize": 17,
+          "fontWeight": 800,
+          "letterSpacing": 2,
+          "opacity": 0,
+          "animations": {
+            "opacity": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 35,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "particleSystems": [
+        {
+          "id": "aim-dust",
+          "count": 36,
+          "seed": 42118,
+          "originX": 76,
+          "originY": 48,
+          "spreadX": 45,
+          "spreadY": 68,
+          "lifeInFrames": 130,
+          "angleMinDeg": 190,
+          "angleMaxDeg": 350,
+          "speedMin": 0.12,
+          "speedMax": 0.9,
+          "gravity": 0,
+          "sizeMin": 1,
+          "sizeMax": 3.5,
+          "opacity": 0.48,
+          "colors": [
+            "#FFFFFF",
+            "#FF4655"
+          ],
+          "shape": "diamond",
+          "blendMode": "screen"
+        }
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": -0.7,
+        "panY": 0.1,
+        "easing": "ease-in-out"
+      },
+      "transitionIn": {
+        "type": "wipe-left",
+        "durationInFrames": 18,
+        "easing": "ease-in-out"
+      }
+    },
+    {
+      "id": "incline-curl",
+      "type": "content",
+      "durationInFrames": 360,
+      "eyebrow": "03 / EXERCISE TWO",
+      "title": "INCLINE CURL",
+      "body": "3 sets · 10–12 reps. Let the arms travel slightly behind the torso. Keep the shoulder stable; own the stretch.",
+      "backgroundColor": "#0D1017",
+      "accentColor": "#D9B48A",
+      "media": {
+        "type": "image",
+        "src": "assets/04-incline.svg",
+        "placement": "right",
+        "fit": "contain",
+        "opacity": 0.94,
+        "zIndex": 1,
+        "animations": {
+          "x": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 65,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 120,
+                "value": 57
+              }
+            ]
+          },
+          "scaleX": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "scaleY": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "rotation": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 1.8,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 140,
+                "value": 0
+              }
+            ]
+          }
+        }
+      },
+      "graphics": [
+        {
+          "id": "incline-arc",
+          "type": "path",
+          "x": 55,
+          "y": 23,
+          "width": 42,
+          "height": 60,
+          "d": "M0 85 C20 48 45 25 100 10",
+          "stroke": "#D9B48A",
+          "strokeWidth": 2.3,
+          "lineCap": "round",
+          "animations": {
+            "pathProgress": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 125,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "incline-stretch",
+          "type": "ellipse",
+          "x": 68,
+          "y": 31,
+          "width": 23,
+          "height": 46,
+          "stroke": "#D9B48A",
+          "strokeWidth": 1.5,
+          "opacity": 0.4,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.7
+                },
+                {
+                  "frame": 165,
+                  "value": 1.2
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.7
+                },
+                {
+                  "frame": 165,
+                  "value": 1.2
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "incline-tag",
+          "type": "text",
+          "x": 60,
+          "y": 84,
+          "width": 38,
+          "height": 5,
+          "text": "LONG-LENGTH POSITION",
+          "fill": "#EAD0B3",
+          "fontSize": 17,
+          "fontWeight": 800,
+          "letterSpacing": 2
+        }
+      ],
+      "particleSystems": [
+        {
+          "id": "warning-fragments",
+          "count": 36,
+          "seed": 42120,
+          "originX": 76,
+          "originY": 48,
+          "spreadX": 45,
+          "spreadY": 68,
+          "lifeInFrames": 130,
+          "angleMinDeg": 190,
+          "angleMaxDeg": 350,
+          "speedMin": 0.12,
+          "speedMax": 0.9,
+          "gravity": 0,
+          "sizeMin": 1,
+          "sizeMax": 3.5,
+          "opacity": 0.48,
+          "colors": [
+            "#FF4655",
+            "#FFB5BA"
+          ],
+          "shape": "diamond",
+          "blendMode": "screen"
+        }
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": 1,
+        "panY": -0.2,
+        "easing": "ease-in-out"
+      },
+      "transitionIn": {
+        "type": "zoom",
+        "durationInFrames": 18,
+        "easing": "ease-in-out"
+      }
+    },
+    {
+      "id": "hammer-curl",
+      "type": "content",
+      "durationInFrames": 360,
+      "eyebrow": "04 / EXERCISE THREE",
+      "title": "HAMMER CURL",
+      "body": "3 sets · 10–12 reps. Neutral grip. No wrist twist. Train the brachialis and brachioradialis too.",
+      "backgroundColor": "#0A1115",
+      "accentColor": "#8BD1C3",
+      "media": {
+        "type": "image",
+        "src": "assets/05-hammer.svg",
+        "placement": "right",
+        "fit": "contain",
+        "opacity": 0.94,
+        "zIndex": 1,
+        "animations": {
+          "x": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 65,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 120,
+                "value": 57
+              }
+            ]
+          },
+          "scaleX": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "scaleY": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "rotation": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 1.8,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 140,
+                "value": 0
+              }
+            ]
+          }
+        }
+      },
+      "graphics": [
+        {
+          "id": "hammer-axis",
+          "type": "path",
+          "x": 67,
+          "y": 16,
+          "width": 22,
+          "height": 68,
+          "d": "M50 0 L50 100",
+          "stroke": "#8BD1C3",
+          "strokeWidth": 1.5,
+          "opacity": 0.58
+        },
+        {
+          "id": "hammer-grip",
+          "type": "rect",
+          "x": 73,
+          "y": 40,
+          "width": 12,
+          "height": 2,
+          "fill": "#8BD1C3",
+          "opacity": 0.82,
+          "animations": {
+            "rotation": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": -4
+                },
+                {
+                  "frame": 180,
+                  "value": 4
+                },
+                {
+                  "frame": 350,
+                  "value": -4
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "hammer-tag",
+          "type": "text",
+          "x": 60,
+          "y": 84,
+          "width": 39,
+          "height": 5,
+          "text": "NEUTRAL GRIP / NO SWING",
+          "fill": "#B7E8DE",
+          "fontSize": 16,
+          "fontWeight": 800,
+          "letterSpacing": 2
+        }
+      ],
+      "particleSystems": [
+        {
+          "id": "execute-particles",
+          "count": 36,
+          "seed": 42121,
+          "originX": 76,
+          "originY": 48,
+          "spreadX": 45,
+          "spreadY": 68,
+          "lifeInFrames": 130,
+          "angleMinDeg": 190,
+          "angleMaxDeg": 350,
+          "speedMin": 0.12,
+          "speedMax": 0.9,
+          "gravity": 0,
+          "sizeMin": 1,
+          "sizeMax": 3.5,
+          "opacity": 0.48,
+          "colors": [
+            "#6AD9FF",
+            "#FFFFFF",
+            "#FF4655"
+          ],
+          "shape": "diamond",
+          "blendMode": "screen"
+        }
+      ],
+      "cameraMotion": {
+        "zoom": 1.055,
+        "panX": -0.6,
+        "panY": 0.1,
+        "easing": "ease-in-out"
+      },
+      "transitionIn": {
+        "type": "wipe-left",
+        "durationInFrames": 18,
+        "easing": "ease-in-out"
+      }
+    },
+    {
+      "id": "protocol-finale",
+      "type": "outro",
+      "durationInFrames": 300,
+      "eyebrow": "THE SESSION / PROTOCOL 01",
+      "title": "3 MOVES.\n9 WORKING SETS.",
+      "body": "Rest 90–120 seconds. Finish most sets with 1–2 good reps in reserve. Add reps, then load.",
+      "backgroundColor": "#080A0E",
+      "accentColor": "#F15B42",
+      "media": {
+        "type": "image",
+        "src": "assets/06-finale.svg",
+        "placement": "right",
+        "fit": "contain",
+        "opacity": 0.94,
+        "zIndex": 1,
+        "animations": {
+          "x": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 65,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 120,
+                "value": 57
+              }
+            ]
+          },
+          "scaleX": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "scaleY": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 0.9,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 130,
+                "value": 1.04
+              }
+            ]
+          },
+          "rotation": {
+            "keyframes": [
+              {
+                "frame": 0,
+                "value": 1.8,
+                "easing": "ease-out"
+              },
+              {
+                "frame": 140,
+                "value": 0
+              }
+            ]
+          }
+        }
+      },
+      "graphics": [
+        {
+          "id": "protocol-line",
+          "type": "path",
+          "x": 52,
+          "y": 26,
+          "width": 43,
+          "height": 1,
+          "d": "M0 50 L100 50",
+          "stroke": "#F15B42",
+          "strokeWidth": 2,
+          "opacity": 0.9,
+          "animations": {
+            "pathProgress": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 75,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "protocol-a",
+          "type": "text",
+          "x": 57,
+          "y": 34,
+          "width": 38,
+          "height": 5,
+          "text": "01  CURL                  3 × 8–12",
+          "fill": "#FFFFFF",
+          "fontSize": 21,
+          "fontWeight": 800,
+          "letterSpacing": 1
+        },
+        {
+          "id": "protocol-b",
+          "type": "text",
+          "x": 57,
+          "y": 47,
+          "width": 38,
+          "height": 5,
+          "text": "02  INCLINE CURL     3 × 10–12",
+          "fill": "#FFFFFF",
+          "fontSize": 21,
+          "fontWeight": 800,
+          "letterSpacing": 1
+        },
+        {
+          "id": "protocol-c",
+          "type": "text",
+          "x": 57,
+          "y": 60,
+          "width": 38,
+          "height": 5,
+          "text": "03  HAMMER CURL   3 × 10–12",
+          "fill": "#FFFFFF",
+          "fontSize": 21,
+          "fontWeight": 800,
+          "letterSpacing": 1
+        },
+        {
+          "id": "protocol-footer",
+          "type": "text",
+          "x": 57,
+          "y": 76,
+          "width": 38,
+          "height": 5,
+          "text": "90–120 S REST  /  1–2 RIR",
+          "fill": "#F6B39A",
+          "fontSize": 18,
+          "fontWeight": 800,
+          "letterSpacing": 2
+        }
+      ],
+      "particleSystems": [
+        {
+          "id": "final-glow",
+          "count": 36,
+          "seed": 42122,
+          "originX": 76,
+          "originY": 48,
+          "spreadX": 45,
+          "spreadY": 68,
+          "lifeInFrames": 130,
+          "angleMinDeg": 190,
+          "angleMaxDeg": 350,
+          "speedMin": 0.12,
+          "speedMax": 0.9,
+          "gravity": 0,
+          "sizeMin": 1,
+          "sizeMax": 3.5,
+          "opacity": 0.48,
+          "colors": [
+            "#FF4655",
+            "#FFFFFF",
+            "#6AD9FF"
+          ],
+          "shape": "diamond",
+          "blendMode": "screen"
+        }
+      ],
+      "cameraMotion": {
+        "zoom": 1.035,
+        "panX": 0,
+        "panY": -0.2,
+        "easing": "ease-in-out"
+      },
+      "transitionIn": {
+        "type": "zoom",
+        "durationInFrames": 18,
+        "easing": "ease-in-out"
+      }
+    }
+  ],
+  "audioTracks": [
+    {
+      "id": "cinematic-bed",
+      "role": "music",
+      "src": "assets/audio/score.wav",
+      "startInFrames": 0,
+      "durationInFrames": 1800,
+      "volume": 0.22,
+      "fadeInFrames": 40,
+      "fadeOutFrames": 90,
+      "loop": true,
+      "preservePitch": true,
+      "effects": {
+        "highPassHz": 35,
+        "lowPassHz": 15000,
+        "compressor": {
+          "thresholdDb": -24,
+          "ratio": 2.6,
+          "attackMs": 25,
+          "releaseMs": 280,
+          "makeupGainDb": 1
+        }
+      }
+    },
+    {
+      "id": "transition-0",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 180,
+      "durationInFrames": 38,
+      "volume": 0.29,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 18
+    },
+    {
+      "id": "transition-1",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 420,
+      "durationInFrames": 38,
+      "volume": 0.29,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 18
+    },
+    {
+      "id": "transition-2",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 780,
+      "durationInFrames": 38,
+      "volume": 0.29,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 18
+    },
+    {
+      "id": "transition-3",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 1140,
+      "durationInFrames": 38,
+      "volume": 0.29,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 18
+    },
+    {
+      "id": "transition-4",
+      "role": "sfx",
+      "src": "assets/audio/transition-whoosh.wav",
+      "startInFrames": 1500,
+      "durationInFrames": 38,
+      "volume": 0.29,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 18
+    },
+    {
+      "id": "anatomy-hit",
+      "role": "sfx",
+      "src": "assets/audio/impact.wav",
+      "startInFrames": 255,
+      "durationInFrames": 30,
+      "volume": 0.32,
+      "fadeOutFrames": 18
+    },
+    {
+      "id": "curl-hit",
+      "role": "sfx",
+      "src": "assets/audio/impact.wav",
+      "startInFrames": 540,
+      "durationInFrames": 30,
+      "volume": 0.22,
+      "fadeOutFrames": 18
+    },
+    {
+      "id": "final-chime",
+      "role": "sfx",
+      "src": "assets/audio/transition-chime.wav",
+      "startInFrames": 1620,
+      "durationInFrames": 48,
+      "volume": 0.34,
+      "fadeInFrames": 2,
+      "fadeOutFrames": 28
+    }
+  ],
+  "audioMastering": {
+    "integratedLufs": -16,
+    "truePeakDb": -1.5,
+    "loudnessRange": 10
+  },
+  "output": {
+    "format": "mp4",
+    "codec": "h264"
+  }
+}
