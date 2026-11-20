@@ -3,7 +3,7 @@
   "id": "biceps-protocol",
   "title": "BICEPS PROTOCOL — Build With Intent",
   "delivery": {
-    "durationSeconds": 58.38,
+    "durationSeconds": 58.2,
     "width": 1920,
     "height": 1080,
     "fps": 30,
@@ -122,7 +122,7 @@
     {
       "id": "protocol-finale",
       "startSeconds": 50,
-      "durationSeconds": 10,
+      "durationSeconds": 8.2,
       "purpose": "Leave actionable program.",
       "visual": "Three numbered movements resolve into concise training card.",
       "subject": "Three-exercise biceps session",
