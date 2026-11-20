@@ -142,6 +142,8 @@ This writes `render-output/my-video.qa.json` (or a supplied report path) with ff
 
 **Real-media regression tests:** `npm test` includes FFmpeg/FFprobe-backed integration tests that generate tiny MP4s and run the actual `inspectMedia` pipeline. The tests cover delayed audio, silence severity, frozen-video intervals and black-frame intervals (warning versus error). They skip locally when media tools are missing. CI sets `MEDIA_QA_INTEGRATION_REQUIRED=1`, which keeps these tests enabled and makes missing FFmpeg/FFprobe fail the test instead of silently skipping the integration suite.
 
+**Render provenance:** GitHub Actions render artifacts include a `*.provenance.json` manifest with the source commit/ref, workflow run and attempt, request/project identities, SHA-256 and byte size for the MP4 and evidence files, a concise Media QA summary, and contact-sheet sampling details. After upload, the workflow summary records the artifact ID, URL and upload digest (kept outside the manifest to avoid self-referential metadata).
+
 ## Storyboard risk review
 
 Run a deterministic first-pass review against a production plan:
