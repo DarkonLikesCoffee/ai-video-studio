@@ -205,4 +205,30 @@ await writeMonoWav(resolve(soraDirectory, "score.wav"), soraDuration, (time) => 
   return (warmPad + lowPulse + softTick + airy) * envelope * 0.56;
 });
 
-console.log("Generated legacy samples, original Aether, PULSE, and SORA audio fixtures.");
+
+
+const madridTravelDirectory = resolve("packages/video-engine/public/audio");
+const madridTravelDuration = 30;
+const madridTravelChords = [
+  [110, 164.81, 220, 261.63],
+  [98, 146.83, 196, 246.94],
+  [130.81, 164.81, 196, 261.63],
+  [110, 164.81, 220, 261.63],
+];
+await writeMonoWav(resolve(madridTravelDirectory, "madrid-travel-score.wav"), madridTravelDuration, (time) => {
+  const fadeIn = Math.min(1, time / 2.2);
+  const fadeOut = Math.min(1, (madridTravelDuration - time) / 2.5);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const chord = madridTravelChords[Math.min(3, Math.floor(time / 7.5))]!;
+  const pad = chord.reduce((sum, frequency, index) => {
+    const modulation = Math.sin(2 * Math.PI * 0.08 * time + index * 0.7) * 0.035;
+    return sum + Math.sin(2 * Math.PI * frequency * time + modulation) * (0.13 - index * 0.014);
+  }, 0);
+  const airy = Math.sin(2 * Math.PI * 392 * time + Math.sin(time * 0.35)) * 0.025 +
+    Math.sin(2 * Math.PI * 587.33 * time + Math.sin(time * 0.23)) * 0.018 +
+    Math.sin(2 * Math.PI * 783.99 * time) * 0.01;
+  const pulse = 0.92 + 0.08 * Math.sin(2 * Math.PI * 0.12 * time);
+  return (pad + airy) * pulse * envelope * 0.52;
+});
+
+console.log("Generated legacy samples, original Aether, PULSE, SORA, and Madrid travel audio fixtures.");
