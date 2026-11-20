@@ -927,3 +927,11 @@ test("PULSE editorial showcase is a distinct five-scene, twenty-second motion be
     ));
   }
 });
+
+
+test("Last Signal narration render does not duplicate manually authored captions", async () => {
+  const project = JSON.parse(
+    await readFile(new URL("../projects/last-signal/scene.json", import.meta.url), "utf8")
+  ) as VideoProject;
+  assert.equal(project.subtitles?.length ?? 0, 0);
+});
