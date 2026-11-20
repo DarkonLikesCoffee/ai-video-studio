@@ -1,7 +1,7 @@
 {
   "provider": "github-actions",
   "compositionId": "SportsCarCinematic",
-  "outputName": "sports-car-3d-cinematic-v2",
-  "requestId": "sports-car-3d-cinematic-20261120-v2",
-  "candidateSha": "1e50b2e44f72400ac60738589c8051a1d23c5c25"
+  "outputName": "sports-car-3d-cinematic-v3",
+  "requestId": "sports-car-3d-cinematic-20261120-v3",
+  "candidateSha": "6409b1b9ed8c5520a36357309bc954b87687f109"
 }
