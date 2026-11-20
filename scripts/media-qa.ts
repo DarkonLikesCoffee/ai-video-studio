@@ -14,6 +14,8 @@ export type MediaQaOptions = {
   maxBlackDurationSeconds?: number;
   maxAudioVideoDriftSeconds?: number;
   maxAudioVideoStartOffsetSeconds?: number;
+  expectedDurationSeconds?: number;
+  maxExpectedDurationDriftSeconds?: number;
   maxTruePeakDbfs?: number;
   warningTruePeakDbfs?: number;
 };
@@ -48,6 +50,8 @@ export type MediaQaReport = {
     maxBlackDurationSeconds: number;
     maxAudioVideoDriftSeconds: number;
     maxAudioVideoStartOffsetSeconds: number;
+    expectedDurationSeconds?: number;
+    maxExpectedDurationDriftSeconds: number;
     maxTruePeakDbfs: number;
     warningTruePeakDbfs: number;
   };
@@ -104,6 +108,8 @@ const defaults: Required<MediaQaOptions> = {
   maxBlackDurationSeconds: 1,
   maxAudioVideoDriftSeconds: 0.5,
   maxAudioVideoStartOffsetSeconds: 0.5,
+  expectedDurationSeconds: Number.NaN,
+  maxExpectedDurationDriftSeconds: 0.75,
   maxTruePeakDbfs: 0,
   warningTruePeakDbfs: -1,
 };
@@ -206,6 +212,16 @@ export const buildMediaQaReport = (
   const findings: MediaQaReport["findings"] = [];
   if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
     findings.push({ severity: "error", code: "invalid-duration", message: "The file has no valid positive duration." });
+  }
+  if (Number.isFinite(config.expectedDurationSeconds) && config.expectedDurationSeconds > 0) {
+    const drift = Math.abs(durationSeconds - config.expectedDurationSeconds);
+    if (drift > config.maxExpectedDurationDriftSeconds) {
+      findings.push({
+        severity: "error",
+        code: "expected-duration-mismatch",
+        message: `Rendered duration ${durationSeconds.toFixed(2)}s differs from the planned ${config.expectedDurationSeconds.toFixed(2)}s by ${drift.toFixed(2)}s (maximum ${config.maxExpectedDurationDriftSeconds.toFixed(2)}s).`,
+      });
+    }
   }
   if (!videoStream) {
     findings.push({ severity: "error", code: "missing-video-stream", message: "The MP4 contains no video stream." });
@@ -317,6 +333,8 @@ export const buildMediaQaReport = (
       maxBlackDurationSeconds: config.maxBlackDurationSeconds,
       maxAudioVideoDriftSeconds: config.maxAudioVideoDriftSeconds,
       maxAudioVideoStartOffsetSeconds: config.maxAudioVideoStartOffsetSeconds,
+      ...(Number.isFinite(config.expectedDurationSeconds) ? { expectedDurationSeconds: config.expectedDurationSeconds } : {}),
+      maxExpectedDurationDriftSeconds: config.maxExpectedDurationDriftSeconds,
       maxTruePeakDbfs: config.maxTruePeakDbfs,
       warningTruePeakDbfs: config.warningTruePeakDbfs,
     },
