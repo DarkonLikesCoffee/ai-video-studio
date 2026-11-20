@@ -14,6 +14,12 @@ The v7 contact sheet was inspected at 5-second intervals (12 sampled frames). It
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
+## 2026-11-20 — Render-request freeze gate (PRs pending merge)
+
+The protected production branch is feat/biceps-protocol-cinematic-video-20261120 at 9111fcfc90d9b702c9847a97134aa3b17a482c7e. Its latest existing render run #44797815155 completed successfully for request biceps-protocol-es-20261120-v10. PR #116 targets that branch; CI run #44801549483 passed. PR remains open pending integration. render-request.json was not changed by this fix.
+
+The render workflow now runs `scripts/render-candidate.mjs` before dependency installation and Remotion. A valid request must carry `candidateSha` equal to the exact remote branch tip before the request-only commit; the triggering push must modify only `render-request.json`. Full Git history is fetched and duplicate candidate SHAs / request IDs are rejected deterministically. Regression coverage is in `tests/render-candidate.test.ts`. The gate prevents development pushes and duplicate submissions from reaching Remotion; it does not itself judge creative quality, so the existing production-readiness checklist and project/media QA remain necessary.
+
 ## 1. Product vision
 
 AI Video Studio should let someone describe a video in ordinary language and receive a finished, high-quality MP4 without manually editing it.
