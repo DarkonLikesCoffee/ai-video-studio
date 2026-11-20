@@ -34,6 +34,8 @@ Help build AI Video Studio into a prompt-to-finished-video production system. Do
 - After a render completes, download and inspect that exact artifact. A successful job is not creative acceptance. For a QA failure, use the actual QA findings to drive a targeted revision.
 - Keep render-request commits out of the build loop. Avoid repeatedly updating `render-request.json` to trigger CI or renders.
 
+- **Technical freeze gate (enforced by CI):** Push the complete candidate project first. Then make a separate commit that changes only `render-request.json`; include `candidateSha` equal to the exact remote branch tip immediately before that request commit. The render workflow fetches full history and rejects a missing/mismatched SHA, any other file in the triggering push, reused candidate SHAs, and reused request IDs. A new branch push cannot render. If any project files remain unpushed, push them in a normal development commit first, then create the request-only commit.
+
 ## Definition of done
 
 For code changes: relevant tests, typecheck, validation and CI pass; the implementation matches its documentation.
