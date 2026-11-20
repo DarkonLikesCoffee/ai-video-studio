@@ -211,7 +211,7 @@ jobs:
       - name: Master solar system soundtrack
         if: steps.request.outputs.provider == 'github-actions' && (steps.request.outputs.composition_id == 'SolarSystemOrbitalMotion' || steps.request.outputs.composition_id == 'InnerPlanets')
         env:
-          OUTPUT_NAME: \${{ steps.request.outputs.output_name }}
+          OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
         run: |
           ffmpeg -y -i "render-output/$OUTPUT_NAME.mp4" \
             -af "loudnorm=I=-18:TP=-1.5:LRA=11" \
