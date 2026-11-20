@@ -4,7 +4,7 @@
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
 **Last verified main commit:** `e64278320c3e59695f5f8cd1ba6170c4104f158b` — verified 2026-11-20 as the current `main` branch head.  
-**Current development branch:** `feat/solar-system-orbital-motion` — head `a0d930cd49efcc128a47b3f077aee08d00e8db9e`, based on main `e64278320c3e59695f5f8cd1ba6170c4104f158b`; PR #113 is open and mergeable. Latest CI #44776295360 passed: 242 tests, 0 failed, 0 skipped; typecheck and studio build passed.
+**Current development branch:** `feat/solar-system-orbital-motion` — PR #113 is open against main `e64278320c3e59695f5f8cd1ba6170c4104f158b`. Verified render source commit: `a0d930cd49efcc128a47b3f077aee08d00e8db9e`; follow-up branch commits clarify JPL provenance and record the completed render evidence. CI #44776295360 passed: 242 tests, 0 failed, 0 skipped; typecheck and studio build passed.
 
 PR #105 added the strict production asset-evidence gate and merged as `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`. Its exact-head CI #44719701055 passed 233 tests with 0 skipped. Render v6 (#44719959584, artifact #14622220762) proved the gate reports `ready` for the benchmark: 6/6 acceptance criteria linked, 18 assets, and zero unresolved refs, missing files, unsafe paths, rights/provenance gaps or issues.
 
