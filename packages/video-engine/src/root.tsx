@@ -8,6 +8,8 @@ import { MadridNewYorkParis } from "./scenes/MadridNewYorkParis";
 import { MadridTrip, MADRID_TRIP_DURATION, FPS as MADRID_TRIP_FPS, WIDTH as MADRID_TRIP_WIDTH, HEIGHT as MADRID_TRIP_HEIGHT } from "./scenes/MadridTrip";
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
 import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
+import { SolarSystemOrbitalMotion, INNER_PLANETS_DEFAULT_PROPS } from "./scenes/SolarSystemOrbitalMotion";
+import { EARTH_ORBITAL_PERIOD_DAYS, VIDEO_DURATION_IN_FRAMES, VIDEO_FPS } from "./solar-system/planetData";
 
 // Remotion merges partial --props over defaultProps. Do not leak the example
 // project's soundtrack into projects that intentionally omit audioTracks.
@@ -72,6 +74,24 @@ export const RemotionRoot = () => (
       fps={30}
       width={1920}
       height={1080}
+    />
+    <Composition
+      id="SolarSystemOrbitalMotion"
+      component={SolarSystemOrbitalMotion}
+      durationInFrames={VIDEO_DURATION_IN_FRAMES}
+      fps={VIDEO_FPS}
+      width={1920}
+      height={1080}
+      defaultProps={{ zoom: 1, simulationDays: EARTH_ORBITAL_PERIOD_DAYS, innerOnly: false }}
+    />
+    <Composition
+      id="InnerPlanets"
+      component={SolarSystemOrbitalMotion}
+      durationInFrames={VIDEO_DURATION_IN_FRAMES}
+      fps={VIDEO_FPS}
+      width={1920}
+      height={1080}
+      defaultProps={INNER_PLANETS_DEFAULT_PROPS}
     />
     <Composition
       id="NarratedSkyExplainer"
