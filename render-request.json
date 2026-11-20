@@ -1,6 +1,6 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "SolarSystemOrbitalMotion",
+  "outputName": "solar-system-orbital-motion",
+  "requestId": "solar-system-orbital-motion-20261120-v1"
 }
