@@ -27,7 +27,7 @@ The command writes a sidecar `video.qa.json` unless a report path is supplied.
 ## Interpretation
 - Missing audio/video stream or invalid duration is a hard failure.
 - Audio/video duration differences above 0.5 seconds and start offsets above 0.5 seconds are hard failures by default.
-- Silence, freeze and black intervals are warnings, not automatic failures: intentional pauses, fades and black transitions may be valid. Compare each timestamp with the production plan and actual rendered media.
+- Silence, freeze and black intervals are warnings or errors according to their duration thresholds; intentional pauses, fades and black transitions may be valid. Compare each timestamp with the production plan and actual rendered media.
 - The report does not understand story, asset relevance, shot variety, captions, narration correctness or whether silence is intentional.
 - Measurements are not a substitute for listening or watching the video.
 - Never mark a video creatively accepted from this report alone.
