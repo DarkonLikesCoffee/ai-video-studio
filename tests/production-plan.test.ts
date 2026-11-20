@@ -74,6 +74,20 @@ test("production plan rejects shots that exceed the requested runtime", () => {
   assert.ok(validateProductionPlan(invalid).some((error) => error.includes("extends beyond")));
 });
 
+test("production plan rejects timeline gaps", () => {
+  const invalid = structuredClone(example);
+  const shots = invalid.shots as Array<Record<string, unknown>>;
+  shots[1]!.startSeconds = Number(shots[1]!.startSeconds) + 0.5;
+  assert.ok(validateProductionPlan(invalid).some((error) => error.includes("Timeline gap/overlap")));
+});
+
+test("production plan rejects timeline overlaps", () => {
+  const invalid = structuredClone(example);
+  const shots = invalid.shots as Array<Record<string, unknown>>;
+  shots[1]!.startSeconds = Number(shots[1]!.startSeconds) - 0.5;
+  assert.ok(validateProductionPlan(invalid).some((error) => error.includes("Timeline gap/overlap")));
+});
+
 test("production plan rejects out-of-order shots", () => {
   const invalid = structuredClone(example);
   const shots = invalid.shots as Array<Record<string, unknown>>;
