@@ -231,4 +231,28 @@ await writeMonoWav(resolve(madridTravelDirectory, "madrid-travel-score.wav"), ma
   return (pad + airy) * pulse * envelope * 0.52;
 });
 
-console.log("Generated legacy samples, original Aether, PULSE, SORA, and Madrid travel audio fixtures.");
+
+const carAudioDirectory = resolve("packages/video-engine/public/audio");
+const carDuration = 24;
+const carChords = [
+  [55, 82.41, 110, 164.81],
+  [61.74, 92.5, 123.47, 185],
+  [49, 73.42, 98, 146.83],
+  [55, 82.41, 110, 164.81],
+];
+await writeMonoWav(resolve(carAudioDirectory, "sports-car-score.wav"), carDuration, (time) => {
+  const fadeIn = Math.min(1, time / 1.4);
+  const fadeOut = Math.min(1, (carDuration - time) / 2);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const chord = carChords[Math.min(3, Math.floor(time / 6))]!;
+  const lowPad = chord.reduce((sum, frequency, index) =>
+    sum + Math.sin(2 * Math.PI * frequency * time + Math.sin(time * 0.12 + index) * 0.05) * (0.12 - index * 0.015), 0
+  );
+  const pulsePhase = time % (60 / 96);
+  const pulse = Math.sin(2 * Math.PI * (42 + 22 * Math.exp(-pulsePhase * 12)) * pulsePhase) * Math.exp(-pulsePhase * 18) * 0.2;
+  const metallic = Math.sin(2 * Math.PI * 659.25 * time + Math.sin(time * 0.35)) * 0.018 +
+    Math.sin(2 * Math.PI * 987.77 * time) * 0.012;
+  return (lowPad + pulse + metallic) * envelope * 0.62;
+});
+
+console.log("Generated legacy samples, original Aether, PULSE, SORA, Madrid travel, and sports-car audio fixtures.");
