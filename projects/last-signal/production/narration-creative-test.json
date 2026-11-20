@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "language": "es",
+  "voice": "ef_dora",
+  "speed": 0.96,
+  "speaker": "NARRADORA",
+  "text": "A las cuatro diecisiete, el observatorio recibió una señal. No venía de una estrella conocida. Era breve, repetida… como si alguien, al otro lado del océano de luz, estuviera intentando decirnos que no estamos solos. Y entonces, justo antes del amanecer, dejó de transmitir.",
+  "subtitle": {
+    "maxWords": 5,
+    "maxPauseSeconds": 0.42,
+    "maxDurationSeconds": 3.1,
+    "position": "bottom",
+    "fontSize": 42,
+    "fontWeight": 700,
+    "color": "#FFFFFF",
+    "activeWordColor": "#FFD59B",
+    "backgroundOpacity": 0.38
+  }
+}
