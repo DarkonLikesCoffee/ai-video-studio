@@ -157,6 +157,7 @@ jobs:
           NODE
 
       - name: Render MP4 with GitHub Actions
+        id: render-mp4
         if: steps.request.outputs.provider == 'github-actions'
         env:
           PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
@@ -191,6 +192,16 @@ jobs:
             -c:v copy -c:a aac -b:a 192k -movflags +faststart \
             "render-output/$OUTPUT_NAME.mastered.mp4"
           mv "render-output/$OUTPUT_NAME.mastered.mp4" "render-output/$OUTPUT_NAME.mp4"
+
+      - name: Preserve rendered MP4 before QA
+        id: pre-qa-artifact
+        if: always() && steps.request.outputs.provider == 'github-actions' && steps.render-mp4.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.request.outputs.output_name }}-pre-qa
+          path: render-output/${{ steps.request.outputs.output_name }}.mp4
+          if-no-files-found: error
+          retention-days: 3
 
       - name: Run rendered-media diagnostics
         if: steps.request.outputs.provider == 'github-actions'
