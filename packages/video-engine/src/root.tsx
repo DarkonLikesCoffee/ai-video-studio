@@ -5,6 +5,7 @@ import { DemoVideo } from "./scenes/DemoVideo";
 import { ProjectVideo } from "./scenes/ProjectVideo";
 import { ThreeDShowcase } from "./scenes/ThreeDShowcase";
 import { MadridNewYorkParis } from "./scenes/MadridNewYorkParis";
+import { MadridTrip, MADRID_TRIP_DURATION, FPS as MADRID_TRIP_FPS, WIDTH as MADRID_TRIP_WIDTH, HEIGHT as MADRID_TRIP_HEIGHT } from "./scenes/MadridTrip";
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
 import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
 
@@ -55,6 +56,14 @@ export const RemotionRoot = () => (
       fps={30}
       width={1920}
       height={1080}
+    />
+    <Composition
+      id="MadridTrip"
+      component={MadridTrip}
+      durationInFrames={MADRID_TRIP_DURATION}
+      fps={MADRID_TRIP_FPS}
+      width={MADRID_TRIP_WIDTH}
+      height={MADRID_TRIP_HEIGHT}
     />
     <Composition
       id="CinematicAdBenchmark"

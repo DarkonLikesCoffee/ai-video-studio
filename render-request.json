@@ -1,6 +1,6 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridNewYorkParis",
-  "outputName": "madrid-new-york-paris-3d-trip",
-  "requestId": "madrid-ny-paris-3d-20261120-final-qa1"
+  "compositionId": "MadridTrip",
+  "outputName": "madrid-trip-geographic-reference",
+  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
 }
