@@ -49,6 +49,14 @@ export const RemotionRoot = () => (
       height={1080}
     />
     <Composition
+      id="MadridNewYorkParis"
+      component={MadridNewYorkParis}
+      durationInFrames={900}
+      fps={30}
+      width={1920}
+      height={1080}
+    />
+    <Composition
       id="CinematicAdBenchmark"
       component={CinematicAdBenchmark}
       durationInFrames={600}
