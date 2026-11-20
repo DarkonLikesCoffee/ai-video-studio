@@ -197,3 +197,35 @@ test("media QA closes short trailing silence at EOF and skips zero-length traili
   const zeroLength = buildMediaQaReport("zero-trailing.mp4", probe, "silence_start: 60.1\n", "");
   assert.deepEqual(zeroLength.measurements.silenceIntervals, []);
 });
+
+
+test("media QA enforces planned delivery duration with configurable tolerance", () => {
+  const withinTolerance = buildMediaQaReport("on-time.mp4", probe, "", "", {
+    expectedDurationSeconds: 60,
+  });
+  assert.equal(withinTolerance.passed, true);
+  assert.equal(withinTolerance.thresholds.expectedDurationSeconds, 60);
+  assert.equal(withinTolerance.thresholds.maxExpectedDurationDriftSeconds, 0.75);
+
+  const drift = buildMediaQaReport("short-render.mp4", {
+    ...probe,
+    format: { ...probe.format, duration: "47.899" },
+    streams: [
+      { ...probe.streams[0]!, duration: "47.7" },
+      { ...probe.streams[1]!, duration: "47.899" },
+    ],
+  }, "", "", { expectedDurationSeconds: 60 });
+  assert.equal(drift.passed, false);
+  assert.ok(drift.findings.some((finding) =>
+    finding.code === "expected-duration-mismatch" &&
+    finding.message.includes("47.90s") &&
+    finding.message.includes("60.00s"),
+  ));
+
+  const relaxed = buildMediaQaReport("accepted-short-render.mp4", {
+    ...probe,
+    format: { ...probe.format, duration: "59.4" },
+  }, "", "", { expectedDurationSeconds: 60, maxExpectedDurationDriftSeconds: 0.75 });
+  assert.equal(relaxed.passed, true);
+  assert.ok(!relaxed.findings.some((finding) => finding.code === "expected-duration-mismatch"));
+});
