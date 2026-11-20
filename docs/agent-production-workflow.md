@@ -26,6 +26,19 @@ Define how an AI agent turns a natural-language brief into a finished video usin
 - Do not add planning-only fields to the render schema.
 - The `render-request.json` selects one project and one composition. Use a unique request ID for each actual render.
 
+## Technical render-request gate
+
+The GitHub Actions render workflow enforces the freeze protocol before installing dependencies or running Remotion:
+
+- Push the complete, validated candidate project to the target branch first. This is a normal development push and does not trigger rendering.
+- In a separate commit, change **only** `render-request.json`. Set `candidateSha` to the full SHA of the remote branch tip immediately before that request-only commit.
+- The preflight compares `candidateSha` to the push's previous remote SHA and verifies that the entire triggering push changed exactly one path: `render-request.json`.
+- The workflow fetches full Git history and checks request history across fetched refs. A candidate SHA or request ID already submitted is rejected; only the earliest duplicate submission can proceed.
+- A request cannot render on the initial push that creates a branch. It must follow a candidate that already exists on the remote.
+- To render a corrected version after a failure, commit the correction as a new candidate, push it normally, and then make one new request-only commit. Do not reuse the old candidate SHA or request ID.
+
+This is a technical safety gate, not proof of creative readiness. Existing project, narration, production-plan, asset-evidence and final-media QA checks still apply.
+
 ## Agent operating loop
 
 1. Read the user's prompt and all supplied references. Preserve factual details and distinguish verified facts from assumptions.

@@ -22,6 +22,15 @@ Help build AI Video Studio into a prompt-to-finished-video production system. Do
 - Do not ask whether to merge. Merge when required CI, render and quality gates pass. If a gate fails, diagnose and fix it first.
 - Do not hide failures, skip failed tests, weaken validation merely to get green CI, or call a failed/partial run successful.
 
+
+## Render discipline
+
+- A normal project commit is a development checkpoint, not permission to render. Do not edit `render-request.json` during project construction or iteration.
+- Build and validate the complete candidate first. Push the project and all required assets as normal commits.
+- Only after the candidate is frozen, make a separate commit that changes **only** `render-request.json`. Include `candidateSha`, the exact full SHA of the remote branch tip immediately before this request-only commit.
+- The render workflow fetches full history and rejects a missing/mismatched candidate SHA, any other file in the triggering push, a new-branch push, or a previously submitted candidate SHA/request ID. The earliest duplicate request is the only one eligible to render.
+- Do not update the project while a render is running. After a failure, inspect the logs, correct the cause in a new candidate commit, push it, rerun non-render checks and then submit one new request-only commit with a new request ID.
+
 ## Definition of done
 
 For code changes: relevant tests, typecheck, validation and CI pass; the implementation matches its documentation.

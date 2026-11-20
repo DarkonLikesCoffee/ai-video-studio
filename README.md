@@ -738,6 +738,8 @@ GitHub Actions runs type-checking, tests, production-plan validation, legacy-pro
 
 ## Custom Remotion compositions
 
+The request must also include `candidateSha`: the full commit SHA of the frozen project candidate already pushed to the branch. Push the project first, then create a separate commit that changes **only** `render-request.json`. The render workflow rejects requests whose candidate SHA does not equal the previous remote branch tip, whose triggering push changes any other file, or whose candidate SHA / request ID has already been submitted. This keeps ordinary project commits out of the render pipeline and prevents duplicate submissions of the same frozen candidate.
+
 The cloud render request can target any composition registered in `packages/video-engine/src/root.tsx`; Remotion rejects IDs that are not registered. Use `ProjectVideo` with a validated `projectPath` for schema-driven projects. For a custom React composition, set `compositionId` to its registered ID and optionally provide `projectPath` to a JSON props file under `projects/`. The request file may omit `projectPath` when the composition uses only its own defaults and bundled assets. When a custom composition receives `projectPath`, the render worker passes that JSON file as props and uses its folder as the public asset directory.
 
 
