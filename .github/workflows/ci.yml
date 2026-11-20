@@ -51,6 +51,8 @@ jobs:
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
       - name: Test
+        env:
+          MEDIA_QA_INTEGRATION_REQUIRED: "1"
         run: npm test
       - name: Validate example production plan
         run: npm run validate:plan -- projects/examples/production-plan.json
