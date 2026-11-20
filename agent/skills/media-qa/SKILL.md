@@ -22,6 +22,7 @@ The command writes a sidecar `video.qa.json` unless a report path is supplied.
 
 - `tests/media-qa-ffmpeg.integration.test.ts` generates a moving-pattern MP4 with delayed audio and checks the actual `inspectMedia` pipeline for an A/V start-offset error without conflating it with duration drift.
 - `tests/media-qa-silence.integration.test.ts` generates real MP4 fixtures with moderate and excessive silence and verifies warning/failure severity, interval measurement and clean A/V timing.
+- `tests/media-qa-video-intervals.integration.test.ts` generates real MP4s with frozen or black middle segments and verifies warning/pass versus excessive/error behavior, while checking unrelated silence and A/V timing measurements remain clean.
 - These tests are part of `npm test`. They skip if FFmpeg/FFprobe are unavailable locally. CI must install and verify both binaries before the test step; placing tool setup after `npm test` causes the integration tests to be skipped rather than validated.
 
 ## Interpretation

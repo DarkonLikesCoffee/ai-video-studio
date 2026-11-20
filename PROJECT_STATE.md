@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `ad5746fbf07053116786b5d4c9c8c1a72137296a` — PR #100 real-MP4 A/V offset integration merged; PR CI #44654898138 passed (the integration test was skipped); post-merge main CI #44662134081 passed
-**Current development branch:** `test/media-qa-real-silence-fixtures` (PR #101 in progress). PR #100 merged as `ad5746fbf07053116786b5d4c9c8c1a72137296a`; CI #44654898138 succeeded, but log review showed its delayed-audio integration test was skipped because FFmpeg setup ran after `npm test`. Post-merge main CI #44662134081 passed. PR #101 moves FFmpeg setup/verification before tests and adds real-MP4 silence warning/error integration cases. PRs #95–#100 are merged. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
+**Last verified main commit:** `a299ab13321df1399b3f7176292fb04d838ff211` — PR #101 merged; exact-head CI #44662651944 passed (219 tests passed, 0 failed, 0 skipped); post-merge main CI #44669560240 passed
+**Current development branch:** `test/media-qa-real-video-intervals` (PR #102 in progress). PR #101 merged as `a299ab13321df1399b3f7176292fb04d838ff211`; CI #44662651944 passed on exact head `8f4b2526dfe041e67693e85e3ae6e63da42459fb` with 219 passed, 0 failed, 0 skipped. Post-merge main CI #44669560240 passed. PR #102 adds real-MP4 frozen-video and black-frame warning/error severity coverage; FFmpeg fixture recipes were manually verified, repository CI is pending.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -107,7 +107,7 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 7. Verified current repository snapshot — 2026-11-20
 
-- Main HEAD: `ad5746fbf07053116786b5d4c9c8c1a72137296a` (PR #100 merged; PR #100 CI #44654898138 passed but the FFmpeg-backed integration test was skipped; post-merge main CI #44662134081 passed).
+- Main HEAD: `a299ab13321df1399b3f7176292fb04d838ff211` (PR #101 merged; exact-head CI #44662651944 passed with 219 tests, 0 skipped; post-merge main CI #44669560240 passed).
 - PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
 - PRs #66–#77 are merged.
 - A real MP4 from render run #44485488551 (artifact #14511125907) was retrieved and inspected with a contact sheet. Its bundled media-QA report passed with no detected silence, frozen video, black frames or audio/video duration drift beyond thresholds. See the new benchmark entry in `PROGRESS_LOG.md`.
@@ -128,11 +128,10 @@ The next agent should use this project as a regression/quality case, not simply 
 These features are deterministic and heuristic. They do not semantically understand the story, inspect motion continuously, listen to the audio, or guarantee cinematic quality. A contact sheet is a sparse visual sample, not full-video creative approval. Do not claim a persistent autonomous Production Director or automatic repair loop exists.
 
 ## 8. Immediate development direction
-
 The traceable storyboard revision workflow through PRs #88–#90 remains implemented, with explicit narrative-beat review (#91), Creative Brief → storyboard handoff (#95), storyboard-to-production-plan import (#97) and criterion-to-asset evidence report (#98) merged. The report is review-only and does not establish semantic asset relevance.
 
+PR #99 added signed A/V stream-start-offset diagnostics and PR #100 added a real MP4 offset regression. PR #100's integration test was skipped in CI because FFmpeg setup followed `npm test`; PR #101 corrected the order and its exact-head CI #44662651944 passed with **219 tests, 0 failed, 0 skipped**. Post-merge main CI #44669560240 passed. PR #102 now adds real-MP4 freeze and black-frame tests for warning versus hard-failure thresholds. This test-only slice requires no render gate; the actual project test run remains pending CI.
 
-PR #99 added signed A/V stream start-offset diagnostics; PR #100 added a real MP4 late-audio integration test, but CI log #44654898138 revealed that test was skipped because FFmpeg setup was placed after `npm test`. PR #101 fixes the test-ordering gate and adds real MP4 silence-warning and excessive-silence failure cases. This is the highest-priority actionable QA follow-up: verify the real-media tests execute, not merely that the test suite exits green.
 
 
 ## Resume checklist
@@ -258,3 +257,11 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - PR #101 moves FFmpeg setup and version verification ahead of `npm test` and adds real MP4 silence fixtures to verify moderate silence is a warning and excessive silence is a hard error.
 - Fixture recipes were manually tested with FFmpeg/FFprobe: the warning case measured 1.215667s of silence; the error case measured 2.516979s. Both used aligned audio/video streams and emitted no freeze/black findings. Repository integration tests await CI.
 - No render gate applies to this test-only workflow correction. No full playback or audio listening was performed.
+
+
+## 2026-11-20 — PR #101 merged; real-media integration tests executed
+
+- PR #101 merged as `a299ab13321df1399b3f7176292fb04d838ff211`; PR CI #44662651944 passed on exact head `8f4b2526dfe041e67693e85e3ae6e63da42459fb`. The test log reported 219 passed, 0 failed, 0 skipped, confirming the FFmpeg-backed offset and silence integration tests ran after tool setup.
+- Post-merge main CI #44669560240 passed on the merge commit.
+- PR #102 adds generated MP4 regressions through the real `inspectMedia` pipeline for frozen-video and black-frame intervals, including warning/pass and excessive/error thresholds. Fixture generation recipes were manually verified with FFmpeg/FFprobe 7.1.5; repository tests are pending CI.
+- No render gate applies to this QA-test-only slice. No full video playback or audio listening was performed.
