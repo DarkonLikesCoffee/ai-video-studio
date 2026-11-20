@@ -2,7 +2,7 @@ name: Render video
 
 on:
   push:
-    branches: [main, "fix/**", "feat/cinematic-motion-qa", "feat/user-gameplay-footage-pipeline"]
+    branches: [main, "fix/**", "feat/**"]
     paths:
       - render-request.json
 
