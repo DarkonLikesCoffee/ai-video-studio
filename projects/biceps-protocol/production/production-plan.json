@@ -143,5 +143,67 @@
     "Visuals clearly identified as illustrative.",
     "Music beneath narration and mastered final mix.",
     "Inspect MP4 and contact sheet."
+  ],
+  "acceptanceCoverage": [
+    {
+      "criterion": "1920×1080, 16:9 H.264 MP4 near 60 seconds.",
+      "shotIds": [
+        "opening-hook",
+        "protocol-finale"
+      ]
+    },
+    {
+      "criterion": "Spanish narration with word-aligned captions.",
+      "shotIds": [
+        "opening-hook",
+        "anatomy-map",
+        "standing-curl",
+        "incline-curl",
+        "hammer-curl",
+        "protocol-finale"
+      ]
+    },
+    {
+      "criterion": "Six distinct chapters with purposeful motion.",
+      "shotIds": [
+        "opening-hook",
+        "anatomy-map",
+        "standing-curl",
+        "incline-curl",
+        "hammer-curl",
+        "protocol-finale"
+      ]
+    },
+    {
+      "criterion": "Exercise depictions communicate joint action and grip.",
+      "shotIds": [
+        "standing-curl",
+        "incline-curl",
+        "hammer-curl"
+      ]
+    },
+    {
+      "criterion": "Visuals clearly identified as illustrative.",
+      "shotIds": [
+        "opening-hook",
+        "anatomy-map",
+        "standing-curl",
+        "incline-curl",
+        "hammer-curl"
+      ]
+    },
+    {
+      "criterion": "Music beneath narration and mastered final mix.",
+      "shotIds": [
+        "opening-hook",
+        "protocol-finale"
+      ]
+    },
+    {
+      "criterion": "Inspect MP4 and contact sheet.",
+      "shotIds": [
+        "protocol-finale"
+      ]
+    }
   ]
 }
