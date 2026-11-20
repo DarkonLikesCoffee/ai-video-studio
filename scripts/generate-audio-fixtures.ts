@@ -232,3 +232,69 @@ await writeMonoWav(resolve(madridTravelDirectory, "madrid-travel-score.wav"), ma
 });
 
 console.log("Generated legacy samples, original Aether, PULSE, SORA, and Madrid travel audio fixtures.");
+
+
+// Original soundscape for THE LAST SIGNAL: restrained analog synths, coastal wind,
+// and a patterned radio transmission. Generated deterministically with no paid APIs.
+const lastSignalDirectory = resolve("projects/surprise-last-signal/assets/audio");
+const lastSignalDuration = 28;
+const lastSignalChords = [
+  [55, 82.41, 110, 164.81],
+  [49, 73.42, 98, 146.83],
+  [65.41, 98, 130.81, 196],
+  [55, 82.41, 110, 164.81],
+];
+await writeMonoWav(resolve(lastSignalDirectory, "score.wav"), lastSignalDuration, (time) => {
+  const fadeIn = Math.min(1, time / 2.4);
+  const fadeOut = Math.min(1, (lastSignalDuration - time) / 2.6);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const chord = lastSignalChords[Math.min(3, Math.floor(time / 7))]!;
+  const pad = chord.reduce((sum, frequency, index) => {
+    const detune = Math.sin(2 * Math.PI * 0.035 * time + index * 0.8) * 0.7;
+    return sum + Math.sin(2 * Math.PI * (frequency + detune) * time) * (0.18 - index * 0.025);
+  }, 0);
+  const beatLength = 60 / 72;
+  const beat = time % beatLength;
+  const sub = Math.sin(2 * Math.PI * (39 + 24 * Math.exp(-beat * 11)) * beat) *
+    Math.exp(-beat * 14) * 0.17;
+  const shimmer = Math.sin(2 * Math.PI * 392 * time + Math.sin(time * 0.28)) * 0.018 +
+    Math.sin(2 * Math.PI * 587.33 * time + Math.sin(time * 0.17)) * 0.012;
+  const distantPulse = Math.sin(2 * Math.PI * 164.81 * time) *
+    Math.pow(Math.max(0, Math.sin(2 * Math.PI * 0.125 * time)), 10) * 0.035;
+  return (pad + sub + shimmer + distantPulse) * envelope * 0.56;
+});
+
+await writeMonoWav(resolve(lastSignalDirectory, "wind.wav"), lastSignalDuration, (time) => {
+  const fadeIn = Math.min(1, time / 1.8);
+  const fadeOut = Math.min(1, (lastSignalDuration - time) / 2.2);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const low = Math.sin(2 * Math.PI * 43 * time + Math.sin(time * 0.11)) * 0.34;
+  const mid = Math.sin(2 * Math.PI * 57.7 * time + Math.sin(time * 0.19) * 1.8) * 0.16;
+  const gust = 0.72 + 0.28 * Math.sin(2 * Math.PI * 0.071 * time + 0.4);
+  const texture = Math.sin(2 * Math.PI * 181 * time + Math.sin(time * 0.31)) * 0.035;
+  return (low + mid + texture) * gust * envelope * 0.16;
+});
+
+const signalPulses = [
+  [4.20, 0.16], [4.62, 0.16], [5.04, 0.16], [5.95, 0.66],
+  [8.10, 0.12], [8.47, 0.12], [8.84, 0.12], [9.55, 0.42],
+  [14.30, 0.12], [14.68, 0.12], [15.06, 0.12], [15.80, 0.7],
+  [19.60, 0.10], [20.00, 0.10], [20.40, 0.10], [21.15, 0.55],
+  [23.70, 0.12], [24.10, 0.12], [24.50, 0.12], [25.25, 0.62],
+];
+await writeMonoWav(resolve(lastSignalDirectory, "signal.wav"), lastSignalDuration, (time) => {
+  let output = 0;
+  for (const [start, length] of signalPulses) {
+    const local = time - start!;
+    if (local < 0 || local > length!) continue;
+    const attack = Math.min(1, local / 0.008);
+    const release = Math.min(1, (length! - local) / 0.035);
+    const envelope = Math.max(0, Math.min(attack, release));
+    const carrier = Math.sin(2 * Math.PI * (510 + 34 * Math.sin(local * 8)) * local);
+    const overtone = Math.sin(2 * Math.PI * 1020 * local) * 0.22;
+    output += (carrier + overtone) * envelope * 0.44;
+  }
+  return output;
+});
+
+console.log("Generated original THE LAST SIGNAL score, coastal ambience, and radio pulses.");

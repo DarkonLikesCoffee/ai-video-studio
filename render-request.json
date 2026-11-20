@@ -1,6 +1,8 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "ProjectVideo",
+  "outputName": "the-last-signal-surprise",
+  "requestId": "surprise-last-signal-20261120-03",
+  "candidateSha": "PLACEHOLDER",
+  "projectPath": "projects/surprise-last-signal/scene.json"
 }

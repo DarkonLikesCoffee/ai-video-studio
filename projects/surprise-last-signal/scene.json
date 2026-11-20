@@ -1,0 +1,941 @@
+{
+  "schemaVersion": 1,
+  "id": "the-last-signal-surprise",
+  "title": "THE LAST SIGNAL — Midnight Transmission",
+  "description": "An original 28-second cinematic science-fiction microfilm: a remote observatory detects a repeating signal, answers it, and discovers the signal is coming from its own future. Original vector environments, camera-like moves, layered sound and minimal editorial typography.",
+  "composition": {
+    "id": "ProjectVideo",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "audioTracks": [
+    {
+      "id": "score",
+      "role": "music",
+      "src": "assets/audio/score.wav",
+      "startInFrames": 0,
+      "durationInFrames": 840,
+      "volume": 0.72,
+      "fadeInFrames": 48,
+      "fadeOutFrames": 72
+    },
+    {
+      "id": "wind",
+      "role": "ambience",
+      "src": "assets/audio/wind.wav",
+      "startInFrames": 0,
+      "durationInFrames": 840,
+      "volume": 0.2,
+      "fadeInFrames": 60,
+      "fadeOutFrames": 60
+    },
+    {
+      "id": "signal",
+      "role": "sfx",
+      "src": "assets/audio/signal.wav",
+      "startInFrames": 0,
+      "durationInFrames": 840,
+      "volume": 0.5,
+      "fadeInFrames": 0,
+      "fadeOutFrames": 12
+    }
+  ],
+  "scenes": [
+    {
+      "id": "night-coast",
+      "type": "title",
+      "durationInFrames": 150,
+      "eyebrow": "NORTH ATLANTIC / 04:17",
+      "title": "THE LAST\nSIGNAL",
+      "body": "No one had transmitted from this station in 19 years.",
+      "backgroundColor": "#07101e",
+      "accentColor": "#f5c58f",
+      "mediaLayers": [
+        {
+          "id": "observatory-wide",
+          "type": "image",
+          "src": "assets/observatory.svg",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "fit": "cover",
+          "zIndex": 0,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.12
+                },
+                {
+                  "frame": 149,
+                  "value": 1
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.12
+                },
+                {
+                  "frame": 149,
+                  "value": 1
+                }
+              ]
+            },
+            "x": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 3
+                },
+                {
+                  "frame": 149,
+                  "value": -2
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "titleAnimation": {
+        "opacity": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 0
+            },
+            {
+              "frame": 26,
+              "value": 1
+            }
+          ]
+        },
+        "y": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 34
+            },
+            {
+              "frame": 32,
+              "value": 0,
+              "easing": "ease-out"
+            }
+          ]
+        }
+      },
+      "bodyAnimation": {
+        "opacity": {
+          "keyframes": [
+            {
+              "frame": 34,
+              "value": 0
+            },
+            {
+              "frame": 58,
+              "value": 1
+            },
+            {
+              "frame": 128,
+              "value": 1
+            },
+            {
+              "frame": 149,
+              "value": 0
+            }
+          ]
+        }
+      },
+      "graphics": [
+        {
+          "id": "scan-line",
+          "type": "path",
+          "x": 0,
+          "y": 48,
+          "width": 100,
+          "height": 1,
+          "d": "M0 50 L100 50",
+          "stroke": "#ffd7a3",
+          "strokeWidth": 1,
+          "opacity": 0.26,
+          "animations": {
+            "width": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.01
+                },
+                {
+                  "frame": 110,
+                  "value": 100
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "coord",
+          "type": "text",
+          "x": 7,
+          "y": 89,
+          "width": 42,
+          "height": 4,
+          "text": "SIGNAL ACQUISITION  /  001",
+          "fill": "#f5c58f",
+          "fontSize": 17,
+          "letterSpacing": 3,
+          "opacity": 0.82
+        }
+      ]
+    },
+    {
+      "id": "the-antenna",
+      "type": "content",
+      "durationInFrames": 150,
+      "transitionIn": {
+        "type": "cut",
+        "durationInFrames": 0
+      },
+      "eyebrow": "INCOMING / 02:31:08",
+      "title": "A pulse in the noise.",
+      "body": "Three short. One long. Then the same sequence again.",
+      "backgroundColor": "#06111d",
+      "accentColor": "#ffd99e",
+      "mediaLayers": [
+        {
+          "id": "dish",
+          "type": "image",
+          "src": "assets/antenna.svg",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "fit": "cover",
+          "zIndex": 0,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.18
+                },
+                {
+                  "frame": 149,
+                  "value": 1.02
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.18
+                },
+                {
+                  "frame": 149,
+                  "value": 1.02
+                }
+              ]
+            },
+            "x": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": -2
+                },
+                {
+                  "frame": 149,
+                  "value": 2
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "titleAnimation": {
+        "opacity": {
+          "keyframes": [
+            {
+              "frame": 4,
+              "value": 0
+            },
+            {
+              "frame": 28,
+              "value": 1
+            }
+          ]
+        },
+        "x": {
+          "keyframes": [
+            {
+              "frame": 4,
+              "value": -22
+            },
+            {
+              "frame": 30,
+              "value": 0,
+              "easing": "ease-out"
+            }
+          ]
+        }
+      },
+      "graphics": [
+        {
+          "id": "pulse-a",
+          "type": "ellipse",
+          "x": 48,
+          "y": 24,
+          "width": 4,
+          "height": 11,
+          "stroke": "#ffe0a8",
+          "strokeWidth": 2,
+          "opacity": 0.8,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.5
+                },
+                {
+                  "frame": 75,
+                  "value": 7
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.5
+                },
+                {
+                  "frame": 75,
+                  "value": 7
+                }
+              ]
+            },
+            "opacity": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.8
+                },
+                {
+                  "frame": 75,
+                  "value": 0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "pulse-b",
+          "type": "ellipse",
+          "x": 48,
+          "y": 24,
+          "width": 4,
+          "height": 11,
+          "stroke": "#ffe0a8",
+          "strokeWidth": 1,
+          "opacity": 0.7,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 30,
+                  "value": 0.5
+                },
+                {
+                  "frame": 105,
+                  "value": 8
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 30,
+                  "value": 0.5
+                },
+                {
+                  "frame": 105,
+                  "value": 8
+                }
+              ]
+            },
+            "opacity": {
+              "keyframes": [
+                {
+                  "frame": 30,
+                  "value": 0.7
+                },
+                {
+                  "frame": 105,
+                  "value": 0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "scope",
+          "type": "path",
+          "x": 72,
+          "y": 15,
+          "width": 21,
+          "height": 62,
+          "d": "M0 50 L100 50 M50 0 L50 100",
+          "stroke": "#b6d5df",
+          "strokeWidth": 1,
+          "opacity": 0.34
+        }
+      ]
+    },
+    {
+      "id": "inside-the-room",
+      "type": "content",
+      "durationInFrames": 150,
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 14,
+        "easing": "ease-in-out"
+      },
+      "eyebrow": "OBSERVATORY / LOWER DECK",
+      "title": "It knows our coordinates.",
+      "body": "The message contains a location that has not been built yet.",
+      "backgroundColor": "#0b1421",
+      "accentColor": "#a7d6e4",
+      "mediaLayers": [
+        {
+          "id": "control-room",
+          "type": "image",
+          "src": "assets/control-room.svg",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "fit": "cover",
+          "zIndex": 0,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.1
+                },
+                {
+                  "frame": 149,
+                  "value": 1.01
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.1
+                },
+                {
+                  "frame": 149,
+                  "value": 1.01
+                }
+              ]
+            },
+            "y": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 2
+                },
+                {
+                  "frame": 149,
+                  "value": -1
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "titleAnimation": {
+        "opacity": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 0
+            },
+            {
+              "frame": 27,
+              "value": 1
+            }
+          ]
+        },
+        "y": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 20
+            },
+            {
+              "frame": 28,
+              "value": 0,
+              "easing": "ease-out"
+            }
+          ]
+        }
+      },
+      "graphics": [
+        {
+          "id": "terminal-text",
+          "type": "text",
+          "x": 8,
+          "y": 72,
+          "width": 41,
+          "height": 4,
+          "text": "LAT  63° 08'  N     LON  021° 44'  W",
+          "fill": "#91d3df",
+          "fontSize": 16,
+          "letterSpacing": 1.5,
+          "opacity": 0.8
+        },
+        {
+          "id": "terminal-cursor",
+          "type": "rect",
+          "x": 8,
+          "y": 80,
+          "width": 1.3,
+          "height": 0.5,
+          "fill": "#a9edf0",
+          "opacity": 0.8,
+          "animations": {
+            "x": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 8
+                },
+                {
+                  "frame": 140,
+                  "value": 42
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-reply",
+      "type": "content",
+      "durationInFrames": 150,
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 12
+      },
+      "eyebrow": "OUTBOUND TRANSMISSION / 04:19",
+      "title": "We answered.",
+      "body": "A single burst of light crossed the black horizon.",
+      "backgroundColor": "#070d1a",
+      "accentColor": "#ffcb92",
+      "mediaLayers": [
+        {
+          "id": "beacon-sky",
+          "type": "image",
+          "src": "assets/beacon.svg",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "fit": "cover",
+          "zIndex": 0,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.17
+                },
+                {
+                  "frame": 149,
+                  "value": 1
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.17
+                },
+                {
+                  "frame": 149,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "titleAnimation": {
+        "opacity": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 0
+            },
+            {
+              "frame": 28,
+              "value": 1
+            }
+          ]
+        },
+        "x": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": -14
+            },
+            {
+              "frame": 28,
+              "value": 0,
+              "easing": "ease-out"
+            }
+          ]
+        }
+      },
+      "graphics": [
+        {
+          "id": "transmission-beam",
+          "type": "path",
+          "x": 4,
+          "y": 22,
+          "width": 92,
+          "height": 56,
+          "d": "M0 90 Q48 0 100 42",
+          "stroke": "#ffe3ad",
+          "strokeWidth": 2.4,
+          "opacity": 0.7,
+          "animations": {
+            "pathProgress": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0
+                },
+                {
+                  "frame": 82,
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "beam-orbit",
+          "type": "ellipse",
+          "x": 55,
+          "y": 22,
+          "width": 32,
+          "height": 56,
+          "stroke": "#ffd59a",
+          "strokeWidth": 1,
+          "opacity": 0.3,
+          "animations": {
+            "rotation": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": -24
+                },
+                {
+                  "frame": 149,
+                  "value": 32
+                }
+              ]
+            },
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.8
+                },
+                {
+                  "frame": 149,
+                  "value": 1.2
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-twist",
+      "type": "content",
+      "durationInFrames": 120,
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 16
+      },
+      "eyebrow": "RECEIVED / 04:17",
+      "title": "Wait.",
+      "body": "The reply is dated tomorrow. And signed with our call sign.",
+      "backgroundColor": "#11101c",
+      "accentColor": "#f3b38e",
+      "mediaLayers": [
+        {
+          "id": "dawn",
+          "type": "image",
+          "src": "assets/dawn.svg",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "fit": "cover",
+          "zIndex": 0,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.2
+                },
+                {
+                  "frame": 119,
+                  "value": 1
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.2
+                },
+                {
+                  "frame": 119,
+                  "value": 1
+                }
+              ]
+            },
+            "y": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 3
+                },
+                {
+                  "frame": 119,
+                  "value": -2
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "titleAnimation": {
+        "opacity": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 0
+            },
+            {
+              "frame": 18,
+              "value": 1
+            }
+          ]
+        },
+        "scaleX": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 0.82
+            },
+            {
+              "frame": 26,
+              "value": 1
+            }
+          ]
+        },
+        "scaleY": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 0.82
+            },
+            {
+              "frame": 26,
+              "value": 1
+            }
+          ]
+        }
+      },
+      "graphics": [
+        {
+          "id": "future-date",
+          "type": "text",
+          "x": 8,
+          "y": 72,
+          "width": 38,
+          "height": 6,
+          "text": "20 NOV 2026  /  04:19:03",
+          "fill": "#fff0d0",
+          "fontSize": 26,
+          "fontWeight": 700,
+          "letterSpacing": 2,
+          "opacity": 0.92
+        },
+        {
+          "id": "signature",
+          "type": "text",
+          "x": 8,
+          "y": 82,
+          "width": 35,
+          "height": 4,
+          "text": "SENDER: STATION 01 — US",
+          "fill": "#f6c5a4",
+          "fontSize": 18,
+          "letterSpacing": 2,
+          "opacity": 0.76
+        }
+      ]
+    },
+    {
+      "id": "end",
+      "type": "outro",
+      "durationInFrames": 120,
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 18
+      },
+      "eyebrow": "END TRANSMISSION",
+      "title": "IT WAS US.",
+      "body": "THE LAST SIGNAL  /  A SHORT FILM",
+      "backgroundColor": "#050912",
+      "accentColor": "#f3c88f",
+      "mediaLayers": [
+        {
+          "id": "final-coast",
+          "type": "image",
+          "src": "assets/observatory.svg",
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100,
+          "fit": "cover",
+          "opacity": 0.52,
+          "zIndex": 0,
+          "animations": {
+            "scaleX": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.22
+                },
+                {
+                  "frame": 119,
+                  "value": 1.06
+                }
+              ]
+            },
+            "scaleY": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 1.22
+                },
+                {
+                  "frame": 119,
+                  "value": 1.06
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "titleAnimation": {
+        "opacity": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 0
+            },
+            {
+              "frame": 28,
+              "value": 1
+            }
+          ]
+        },
+        "y": {
+          "keyframes": [
+            {
+              "frame": 0,
+              "value": 22
+            },
+            {
+              "frame": 30,
+              "value": 0,
+              "easing": "ease-out"
+            }
+          ]
+        }
+      },
+      "graphics": [
+        {
+          "id": "closing-rule",
+          "type": "path",
+          "x": 23,
+          "y": 66,
+          "width": 54,
+          "height": 1,
+          "d": "M0 50 L100 50",
+          "stroke": "#f4ca91",
+          "strokeWidth": 1,
+          "opacity": 0.64,
+          "animations": {
+            "width": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.01
+                },
+                {
+                  "frame": 70,
+                  "value": 100
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "closing-id",
+          "type": "text",
+          "x": 40,
+          "y": 76,
+          "width": 20,
+          "height": 4,
+          "text": "A SIGNAL FROM TOMORROW",
+          "fill": "#eecda6",
+          "fontSize": 15,
+          "letterSpacing": 3,
+          "opacity": 0.74
+        }
+      ]
+    }
+  ],
+  "audioMastering": {
+    "integratedLufs": -16,
+    "truePeakDb": -1.5,
+    "loudnessRange": 11
+  },
+  "output": {
+    "format": "mp4",
+    "codec": "h264"
+  }
+}
