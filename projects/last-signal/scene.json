@@ -646,38 +646,7 @@
       ]
     }
   ],
-  "subtitles": [
-    {
-      "id": "line-1",
-      "startInFrames": 42,
-      "durationInFrames": 42,
-      "text": "Somewhere, someone is still listening.",
-      "position": "bottom",
-      "alignment": "left",
-      "fontSize": 28,
-      "backgroundOpacity": 0.72
-    },
-    {
-      "id": "line-2",
-      "startInFrames": 132,
-      "durationInFrames": 48,
-      "text": "One pulse. Then silence.",
-      "position": "bottom",
-      "alignment": "left",
-      "fontSize": 28,
-      "backgroundOpacity": 0.72
-    },
-    {
-      "id": "line-3",
-      "startInFrames": 222,
-      "durationInFrames": 48,
-      "text": "The signal came from beyond the horizon.",
-      "position": "bottom",
-      "alignment": "left",
-      "fontSize": 28,
-      "backgroundOpacity": 0.72
-    }
-  ],
+  "subtitles": [],
   "output": {
     "format": "mp4",
     "codec": "h264"
