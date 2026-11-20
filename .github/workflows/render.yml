@@ -196,7 +196,15 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         env:
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
-        run: npm run qa:media -- "render-output/$OUTPUT_NAME.mp4"
+          PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
+        run: |
+          PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+          PLAN_PATH="$PROJECT_DIR/production/production-plan.json"
+          if [[ -f "$PLAN_PATH" ]]; then
+            npm run qa:media -- "render-output/$OUTPUT_NAME.mp4" --plan "$PLAN_PATH" --duration-tolerance 0.75
+          else
+            npm run qa:media -- "render-output/$OUTPUT_NAME.mp4"
+          fi
 
       - name: Generate render contact sheet and JSON evidence
         if: steps.request.outputs.provider == 'github-actions'
