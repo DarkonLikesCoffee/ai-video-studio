@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `d6e5314c320b01a24e8161f2ff59c7a313e03be3` — PR #103 merged; exact-head CI #44675048271 passed (226 tests passed, 0 failed, 0 skipped, FFmpeg/FFprobe verified); post-merge main CI #44681010124 is in progress
-**Current development branch:** `feat/render-provenance-manifest` (PR #104 in progress). PR #103 merged as `d6e5314c320b01a24e8161f2ff59c7a313e03be3`; exact-head CI #44675048271 passed with 226 tests and 0 skipped, confirming the CI-required media integration suite ran with FFmpeg/FFprobe. Post-merge main CI #44681010124 is still running. PR #104 adds a render provenance JSON manifest and post-upload artifact ID/URL/digest summary to the GitHub Actions render workflow; no new render has yet exercised it.
+**Last verified main commit:** `d6e5314c320b01a24e8161f2ff59c7a313e03be3` — PR #103 merged; exact-head CI #44675048271 passed (226 tests passed, 0 failed, 0 skipped, FFmpeg/FFprobe verified); post-merge main CI #44681010124 passed
+**Current development branch:** `feat/render-provenance-manifest` (PR #104 in progress). PR #103 merged as `d6e5314c320b01a24e8161f2ff59c7a313e03be3`; exact-head CI #44675048271 passed with 226 tests and 0 skipped, confirming the CI-required media integration suite ran with FFmpeg/FFprobe. Post-merge main CI #44681010124 completed successfully. PR #104 adds a render provenance JSON manifest and post-upload artifact ID/URL/digest summary to the GitHub Actions render workflow. CI #44695855199 passed on code head `78d58e5febe56f1b42be1215828fb932e52c3938` (231 tests, 0 skipped, typecheck, validation and build); this documentation refresh requires a new CI run. No render has yet exercised the provenance workflow.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -107,7 +107,7 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 7. Verified current repository snapshot — 2026-11-20
 
-- Main HEAD: `d6e5314c320b01a24e8161f2ff59c7a313e03be3` (PR #103 merged; exact-head CI #44675048271 passed with 226 tests and 0 skipped; post-merge main CI #44681010124 is in progress).
+- Main HEAD: `d6e5314c320b01a24e8161f2ff59c7a313e03be3` (PR #103 merged; exact-head CI #44675048271 passed with 226 tests and 0 skipped; post-merge main CI #44681010124 passed).
 - PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
 - PRs #66–#77 are merged.
 - A real MP4 from render run #44485488551 (artifact #14511125907) was retrieved and inspected with a contact sheet. Its bundled media-QA report passed with no detected silence, frozen video, black frames or audio/video duration drift beyond thresholds. See the new benchmark entry in `PROGRESS_LOG.md`.

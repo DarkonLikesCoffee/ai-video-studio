@@ -547,3 +547,11 @@ Append one entry per meaningful development session:
 - Selected the next actionable P0 item: preserve traceable evidence for each GitHub Actions render. The existing artifact bundles MP4, Media QA JSON, contact-sheet image/report and optional credits, but lacks a source/request/run manifest and post-upload artifact identifiers in the run summary.
 - PR #104 adds `scripts/render-provenance.ts`, `render:provenance`, tests for metadata/QA summaries and SHA-256 file evidence, a manifest in the render artifact, and a post-upload workflow summary with artifact ID, URL and digest. Documentation is reconciled to PR #103's verified state.
 - This is render-workflow evidence tooling, not a new video-producing capability. CI tests the script/workflow changes; a subsequent render is still needed to verify the manifest against a real uploaded artifact. No render, playback or audio listening was performed during this work.
+
+
+## 2026-11-20 — PR #104 provenance CI passed; merge review
+
+- PR #98 is merged as `73807bad31f133a0a2819cdd084286903f963645`; required CI #44608513408 passed, and post-merge main CI #44620050018 passed. PR #103 post-merge main CI #44681010124 also passed on main commit `d6e5314c320b01a24e8161f2ff59c7a313e03be3`.
+- PR #104 (`feat/render-provenance-manifest`) is based on that main commit. Exact-head CI #44695855199 passed on code head `78d58e5febe56f1b42be1215828fb932e52c3938`: 231 tests passed, 0 failed, 0 skipped; TypeScript type-check, project validation, examples/preview/risk steps and studio build passed. Reviewed the provenance script, tests and workflow wiring: required render/evidence files are hashed and sized; optional credits are included when present; the manifest is uploaded; the run summary records the post-upload artifact ID, URL and digest. The manifest intentionally does not include its own artifact ID.
+- No render has exercised the provenance manifest. This remains workflow/code validation, not audiovisual acceptance. No full playback or audio listening was performed.
+- Updated project state and roadmap to reflect the main CI success and PR #104 validation. This documentation commit requires a fresh CI run before merge.
