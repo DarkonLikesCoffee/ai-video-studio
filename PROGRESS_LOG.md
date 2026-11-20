@@ -593,3 +593,13 @@ Append one entry per meaningful development session:
 - Asset evidence is `ready`: 6 shots, 18 assets, 6/6 criteria linked, 0 missing files, unresolved references, unsafe paths, missing rights/provenance, warnings or errors. Provenance manifest hashes the MP4 and QA, contact-sheet and asset-evidence files.
 - Inspected the 12-frame v7 contact sheet at 5-second intervals. It shows real supplied gameplay in all six chapters, but large chapter headlines remain overlaid on the footage. This is sampled visual review only; no complete playback or audio listening was performed. Creative acceptance remains open.
 - Current development branch `fix/benchmark-duration-contract-v2` is based on main `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`; the latest CI tested the implementation and the render v7 commit contains the render-specific code/config changes. No PR has yet been opened for this slice. Next priority is full audiovisual review and refinement of title hierarchy/timing and gameplay readability.
+
+
+## 2026-11-20 — Technical render freeze and duplicate-request gate
+
+- Root cause addressed: project commits were not the render trigger; changes to `render-request.json` were. The old render path validated request shape but did not require a frozen candidate SHA or reject repeat submissions of the same candidate.
+- Added `scripts/render-candidate.mjs` and placed it at the start of the Render workflow, before dependency installation and Remotion. The request must specify `candidateSha` equal to the remote branch tip immediately before the request-only commit; the entire triggering push must change exactly `render-request.json`.
+- The workflow fetches full history and rejects reused candidate SHAs or request IDs. Deterministic ordering means only the earliest of duplicate submissions can proceed. New-branch pushes are rejected. Added regression tests covering missing/mismatched SHA, mixed project/request pushes, duplicate candidates, duplicate IDs and initial branch pushes.
+- CI passed: #44801247196 for PR #115 and #44801549483 for PR #116 (typecheck, test suite and studio build all succeeded). PR #115 targets `main`; PR #116 applies the same protection to the active Biceps production branch.
+- The Biceps v10 request and its `render-request.json` were left untouched; this change did not trigger another render. Existing render run #44797815155 had already completed successfully.
+- Limitation: a machine cannot infer whether a creative concept is artistically finished. The new gate guarantees a separate frozen candidate, checks the technical request boundary and prevents duplicate submissions; the agent's render-ready review and existing project/asset/media QA remain required.

@@ -684,7 +684,8 @@ Example request:
   "projectPath": "projects/showcase-motion/scene.json",
   "compositionId": "ProjectVideo",
   "outputName": "aether-motion-showcase",
-  "requestId": "replace-with-a-unique-id"
+  "requestId": "replace-with-a-unique-id",
+  "candidateSha": "40-character SHA of the frozen candidate commit"
 }
 ```
 
@@ -693,7 +694,7 @@ Supported providers:
 - `github-actions`: GitHub Actions renders the MP4 and stores it as an artifact for 3 days.
 - `circleci`: a small GitHub Actions dispatcher calls the CircleCI API; CircleCI performs the same Remotion render and stores the MP4 as a CircleCI artifact.
 
-The render request must use a new `requestId` each time. The selected project JSON is passed to Remotion through `--props`; for `ProjectVideo`, the project folder is also passed as `--public-dir` so its assets load in both providers.
+The render request must use a new `requestId` each time. The request must also include `candidateSha`: the full commit SHA of the frozen project candidate already pushed to the branch. Push the project first, then create a separate commit that changes **only** `render-request.json`. The render workflow rejects requests whose candidate SHA does not equal the previous remote branch tip, whose triggering push changes any other file, or whose candidate SHA / request ID has already been submitted. This keeps ordinary project commits out of the render pipeline and prevents duplicate submissions of the same frozen candidate. The selected project JSON is passed to Remotion through `--props`; for `ProjectVideo`, the project folder is also passed as `--public-dir` so its assets load in both providers.
 
 ### One-time CircleCI setup
 
