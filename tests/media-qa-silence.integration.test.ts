@@ -5,12 +5,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { inspectMedia } from "../scripts/media-qa";
+import { assertMediaToolsAvailable, ffmpegPath, ffprobePath, skipMediaIntegration } from "./media-qa-integration-helpers";
 
-const ffmpegPath = process.env.FFMPEG_PATH ?? "ffmpeg";
-const ffprobePath = process.env.FFPROBE_PATH ?? "ffprobe";
-const mediaToolsAvailable =
-  spawnSync(ffmpegPath, ["-version"], { stdio: "ignore" }).status === 0 &&
-  spawnSync(ffprobePath, ["-version"], { stdio: "ignore" }).status === 0;
 
 const createSilenceFixture = (
   directory: string,
@@ -39,9 +35,10 @@ const createSilenceFixture = (
 };
 
 test("inspectMedia reports moderate silence as a warning in a real MP4", {
-  skip: !mediaToolsAvailable,
+  skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
+  assertMediaToolsAvailable();
   const directory = await mkdtemp(join(tmpdir(), "media-qa-silence-warning-"));
 
   try {
@@ -70,9 +67,10 @@ test("inspectMedia reports moderate silence as a warning in a real MP4", {
 });
 
 test("inspectMedia fails excessive silence in a real MP4", {
-  skip: !mediaToolsAvailable,
+  skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
+  assertMediaToolsAvailable();
   const directory = await mkdtemp(join(tmpdir(), "media-qa-silence-error-"));
 
   try {
