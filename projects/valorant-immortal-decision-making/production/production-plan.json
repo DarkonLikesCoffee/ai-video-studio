@@ -172,5 +172,79 @@
     "Music is ducked beneath narration and transitions/impact accents are synchronized to the visual events.",
     "No synthetic visual is described or implied to be authentic VALORANT gameplay; tactical diagrams are clearly illustrative.",
     "The actual rendered MP4 is inspected for pacing, motion, caption timing, audio balance and technical integrity before delivery."
+  ],
+  "acceptanceCoverage": [
+    {
+      "criterion": "Final output is a 1920×1080, 16:9 H.264 MP4 with a 60-second duration, within the repository's supported 60-second project limit.",
+      "shotIds": [
+        "the-hook",
+        "aim-isnt-everything",
+        "read-the-round",
+        "the-ego-peek",
+        "the-better-play",
+        "play-smarter"
+      ],
+      "rationale": "This deliverable-level criterion applies across the complete six-shot timeline; link all shot IDs so its evidence is reviewed project-wide."
+    },
+    {
+      "criterion": "English narration is generated from the approved script, remains intelligible, and is accompanied by word-aligned captions.",
+      "shotIds": [
+        "the-hook",
+        "aim-isnt-everything",
+        "read-the-round",
+        "the-ego-peek",
+        "the-better-play",
+        "play-smarter"
+      ],
+      "rationale": "This deliverable-level criterion applies across the complete six-shot timeline; link all shot IDs so its evidence is reviewed project-wide."
+    },
+    {
+      "criterion": "Every scene contains purposeful animated motion and the six chapters use distinct compositions; the result must not read as a slideshow.",
+      "shotIds": [
+        "the-hook",
+        "aim-isnt-everything",
+        "read-the-round",
+        "the-ego-peek",
+        "the-better-play",
+        "play-smarter"
+      ],
+      "rationale": "This deliverable-level criterion applies across the complete six-shot timeline; link all shot IDs so its evidence is reviewed project-wide."
+    },
+    {
+      "criterion": "Music is ducked beneath narration and transitions/impact accents are synchronized to the visual events.",
+      "shotIds": [
+        "the-hook",
+        "aim-isnt-everything",
+        "read-the-round",
+        "the-ego-peek",
+        "the-better-play",
+        "play-smarter"
+      ],
+      "rationale": "This deliverable-level criterion applies across the complete six-shot timeline; link all shot IDs so its evidence is reviewed project-wide."
+    },
+    {
+      "criterion": "No synthetic visual is described or implied to be authentic VALORANT gameplay; tactical diagrams are clearly illustrative.",
+      "shotIds": [
+        "the-hook",
+        "aim-isnt-everything",
+        "read-the-round",
+        "the-ego-peek",
+        "the-better-play",
+        "play-smarter"
+      ],
+      "rationale": "This deliverable-level criterion applies across the complete six-shot timeline; link all shot IDs so its evidence is reviewed project-wide."
+    },
+    {
+      "criterion": "The actual rendered MP4 is inspected for pacing, motion, caption timing, audio balance and technical integrity before delivery.",
+      "shotIds": [
+        "the-hook",
+        "aim-isnt-everything",
+        "read-the-round",
+        "the-ego-peek",
+        "the-better-play",
+        "play-smarter"
+      ],
+      "rationale": "This deliverable-level criterion applies across the complete six-shot timeline; link all shot IDs so its evidence is reviewed project-wide."
+    }
   ]
 }
