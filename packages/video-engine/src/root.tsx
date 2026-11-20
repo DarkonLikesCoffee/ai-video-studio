@@ -9,7 +9,6 @@ import { MadridTrip, MADRID_TRIP_DURATION, FPS as MADRID_TRIP_FPS, WIDTH as MADR
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
 import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
 import { SportsCarCinematic } from "./scenes/SportsCarCinematic";
-import { SportsCarCinematic } from "./scenes/SportsCarCinematic";
 
 // Remotion merges partial --props over defaultProps. Do not leak the example
 // project's soundtrack into projects that intentionally omit audioTracks.
