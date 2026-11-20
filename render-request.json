@@ -1,6 +1,7 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "SportsCarCinematic",
+  "outputName": "sports-car-3d-cinematic",
+  "requestId": "sports-car-3d-cinematic-20261120-v1",
+  "candidateSha": "ff931e6f43c6987e750c9205fb607646d88c9a57"
 }
