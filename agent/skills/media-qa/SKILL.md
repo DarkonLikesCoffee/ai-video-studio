@@ -18,6 +18,12 @@ The command writes a sidecar `video.qa.json` unless a report path is supplied.
 - Uses FFmpeg blackdetect to locate sustained black frames (default 0.5 s).
 - Reports intervals with timestamps and thresholds for review.
 
+## Real-media integration tests
+
+- `tests/media-qa-ffmpeg.integration.test.ts` generates a moving-pattern MP4 with delayed audio and checks the actual `inspectMedia` pipeline for an A/V start-offset error without conflating it with duration drift.
+- `tests/media-qa-silence.integration.test.ts` generates real MP4 fixtures with moderate and excessive silence and verifies warning/failure severity, interval measurement and clean A/V timing.
+- These tests are part of `npm test`. They skip if FFmpeg/FFprobe are unavailable locally. CI must install and verify both binaries before the test step; placing tool setup after `npm test` causes the integration tests to be skipped rather than validated.
+
 ## Interpretation
 - Missing audio/video stream or invalid duration is a hard failure.
 - Audio/video duration differences above 0.5 seconds and start offsets above 0.5 seconds are hard failures by default.
