@@ -159,6 +159,15 @@ export const validateProductionPlan = (value: unknown): string[] => {
       if (!Number.isFinite(start) || start < 0) errors.push(`shots[${index}].startSeconds must be non-negative.`);
       if (!Number.isFinite(duration) || duration <= 0) errors.push(`shots[${index}].durationSeconds must be greater than zero.`);
       if (Number.isFinite(start) && start < previousStart) errors.push("shots must be ordered by startSeconds.");
+      if (index > 0 && Number.isFinite(start)) {
+        const previousShot = plan.shots[index - 1];
+        if (isRecord(previousShot)) {
+          const previousEnd = Number(previousShot.startSeconds) + Number(previousShot.durationSeconds);
+          if (Number.isFinite(previousEnd) && Math.abs(start - previousEnd) > 1e-6) {
+            errors.push(`Timeline gap/overlap before shots[${index}]: expected startSeconds ${previousEnd}, received ${start}.`);
+          }
+        }
+      }
       if (Number.isFinite(start)) previousStart = start;
       if (Number.isFinite(start) && Number.isFinite(duration) && start + duration > totalDurationSeconds + 1e-6) {
         errors.push(`shots[${index}] extends beyond the delivery duration.`);
