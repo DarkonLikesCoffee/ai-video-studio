@@ -246,7 +246,7 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 
 ## 2026-11-20 — A/V stream start-offset diagnostics (PR #99 merged)
 
-- PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8`; required validate CI #44646093493 passed on exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`. Post-merge main CI #44654418400 is in progress.
+- PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8`; required validate CI #44646093493 passed on exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`. Post-merge main CI #44654418400 passed.
 - Reports signed audio-minus-video first-stream `start_time` offset, with a configurable 0.5s default hard-failure threshold separate from duration drift. Missing timestamps are omitted rather than guessed.
 - Regression tests cover aligned starts, late and early audio with equal stream durations, threshold configuration and missing timestamps. No render gate applies; no local test run, full playback or audio listening was performed.
 
