@@ -25,6 +25,12 @@ The command writes a sidecar `video.qa.json` unless a report path is supplied.
 - `tests/media-qa-video-intervals.integration.test.ts` generates real MP4s with frozen or black middle segments and verifies warning/pass versus excessive/error behavior, while checking unrelated silence and A/V timing measurements remain clean.
 - These tests are part of `npm test`. They skip locally if FFmpeg/FFprobe are unavailable. CI sets `MEDIA_QA_INTEGRATION_REQUIRED=1` for the test step; in required mode the test helper disables skips and throws a clear error if either binary is missing. This prevents a green run from silently omitting the real-media suite.
 
+## Render provenance
+
+- GitHub Actions render artifacts include a `*.provenance.json` manifest tying the render to its source commit/ref, workflow run/attempt, request ID and project identity.
+- The manifest records SHA-256 and size for the MP4, Media QA JSON, contact-sheet image/report and optional credits; it summarizes technical QA findings/measurements and contact-sheet sampling.
+- The post-upload workflow summary supplies the artifact ID, URL and upload digest. The manifest cannot include its own artifact ID because that ID exists only after upload.
+
 ## Interpretation
 - Missing audio/video stream or invalid duration is a hard failure.
 - Audio/video duration differences above 0.5 seconds and start offsets above 0.5 seconds are hard failures by default.
