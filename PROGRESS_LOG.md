@@ -511,3 +511,12 @@ Append one entry per meaningful development session:
 - PR #100 (`test/media-qa-ffmpeg-offset-integration`) creates a short moving test-pattern MP4 with 0.65s delayed audio, then asserts the start-offset finding is present and stream-duration drift remains below the independent threshold. The fixture skips when FFmpeg/FFprobe are absent; CI installs both before tests.
 - Manually verified the fixture recipe with FFmpeg/FFprobe: video start `0.000000`, audio start `0.628000`, video duration `3.600000`, audio duration `3.621333`, drift `0.021333s`; audio/video filters emitted no silence/freeze/black findings. The actual repository test and typecheck have not run locally; PR CI is pending.
 - No render gate applies to this test-only QA hardening. No full video playback or audio listening was performed.
+
+
+## 2026-11-20 — PR #100 merged; real-media test skipped, PR #101 corrects CI ordering
+
+- PR #100 merged as `ad5746fbf07053116786b5d4c9c8c1a72137296a`; its CI #44654898138 and post-merge main CI #44662134081 passed.
+- Inspected the actual PR #100 CI job log. `npm test` reported 216 passed and 1 skipped; subtest 57, the real MP4 delayed-audio integration test, was skipped because FFmpeg/FFprobe had not been installed yet. The workflow installed them only after `npm test`, so the green run did not exercise the integration test.
+- PR #101 moves FFmpeg setup and verification before the test step and adds real MP4 silence integration cases through `inspectMedia`: 1.2s silence should be a warning and keep the report passed; 2.5s silence should be an error and fail the report.
+- Manually generated and inspected the fixture recipes with local FFmpeg/FFprobe: warning case silence 1.215667s; excessive case 2.516979s. Both streams start aligned and video filters report no freeze/black intervals. This is fixture verification, not execution of the repository TypeScript tests.
+- No render gate applies. No full video playback or audio listening was performed.
