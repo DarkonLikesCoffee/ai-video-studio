@@ -5,12 +5,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { inspectMedia } from "../scripts/media-qa";
+import { assertMediaToolsAvailable, ffmpegPath, ffprobePath, skipMediaIntegration } from "./media-qa-integration-helpers";
 
-const ffmpegPath = process.env.FFMPEG_PATH ?? "ffmpeg";
-const ffprobePath = process.env.FFPROBE_PATH ?? "ffprobe";
-const mediaToolsAvailable =
-  spawnSync(ffmpegPath, ["-version"], { stdio: "ignore" }).status === 0 &&
-  spawnSync(ffprobePath, ["-version"], { stdio: "ignore" }).status === 0;
 
 const createSegmentedFixture = (
   directory: string,
@@ -56,9 +52,10 @@ const assertCleanSynchronization = (report: Awaited<ReturnType<typeof inspectMed
 };
 
 test("inspectMedia reports a short real-video freeze as a warning", {
-  skip: !mediaToolsAvailable,
+  skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
+  assertMediaToolsAvailable();
   const directory = await mkdtemp(join(tmpdir(), "media-qa-freeze-warning-"));
 
   try {
@@ -79,9 +76,10 @@ test("inspectMedia reports a short real-video freeze as a warning", {
 });
 
 test("inspectMedia fails an excessive real-video freeze", {
-  skip: !mediaToolsAvailable,
+  skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
+  assertMediaToolsAvailable();
   const directory = await mkdtemp(join(tmpdir(), "media-qa-freeze-error-"));
 
   try {
@@ -102,9 +100,10 @@ test("inspectMedia fails an excessive real-video freeze", {
 });
 
 test("inspectMedia reports a short real black-video interval as a warning", {
-  skip: !mediaToolsAvailable,
+  skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
+  assertMediaToolsAvailable();
   const directory = await mkdtemp(join(tmpdir(), "media-qa-black-warning-"));
 
   try {
@@ -125,9 +124,10 @@ test("inspectMedia reports a short real black-video interval as a warning", {
 });
 
 test("inspectMedia fails an excessive real black-video interval", {
-  skip: !mediaToolsAvailable,
+  skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
+  assertMediaToolsAvailable();
   const directory = await mkdtemp(join(tmpdir(), "media-qa-black-error-"));
 
   try {
