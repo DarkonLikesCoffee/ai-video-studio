@@ -4,7 +4,7 @@
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
 **Last verified main commit:** `dd25e95c7853bc298f744e3eb6b5e891a66a9eba` — PR #104 merged; exact-head CI #44704302163 passed (231 tests passed, 0 failed, 0 skipped); post-merge main CI #44717786935 passed (231 tests passed, 0 failed, 0 skipped)
-**Current development branch:** `feat/render-asset-evidence-gate` (PR #105 in progress). PR #104 merged as `dd25e95c7853bc298f744e3eb6b5e891a66a9eba`; exact-head CI #44704302163 passed with 231 tests and 0 skipped, including typecheck, project validation and build. Post-merge main CI #44717786935 passed with 231 tests and 0 skipped. Render run #44717916331 is in progress on `fix/render-provenance-benchmark-v5` to exercise the provenance manifest on a real artifact; its result and artifact inspection are pending. PR #105 adds a strict criterion-to-asset evidence gate before rendering, corrects the VALORANT benchmark manifest's shot IDs/rights metadata, and includes the report in the provenance manifest; its CI and render validation are pending.
+**Current development branch:** `feat/render-asset-evidence-gate` (PR #105 in progress). PR #104 merged as `dd25e95c7853bc298f744e3eb6b5e891a66a9eba`; exact-head CI #44704302163 passed with 231 tests and 0 skipped, including typecheck, project validation and build. Post-merge main CI #44717786935 passed with 231 tests and 0 skipped. Render run #44717916331 completed successfully on `fix/render-provenance-benchmark-v5`; artifact #14620562670 (46.8 MiB) includes the MP4, QA report, contact sheet and provenance manifest. QA passed: 1920×1080 H.264 at 30 fps, 47.856 s, AAC stereo 96 kHz, no detected silence/freeze/black intervals, integrated loudness −16.0 LUFS, true peak −1.4 dBFS, start offset 0 s and A/V duration drift 0.123 s. The provenance manifest and post-upload artifact ID/URL/digest were verified. A 1-fps contact sheet was inspected; full playback and audio listening remain pending. PR #105 adds a strict criterion-to-asset evidence gate before rendering, corrects the VALORANT benchmark manifest's shot IDs/rights metadata, and includes the report in the provenance manifest; its latest CI is running and v6 render validation is pending.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -128,11 +128,11 @@ The next agent should use this project as a regression/quality case, not simply 
 These features are deterministic and heuristic. They do not semantically understand the story, inspect motion continuously, listen to the audio, or guarantee cinematic quality. A contact sheet is a sparse visual sample, not full-video creative approval. Do not claim a persistent autonomous Production Director or automatic repair loop exists.
 
 ## 8. Immediate development direction
-PR #104 is merged and its provenance code is validated by exact-head CI #44704302163 (231 passed, 0 failed, 0 skipped) and post-merge main CI #44717786935 (231 passed, 0 failed, 0 skipped). Render run #44717916331 on `fix/render-provenance-benchmark-v5` is still in progress; provenance has not yet been verified on the uploaded artifact.
+PR #104 is merged and its provenance code is validated by exact-head CI #44704302163 (231 passed, 0 failed, 0 skipped) and post-merge main CI #44717786935 (231 passed, 0 failed, 0 skipped). Render run #44717916331 on `fix/render-provenance-benchmark-v5` succeeded; artifact #14620562670 and its provenance manifest were inspected. The render is 47.856 s although the project and production plan are 60 s (six 10-second scenes); investigate the duration mismatch. QA detected no silence/freeze/black intervals, measured −16.0 LUFS and −1.4 dBFS true peak, and found 0.123 s A/V duration drift with 0 s start offset. The 1-fps contact sheet was reviewed, but full playback/audio listening is not performed.
 
 PR #105 (`feat/render-asset-evidence-gate`) is in progress. It adds a strict criterion→shot→asset evidence report before render, includes the report in the artifact and provenance manifest, and fixes the VALORANT asset-manifest shot IDs and rights metadata. CI and the v6 render gate are pending. The project-data regression stages placeholder files and validates mapping/metadata only; it does not decode the real media.
 
-No full playback or audio listening was performed during this work.
+No full playback or audio listening was performed during this work; only a 1-fps contact sheet was inspected.
 
 
 ## Resume checklist
