@@ -83,26 +83,6 @@
       "rightsNote": "Original synthetic audio, no third-party recording."
     },
     {
-      "path": "assets/audio/impact.wav",
-      "type": "original-generated-audio-fixture",
-      "shotIds": [
-        "all"
-      ],
-      "provenance": "Generated deterministically by scripts/generate-audio-fixtures.ts.",
-      "rightsBasis": "original-generated-audio",
-      "rightsNote": "Original synthetic audio, no third-party recording."
-    },
-    {
-      "path": "assets/audio/transition-chime.wav",
-      "type": "original-generated-audio-fixture",
-      "shotIds": [
-        "all"
-      ],
-      "provenance": "Generated deterministically by scripts/generate-audio-fixtures.ts.",
-      "rightsBasis": "original-generated-audio",
-      "rightsNote": "Original synthetic audio, no third-party recording."
-    },
-    {
       "path": "assets/audio/narration.wav",
       "type": "generated-speech",
       "shotIds": [
