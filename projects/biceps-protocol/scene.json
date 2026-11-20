@@ -35,8 +35,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 120,
-                "value": 54
+                "frame": 61,
+                "value": 54,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 122,
+                "value": 57,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 179,
+                "value": 53,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -48,8 +59,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 61,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 122,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 179,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -61,8 +83,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 61,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 122,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 179,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -141,8 +174,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 120,
-                "value": 54
+                "frame": 82,
+                "value": 54,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 163,
+                "value": 57,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 239,
+                "value": 53,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -154,8 +198,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 82,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 163,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 239,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -167,8 +222,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 82,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 163,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 239,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -304,8 +370,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 120,
-                "value": 54
+                "frame": 122,
+                "value": 54,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 57,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 53,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -317,8 +394,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 122,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -330,8 +418,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 122,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -491,8 +590,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 120,
-                "value": 54
+                "frame": 122,
+                "value": 54,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 57,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 53,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -504,8 +614,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 122,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -517,8 +638,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 122,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -665,8 +797,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 120,
-                "value": 54
+                "frame": 122,
+                "value": 54,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 57,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 53,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -678,8 +821,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 122,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -691,8 +845,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 122,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 245,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 359,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -817,8 +982,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 120,
-                "value": 54
+                "frame": 102,
+                "value": 54,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 204,
+                "value": 57,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 299,
+                "value": 53,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -830,8 +1006,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 102,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 204,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 299,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
@@ -843,8 +1030,19 @@
                 "easing": "ease-out"
               },
               {
-                "frame": 130,
-                "value": 0.91
+                "frame": 102,
+                "value": 0.91,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 204,
+                "value": 0.935,
+                "easing": "ease-in-out"
+              },
+              {
+                "frame": 299,
+                "value": 0.91,
+                "easing": "ease-in-out"
               }
             ]
           },
