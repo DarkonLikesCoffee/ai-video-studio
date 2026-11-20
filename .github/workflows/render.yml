@@ -171,6 +171,9 @@ jobs:
           elif [[ -n "$PROJECT_PATH" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
+          elif [[ "$COMPOSITION_ID" == "MadridTrip" ]]; then
+            # Keep the single WebGL canvas below Chromium's per-runner context limit.
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1"
           else
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
           fi
