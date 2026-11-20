@@ -130,6 +130,8 @@ The command uses `assetManifestPath` from the plan when available; otherwise it 
 
 Use `--strict` to return a failing exit code when warnings/errors are present or asset/criterion evidence is unavailable. Without strict mode, the report is review-only and does not fail for incomplete evidence. A linked asset does not prove it visually satisfies the shot or acceptance criterion, and procedural shots may intentionally have no manifest assets.
 
+For GitHub Actions renders, the production-plan asset report is generated after local assets and narration are staged. When a plan exists, the render is blocked by `--strict` if references, local files, provenance or rights evidence are incomplete. The report is uploaded and its summary is included in the render-provenance manifest; renders without a production plan receive a clearly marked not-applicable report.
+
 ## Automated rendered-media QA
 
 After a render, run a technical diagnostic pass on the actual MP4:
