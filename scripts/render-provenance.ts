@@ -176,7 +176,7 @@ const main = async () => {
   const creditsPath = resolve(process.env.CREDITS_PATH ?? `render-output/${outputName}-credits.txt`);
   const manifestPath = resolve(process.env.PROVENANCE_MANIFEST_PATH ?? `render-output/${outputName}.provenance.json`);
   const workspacePath = resolve(process.env.GITHUB_WORKSPACE ?? process.cwd());
-  const artifactPath = normalizeArtifactPath;
+  const artifactPath = (path: string) => normalizeArtifactPath(path, workspacePath);
 
   const files = await collectArtifactFiles([
     { filePath: outputPath, artifactPath: `render-output/${outputName}.mp4`, required: true },
