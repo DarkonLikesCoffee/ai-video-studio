@@ -5,8 +5,8 @@ import { buildMediaQaReport, buildMediaQaAudioFilter } from "../scripts/media-qa
 const probe = {
   format: { duration: "60.1", size: "7000000", bit_rate: "900000", format_name: "mov,mp4" },
   streams: [
-    { index: 0, codec_type: "video", codec_name: "h264", width: 1920, height: 1080, avg_frame_rate: "30/1", duration: "60.1" },
-    { index: 1, codec_type: "audio", codec_name: "aac", sample_rate: "48000", channels: 2, duration: "60.1" },
+    { index: 0, codec_type: "video", codec_name: "h264", width: 1920, height: 1080, avg_frame_rate: "30/1", duration: "60.1", start_time: "0.000000" },
+    { index: 1, codec_type: "audio", codec_name: "aac", sample_rate: "48000", channels: 2, duration: "60.1", start_time: "0.000000" },
   ],
 };
 
@@ -15,6 +15,7 @@ test("media QA reports metadata and clean audio/video", () => {
   assert.equal(report.passed, true);
   assert.equal(report.video?.fps, 30);
   assert.equal(report.audio?.sampleRate, 48000);
+  assert.equal(report.measurements.audioVideoStartOffsetSeconds, 0);
   assert.equal(report.findings.length, 0);
 });
 
@@ -33,11 +34,11 @@ test("media QA detects long digital silence intervals with timestamps", () => {
   assert.equal(report.findings[0]?.severity, "error");
 });
 
-test("media QA keeps short silence as a warning but rejects excessive A/V drift", () => {
+test("media QA keeps short silence as a warning but rejects excessive A/V duration drift", () => {
   const shortSilence = buildMediaQaReport(
     "brief-pause.mp4",
     probe,
-    "[silencedetect] silence_start: 4.0" + String.fromCharCode(10) + "[silencedetect] silence_end: 5.0 | silence_duration: 1.0",
+    "[silencedetect] silence_start: 4.0\n[silencedetect] silence_end: 5.0 | silence_duration: 1.0",
     "",
   );
   assert.equal(shortSilence.passed, true);
@@ -54,6 +55,59 @@ test("media QA keeps short silence as a warning but rejects excessive A/V drift"
   assert.equal(mismatch.passed, false);
   assert.ok(Math.abs((mismatch.measurements.audioVideoDurationDriftSeconds ?? 0) - 1.2) < 0.001);
   assert.ok(mismatch.findings.some((finding) => finding.code === "audio-video-duration-mismatch"));
+});
+
+test("media QA detects late audio starts even when stream durations match", () => {
+  const offsetProbe = {
+    ...probe,
+    streams: [
+      { ...probe.streams[0]!, start_time: "1.250" },
+      { ...probe.streams[1]!, start_time: "1.900" },
+    ],
+  };
+  const report = buildMediaQaReport("late-audio.mp4", offsetProbe, "", "");
+  assert.equal(report.measurements.audioVideoStartOffsetSeconds, 0.65);
+  assert.equal(report.measurements.audioVideoDurationDriftSeconds, 0);
+  assert.equal(report.passed, false);
+  assert.ok(report.findings.some((finding) =>
+    finding.code === "audio-video-start-offset" && finding.message.includes("after video"),
+  ));
+});
+
+test("media QA detects audio that starts before video and honors the offset threshold", () => {
+  const earlyAudioProbe = {
+    ...probe,
+    streams: [
+      { ...probe.streams[0]!, start_time: "2.000" },
+      { ...probe.streams[1]!, start_time: "1.400" },
+    ],
+  };
+  const tooEarly = buildMediaQaReport("early-audio.mp4", earlyAudioProbe, "", "");
+  assert.equal(tooEarly.measurements.audioVideoStartOffsetSeconds, -0.6);
+  assert.equal(tooEarly.passed, false);
+  assert.ok(tooEarly.findings.some((finding) =>
+    finding.code === "audio-video-start-offset" && finding.message.includes("before video"),
+  ));
+
+  const accepted = buildMediaQaReport("allowed-offset.mp4", earlyAudioProbe, "", "", {
+    maxAudioVideoStartOffsetSeconds: 0.65,
+  });
+  assert.equal(accepted.passed, true);
+  assert.equal(accepted.thresholds.maxAudioVideoStartOffsetSeconds, 0.65);
+});
+
+test("media QA skips start-offset checks when ffprobe does not report both stream starts", () => {
+  const missingStartProbe = {
+    ...probe,
+    streams: [
+      { ...probe.streams[0]!, start_time: undefined },
+      { ...probe.streams[1]!, start_time: "0.200" },
+    ],
+  };
+  const report = buildMediaQaReport("missing-start-times.mp4", missingStartProbe, "", "");
+  assert.equal(report.measurements.audioVideoStartOffsetSeconds, undefined);
+  assert.equal(report.passed, true);
+  assert.ok(!report.findings.some((finding) => finding.code === "audio-video-start-offset"));
 });
 
 test("media QA detects frozen video and black intervals", () => {

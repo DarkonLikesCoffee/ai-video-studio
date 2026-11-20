@@ -1,10 +1,10 @@
 # AI Video Studio — Project State
 
-**Last verified:** 2026-11-19  
+**Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354` — PR #97 storyboard-to-production-plan import merged
-**Current development branch:** `feat/director-asset-evidence-report` (PR #98 open; required CI rerunning after a TypeScript syntax fix). PRs #95, #96 and #97 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 passed; merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; post-merge main CI #44574582076 passed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
+**Last verified main commit:** `73807bad31f133a0a2819cdd084286903f963645` — PR #98 criterion-to-asset evidence report merged; required validate CI #44608513408 and post-merge main CI passed
+**Current development branch:** `feat/media-qa-av-start-offset` (PR #99 open; required validate CI #44643693225 passed on exact head `89c88a155c7b13bb699e15515de1871c625d066a`; merge pending). PRs #95, #96, #97 and #98 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 and post-merge main CI #44574582076 passed. PR #98 merge commit `73807bad31f133a0a2819cdd084286903f963645`; PR CI #44608513408 passed and post-merge main CI completed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -105,9 +105,9 @@ Creative QA result: **not accepted as a successful cinematic explainer**.
 
 The next agent should use this project as a regression/quality case, not simply produce another similar SVG slideshow.
 
-## 7. Verified current repository snapshot — 2026-11-19
+## 7. Verified current repository snapshot — 2026-11-20
 
-- Main HEAD: `93cec7fec2a4c8917bb6c231519b75181fb54d48` (PR #77 merged).
+- Main HEAD: `73807bad31f133a0a2819cdd084286903f963645` (PR #98 criterion-to-asset evidence report merged).
 - PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
 - PRs #66–#77 are merged.
 - A real MP4 from render run #44485488551 (artifact #14511125907) was retrieved and inspected with a contact sheet. Its bundled media-QA report passed with no detected silence, frozen video, black frames or audio/video duration drift beyond thresholds. See the new benchmark entry in `PROGRESS_LOG.md`.
@@ -127,11 +127,12 @@ The next agent should use this project as a regression/quality case, not simply 
 
 These features are deterministic and heuristic. They do not semantically understand the story, inspect motion continuously, listen to the audio, or guarantee cinematic quality. A contact sheet is a sparse visual sample, not full-video creative approval. Do not claim a persistent autonomous Production Director or automatic repair loop exists.
 
-## 7. Immediate development direction
+## 8. Immediate development direction
 
-The traceable storyboard revision workflow is now implemented through PRs #88–#90: source plans remain immutable, critiques can be selected, model-neutral prompts exported, and imported edits are constrained to selected shots/fields and applied to a separate validated plan. PR #91 adds explicit narrative-beat review. PR #95 now provides a model-neutral storyboard handoff from Creative Brief, and PR #97 imports storyboard JSON into a validated production plan with exact acceptance-criterion → shot mapping.
+The traceable storyboard revision workflow through PRs #88–#90 remains implemented, with explicit narrative-beat review (#91), Creative Brief → storyboard handoff (#95), storyboard-to-production-plan import (#97) and criterion-to-asset evidence report (#98) now merged. The report is review-only and does not establish semantic asset relevance.
 
-Next, connect this criterion/shot mapping to asset selection and build evidence. A report-only CLI should resolve manifest assets per shot, check local files and provenance/rights fields, surface unlinked criterion shots and unresolved references, and preserve honest limitations: it cannot semantically determine whether an asset satisfies the creative criterion.
+
+Next priority is to move from planning evidence to actual asset selection/build and repeatable real-render QA. PR #99 adds an independent signed stream-start-offset diagnostic to media QA; its exact-head CI passed and merge is pending. Technical timestamps still do not prove narration/SFX alignment with visual events or creative acceptance.
 
 ## Resume checklist
 
@@ -232,14 +233,18 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - PR #97 merged as `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`; its required `validate` run #44556330379 passed. The CLI converts model-authored storyboard JSON into a validated production plan, checking delivery, frame-aligned contiguous timing and complete exact criterion-to-shot coverage with rationale.
 - Optional `acceptanceCoverage` is schema/runtime validated; legacy plans without coverage remain valid. Free-form `engineApproach` is retained in bounded `implementationNotes`, while recognized enum values remain normalized.
 - Initial CI run #44550086585 failed because the validator's strict enum check rejected five legacy `external-footage-with-3d-inset` values in the narrated-explainer plan. Those values are now preserved as `implementationNotes`, and a regression test validates the migrated example.
-- The final PR diff was reviewed, including compatibility migration of legacy `engineApproach` notes and restoration of the storyboard handoff files; no render gate applies to this planning/import slice. Local tests/typecheck were not run outside CI. Post-merge main CI #44574582076 is in progress.
-- Next: review current CI/diff, fix any remaining failures, merge only after checks pass, then connect production-plan criteria to asset/build evidence and visual QA.
+- The final PR diff was reviewed, including compatibility migration of legacy `engineApproach` notes and restoration of the storyboard handoff files; no render gate applies to this planning/import slice. Local tests/typecheck were not run outside CI. Post-merge main CI #44574582076 passed.
+- Next step completed by PR #98: connect production-plan criteria to asset-manifest evidence; follow-up now adds first-stream start-offset diagnostics to media QA.
 
 
-## Creative Brief → asset evidence report (development branch)
+## Creative Brief → asset evidence report (merged)
 
-- PR #98: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98 on branch `feat/director-asset-evidence-report`, based on PR #97 merge commit `b05ff0b3674e9a96fd9fdd925bd73a7d9afa6354`.
-- New `director:asset-evidence` CLI maps manifest entries to shot IDs and criterion coverage; checks local file presence/path safety and provenance/rights metadata; surfaces unresolved planned asset references and unknown shot IDs.
-- Report is review-only. Asset links are not semantic proof; procedural shots may intentionally have no manifest assets. `--strict` is opt-in.
-- Tests are added for linked files, missing file/provenance/rights, `all` assignments, unknown IDs, unsafe paths, unresolved plan references and missing coverage.
-- CI history: #44577136550 failed typecheck (fixed); #44585662593 failed tests due to a missing closing parenthesis in the shared-asset test at line 80; #44591887176 failed on the same test file at line 88, where `assert.ok(...some(...))` was missing its final closing parenthesis. The test syntax was corrected on the same branch in commit `42bdb0366e3a3ffa8063b5bde982cf4d559f3c6a`; a new CI run is required for this exact commit. Main CI #44574582076 passed. CI remains the validation gate; no render is applicable to this report-only planning slice. No full video playback or audio listening was performed.
+- PR #98 merged: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/98 as `73807bad31f133a0a2819cdd084286903f963645` (required CI #44608513408 passed; post-merge main CI succeeded).
+- `director:asset-evidence` maps criterion→shot→manifest assets and checks local file/path safety, unresolved references and provenance/rights metadata. It remains report-only; asset links do not establish semantic relevance, and procedural shots may intentionally have no assets.
+- This planning/report CLI requires no video render. No playback or audio listening was performed.
+
+## 2026-11-20 — A/V stream start-offset diagnostics (PR #99; CI passed)
+
+- PR #99: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/99 on `feat/media-qa-av-start-offset`; CI run #44628990848 passed on exact head `78915bd48f3b55373a6a829a8473b7e55fdfcb70`. Diff reviewed; merge pending.
+- Reports signed audio-minus-video first-stream `start_time` offset, with a configurable 0.5s default hard-failure threshold separate from duration drift. Missing timestamps are omitted rather than guessed.
+- Regression tests cover aligned starts, late and early audio with equal stream durations, threshold configuration and missing timestamps. No render gate applies; no local test run, full playback or audio listening was performed.

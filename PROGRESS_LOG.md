@@ -477,3 +477,28 @@ Append one entry per meaningful development session:
 - Inspected latest PR #98 CI run #44591887176. Type-check passed; the test step failed to load `tests/director-asset-evidence.test.ts` because the unknown-shot assertion at line 88 was missing a closing parenthesis. Earlier run #44585662593 had the same syntax error in the shared-asset assertion at line 80; that was corrected in a later head, revealing the second typo.
 - Fixed the line-88 assertion on the existing `feat/director-asset-evidence-report` branch in commit `42bdb0366e3a3ffa8063b5bde982cf4d559f3c6a`. No test was bypassed. Connector-only environment means tests were not executed locally; CI is required on the final branch head.
 - Updated PROJECT_STATE with the CI evidence. Main CI #44574582076 passed. This report-only change does not require a render gate. No full video playback or audio listening was performed.
+
+
+## 2026-11-19 — PR #98 merged; media QA stream start-offset diagnostic in progress
+
+- PR #98 criterion-to-asset evidence report merged as `73807bad31f133a0a2819cdd084286903f963645`. Required `validate` CI #44608513408 passed; post-merge main CI also passed. The report-only criterion→shot→manifest bridge is now on main; it checks unresolved references, local path/file safety and provenance/rights fields without asserting visual suitability.
+- Re-read `START_HERE.md` and its required state/roadmap/log/agent/docs/skills; checked current main, open PRs (none), CI/workflows and relevant media-QA implementation. PRs #95 and #97 remain merged and are not being redone; PR #80 remains closed/unmerged and its true-peak fix is through #86.
+- Roadmap P0 synchronization/QA remains incomplete: duration checks cannot detect equal-length streams with differing start timestamps. Selected a focused follow-up on branch `feat/media-qa-av-start-offset`.
+- Added ffprobe stream `start_time` support and a signed `audioVideoStartOffsetSeconds` measurement (audio start minus video start). Absolute offsets over 0.5s default fail, independently from duration drift; the option is configurable. Missing timestamps are omitted rather than guessed.
+- Added regression tests for aligned starts, late audio with equal stream durations, early audio, configurable threshold and absent timestamps. Updated README and Media QA skill plus PROJECT_STATE and ROADMAP. No local test/typecheck was run because this connector session cannot execute the repo; CI is required.
+- This diagnostic slice does not require a render. No new render, full video playback or audio listening was performed. Latest previously inspected render run #42 remains technical QA evidence only: no detected silence and 0.199s duration drift, with limited contact-sheet inspection.
+
+
+## 2026-11-19 — PR #99 code review correction and benchmark timestamp check
+
+- Reviewed PR #99 diff and caught two unintended parser regressions before CI: the true-peak regex was missing its closing parenthesis, and the `silence_end` regex had lost its negative-number allowance. Corrected both on the same branch in commit `e40a71c3aeb7437dc2abffbbd6b503b8fe39fdac`.
+- Retrieved Render run #42 artifact #14532466761 and inspected its actual MP4 with ffprobe. Video start time 0.000s, audio start time 0.000s (new signed offset would be 0.000s); video stream duration 47.700s, audio/format duration 47.899s. Existing QA JSON passed with no findings, no detected silence/freeze/black intervals, -16.0 LUFS, -1.5 dBFS true peak and 0.199s duration drift. This is technical metadata, not full playback or listening.
+- PR #99 is open: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/99. CI run #44628990848 completed successfully for exact head `78915bd48f3b55373a6a829a8473b7e55fdfcb70`; type-check, tests and validate all passed. PR #99 is mergeable and remains open pending merge. No render gate applies to the diagnostic-only slice.
+
+
+## 2026-11-20 — PR #99 current-head validation evidence (merge pending)
+
+- Rechecked PR #99 against main commit `73807bad31f133a0a2819cdd084286903f963645`: branch `feat/media-qa-av-start-offset`, exact head `89c88a155c7b13bb699e15515de1871c625d066a`, 21 commits ahead and 0 behind; PR remains open and mergeable.
+- Required validate CI #44643693225 completed successfully on this exact head. All steps passed, including TypeScript type-check, tests, production-plan/example validation, preview generation, project validations and studio build. Its `storyboard-planning-previews` artifact #14587822246 was uploaded (8,947 bytes). No render artifact is expected from this diagnostics-only change.
+- Reviewed the PR patch: the signed offset is computed from ffprobe first video/audio stream `start_time`, missing/invalid timestamp values are omitted, and the configurable default 0.5s absolute threshold is independent of duration drift. Regression tests cover zero offset, equal-duration late audio, early audio, custom tolerance and missing timestamps.
+- Main CI #44620050018 passed on the current main commit. PR #99 is merge-ready pending the final merge action. No local test execution, fresh render, full video playback or audio listening was performed.

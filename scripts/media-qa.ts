@@ -13,6 +13,7 @@ export type MediaQaOptions = {
   maxFreezeDurationSeconds?: number;
   maxBlackDurationSeconds?: number;
   maxAudioVideoDriftSeconds?: number;
+  maxAudioVideoStartOffsetSeconds?: number;
   maxTruePeakDbfs?: number;
   warningTruePeakDbfs?: number;
 };
@@ -26,6 +27,7 @@ export type MediaStream = {
   sample_rate?: string;
   channels?: number;
   duration?: string;
+  start_time?: string;
   avg_frame_rate?: string;
   r_frame_rate?: string;
 };
@@ -45,6 +47,7 @@ export type MediaQaReport = {
     maxFreezeDurationSeconds: number;
     maxBlackDurationSeconds: number;
     maxAudioVideoDriftSeconds: number;
+    maxAudioVideoStartOffsetSeconds: number;
     maxTruePeakDbfs: number;
     warningTruePeakDbfs: number;
   };
@@ -82,6 +85,7 @@ export type MediaQaReport = {
     blackIntervals: Array<{ startSeconds: number; endSeconds: number; durationSeconds: number }>;
     loudnessSummary?: string;
     audioVideoDurationDriftSeconds?: number;
+    audioVideoStartOffsetSeconds?: number;
     truePeakDbfs?: number;
   };
 };
@@ -99,6 +103,7 @@ const defaults: Required<MediaQaOptions> = {
   maxFreezeDurationSeconds: 2.5,
   maxBlackDurationSeconds: 1,
   maxAudioVideoDriftSeconds: 0.5,
+  maxAudioVideoStartOffsetSeconds: 0.5,
   maxTruePeakDbfs: 0,
   warningTruePeakDbfs: -1,
 };
@@ -165,6 +170,13 @@ const fpsNumber = (value?: string): number => {
   if (!numeratorText || !denominatorText ||
       !Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) return 0;
   return numerator / denominator;
+};
+
+const streamStartSeconds = (stream?: MediaStream): number | undefined => {
+  const value = stream?.start_time;
+  if (value === undefined || value.trim() === "") return undefined;
+  const seconds = Number(value);
+  return Number.isFinite(seconds) ? seconds : undefined;
 };
 
 export const buildMediaQaReport = (
@@ -246,6 +258,21 @@ export const buildMediaQaReport = (
     });
   }
 
+  const videoStartSeconds = streamStartSeconds(videoStream);
+  const audioStartSeconds = streamStartSeconds(audioStream);
+  const audioVideoStartOffsetSeconds = videoStartSeconds !== undefined && audioStartSeconds !== undefined
+    ? Number((audioStartSeconds - videoStartSeconds).toFixed(3))
+    : undefined;
+  if (audioVideoStartOffsetSeconds !== undefined &&
+      Math.abs(audioVideoStartOffsetSeconds) > config.maxAudioVideoStartOffsetSeconds) {
+    const direction = audioVideoStartOffsetSeconds > 0 ? "after" : "before";
+    findings.push({
+      severity: "error",
+      code: "audio-video-start-offset",
+      message: `Audio starts ${Math.abs(audioVideoStartOffsetSeconds).toFixed(3)}s ${direction} video (maximum absolute offset ${config.maxAudioVideoStartOffsetSeconds.toFixed(3)}s).`,
+    });
+  }
+
   const loudnessSummary = audioLog.match(/Integrated loudness:\s*([^\n]+)/)?.[1]?.trim();
   const truePeakMatch = audioLog.match(/True peak:\s*(?:Peak:\s*)?(-?[0-9.]+)\s*dBFS/i);
   const truePeakDbfs = truePeakMatch ? Number(truePeakMatch[1]) : undefined;
@@ -289,6 +316,7 @@ export const buildMediaQaReport = (
       maxFreezeDurationSeconds: config.maxFreezeDurationSeconds,
       maxBlackDurationSeconds: config.maxBlackDurationSeconds,
       maxAudioVideoDriftSeconds: config.maxAudioVideoDriftSeconds,
+      maxAudioVideoStartOffsetSeconds: config.maxAudioVideoStartOffsetSeconds,
       maxTruePeakDbfs: config.maxTruePeakDbfs,
       warningTruePeakDbfs: config.warningTruePeakDbfs,
     },
@@ -309,6 +337,7 @@ export const buildMediaQaReport = (
       ...(loudnessSummary ? { loudnessSummary } : {}),
       ...(truePeakDbfs === undefined || !Number.isFinite(truePeakDbfs) ? {} : { truePeakDbfs }),
       ...(audioVideoDurationDriftSeconds === undefined ? {} : { audioVideoDurationDriftSeconds }),
+      ...(audioVideoStartOffsetSeconds === undefined ? {} : { audioVideoStartOffsetSeconds }),
     },
   };
 };
