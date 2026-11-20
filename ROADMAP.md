@@ -253,7 +253,7 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 ## 2026-11-20 — A/V stream start-offset diagnostics (PR #99 merged)
 
 - PR #98 merged as `73807bad31f133a0a2819cdd084286903f963645`; its required `validate` CI #44608513408 passed and post-merge main CI completed.
-- PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` from exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`; required validate CI #44646093493 passed. Post-merge main CI #44654418400 is in progress.
+- PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` from exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`; required validate CI #44646093493 passed. Post-merge main CI #44654418400 passed.
 - The report measures signed audio-minus-video first-stream `start_time` offsets. The default 0.5-second absolute threshold is a hard QA error and is configurable separately from duration drift. Missing/invalid timestamps are omitted rather than guessed.
 - Regression tests cover clean alignment, late audio with equal durations, early audio, configurable tolerance and missing timestamp metadata. This is a technical synchronization diagnostic, not proof that narration/SFX align with picture events or creative acceptance. No fresh render, playback or listening was performed.
 
