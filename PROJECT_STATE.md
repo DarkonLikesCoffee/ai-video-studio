@@ -14,6 +14,12 @@ The v7 contact sheet was inspected at 5-second intervals (12 sampled frames). It
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
+## 2026-11-20 — Render-request freeze gate (PRs pending merge)
+
+PR #115 targets main. Main was verified at e64278320c3e59695f5f8cd1ba6170c4104f158b. PR #115 CI run #44801247196 passed after the technical gate commit; PR remains open pending integration.
+
+The render workflow now runs `scripts/render-candidate.mjs` before dependency installation and Remotion. A valid request must carry `candidateSha` equal to the exact remote branch tip before the request-only commit; the triggering push must modify only `render-request.json`. Full Git history is fetched and duplicate candidate SHAs / request IDs are rejected deterministically. Regression coverage is in `tests/render-candidate.test.ts`. The gate prevents development pushes and duplicate submissions from reaching Remotion; it does not itself judge creative quality, so the existing production-readiness checklist and project/media QA remain necessary.
+
 ## 1. Product vision
 
 AI Video Studio should let someone describe a video in ordinary language and receive a finished, high-quality MP4 without manually editing it.
