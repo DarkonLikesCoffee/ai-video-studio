@@ -3,8 +3,8 @@
 **Last verified:** 2026-11-20  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `73807bad31f133a0a2819cdd084286903f963645` — PR #98 criterion-to-asset evidence report merged; required validate CI #44608513408 and post-merge main CI passed
-**Current development branch:** `feat/media-qa-av-start-offset` (PR #99 open; required validate CI #44643693225 passed on exact head `89c88a155c7b13bb699e15515de1871c625d066a`; merge pending). PRs #95, #96, #97 and #98 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed. PR #97 CI #44556330379 and post-merge main CI #44574582076 passed. PR #98 merge commit `73807bad31f133a0a2819cdd084286903f963645`; PR CI #44608513408 passed and post-merge main CI completed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
+**Last verified main commit:** `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` — PR #99 A/V stream start-offset diagnostic merged; required validate CI #44646093493 passed, post-merge main CI #44654418400 is in progress
+**Current development branch:** `test/media-qa-ffmpeg-offset-integration` (PR #100 open; CI pending). PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` from exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`; its required validate CI #44646093493 passed and post-merge main CI #44654418400 is in progress. PRs #95, #96, #97, #98 and #99 are merged. PR #95 CI #44550178698 and post-merge main CI #44554881017 passed; PR #97 CI #44556330379 and post-merge main CI #44574582076 passed; PR #98 CI #44608513408 and post-merge main CI passed. PR #80 remains closed without merge; its true-peak fix is integrated through PR #86. PR #84 contact-sheet integration is verified by real render #42 / artifact #14532466761.
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
@@ -107,7 +107,7 @@ The next agent should use this project as a regression/quality case, not simply 
 
 ## 7. Verified current repository snapshot — 2026-11-20
 
-- Main HEAD: `73807bad31f133a0a2819cdd084286903f963645` (PR #98 criterion-to-asset evidence report merged).
+- Main HEAD: `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` (PR #99 A/V stream start-offset diagnostic merged; main CI #44654418400 is in progress).
 - PR #76 CI run #44516361047 passed; PR #77 CI run #44517012780 passed; post-merge main CI run #44517175453 passed.
 - PRs #66–#77 are merged.
 - A real MP4 from render run #44485488551 (artifact #14511125907) was retrieved and inspected with a contact sheet. Its bundled media-QA report passed with no detected silence, frozen video, black frames or audio/video duration drift beyond thresholds. See the new benchmark entry in `PROGRESS_LOG.md`.
@@ -132,7 +132,7 @@ These features are deterministic and heuristic. They do not semantically underst
 The traceable storyboard revision workflow through PRs #88–#90 remains implemented, with explicit narrative-beat review (#91), Creative Brief → storyboard handoff (#95), storyboard-to-production-plan import (#97) and criterion-to-asset evidence report (#98) now merged. The report is review-only and does not establish semantic asset relevance.
 
 
-Next priority is to move from planning evidence to actual asset selection/build and repeatable real-render QA. PR #99 adds an independent signed stream-start-offset diagnostic to media QA; its exact-head CI passed and merge is pending. Technical timestamps still do not prove narration/SFX alignment with visual events or creative acceptance.
+The criterion→shot→asset evidence bridge (PR #98) and the independent signed A/V stream-start-offset check (PR #99) are merged. PR #99 required CI #44646093493 passed on its exact head; post-merge main CI #44654418400 is still running. The next P0 slice is PR #100: an FFmpeg-generated real MP4 integration regression that exercises the actual `inspectMedia` pipeline with late audio while stream-duration drift remains under threshold. This strengthens technical QA, but timestamps do not prove narration/SFX alignment with visual events or creative acceptance.
 
 ## Resume checklist
 
@@ -243,8 +243,15 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - `director:asset-evidence` maps criterion→shot→manifest assets and checks local file/path safety, unresolved references and provenance/rights metadata. It remains report-only; asset links do not establish semantic relevance, and procedural shots may intentionally have no assets.
 - This planning/report CLI requires no video render. No playback or audio listening was performed.
 
-## 2026-11-20 — A/V stream start-offset diagnostics (PR #99; CI passed)
+## 2026-11-20 — A/V stream start-offset diagnostics (PR #99 merged)
 
-- PR #99: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/99 on `feat/media-qa-av-start-offset`; CI run #44628990848 passed on exact head `78915bd48f3b55373a6a829a8473b7e55fdfcb70`. Diff reviewed; merge pending.
+- PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8`; required validate CI #44646093493 passed on exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`. Post-merge main CI #44654418400 is in progress.
 - Reports signed audio-minus-video first-stream `start_time` offset, with a configurable 0.5s default hard-failure threshold separate from duration drift. Missing timestamps are omitted rather than guessed.
 - Regression tests cover aligned starts, late and early audio with equal stream durations, threshold configuration and missing timestamps. No render gate applies; no local test run, full playback or audio listening was performed.
+
+
+## 2026-11-20 — Real MP4 start-offset integration test (PR #100 pending)
+
+- PR #100 on `test/media-qa-ffmpeg-offset-integration` adds a generated 3.6-second MP4 with 0.65s delayed audio and calls the real `inspectMedia` pipeline. It asserts that the start-offset finding is raised while stream-duration drift stays below 0.5s.
+- FFmpeg/FFprobe fixture recipe was manually verified: video start `0.000000`, audio start `0.628000`, stream durations `3.600000` and `3.621333` (0.021333s drift); the diagnostic filters produced no silence/freeze/black findings. The repository integration test itself has not yet run locally; CI is pending.
+- This is QA integration hardening only; no render, full playback or audio listening was performed.

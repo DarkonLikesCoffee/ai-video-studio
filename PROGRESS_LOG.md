@@ -502,3 +502,12 @@ Append one entry per meaningful development session:
 - Required validate CI #44643693225 completed successfully on this exact head. All steps passed, including TypeScript type-check, tests, production-plan/example validation, preview generation, project validations and studio build. Its `storyboard-planning-previews` artifact #14587822246 was uploaded (8,947 bytes). No render artifact is expected from this diagnostics-only change.
 - Reviewed the PR patch: the signed offset is computed from ffprobe first video/audio stream `start_time`, missing/invalid timestamp values are omitted, and the configurable default 0.5s absolute threshold is independent of duration drift. Regression tests cover zero offset, equal-duration late audio, early audio, custom tolerance and missing timestamps.
 - Main CI #44620050018 passed on the current main commit. PR #99 is merge-ready pending the final merge action. No local test execution, fresh render, full video playback or audio listening was performed.
+
+
+## 2026-11-20 — PR #99 merged; real-MP4 media-QA integration test underway
+
+- PR #99 merged as `86a3549a3b0be0bcfe64f41f6e8f8237453113d8` from exact head `153d4b979544efbd150bb596cb7c58ffb5f5e340`. Required validate CI #44646093493 passed; post-merge main CI #44654418400 is currently in progress.
+- After re-reading the entry point, state, roadmap, progress log, agent rules, README, production workflow and relevant skills, selected the next P0 quality-gate slice: exercise the real `inspectMedia` pipeline on a deliberately offset MP4 rather than relying only on synthetic probe objects passed to `buildMediaQaReport`.
+- PR #100 (`test/media-qa-ffmpeg-offset-integration`) creates a short moving test-pattern MP4 with 0.65s delayed audio, then asserts the start-offset finding is present and stream-duration drift remains below the independent threshold. The fixture skips when FFmpeg/FFprobe are absent; CI installs both before tests.
+- Manually verified the fixture recipe with FFmpeg/FFprobe: video start `0.000000`, audio start `0.628000`, video duration `3.600000`, audio duration `3.621333`, drift `0.021333s`; audio/video filters emitted no silence/freeze/black findings. The actual repository test and typecheck have not run locally; PR CI is pending.
+- No render gate applies to this test-only QA hardening. No full video playback or audio listening was performed.
