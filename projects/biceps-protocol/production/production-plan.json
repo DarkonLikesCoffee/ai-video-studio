@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "id": "biceps-protocol",
+  "title": "BICEPS PROTOCOL — Build With Intent",
+  "delivery": {
+    "durationSeconds": 60,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "format": "mp4",
+    "platform": "YouTube / landscape video",
+    "language": "es"
+  },
+  "creativeDirection": {
+    "objective": "Teach an effective biceps session using anatomical context, exercise technique and a practical prescription.",
+    "audience": "Spanish-speaking gym trainees with basic gym access.",
+    "concept": "Premium training film with anatomy motion graphics and three exercise demonstration plates.",
+    "emotionalArc": [
+      "Curiosity",
+      "Understanding",
+      "Confidence",
+      "Action"
+    ],
+    "visualSystem": {
+      "palette": [
+        "#080A0E",
+        "#111923",
+        "#F15B42",
+        "#E8A56E",
+        "#8BD1C3"
+      ],
+      "typography": "Bold editorial sans-serif with compact technical labels.",
+      "composition": "Cinematic split compositions; motion graphics on right and explanatory copy on left.",
+      "lighting": "Dark studio field, warm rim light and restrained orange highlights.",
+      "textureAndMaterials": "Fine grain, blueprint grids, luminous anatomical strokes."
+    },
+    "motionLanguage": "Camera drift, path reveals, animated joint arcs, rep-cycle cues and varied transitions.",
+    "soundDirection": "Spanish Kokoro narration above restrained original music, with localized impacts and transition sounds.",
+    "rightsAndFactualConstraints": [
+      "Exercise figures are illustrative motion diagrams, not live-action footage.",
+      "Clearly distinguish biceps brachii, brachialis and brachioradialis.",
+      "Do not promise spot fat loss or guaranteed hypertrophy.",
+      "Emphasize controlled, pain-free technique and gradual progression."
+    ]
+  },
+  "shots": [
+    {
+      "id": "opening-hook",
+      "startSeconds": 0,
+      "durationSeconds": 6,
+      "purpose": "Set premium training-film tone.",
+      "visual": "Luminous arm blueprint assembles in dark studio.",
+      "subject": "Upper-arm outline",
+      "action": "Contours draw on as camera pushes forward.",
+      "framing": "Editorial title left, anatomy right.",
+      "cameraMovement": "Slow push-in with parallax.",
+      "transition": "Contour match-cut to anatomy.",
+      "audio": "Low cinematic pulse.",
+      "visualMethod": "Original vector anatomy illustration",
+      "visualProgression": "Outline emerges; muscle contour fills; labeled arm arrives."
+    },
+    {
+      "id": "anatomy-map",
+      "startSeconds": 6,
+      "durationSeconds": 8,
+      "purpose": "Explain target muscles.",
+      "visual": "Anatomical arm with callouts and forearm rotation cue.",
+      "subject": "Biceps brachii and brachialis",
+      "action": "Leader lines trace muscles; rotation arc animates.",
+      "framing": "Anatomical close-up with labels.",
+      "cameraMovement": "Lateral drift and slight zoom.",
+      "transition": "Rotation arc becomes curl path.",
+      "audio": "Two marker impacts.",
+      "visualMethod": "Anatomical motion graphics",
+      "visualProgression": "Full arm; muscle callouts; supination cue."
+    },
+    {
+      "id": "standing-curl",
+      "startSeconds": 14,
+      "durationSeconds": 12,
+      "purpose": "Teach foundational supinated curl.",
+      "visual": "Side-view illustrated lifter and elbow-centered dumbbell arc.",
+      "subject": "Standing dumbbell curl",
+      "action": "Forearm rotates to supinated position as elbow flexes; controlled lowering.",
+      "framing": "Side-on technical demonstration.",
+      "cameraMovement": "Track dumbbell upward and ease downward.",
+      "transition": "Curl arc stretches into incline arm position.",
+      "audio": "Subtle lift accent.",
+      "visualMethod": "Illustrative exercise motion graphic",
+      "visualProgression": "Arms extended; curl and supinate; slow eccentric return."
+    },
+    {
+      "id": "incline-curl",
+      "startSeconds": 26,
+      "durationSeconds": 12,
+      "purpose": "Show curl with upper arm behind torso.",
+      "visual": "Incline bench silhouette and controlled curl.",
+      "subject": "Incline dumbbell curl",
+      "action": "Arms travel from stretched position while shoulder remains stable.",
+      "framing": "Three-quarter side view.",
+      "cameraMovement": "Short diagonal slide.",
+      "transition": "Dumbbell rotates into neutral grip.",
+      "audio": "Airy transition.",
+      "visualMethod": "Illustrative exercise motion graphic",
+      "visualProgression": "Bench and extended arms; controlled curl; return without swing."
+    },
+    {
+      "id": "hammer-curl",
+      "startSeconds": 38,
+      "durationSeconds": 12,
+      "purpose": "Demonstrate neutral grip.",
+      "visual": "Close-up on neutral-grip dumbbells with anatomy overlay.",
+      "subject": "Hammer curl",
+      "action": "Dumbbells rise with palms inward and no wrist twist.",
+      "framing": "Tight arm and dumbbell close-up.",
+      "cameraMovement": "Macro push and rotational parallax.",
+      "transition": "Dumbbell end cap match-cuts to program card.",
+      "audio": "Soft metallic accent.",
+      "visualMethod": "Illustrative motion graphic",
+      "visualProgression": "Neutral grip; elbow flexion; controlled return."
+    },
+    {
+      "id": "protocol-finale",
+      "startSeconds": 50,
+      "durationSeconds": 10,
+      "purpose": "Leave actionable program.",
+      "visual": "Three numbered movements resolve into concise training card.",
+      "subject": "Three-exercise biceps session",
+      "action": "Rows build in sequence and rest guidance settles.",
+      "framing": "High-contrast editorial card.",
+      "cameraMovement": "Rings rotate and settle.",
+      "transition": "Clean hold.",
+      "audio": "Score resolves with soft chime.",
+      "visualMethod": "Kinetic typography",
+      "visualProgression": "Three markers; set/rep prescription; final hold."
+    }
+  ],
+  "acceptanceCriteria": [
+    "1920×1080, 16:9 H.264 MP4 near 60 seconds.",
+    "Spanish narration with word-aligned captions.",
+    "Six distinct chapters with purposeful motion.",
+    "Exercise depictions communicate joint action and grip.",
+    "Visuals clearly identified as illustrative.",
+    "Music beneath narration and mastered final mix.",
+    "Inspect MP4 and contact sheet."
+  ]
+}
