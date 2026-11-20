@@ -7,7 +7,7 @@ This Remotion feature provides two 1920×1080, 30 fps, 30-second compositions:
 
 ## Simulation model
 
-Planetary mean longitude at J2000 and its secular rate are taken from NASA/JPL Solar System Dynamics, *Approximate Positions of the Planets*, Table 1 (valid 1800–2050):
+Planetary mean longitude at J2000 and its secular rate are taken from NASA/JPL Solar System Dynamics, *Approximate Positions of the Planets*, Table 1 (valid 1800–2050). The Earth values use the table's `EM Bary` (Earth–Moon barycenter) row:
 https://ssd.jpl.nasa.gov/planets/approx_pos.html
 
 For simulation day \(d\) after 2025-01-01 00:00 UTC, the circular-orbit angle is:
