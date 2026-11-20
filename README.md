@@ -10,6 +10,7 @@ Remotion compositions include:
 - `ProjectVideo`: a data-driven composition that reads a project JSON file and renders consecutive scenes.
 - `ThreeDShowcase` and `CinematicAdBenchmark`: bespoke 3D/motion-design benchmarks.
 - `NarratedSkyExplainer`: a custom 3D composition with Kokoro narration, aligned captions and music; it can also composite reviewed Wikimedia Commons footage as full-bleed B-roll with an animated 3D scientific inset.
+- `SolarSystemOrbitalMotion` and `InnerPlanets`: deterministic Canvas 2D orbital simulations with JPL J2000 mean-longitude rates, seeded stars, shaded planets, Saturn rings, an orbiting Moon, persistent title/date overlays and an original ambient score.
 
 A `ProjectVideo` project can define:
 - 1–20 scenes of type `title`, `content`, or `outro`.
