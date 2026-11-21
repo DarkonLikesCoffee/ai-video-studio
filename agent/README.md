@@ -6,14 +6,15 @@ This directory defines the operating procedure for an AI agent producing complet
 
 1. **Brief** — extract objective, audience, platform, duration, format, constraints and success criteria.
 2. **Creative direction** — choose one coherent concept, visual language, narrative arc and emotional progression; decide what the audience will actually see happen.
-3. **Storyboard** — plan every shot with purpose, concrete subject/action and visual progression, production method, duration, composition, camera/motion, transitions, text rationale and sound.
-4. **Method selection** — choose per shot from verified available methods (footage, generated media, 2D, motion graphics, diagrams, typography, 3D, simulation or hybrid). The method is chosen to serve the story, not applied uniformly.
-5. **Asset production** — generate or source the required footage, images, illustrations, 3D elements, voice and sound; record provenance. For supported Spanish/US English narration, a Kokoro ONNX adapter can generate speech and phoneme-derived word timings on the render worker. Before build, run `npm run director:asset-evidence -- <production-plan.json> [asset-manifest.json] [report.json]` to connect criterion→shot mappings to manifest assignments and local/provenance/rights checks. Review incomplete mappings and missing files; the render workflow enforces `--strict` when a production plan and manifest exist and includes the report in its artifact. This report does not semantically verify assets or criteria.
-6. **Build** — translate the approved plan into a valid `VideoProject` (`projects/<slug>/scene.json`) and local assets.
-7. **Render** — submit a unique `render-request.json` and wait for the selected provider.
-8. **Visual QA** — inspect the actual MP4, not only CI status; review a contact sheet, keyframes, motion, pacing, audio and technical metadata. Specifically check for slideshow-like repeated layouts, shots without meaningful action/progression, and generic/unmotivated effects.
-9. **Iterate** — fix the highest-impact issues, rerender only the target project, and repeat until it passes.
-10. **Deliver** — provide the MP4/artifact, a concise change log and known limitations.
+3. **Composition selection** — choose one whole-video Remotion composition using the verified catalogue in `scripts/director-compositions.ts`. Record it in the production plan's `renderStrategy`, including renderer, registered/to-be-built status, rationale, required capabilities and fallback. This is distinct from per-shot visual methods.
+4. **Storyboard** — plan every shot with purpose, concrete subject/action and visual progression, production method, duration, composition, camera/motion, transitions, text rationale and sound.
+5. **Per-shot method selection** — choose from verified methods (footage, generated media, 2D, motion graphics, diagrams, typography, 3D, simulation or hybrid). The method is chosen to serve each shot, not applied uniformly.
+6. **Asset production** — generate or source the required footage, images, illustrations, 3D elements, voice and sound; record provenance. For supported Spanish/US English narration, a Kokoro ONNX adapter can generate speech and phoneme-derived word timings on the render worker. Before build, run `npm run director:asset-evidence -- <production-plan.json> [asset-manifest.json] [report.json]` to connect criterion→shot mappings to manifest assignments and local/provenance/rights checks. Review incomplete mappings and missing files; the render workflow enforces `--strict` when a production plan and manifest exist and includes the report in its artifact. This report does not semantically verify assets or criteria.
+7. **Build** — translate the approved plan into a valid `VideoProject` (`projects/<slug>/scene.json`) and local assets.
+8. **Render** — submit a unique `render-request.json` and wait for the selected provider.
+9. **Visual QA** — inspect the actual MP4, not only CI status; review a contact sheet, keyframes, motion, pacing, audio and technical metadata. Specifically check for slideshow-like repeated layouts, shots without meaningful action/progression, and generic/unmotivated effects.
+10. **Iterate** — fix the highest-impact issues, rerender only the target project, and repeat until it passes.
+11. **Deliver** — provide the MP4/artifact, a concise change log and known limitations.
 
 ## Pre-production storyboard review
 
@@ -27,6 +28,8 @@ The `npm run storyboard:qa -- <production-plan.json>` command provides warning-o
 ## Production intelligence checklist
 
 Before building scenes, the plan must answer:
+- Which whole-video composition is selected, and why does its documented scope fit the entire brief?
+- Is that composition actually registered and selectable, or does it still need to be built?
 - What is the audience supposed to understand, feel or do?
 - What is the creative thesis and narrative progression?
 - What visually happens in each shot? What changes from its start to end?
@@ -53,6 +56,8 @@ Use these skill files as focused playbooks. Apply all relevant skills; do not tr
 
 ## Source of truth and boundaries
 
+- `scripts/director-compositions.ts` is the model-facing catalogue of registered compositions, their strengths, limitations and selection status. Keep it synchronized with literal composition IDs in `packages/video-engine/src/root.tsx`.
+- The production plan's `renderStrategy` selects one whole-video renderer/composition. The render workflow rejects a request if its composition differs from the linked plan or is not registered. A `to-be-built` choice must be implemented and registered before rendering.
 - The existing Remotion project schema and validator in `packages/video-engine/src/project.ts` are authoritative for what `ProjectVideo` can render. `ProjectVideo` is a compatibility renderer, not the creative ceiling: use a custom Remotion composition when the brief needs richer camera work, kinetic typography, layered footage, complex motion or narration-synchronized scenes.
 - Read `README.md` before building. Do not invent engine capabilities or silently add unsupported fields to `scene.json`.
 - A storyboard is a production plan, not a renderable project. Keep it separate from `scene.json`.
@@ -84,10 +89,10 @@ Use `npm run storyboard:critic -- <production-plan.json> [output.md]` to turn ex
 ## Traceable storyboard revision workflow
 
 Use the versioned revision artifact rather than editing the source plan in place:
-1. Run `npm run storyboard:revision -- init <production-plan.json> <revision.json>` to preserve source text/plan, SHA-256, and critic suggestions (unselected).
-2. Review the artifact; explicitly mark suggestions selected and add concrete edits under `edits` with `shotId`, `changeNote`, and field updates. Do not treat selection as auto-application.
-3. Run `npm run storyboard:revision -- validate <revision.json>` to store schema errors and QA warnings.
-4. Run `npm run storyboard:revision -- apply <revision.json> <revised-plan.json>` to write a separate revised plan; the original remains untouched.
-5. Run `npm run validate:plan -- <revised-plan.json>` and `npm run storyboard:qa -- <revised-plan.json>` before production.
+2. Run `npm run storyboard:revision -- init <production-plan.json> <revision.json>` to preserve source text/plan, SHA-256, and critic suggestions (unselected).
+3. Review the artifact; explicitly mark suggestions selected and add concrete edits under `edits` with `shotId`, `changeNote`, and field updates. Do not treat selection as auto-application.
+4. Run `npm run storyboard:revision -- validate <revision.json>` to store schema errors and QA warnings.
+5. Run `npm run storyboard:revision -- apply <revision.json> <revised-plan.json>` to write a separate revised plan; the original remains untouched.
+6. Run `npm run validate:plan -- <revised-plan.json>` and `npm run storyboard:qa -- <revised-plan.json>` before production.
 
 The CLI verifies that the source file and embedded source text still match the recorded SHA-256 and that the preserved source object matches its text. A source change requires a fresh artifact. Validation errors are hard failures; heuristic warnings are review prompts only.

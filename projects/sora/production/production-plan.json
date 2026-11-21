@@ -127,5 +127,18 @@
     "All copy is readable and stays within title-safe areas.",
     "Each shot contains purposeful visual movement rather than a static title swap.",
     "The final hero frame holds clearly and resolves the opening idea."
-  ]
+  ],
+  "renderStrategy": {
+    "renderer": "project-video",
+    "compositionId": "ProjectVideo",
+    "availability": "registered",
+    "rationale": "This existing SORA example is authored as layered 2D product motion graphics that fit the ProjectVideo scene schema. This is a documented compatibility choice for the legacy example, not a default for new product films.",
+    "requiredCapabilities": [
+      "layered 2D product assets",
+      "keyframed motion",
+      "editorial typography",
+      "scene transitions and audio tracks"
+    ],
+    "fallback": "If the product needs bespoke physical camera moves or 3D surfaces, build a dedicated custom product composition rather than forcing unsupported behavior into scene JSON."
+  }
 }

@@ -129,5 +129,18 @@
     "All footage layers follow the storyboard timing and use no unreviewed or unsupported licenses.",
     "Spanish narration, word-synchronized captions, and the existing mastered soundtrack remain intact.",
     "No adjacent shots repeat the same source clip unless the storyboard explicitly requires a match cut."
-  ]
+  ],
+  "renderStrategy": {
+    "renderer": "custom-remotion",
+    "compositionId": "NarratedSkyExplainer",
+    "availability": "registered",
+    "rationale": "This project is specifically a narrated sky/science explainer; the registered composition already provides 3D scientific sequences, narration timing, subtitles and optional footage clips.",
+    "requiredCapabilities": [
+      "3D science visual sequences",
+      "narration and subtitle timing",
+      "optional footage clips",
+      "music and transition audio"
+    ],
+    "fallback": "Use reviewed real sky/atmospheric footage with restrained 2D science overlays if the custom 3D sequence cannot be produced."
+  }
 }

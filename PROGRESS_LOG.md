@@ -1,3 +1,15 @@
+## 2026-11-21 — Explicit Director composition selection (implementation in progress)
+
+- Re-read the roadmap, project state, operating instructions, production workflow, Creative Director and Remotion Producer skills before starting. Confirmed the autonomous AI Production Director is an explicitly planned but unfinished P1 milestone.
+- Created branch `feat/director-composition-selection` from main `c148c3002f8364926ad7a71e870ea41411aa5c56`.
+- Added a model-facing composition catalogue describing currently selectable Remotion compositions, plus a validation contract for a plan-level `renderStrategy`. The choice is separate from per-shot `visualMethod`.
+- Updated the storyboard prompt to include the live composition catalogue and require an explicit composition decision. The production-plan schema/importer/runtime validator now require and validate the selection.
+- Migrated the four checked-in production-plan examples: narrated sky uses `NarratedSkyExplainer`; legacy SORA and VALORANT plans explicitly retain `ProjectVideo`; the generic 3D product sample proposes a not-yet-built `ProductRevealFilm`.
+- Added a render-workflow gate to reject unregistered composition IDs and plan/request mismatches. Legacy renders with no linked production plan remain compatible, but the requested composition must still be registered.
+- Updated the agent workflow, Creative Director and Remotion Producer playbooks, and marked only this registry/selection/gate roadmap slice complete. The overall autonomous Director milestone remains open: no LLM is embedded in the repository.
+- CI/typecheck/test validation has not yet been run; no render was requested during this implementation.
+- Current branch: `feat/director-composition-selection`; base main commit: `c148c3002f8364926ad7a71e870ea41411aa5c56`.
+
 ## 2026-11-18 — User-provided gameplay footage integration merged (PR #58)
 
 - Reviewed the post-merge narration-sync render #44394465979 and downloaded artifact #14469659407. QA: 47.733s video, 47.8s audio, 1920x1080, 30fps, H.264/AAC stereo, -16.1 LUFS, zero silence/freeze/black intervals. Contact sheet confirmed the technical result still reads as repeated vector-diagram compositions.

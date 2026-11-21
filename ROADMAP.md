@@ -90,7 +90,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 - [ ] Evaluate Blender for shots requiring complex modelling, lighting, simulation, rendering or capabilities that are not economical in the current web/Remotion engine. Use it as an optional specialist renderer, not a blanket dependency.
 - [ ] Support 2D character/rig animation and physical simulation only for projects where those techniques serve the brief.
 - [ ] Make generated/custom Remotion compositions first-class; ProjectVideo remains a useful compatibility renderer, not the creative ceiling.
-- [ ] Create a capability registry and method-selection interface so production plans can request capabilities without hard-coding a single engine.
+- [x] Add a versioned composition-capability registry and require every new production plan to make an explicit whole-video renderer/composition choice. Validate registered versus to-be-built status and enforce agreement between the plan and render request before Remotion runs. The AI decision remains model/agent-led; this is not an embedded autonomous LLM.
 - [ ] Benchmark visual capabilities on several unrelated topics and formats.
 
 **Architecture policy:** Remotion is the current core composition/rendering path. Three.js, Blender, specialized animation tools and other renderers should be integrated selectively behind reusable interfaces. FFmpeg remains a post-processing, audio/video processing and export tool. Evaluate HyperFrames or other engines against concrete requirements before adopting; do not add technology merely because it appears in research.

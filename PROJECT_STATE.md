@@ -1,10 +1,22 @@
 # AI Video Studio — Project State
 
-**Last verified:** 2026-11-20  
+## 2026-11-21 — Explicit Director composition selection (feature branch in progress)
+
+- Started `feat/director-composition-selection` from verified main `c148c3002f8364926ad7a71e870ea41411aa5c56`.
+- Adds a model-facing catalogue of the compositions registered in RemotionRoot, including intended use, strengths, limitations and whether each is selectable. Test/reference-only compositions are excluded from production selection.
+- Extends the storyboard handoff and production-plan contract with one top-level `renderStrategy`: renderer, composition ID, registered/to-be-built status, rationale, required capabilities and fallback. This is a whole-video renderer choice, separate from per-shot `visualMethod`.
+- Updates the existing production-plan examples with explicit historical or intended renderer choices. The generic 3D product example honestly marks its bespoke composition as `to-be-built`.
+- Adds a pre-render gate that verifies the chosen ID is registered and, when a conventional adjacent production plan exists, that the plan's registered renderer/composition matches the render request. Legacy projects without a production plan remain supported but still require a registered composition.
+- Updates Director/Remotion guidance and marks only the composition-selection registry/gate roadmap slice complete. The broader autonomous Director workflow remains incomplete: ChatGPT or another external model still makes the creative decision; the repository does not call an LLM.
+- Validation status: branch CI, typecheck and tests have not yet been run. No video render has been requested.
+- Next: inspect the complete branch diff, run CI, fix any failures, then open a PR. Do not merge until required checks are green.
+
+
+**Last verified:** 2026-11-21  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `3f3dd846e59a02c0d0f9101ced794ee87357d2e3` — PR #105 merged; post-merge CI #44749739555 passed.  
-**Current development branch:** `fix/benchmark-duration-contract-v2` — head `d914fa18249c009cc449e7410f501ee0e866da72`, 12 commits ahead of main, 0 behind. Branch CI #44750874075 passed: 234 tests, 0 failed, 0 skipped; typecheck, project validation and studio build passed.
+**Last verified main commit:** `c148c3002f8364926ad7a71e870ea41411aa5c56` (includes the render-candidate freeze gate from PR #115). PR #116 is also marked merged; recheck the live main ref before relying on its merge SHA.  
+**Current development branch:** `feat/director-composition-selection` — composition-selection workflow in progress; CI has not yet been run.
 
 PR #105 added the strict production asset-evidence gate and merged as `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`. Its exact-head CI #44719701055 passed 233 tests with 0 skipped. Render v6 (#44719959584, artifact #14622220762) proved the gate reports `ready` for the benchmark: 6/6 acceptance criteria linked, 18 assets, and zero unresolved refs, missing files, unsafe paths, rights/provenance gaps or issues.
 
@@ -14,9 +26,9 @@ The v7 contact sheet was inspected at 5-second intervals (12 sampled frames). It
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
-## 2026-11-20 — Render-request freeze gate (PRs pending merge)
+## 2026-11-20 — Render-request freeze gate (PR #115 merged)
 
-PR #115 targets main. Main was verified at e64278320c3e59695f5f8cd1ba6170c4104f158b. PR #115 CI run #44801247196 passed after the technical gate commit; PR remains open pending integration.
+PR #115 is closed/merged at `c148c3002f8364926ad7a71e870ea41411aa5c56`; its freeze gate is now in main. PR #116 is also recorded as merged by GitHub, but the live `main` ref was still `c148c3002f8364926ad7a71e870ea41411aa5c56` at the start of the next development session, so verify the branch ref before assuming its merge is present.
 
 The render workflow now runs `scripts/render-candidate.mjs` before dependency installation and Remotion. A valid request must carry `candidateSha` equal to the exact remote branch tip before the request-only commit; the triggering push must modify only `render-request.json`. Full Git history is fetched and duplicate candidate SHAs / request IDs are rejected deterministically. Regression coverage is in `tests/render-candidate.test.ts`. The gate prevents development pushes and duplicate submissions from reaching Remotion; it does not itself judge creative quality, so the existing production-readiness checklist and project/media QA remain necessary.
 

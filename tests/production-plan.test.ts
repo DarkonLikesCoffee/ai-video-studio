@@ -21,6 +21,8 @@ test("production-plan JSON Schema matches runtime shot requirements and narrativ
   assert.deepEqual(shotSchema.properties.narrativeBeat.enum, NARRATIVE_BEATS);
   assert.ok(!shotSchema.required.includes("narrativeBeat"), "narrativeBeat remains optional");
   assert.ok(shotSchema.properties.implementationNotes, "free-form implementation notes must be preserved");
+  assert.ok(schema.required.includes("renderStrategy"), "a plan must make a whole-video composition decision");
+  assert.deepEqual(schema.properties.renderStrategy.required, ["renderer", "compositionId", "availability", "rationale", "requiredCapabilities", "fallback"]);
   const coverageSchema = schema.properties.acceptanceCoverage;
   assert.ok(coverageSchema, "schema must define optional acceptance coverage");
   assert.ok(!schema.required.includes("acceptanceCoverage"), "legacy plans remain valid without coverage");
@@ -271,4 +273,22 @@ test("visual strategy JSON has a versioned machine-readable envelope", () => {
   assert.equal(parsed.report.shotCount, plan.shots.length);
   assert.equal(parsed.generatedBy, "ai-video-studio/storyboard:strategy");
   assert.ok(Array.isArray(parsed.report.recommendations));
+});
+
+
+test("production plan requires an explicit registered or to-be-built composition strategy", () => {
+  const missing = structuredClone(example);
+  delete missing.renderStrategy;
+  assert.ok(validateProductionPlan(missing).some((error) => error.includes("renderStrategy")));
+
+  const invalid = structuredClone(example);
+  invalid.renderStrategy = {
+    renderer: "project-video",
+    compositionId: "SomeMadeUpComposition",
+    availability: "registered",
+    rationale: "Use it because it seems suitable.",
+    requiredCapabilities: ["2D animation"],
+    fallback: "Try the default renderer.",
+  };
+  assert.ok(validateProductionPlan(invalid).some((error) => error.includes("not registered")));
 });

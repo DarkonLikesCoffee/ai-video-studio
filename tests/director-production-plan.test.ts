@@ -12,6 +12,14 @@ const storyboard = () => ({
   id: "cinematic-launch-storyboard",
   title: "Cinematic Product Launch",
   delivery: { ...brief.delivery },
+  renderStrategy: {
+    renderer: "custom-remotion",
+    compositionId: "HeadphoneProductReveal",
+    availability: "to-be-built",
+    rationale: "The product reveal needs bespoke 3D macro photography, an exploded product view and a moving camera that no current registered composition provides.",
+    requiredCapabilities: ["Three.js product geometry", "procedural macro materials", "animated camera orbit", "exploded-view object animation"],
+    fallback: "Build the custom composition before rendering; do not silently fall back to the fixed ProjectVideo layout.",
+  },
   creativeDirection: {
     objective: brief.objective,
     audience: brief.audience,
@@ -86,6 +94,8 @@ test("Creative Brief + storyboard converts to a validated production plan with c
   const plan = buildProductionPlanFromStoryboard(brief, storyboard());
   assert.deepEqual(validateProductionPlan(plan), []);
   assert.equal(plan.shots.length, 3);
+  assert.equal(plan.renderStrategy.compositionId, "HeadphoneProductReveal");
+  assert.equal(plan.renderStrategy.availability, "to-be-built");
   assert.equal(plan.acceptanceCoverage.length, brief.acceptanceCriteria.length);
   assert.deepEqual(plan.acceptanceCriteria, brief.acceptanceCriteria);
   assert.equal(plan.shots[0]?.implementationNotes, "Use a custom 3D render with a procedural brushed-metal material.");
@@ -131,4 +141,17 @@ test("migrated narrated explainer preserves legacy implementation notes and vali
   assert.deepEqual(validateProductionPlan(narratedPlan), []);
   assert.equal(narratedPlan.shots.length, 5);
   assert.ok(narratedPlan.shots.every((shot: Record<string, unknown>) => shot.engineApproach === undefined && shot.implementationNotes === "external-footage-with-3d-inset"));
+});
+
+
+test("conversion rejects an unregistered composition falsely marked as available", () => {
+  const draft = storyboard();
+  draft.renderStrategy.availability = "registered";
+  assert.throws(() => buildProductionPlanFromStoryboard(brief, draft), /not registered/);
+});
+
+test("conversion rejects a renderer that conflicts with the selected composition", () => {
+  const draft = storyboard();
+  draft.renderStrategy.renderer = "project-video";
+  assert.throws(() => buildProductionPlanFromStoryboard(brief, draft), /must be "custom-remotion"/);
 });

@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { validateCreativeBrief } from "./director-brief";
+import { renderCompositionRegistryForPrompt } from "./director-compositions";
 
 type RecordValue = Record<string, unknown>;
 const record = (value: unknown): RecordValue => value && typeof value === "object" && !Array.isArray(value) ? value as RecordValue : {};
@@ -11,6 +12,7 @@ export const buildStoryboardDirectorPrompt = (brief: RecordValue): string => {
   const minShots = Math.max(3, Math.ceil(duration / 5));
   const maxShots = Math.max(minShots, Math.floor(duration / 2));
   const briefJson = JSON.stringify(brief, null, 2);
+  const compositionRegistry = renderCompositionRegistryForPrompt();
   return [
     "# AI Video Studio — Storyboard Director Handoff",
     "",
@@ -20,11 +22,21 @@ export const buildStoryboardDirectorPrompt = (brief: RecordValue): string => {
     "- Tell a visual story with a clear opening promise, progression, and payoff. Every shot must change the viewer's understanding, emotion, subject, environment, or visual state.",
     "- Do not default to text cards, diagrams, abstract backgrounds, or generic camera movement. Use them only when the subject and story justify them.",
     "- Choose the best visual method shot-by-shot: live-action/stock footage, generated footage, still photography, 2D animation, motion graphics, typography, 3D, simulation, or a hybrid. Be specific and explain the choice through the shot's visual description.",
+    "- Separately choose ONE whole-video renderer/composition in renderStrategy. Per-shot visualMethod is not the same thing as the Remotion composition.",
+    "- ProjectVideo is a fixed-layout compatibility renderer, not the default. Select it only when its recurring structured 2D layout genuinely fits this entire video.",
+    "- Prefer a registered custom composition only when its documented purpose and limitations fit the brief. A specialized example is not automatically reusable for unrelated content.",
+    "- If no registered composition is a good fit, propose a new PascalCase compositionId with availability 'to-be-built'. Do not pretend it already exists or that the project is render-ready; implement and register it before rendering.",
+    "- Always give a concrete rationale, required capabilities and an honest fallback. Do not choose based on convenience or because ProjectVideo is the easiest route.",
     "- Make each shot filmable/renderable: describe subject, environment, foreground/background, lighting, composition, action, and what visibly changes over time. Avoid vague adjectives without concrete visual direction.",
     "- Vary shot scale, angle, composition and movement with intent. Avoid repeating the same framing or technique in adjacent shots unless repetition is a deliberate motif.",
     "- Protect the brief's factual constraints and acceptance criteria. Never invent product facts, sources, footage availability, or asset licenses. Mark unknowns as needs.",
     "- Sound is editorial: give each shot a purposeful sound cue/ambience/music change or intentional silence; avoid generic whooshes.",
     "- Respect runtime exactly. Use contiguous shot timing with no gaps/overlaps, start at 0, and end at delivery.durationSeconds. Every boundary must be frame-aligned for the supplied fps.",
+    "",
+    "## Verified composition registry",
+    compositionRegistry,
+    "",
+    "Select only a composition marked selectable. DemoVideo and ThreeDShowcase are reference/test-only. The registry is the source of truth for currently available production compositions.",
     "",
     "## Timing and scope",
     `- Delivery duration: ${duration}s at ${String(delivery.fps)} fps.`,
@@ -46,6 +58,14 @@ export const buildStoryboardDirectorPrompt = (brief: RecordValue): string => {
     "visualSystem": { "palette": ["string"], "typography": "string", "composition": "string", "lighting": "string", "texture": "string" },
     "motionLanguage": "string",
     "soundDirection": "string"
+  },
+  "renderStrategy": {
+    "renderer": "project-video | custom-remotion",
+    "compositionId": "exact registered ID, or a new PascalCase ID if availability is to-be-built",
+    "availability": "registered | to-be-built",
+    "rationale": "why this whole-video renderer/composition fits the story and visual direction",
+    "requiredCapabilities": ["concrete rendering capabilities required"],
+    "fallback": "honest alternative if the composition or a required capability cannot be delivered"
   },
   "shots": [{
     "id": "shot-01",
@@ -77,6 +97,7 @@ export const buildStoryboardDirectorPrompt = (brief: RecordValue): string => {
     "- Remove shots that merely repeat information or exist only to fill time.",
     "- Check the sequence for meaningful visual progression, strong visual specificity and shot variety.",
     "- Check that no unsupported facts or assets are assumed available.",
+    "- Confirm renderStrategy is a single whole-video composition decision, distinct from per-shot visualMethod; registered IDs must come from the supplied registry and to-be-built IDs must not be described as available.",
     "- Include exactly one acceptanceCoverage entry per Creative Brief acceptance criterion. Copy the criterion text verbatim, reference one or more existing shot IDs, and provide a specific visual rationale. Do not omit or invent criteria.",
     "- Make production notes honest: distinguish asset needs from assets already available.",
     "",
