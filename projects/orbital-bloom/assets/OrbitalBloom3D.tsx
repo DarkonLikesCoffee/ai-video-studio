@@ -262,14 +262,14 @@ export const OrbitalBloom3D: FC<OrbitalBloomProps> = ({ durationInFrames = 600 }
   const y = interpolate(frame, frames, [3.5, 1.85, 0.62, 0.92, 3.5, 3.8], { ...clamp, easing: Easing.inOut(Easing.cubic) });
   const z = interpolate(frame, frames, [10.8, 5.8, 3.65, 4.2, 15.2, 16.4], { ...clamp, easing: Easing.inOut(Easing.cubic) });
   const targetY = interpolate(frame, frames, [1.15, 1.18, 1.08, 1.12, 1.28, 1.35], clamp);
-  const pitch = Math.atan2(targetY - y, Math.hypot(x, z));
-  const yaw = Math.atan2(x, z);
+  const cameraPitch = Math.atan2(targetY - y, Math.hypot(x, z));
+  const cameraYaw = Math.atan2(x, z);
   const titleOpacity = interpolate(frame, [548, 575], [0, 1], { ...clamp, easing: Easing.out(Easing.quad) });
   const titleLift = interpolate(frame, [548, 580], [18, 0], { ...clamp, easing: Easing.out(Easing.cubic) });
   return (
     <AbsoluteFill style={{ backgroundColor: "#03070b", color: "#f5ead8", fontFamily: "Georgia, 'Times New Roman', serif" }}>
       <Audio src={staticFile("assets/audio/orbital-bloom.wav")} volume={0.94} />
-      <ThreeCanvas width={width} height={height} camera={{ position: [x, y, z], rotation: [pitch, yaw, Math.sin(frame / 170) * 0.012], fov: 43, near: 0.1, far: 90 }} style={{ width: "100%", height: "100%" }}>
+      <ThreeCanvas width={width} height={height} camera={{ position: [x, y, z], rotation: [cameraPitch, cameraYaw, Math.sin(frame / 170) * 0.012], fov: 43, near: 0.1, far: 90 }} style={{ width: "100%", height: "100%" }}>
         <World />
       </ThreeCanvas>
       <AbsoluteFill style={{ pointerEvents: "none", background: "radial-gradient(ellipse at 50% 46%, transparent 36%, rgba(1,4,7,.54) 100%)" }} />
