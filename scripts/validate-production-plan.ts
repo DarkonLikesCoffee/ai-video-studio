@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
+import { validateRenderStrategy } from "./director-compositions";
 
 type Plan = {
   schemaVersion?: unknown;
@@ -38,6 +39,7 @@ type Plan = {
     engineApproach?: unknown;
     assets?: unknown;
   }>;
+  renderStrategy?: unknown;
   acceptanceCriteria?: unknown;
 };
 
@@ -189,6 +191,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
     errors.push("acceptanceCriteria must contain 3–10 non-empty strings.");
   }
 
+  errors.push(...validateRenderStrategy(plan.renderStrategy));
   errors.push(...validateAcceptanceCoverage(plan));
   return errors;
 };

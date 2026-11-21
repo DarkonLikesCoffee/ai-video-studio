@@ -34,6 +34,9 @@ jobs:
         id: request
         run: node scripts/render-request.mjs render-request.json
 
+      - name: Enforce the Director's composition decision
+        run: node scripts/validate-render-strategy.mjs render-request.json packages/video-engine/src/root.tsx
+
       - name: Install dependencies
         if: steps.request.outputs.provider == 'github-actions'
         run: npm install --no-audit --no-fund

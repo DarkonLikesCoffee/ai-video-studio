@@ -1,10 +1,29 @@
 # AI Video Studio — Project State
 
-**Last verified:** 2026-11-20  
+## 2026-11-21 — Explicit Director composition selection (PR #121; CI and representative render passed)
+
+- Started clean development branch `feat/director-composition-selection-final` from the tested Director implementation. The PR excludes the temporary render request; the smoke render was run from a separate branch.
+- Added a model-facing catalogue of the compositions registered in RemotionRoot, with purpose, strengths, limitations and selectability. Reference/test-only compositions cannot be selected for production.
+- Added a required plan-level `renderStrategy`: renderer, whole-video composition ID, registered/to-be-built status, rationale, required capabilities and fallback. This is separate from per-shot `visualMethod`.
+- Wired the catalogue into the model-neutral storyboard prompt; production-plan schema, importer and runtime validator now preserve and validate the decision.
+- Added pre-render enforcement: the requested composition must exist in RemotionRoot and match the adjacent production plan's registered renderer/composition. Legacy projects without plans still receive composition-registration validation.
+- Updated four example plans: NarratedSkyExplainer for the narrated sky example; ProjectVideo for legacy SORA and VALORANT examples with explicit rationale; ProductRevealFilm marked `to-be-built` for the generic 3D product sample.
+- Added five explicit acceptance-criterion-to-shot mappings to the SORA production plan. This fixes a pre-existing evidence gap without weakening the strict asset-evidence gate.
+- Updated the Creative Director and Remotion Producer skills, agent workflow, roadmap, project state and progress log. Only the composition catalogue/selection/enforcement slice is complete. The broader autonomous AI Production Director remains unfinished; ChatGPT or another external LLM still makes creative decisions.
+- PR #121: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/121. Current PR head before this documentation update: `dd90fe01cb3857e39e009e3d0dfcff257e0f5008`.
+- CI runs #44920371134 and #44920356458 passed on that head: 254 tests passed, 0 failed, 0 skipped; Python narration tests, type-check, example plan/project validators, storyboard QA/preview/critic, audio checks and Studio build passed.
+- Representative SORA render #44920489901 passed on the exact frozen project candidate `dd90fe01cb3857e39e009e3d0dfcff257e0f5008` using `ProjectVideo`. The frozen-candidate guard, render-request validator and new Director composition gate all passed. Strict asset evidence reported `ready`: 4 assets, all 5 criteria linked, no missing files/rights/provenance and no issues.
+- Retrieved and inspected artifact #14712604149 (`director-composition-selection-sora-verified`). MP4: 1920×1080, 30fps, 360 frames/12.0s H.264; AAC stereo 48kHz, 12.1s container duration. Media QA passed with zero silence/frozen/black intervals, A/V duration drift 0.10s, start offset 0s, loudness -15.8 LUFS and true peak -7.9 dBFS.
+- Visual inspection of a 1-second-per-frame contact sheet confirmed four distinct asset/shot designs, but also showed the repeated editorial title/eyebrow layout and relatively restrained within-scene movement of the legacy ProjectVideo renderer. This render verifies the selection and render path; it does not prove cinematic creative quality or that the broader Director now chooses custom compositions well.
+- Audio was measured by Media QA but was not listened to in this inspection.
+- The earlier failed smoke request stopped at the strict asset-evidence gate because SORA lacked `acceptanceCoverage`; no MP4 was produced by that attempt. The corrected, separate smoke request succeeded. Superseded PR #120 is closed; PR #121 is the active clean PR.
+
+
+**Last verified:** 2026-11-21  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `3f3dd846e59a02c0d0f9101ced794ee87357d2e3` — PR #105 merged; post-merge CI #44749739555 passed.  
-**Current development branch:** `fix/benchmark-duration-contract-v2` — head `d914fa18249c009cc449e7410f501ee0e866da72`, 12 commits ahead of main, 0 behind. Branch CI #44750874075 passed: 234 tests, 0 failed, 0 skipped; typecheck, project validation and studio build passed.
+**Last verified main commit:** `c148c3002f8364926ad7a71e870ea41411aa5c56` (includes the render-candidate freeze gate from PR #115). PR #116 is also marked merged; recheck the live main ref before relying on its merge SHA.  
+**Current development branch:** `feat/director-composition-selection-final` — clean PR #121; CI and the representative SORA render passed. PR merge is the next integration action.
 
 PR #105 added the strict production asset-evidence gate and merged as `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`. Its exact-head CI #44719701055 passed 233 tests with 0 skipped. Render v6 (#44719959584, artifact #14622220762) proved the gate reports `ready` for the benchmark: 6/6 acceptance criteria linked, 18 assets, and zero unresolved refs, missing files, unsafe paths, rights/provenance gaps or issues.
 
@@ -14,9 +33,9 @@ The v7 contact sheet was inspected at 5-second intervals (12 sampled frames). It
 
 > This is a snapshot. Always verify the live repository, open PRs and workflows before relying on it.
 
-## 2026-11-20 — Render-request freeze gate (PRs pending merge)
+## 2026-11-20 — Render-request freeze gate (PR #115 merged)
 
-PR #115 targets main. Main was verified at e64278320c3e59695f5f8cd1ba6170c4104f158b. PR #115 CI run #44801247196 passed after the technical gate commit; PR remains open pending integration.
+PR #115 is closed/merged at `c148c3002f8364926ad7a71e870ea41411aa5c56`; its freeze gate is now in main. PR #116 is also recorded as merged by GitHub, but the live `main` ref was still `c148c3002f8364926ad7a71e870ea41411aa5c56` at the start of the next development session, so verify the branch ref before assuming its merge is present.
 
 The render workflow now runs `scripts/render-candidate.mjs` before dependency installation and Remotion. A valid request must carry `candidateSha` equal to the exact remote branch tip before the request-only commit; the triggering push must modify only `render-request.json`. Full Git history is fetched and duplicate candidate SHAs / request IDs are rejected deterministically. Regression coverage is in `tests/render-candidate.test.ts`. The gate prevents development pushes and duplicate submissions from reaching Remotion; it does not itself judge creative quality, so the existing production-readiness checklist and project/media QA remain necessary.
 

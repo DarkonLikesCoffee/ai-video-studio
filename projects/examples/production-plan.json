@@ -131,5 +131,18 @@
     "All on-screen copy is readable and remains inside title-safe areas.",
     "The soundtrack supports the edit without masking tactile effects.",
     "The final hero composition holds long enough to read and remember."
-  ]
+  ],
+  "renderStrategy": {
+    "renderer": "custom-remotion",
+    "compositionId": "ProductRevealFilm",
+    "availability": "to-be-built",
+    "rationale": "The plan calls for multi-shot 3D product macro work, a bespoke product reveal and a camera-driven hero shot. No currently registered composition is a general product renderer.",
+    "requiredCapabilities": [
+      "3D product scene authoring",
+      "macro material and lighting control",
+      "camera moves",
+      "product reveal and hero-shot animation"
+    ],
+    "fallback": "Implement and register ProductRevealFilm before rendering. Do not substitute the ProjectVideo fixed layout without revising the creative plan."
+  }
 }

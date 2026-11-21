@@ -5,7 +5,7 @@
   "description": "A non-renderable, agent-facing plan that precedes a VideoProject.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "id", "title", "delivery", "creativeDirection", "shots", "acceptanceCriteria"],
+  "required": ["schemaVersion", "id", "title", "delivery", "creativeDirection", "renderStrategy", "shots", "acceptanceCriteria"],
   "properties": {
     "schemaVersion": { "const": 1 },
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
@@ -49,6 +49,19 @@
         "soundDirection": { "type": "string", "minLength": 1, "maxLength": 500 },
         "assumptions": { "type": "array", "items": { "type": "string", "maxLength": 300 } },
         "rightsAndFactualConstraints": { "type": "array", "items": { "type": "string", "maxLength": 300 } }
+      }
+    },
+    "renderStrategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["renderer", "compositionId", "availability", "rationale", "requiredCapabilities", "fallback"],
+      "properties": {
+        "renderer": { "type": "string", "enum": ["project-video", "custom-remotion"] },
+        "compositionId": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]{1,63}$" },
+        "availability": { "type": "string", "enum": ["registered", "to-be-built"] },
+        "rationale": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "requiredCapabilities": { "type": "array", "minItems": 1, "maxItems": 12, "items": { "type": "string", "minLength": 1, "maxLength": 160 } },
+        "fallback": { "type": "string", "minLength": 1, "maxLength": 500 }
       }
     },
     "shots": {

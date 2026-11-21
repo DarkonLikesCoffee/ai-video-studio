@@ -127,5 +127,68 @@
     "All copy is readable and stays within title-safe areas.",
     "Each shot contains purposeful visual movement rather than a static title swap.",
     "The final hero frame holds clearly and resolves the opening idea."
+  ],
+  "renderStrategy": {
+    "renderer": "project-video",
+    "compositionId": "ProjectVideo",
+    "availability": "registered",
+    "rationale": "This existing SORA example is authored as layered 2D product motion graphics that fit the ProjectVideo scene schema. This is a documented compatibility choice for the legacy example, not a default for new product films.",
+    "requiredCapabilities": [
+      "layered 2D product assets",
+      "keyframed motion",
+      "editorial typography",
+      "scene transitions and audio tracks"
+    ],
+    "fallback": "If the product needs bespoke physical camera moves or 3D surfaces, build a dedicated custom product composition rather than forcing unsupported behavior into scene JSON."
+  },
+  "acceptanceCoverage": [
+    {
+      "criterion": "Four visually distinct shot scales and compositions.",
+      "shotIds": [
+        "material",
+        "silhouette",
+        "control",
+        "hero"
+      ],
+      "rationale": "The macro material crop, three-quarter silhouette reveal, tight control detail and final wide hero are separate authored compositions."
+    },
+    {
+      "criterion": "The headphone silhouette remains coherent across all four shots.",
+      "shotIds": [
+        "material",
+        "silhouette",
+        "control",
+        "hero"
+      ],
+      "rationale": "Each original vector asset depicts the same fictional headphone design, retaining consistent earcup, headband and cushion geometry."
+    },
+    {
+      "criterion": "All copy is readable and stays within title-safe areas.",
+      "shotIds": [
+        "material",
+        "silhouette",
+        "control",
+        "hero"
+      ],
+      "rationale": "Each shot has its own editorial text treatment and safe-area layout; the four corresponding assets contain the copy placement."
+    },
+    {
+      "criterion": "Each shot contains purposeful visual movement rather than a static title swap.",
+      "shotIds": [
+        "material",
+        "silhouette",
+        "control",
+        "hero"
+      ],
+      "rationale": "Each scene defines a distinct camera-like scale, lateral or reveal movement and a clear start-to-end visual progression."
+    },
+    {
+      "criterion": "The final hero frame holds clearly and resolves the opening idea.",
+      "shotIds": [
+        "material",
+        "hero"
+      ],
+      "rationale": "The opening establishes the material edge and the final hero returns to the complete product form, with a deliberate closing hold."
+    }
   ]
 }

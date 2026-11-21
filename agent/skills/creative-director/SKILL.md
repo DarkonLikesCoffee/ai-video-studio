@@ -19,9 +19,10 @@ Turn a vague request into a distinctive, coherent creative concept that can be p
 5. Define one creative thesis, emotional arc, visual metaphor, visual system (palette, type, materials, lighting, composition), motion language, sound identity and narrative structure.
 6. Decide how the video should communicate: show an event, action, transformation, demonstration, comparison, visual metaphor, reveal, environment or human/subject behavior. Prefer showing over explanatory text when the concept can be visualized.
 7. Select a production method for each planned beat/shot. Possible methods include real/user footage, generated video, still-image compositing, 2D animation, motion graphics, typography, diagram, Three.js/3D, simulation or hybrid. Choose based on the creative need and verified engine/provider capability—not familiarity or convenience.
-8. Check the concept against available assets, rights, costs and engine capabilities. If a shot requires unsupported capability, either choose an honest producible alternative or propose a small reusable extension. Do not fake unavailable camera/3D/physics capabilities with schema fields.
-9. Make the visual concept concrete and producible. Identify the subject, action, environment, camera, composition, and what changes over time. A shot that merely says “show the concept” is not production-ready.
-10. Write a concise creative brief and measurable acceptance criteria before storyboarding.
+8. Select ONE whole-video Remotion composition from `scripts/director-compositions.ts`. Read its purpose, strengths and limitations. Choose `ProjectVideo` only when its recurring fixed layout fits the concept; otherwise select a fitting registered custom composition or mark a new custom composition as `to-be-built`. Record renderer, composition ID, status, rationale, required capabilities and fallback in `renderStrategy`.
+9. Check the concept against available assets, rights, costs and engine capabilities. If a shot requires unsupported capability, either choose an honest producible alternative or propose a small reusable extension. Do not fake unavailable camera/3D/physics capabilities with schema fields.
+10. Make the visual concept concrete and producible. Identify the subject, action, environment, camera, composition, and what changes over time. A shot that merely says “show the concept” is not production-ready.
+11. Write a concise creative brief and measurable acceptance criteria before storyboarding.
 
 ## Required output
 
@@ -30,7 +31,8 @@ Turn a vague request into a distinctive, coherent creative concept that can be p
 - Narrative/emotional arc with beginning, development and payoff.
 - Art direction: palette, typography, composition, texture/material, lighting and visual references described in words.
 - Visual storytelling approach: what the audience sees happen; planned visual metaphors, demonstrations, comparisons, actions or reveals.
-- Production-method strategy: which methods suit the content and why; key capability gaps.
+- Whole-video composition decision: selected renderer and composition ID, whether it is already registered or must be built, why it fits the concept, required capabilities and an honest fallback.
+- Production-method strategy: which methods suit individual shots and why; key capability gaps.
 - Motion direction: camera language, subject/object/environment motion, movement tempo, transitions and restraint.
 - Sound direction: music character, sound effects, ambience, voice-over/dialogue if relevant.
 - Platform/delivery specification.

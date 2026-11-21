@@ -2,6 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { validateCreativeBrief } from "./director-brief";
 import { validateProductionPlan } from "./validate-production-plan";
+import { validateRenderStrategy } from "./director-compositions";
 
 type RecordValue = Record<string, unknown>;
 const isRecord = (value: unknown): value is RecordValue => typeof value === "object" && value !== null && !Array.isArray(value);
@@ -21,6 +22,7 @@ export type DirectorProductionPlan = RecordValue & {
   acceptanceCriteria: string[];
   acceptanceCoverage: AcceptanceCoverage[];
   shots: RecordValue[];
+  renderStrategy: RecordValue;
 };
 
 export const buildProductionPlanFromStoryboard = (briefInput: unknown, storyboardInput: unknown): DirectorProductionPlan => {
@@ -127,9 +129,12 @@ export const buildProductionPlanFromStoryboard = (briefInput: unknown, storyboar
       rightsAndFactualConstraints: brief.constraints,
     },
     shots,
+    renderStrategy: record(storyboard.renderStrategy),
     acceptanceCriteria,
     acceptanceCoverage,
   };
+  const strategyErrors = validateRenderStrategy(plan.renderStrategy);
+  if (strategyErrors.length) throw new Error(strategyErrors.join("\n"));
   const errors = validateProductionPlan(plan);
   const timingErrors: string[] = [];
   const fps = Number(delivery.fps);

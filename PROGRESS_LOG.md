@@ -1,3 +1,19 @@
+## 2026-11-21 — Explicit Director composition selection (PR #121; CI and representative render passed)
+
+- Re-read the roadmap, state, operating instructions, production workflow, Creative Director and Remotion Producer skills. Confirmed autonomous AI Production Director is an explicitly planned but unfinished P1 milestone.
+- Implemented a model-facing Remotion composition catalogue, required top-level plan `renderStrategy`, storyboard prompt wiring, schema/import/runtime validation, pre-render registration and plan/request matching, tests, and updated agent playbooks.
+- Whole-video renderer/composition selection is distinct from per-shot visual methods. ChatGPT (or another external model) remains the creative decision-maker; no LLM is embedded in this repo.
+- Migrated the checked-in plan examples: NarratedSkyExplainer, explicit legacy ProjectVideo selections for SORA and VALORANT, and a not-yet-built ProductRevealFilm for the generic 3D product sample.
+- Fixed SORA's missing acceptanceCoverage by mapping all five criteria to relevant shot IDs with explicit rationales. The strict asset-evidence gate remains unchanged.
+- PR #121 is the clean replacement PR: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/121. Superseded PR #120 is closed.
+- CI runs #44920371134 and #44920356458 passed on PR head `dd90fe01cb3857e39e009e3d0dfcff257e0f5008`: 254 tests passed, 0 failed, 0 skipped; typecheck, narration tests, plan/project/storyboard checks, audio preparation and Studio build all passed.
+- Representative SORA render #44920489901 passed on that exact frozen candidate. The candidate-freeze gate, request validator and new Director composition gate all passed. Asset evidence: `ready`, 4 local assets, all 5 criteria linked, 0 issues.
+- Retrieved and inspected MP4 artifact #14712604149, SHA-256 `56dd7610c19102f5cf132d8b19b0dcd7fccdcd0e1d8f6931489370db3895d772`. Output: H.264 1920×1080/30fps, 360 frames/12.0s; AAC stereo 48kHz, 12.1s container. QA passed: no silence, frozen or black intervals; 0.10s A/V duration drift, 0s start offset, -15.8 LUFS integrated loudness and -7.9 dBFS true peak.
+- The one-second frame inspection shows four distinct SORA scene designs, but ProjectVideo's recurring eyebrow/title treatment and restrained in-scene movement remain. This is a technical path smoke test using the explicitly selected legacy ProjectVideo, not evidence of cinematic quality or an autonomous Director's creative judgment.
+- Audio was measured by QA but not listened to. No creative-acceptance claim is made.
+- Latest next step: merge PR #121 after verifying the two required checks remain green; continue the broader Director milestone with richer custom-composition selection and actual per-brief visual strategy.
+
+
 ## 2026-11-18 — User-provided gameplay footage integration merged (PR #58)
 
 - Reviewed the post-merge narration-sync render #44394465979 and downloaded artifact #14469659407. QA: 47.733s video, 47.8s audio, 1920x1080, 30fps, H.264/AAC stereo, -16.1 LUFS, zero silence/freeze/black intervals. Contact sheet confirmed the technical result still reads as repeated vector-diagram compositions.

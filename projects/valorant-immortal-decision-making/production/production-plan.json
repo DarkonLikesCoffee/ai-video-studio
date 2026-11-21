@@ -246,5 +246,18 @@
       ],
       "rationale": "This deliverable-level criterion applies across the complete six-shot timeline; link all shot IDs so its evidence is reviewed project-wide."
     }
-  ]
+  ],
+  "renderStrategy": {
+    "renderer": "project-video",
+    "compositionId": "ProjectVideo",
+    "availability": "registered",
+    "rationale": "This legacy VALORANT explainer combines user-owned gameplay clips with explanatory 2D tactical overlays and narration; its current project is authored for the ProjectVideo schema. Its known visual limitations remain an explicit creative-QA concern.",
+    "requiredCapabilities": [
+      "layered gameplay video clips",
+      "2D tactical overlays",
+      "narration and timed captions",
+      "music ducking and transitions"
+    ],
+    "fallback": "If editorial footage-led cutting, reframing or kinetic camera work cannot be achieved in ProjectVideo, build a dedicated custom Remotion edit and keep tactical graphics as supporting inserts."
+  }
 }
