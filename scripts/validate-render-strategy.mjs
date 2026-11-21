@@ -35,7 +35,7 @@ export const validateRenderStrategyAgainstRequest = ({ request, plan, registered
     errors.push("The linked production plan must specify a compositionId.");
   }
   if (typeof strategy.rationale !== "string" || !strategy.rationale.trim()) {
-    errors.push("The linked production plan must explain why this composition was selected.");
+    errors.push("The linked production plan must include a non-empty renderStrategy.rationale explaining why this composition was selected.");
   }
   if (!Array.isArray(strategy.requiredCapabilities) || strategy.requiredCapabilities.length === 0 ||
       strategy.requiredCapabilities.some((item) => typeof item !== "string" || !item.trim())) {
