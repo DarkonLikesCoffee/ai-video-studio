@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "id": "orbital-bloom",
+  "title": "ORBITAL BLOOM",
+  "delivery": {
+    "durationSeconds": 20,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "format": "mp4",
+    "platform": "Cinematic short film",
+    "language": "No dialogue; original instrumental sound design"
+  },
+  "creativeDirection": {
+    "objective": "Tell a complete science-fiction story through spatial cinematography, physical transformation and sound, without narration or exposition.",
+    "audience": "Viewers of premium science-fiction short films and cinematic CGI.",
+    "concept": "A dormant mechanical seed awakens inside a derelict orbital station, blooms into the last living organism of an extinct ecosystem, and reveals the station as a vast greenhouse built to preserve it.",
+    "emotionalArc": [
+      "Unease and discovery",
+      "Tactile curiosity",
+      "Mechanical anticipation",
+      "Wonder and renewal",
+      "Quiet revelation"
+    ],
+    "visualSystem": {
+      "palette": [
+        "#03070B",
+        "#28373E",
+        "#A75D3C",
+        "#D9C6A5",
+        "#FFB044",
+        "#376E66",
+        "#F1BBA0",
+        "#274E66"
+      ],
+      "typography": "No explanatory copy. One restrained serif title appears only in the final two seconds.",
+      "composition": "One continuous physical world. Asymmetric macro framing gives way to a low growth shot and a wide architectural reveal; the plant remains the visual anchor.",
+      "lighting": "Cold desaturated station ambience and grazing metallic highlights transition to amber core illumination, warm organic bounce and muted planetary blue.",
+      "textureAndMaterials": "Machined copper and titanium plates, locking pins, clear mineral-like chamber, emissive amber core, translucent petal membranes, veined organic leaves, weathered steel and thin glass."
+    },
+    "motionLanguage": "A continuous camera path: slow station approach, macro orbit, motivated camera arc around the mechanical opening, low tracking move through the bloom, then a long rising dolly-back through the greenhouse. Eased movements and staggered mechanisms replace decorative spinning and generic transitions.",
+    "soundDirection": "Original 48 kHz stereo soundscape: distant station resonance, sparse signal ticks, latch impact, metallic iris movement, organic glass-like harmonics and a warm resolving bed. No voice or paid audio service.",
+    "assumptions": [
+      "The station, mechanical seed and alien ecosystem are fictional.",
+      "The seed, plant and greenhouse are original procedural geometry; no imported 3D model or texture is used.",
+      "Audio is generated deterministically from source code during the GitHub Actions render."
+    ],
+    "rightsAndFactualConstraints": [
+      "All visual assets are original geometry and material code authored for this repository; no third-party model, footage or texture is used.",
+      "The soundtrack is original procedural synthesis with no third-party samples or recordings."
+    ]
+  },
+  "renderStrategy": {
+    "renderer": "custom-remotion",
+    "compositionId": "OrbitalBloom3D",
+    "availability": "registered",
+    "rationale": "A single continuous Three.js world is required for the articulated seed, organic bloom, motivated 3D camera path and greenhouse reveal; the fixed-layout ProjectVideo renderer cannot express these spatial events.",
+    "requiredCapabilities": [
+      "Procedural Three.js geometry and physically based materials",
+      "Articulated shell panels, independent rings and iris animation",
+      "Organic 3D stems, roots, leaves and translucent animated petals",
+      "Frame-synchronised dolly and orbit camera movement",
+      "Transparent orbital greenhouse dome and planetary reveal",
+      "Original stereo soundtrack embedded in the MP4"
+    ],
+    "fallback": "Do not substitute ProjectVideo. If WebGL or transparency fails on the GitHub runner, diagnose and revise this custom composition while preserving the 3D seed, living bloom and greenhouse reveal."
+  },
+  "shots": [
+    {
+      "id": "discovery",
+      "startSeconds": 0,
+      "durationSeconds": 4,
+      "purpose": "Establish isolation and frame the first glimpse as a genuine discovery.",
+      "visual": "A derelict orbital greenhouse emerges from darkness: cold steel ribs, a damaged containment bay, drifting dust and a small copper seed suspended above cracked soil.",
+      "visualMethod": "Custom procedural Three.js 3D environment and hero object",
+      "action": "The camera glides past the dark station structure toward the suspended seed as dust drifts through a weak maintenance light.",
+      "visualProgression": "Begin in near-black with only a station silhouette. The moving camera reveals the curved dome ribs and damaged bay. End close enough to recognise the seed silhouette but not its construction.",
+      "narrativeBeat": "hook",
+      "framing": "Wide high-oblique establishing shot tightening into a medium-long three-quarter composition.",
+      "cameraMovement": "Slow forward dolly while descending toward the seed.",
+      "transition": "The same camera move carries forward into the macro exploration; no transition card.",
+      "audio": "Low station ventilation and hull resonance, distant relay ticks and a restrained metallic ping.",
+      "assets": [
+        "orbital-bloom-3d-composition",
+        "orbital-bloom-original-soundscape"
+      ]
+    },
+    {
+      "id": "macro-object",
+      "startSeconds": 4,
+      "durationSeconds": 4,
+      "purpose": "Reveal the seed as a designed mechanical artefact with tactile construction and material detail.",
+      "visual": "A macro exploration of machined copper armour segments, titanium underlayers, fine rivets, independent concentric rings, a clear inner chamber, amber core and closed precision iris.",
+      "visualMethod": "Custom Three.js procedural hard-surface modelling and macro cinematography",
+      "action": "The camera makes a close orbital pass as independent rings counter-rotate and narrow highlights travel across the shell.",
+      "visualProgression": "Start on a cropped machined seam and locking pin. Track across layered shell surfaces to expose the clear chamber and dormant core. End facing the closed iris.",
+      "narrativeBeat": "development",
+      "framing": "Extreme macro with shallow compressed perspective and asymmetric crop.",
+      "cameraMovement": "Slow close orbit and short dolly-in, holding material layers readable.",
+      "transition": "The orbit centres on the iris, matching its circular shape into activation.",
+      "audio": "Close granular metal movement, tiny latch ticks and fine resonant detail over the low drone.",
+      "assets": [
+        "orbital-bloom-3d-composition",
+        "orbital-bloom-original-soundscape"
+      ]
+    },
+    {
+      "id": "activation",
+      "startSeconds": 8,
+      "durationSeconds": 4,
+      "purpose": "Deliver the mechanical transformation and reveal the seed's stored energy.",
+      "visual": "The amber heart ignites behind the transparent chamber. Eight shell plates peel outward, iris blades rotate open and three metal rings travel on separate axes.",
+      "visualMethod": "Custom Three.js articulated object animation",
+      "action": "The core pulses on; the iris unlocks; shell panels lift on separate hinge paths while independent rings counter-rotate around the exposed chamber.",
+      "visualProgression": "Begin with the iris closed and core dim. The amber ignition precedes the latches. Iris blades separate, then shell panels fan outward in staggered motion. End open and glowing above the soil.",
+      "narrativeBeat": "escalation",
+      "framing": "Tight three-quarter macro becoming a close-medium view as the shell clears.",
+      "cameraMovement": "Controlled lateral orbit around the mechanism followed by a slight pull-back.",
+      "transition": "Follow the seed's descent while keeping the glowing core centred.",
+      "audio": "Restrained sub impact, staggered latch clicks, metallic ratchet and rising electrical hum.",
+      "assets": [
+        "orbital-bloom-3d-composition",
+        "orbital-bloom-original-soundscape"
+      ]
+    },
+    {
+      "id": "the-bloom",
+      "startSeconds": 12,
+      "durationSeconds": 4,
+      "purpose": "Transform engineered metal into living structure and create the emotional release.",
+      "visual": "The open seed settles on cracked earth. Roots spread below the surface, teal stems branch upward, translucent veined leaves flex outward and twelve glass-like petals open around a living amber centre.",
+      "visualMethod": "Custom Three.js procedural organic geometry and keyframed growth",
+      "action": "Luminous filaments emerge from the core; roots anchor, five main stems grow, branches flex, leaves unfurl and petals open independently.",
+      "visualProgression": "Begin with the opened seed shell just above the ground. Roots and stems emerge first, followed by branches and leaves, then the flower crown. End on the complete organism illuminated from within.",
+      "narrativeBeat": "reveal",
+      "framing": "Low soil-level tracking medium close-up with the crown rising into the upper frame.",
+      "cameraMovement": "Smooth low arc around the growing plant, lifting slightly with the tallest stem.",
+      "transition": "The camera lift becomes a gradual dolly-back and lets the greenhouse architecture enter frame.",
+      "audio": "Soft organic emergence, glassy harmonics, a delicate shimmer and a widening warm chord.",
+      "assets": [
+        "orbital-bloom-3d-composition",
+        "orbital-bloom-original-soundscape"
+      ]
+    },
+    {
+      "id": "greenhouse-revelation",
+      "startSeconds": 16,
+      "durationSeconds": 4,
+      "purpose": "Reframe the setting and finish on an image of life protected across deep time.",
+      "visual": "The camera retreats to reveal the glowing organism at the centre of an immense abandoned orbital greenhouse. Steel ribs and the glass dome span the frame; a distant blue planet hangs beyond it.",
+      "visualMethod": "Custom Three.js wide environment reveal and cinematic hero composition",
+      "action": "The camera pulls back and rises; the plant's light washes across the greenhouse floor, revealing the dome scale and planet. The title appears only as the wide composition settles.",
+      "visualProgression": "Start close on the living flower. The retreat reveals the dome ribs and station breadth. End with the luminous plant, greenhouse and distant planet held in a balanced wide shot.",
+      "narrativeBeat": "payoff",
+      "framing": "Very wide centred composition, plant as luminous focal point and planet offset in the upper-right background.",
+      "cameraMovement": "Long dolly-back and slight rise, easing into a stable final hold.",
+      "transition": "No card or cut; the final title fades in over the resolved world.",
+      "audio": "Warm resolving chord; station ambience recedes into a long resonant tail.",
+      "assets": [
+        "orbital-bloom-3d-composition",
+        "orbital-bloom-original-soundscape"
+      ]
+    }
+  ],
+  "assetManifestPath": "projects/orbital-bloom/production/asset-manifest.json",
+  "acceptanceCriteria": [
+    "The film tells the five-beat discovery, macro, activation, bloom and greenhouse-reveal story without narration or explanatory cards.",
+    "The mechanical seed is a coherent detailed 3D object with articulated shell panels, an iris, independently rotating rings, a transparent chamber and an amber core.",
+    "The seed visibly unfolds and the plant grows as real 3D stems, roots, leaves and independently animated translucent petals.",
+    "The film uses purposeful camera movement and distinct wide, macro, low-tracking and revealing compositions rather than repeated static layouts.",
+    "The final shot reveals the enormous orbital greenhouse, glowing plant and distant planet through the dome; the title appears only at the end.",
+    "The MP4 contains an original stereo soundscape with mechanical, activation and organic bloom cues and passes technical media QA."
+  ],
+  "acceptanceCoverage": [
+    {
+      "criterion": "The film tells the five-beat discovery, macro, activation, bloom and greenhouse-reveal story without narration or explanatory cards.",
+      "shotIds": [
+        "discovery",
+        "macro-object",
+        "activation",
+        "the-bloom",
+        "greenhouse-revelation"
+      ],
+      "rationale": "Each narrative beat is assigned to a contiguous four-second section of the single continuous camera path."
+    },
+    {
+      "criterion": "The mechanical seed is a coherent detailed 3D object with articulated shell panels, an iris, independently rotating rings, a transparent chamber and an amber core.",
+      "shotIds": [
+        "macro-object",
+        "activation"
+      ],
+      "rationale": "The macro shot exposes the material and construction layers; activation demonstrates all moving mechanical assemblies."
+    },
+    {
+      "criterion": "The seed visibly unfolds and the plant grows as real 3D stems, roots, leaves and independently animated translucent petals.",
+      "shotIds": [
+        "activation",
+        "the-bloom",
+        "greenhouse-revelation"
+      ],
+      "rationale": "Activation releases the seed; bloom and final reveal show the living roots, stems, leaves and petals."
+    },
+    {
+      "criterion": "The film uses purposeful camera movement and distinct wide, macro, low-tracking and revealing compositions rather than repeated static layouts.",
+      "shotIds": [
+        "discovery",
+        "macro-object",
+        "activation",
+        "the-bloom",
+        "greenhouse-revelation"
+      ],
+      "rationale": "Each beat changes camera scale, angle, height and distance in response to the action."
+    },
+    {
+      "criterion": "The final shot reveals the enormous orbital greenhouse, glowing plant and distant planet through the dome; the title appears only at the end.",
+      "shotIds": [
+        "discovery",
+        "greenhouse-revelation"
+      ],
+      "rationale": "The dome is established in the opening and its scale and planet-facing glass are revealed in the final pull-back."
+    },
+    {
+      "criterion": "The MP4 contains an original stereo soundscape with mechanical, activation and organic bloom cues and passes technical media QA.",
+      "shotIds": [
+        "discovery",
+        "macro-object",
+        "activation",
+        "the-bloom",
+        "greenhouse-revelation"
+      ],
+      "rationale": "One continuous score synchronises ambience, signal ticks, activation, mechanical movement, bloom harmonics and resolution."
+    }
+  ]
+}

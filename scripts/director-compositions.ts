@@ -72,6 +72,21 @@ export const COMPOSITION_REGISTRY: readonly CompositionCapability[] = [
     limitations: ["The product model, brand copy, timing and shot structure are hard-coded; do not reuse unchanged for unrelated products."],
   },
   {
+    id: "OrbitalBloom3D",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "A bespoke 20-second science-fiction short built as one continuous procedural 3D environment and mechanical-to-organic transformation.",
+    strengths: [
+      "Articulated copper/titanium seed with iris, independently rotating rings and amber core",
+      "Procedural organic plant growth with translucent animated petals",
+      "Moving 3D camera, orbital greenhouse dome, planetary reveal and original soundtrack",
+    ],
+    limitations: [
+      "A dedicated authored film composition, not a general-purpose prompt-driven 3D scene authoring system",
+      "The seed, plant, environment and camera path are specific to ORBITAL BLOOM",
+    ],
+  },
+  {
     id: "NarratedSkyExplainer",
     renderer: "custom-remotion",
     selectable: true,

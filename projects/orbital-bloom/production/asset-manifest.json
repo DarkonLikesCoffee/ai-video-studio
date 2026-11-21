@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "projectId": "orbital-bloom",
+  "assets": [
+    {
+      "id": "orbital-bloom-3d-composition",
+      "file": "assets/OrbitalBloom3D.tsx",
+      "type": "original-procedural-3d-scene-source",
+      "shotIds": [
+        "all"
+      ],
+      "provenance": "Original Three.js / React Three Fiber composition and procedural geometry authored in this repository for ORBITAL BLOOM.",
+      "rightsBasis": "original-content",
+      "rightsNote": "Modelling, geometry, materials, environment and animation code are original work created for this project; no imported model or texture is used."
+    },
+    {
+      "id": "orbital-bloom-original-soundscape",
+      "file": "assets/audio/generate-soundscape.mjs",
+      "type": "original-procedural-audio-source",
+      "shotIds": [
+        "all"
+      ],
+      "provenance": "Original deterministic PCM soundscape generator authored for ORBITAL BLOOM and executed by GitHub Actions.",
+      "rightsBasis": "original-content",
+      "rightsNote": "Audio is synthesised from original source code and sine/noise waveforms; no third-party sample, model, recording or paid API is used."
+    }
+  ]
+}

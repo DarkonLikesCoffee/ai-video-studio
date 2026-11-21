@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "orbital-bloom",
+  "title": "ORBITAL BLOOM",
+  "composition": {
+    "id": "OrbitalBloom3D",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 600
+  },
+  "durationInFrames": 600
+}

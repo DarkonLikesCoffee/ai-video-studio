@@ -894,3 +894,20 @@ npm run director:brief -- projects/examples/creative-brief.json creative-brief-s
 ```
 
 This is a contract/validation stage, not an autonomous LLM director. It does not generate the brief, storyboard or assets.
+
+
+## ORBITAL BLOOM — procedural cinematic 3D short
+
+`projects/orbital-bloom/` contains a 20-second, 1920×1080/30fps custom Remotion film. It uses the selectable `OrbitalBloom3D` composition rather than the fixed-layout `ProjectVideo` renderer. The Three.js scene builds the articulated seed, organic plant, greenhouse dome, station structure and distant planet from original procedural geometry.
+
+The creative brief, five-shot storyboard, production plan, acceptance-criterion map, rights manifest and audio cue sheet live under `projects/orbital-bloom/production/`. GitHub Actions synthesises the original stereo soundtrack from `assets/audio/generate-soundscape.mjs`; the WAV is runner-local, embedded by Remotion and mastered into the MP4. No imported 3D models, textures, stock footage, audio samples or paid APIs are required.
+
+For local development, generate the score and run validation:
+
+```bash
+node projects/orbital-bloom/assets/audio/generate-soundscape.mjs
+npm run typecheck
+npm test
+```
+
+The render must use the frozen-candidate GitHub Actions process and pass strict asset-evidence checks. A successful job is not creative approval: inspect the actual MP4 and contact sheet, and listen to the audio before delivery.
