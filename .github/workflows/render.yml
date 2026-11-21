@@ -182,6 +182,10 @@ jobs:
           if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_DIR/.render-project.json" "--public-dir=../../$PROJECT_DIR"
+          elif [[ "$COMPOSITION_ID" == "OrbitalBloom3D" ]]; then
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+            # GitHub-hosted runners have no physical GPU; Three.js needs SwiftShader.
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR" "--concurrency=1" "--gl=swangle"
           elif [[ -n "$PROJECT_PATH" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
