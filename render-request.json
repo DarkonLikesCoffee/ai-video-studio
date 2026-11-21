@@ -1,6 +1,8 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "ProjectVideo",
+  "projectPath": "projects/sora/scene.json",
+  "outputName": "director-composition-selection-sora-check",
+  "requestId": "director-composition-selection-check-20261121-01",
+  "candidateSha": "a27629b803d4cea4b5f62458c83794ccc6e99efc"
 }
