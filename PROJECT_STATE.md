@@ -1,22 +1,24 @@
 # AI Video Studio — Project State
 
-## 2026-11-21 — Explicit Director composition selection (feature branch in progress)
+## 2026-11-21 — Explicit Director composition selection (PR #120 open; CI green)
 
 - Started `feat/director-composition-selection` from verified main `c148c3002f8364926ad7a71e870ea41411aa5c56`.
 - Adds a model-facing catalogue of the compositions registered in RemotionRoot, including intended use, strengths, limitations and whether each is selectable. Test/reference-only compositions are excluded from production selection.
 - Extends the storyboard handoff and production-plan contract with one top-level `renderStrategy`: renderer, composition ID, registered/to-be-built status, rationale, required capabilities and fallback. This is a whole-video renderer choice, separate from per-shot `visualMethod`.
-- Updates the existing production-plan examples with explicit historical or intended renderer choices. The generic 3D product example honestly marks its bespoke composition as `to-be-built`.
+- Updates the four checked-in production-plan examples with explicit renderer choices. The generic 3D product example honestly marks its bespoke composition as `to-be-built`.
 - Adds a pre-render gate that verifies the chosen ID is registered and, when a conventional adjacent production plan exists, that the plan's registered renderer/composition matches the render request. Legacy projects without a production plan remain supported but still require a registered composition.
 - Updates Director/Remotion guidance and marks only the composition-selection registry/gate roadmap slice complete. The broader autonomous Director workflow remains incomplete: ChatGPT or another external model still makes the creative decision; the repository does not call an LLM.
-- Validation status: branch CI, typecheck and tests have not yet been run. No video render has been requested.
-- Next: inspect the complete branch diff, run CI, fix any failures, then open a PR. Do not merge until required checks are green.
-
+- PR #120: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/120. Latest branch commit: `98842fd5957a62ab3462747ab983dce133f795b3`.
+- CI runs #44919449799 and #44919454705 passed on that commit. Confirmed summary: 254 tests passed, 0 failed, 0 skipped; Python narration tests, TypeScript typecheck, all example production-plan validators, storyboard preview/critic/QA, project/audio validation and Studio build also passed.
+- The first CI attempts exposed outdated asset-evidence test fixtures and a validation-message assertion mismatch; both were corrected. The final run is fully green.
+- No video render was requested because this is a planning/render-selection architecture change, not a visual-composition implementation. No video-output claim is made.
+- Next: merge PR #120 after confirming the required PR checks remain green. The PR is mergeable.
 
 **Last verified:** 2026-11-21  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
 **Last verified main commit:** `c148c3002f8364926ad7a71e870ea41411aa5c56` (includes the render-candidate freeze gate from PR #115). PR #116 is also marked merged; recheck the live main ref before relying on its merge SHA.  
-**Current development branch:** `feat/director-composition-selection` — composition-selection workflow in progress; CI has not yet been run.
+**Current development branch:** `feat/director-composition-selection` — PR #120 open; latest commit `98842fd5957a62ab3462747ab983dce133f795b3`; CI passed with 254 tests, 0 failed, 0 skipped.
 
 PR #105 added the strict production asset-evidence gate and merged as `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`. Its exact-head CI #44719701055 passed 233 tests with 0 skipped. Render v6 (#44719959584, artifact #14622220762) proved the gate reports `ready` for the benchmark: 6/6 acceptance criteria linked, 18 assets, and zero unresolved refs, missing files, unsafe paths, rights/provenance gaps or issues.
 
