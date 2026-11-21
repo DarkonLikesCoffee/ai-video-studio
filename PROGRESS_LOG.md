@@ -1,16 +1,15 @@
-## 2026-11-21 — Explicit Director composition selection (PR #120; CI green)
+## 2026-11-21 — Explicit Director composition selection (clean PR #121; validation in progress)
 
-- Started `feat/director-composition-selection` from verified main `c148c3002f8364926ad7a71e870ea41411aa5c56`.
-- Adds a model-facing catalogue of the compositions registered in RemotionRoot, including intended use, strengths, limitations and whether each is selectable. Test/reference-only compositions are excluded from production selection.
-- Extends the storyboard handoff and production-plan contract with one top-level `renderStrategy`: renderer, composition ID, registered/to-be-built status, rationale, required capabilities and fallback. This is a whole-video renderer choice, separate from per-shot `visualMethod`.
-- Updates the four checked-in production-plan examples with explicit renderer choices. The generic 3D product example honestly marks its bespoke composition as `to-be-built`.
-- Adds a pre-render gate that verifies the chosen ID is registered and, when a conventional adjacent production plan exists, that the plan's registered renderer/composition matches the render request. Legacy projects without a production plan remain supported but still require a registered composition.
-- Updates Director/Remotion guidance and marks only the composition-selection registry/gate roadmap slice complete. The broader autonomous Director workflow remains incomplete: ChatGPT or another external model still makes the creative decision; the repository does not call an LLM.
-- PR #120: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/120. Latest branch commit: `98842fd5957a62ab3462747ab983dce133f795b3`.
-- CI runs #44919449799 and #44919454705 passed on that commit. Confirmed summary: 254 tests passed, 0 failed, 0 skipped; Python narration tests, TypeScript typecheck, all example production-plan validators, storyboard preview/critic/QA, project/audio validation and Studio build also passed.
-- The first CI attempts exposed outdated asset-evidence test fixtures and a validation-message assertion mismatch; both were corrected. The final run is fully green.
-- No video render was requested because this is a planning/render-selection architecture change, not a visual-composition implementation. No video-output claim is made.
-- Next: merge PR #120 after confirming the required PR checks remain green. The PR is mergeable.
+- Re-read the roadmap, project state, operating instructions, production workflow, Creative Director and Remotion Producer skills before starting. Confirmed autonomous AI Production Director is a planned but unfinished P1 milestone.
+- Implemented a model-facing composition catalogue, top-level plan `renderStrategy`, model-neutral storyboard prompt wiring, production-plan schema/import/runtime validation, pre-render plan/request matching, and regression tests. Whole-video composition selection is explicitly separate from per-shot `visualMethod`.
+- Updated the checked-in plan examples: NarratedSkyExplainer is selected for the narrated sky example; legacy SORA and VALORANT use ProjectVideo with documented rationale; generic 3D product asks for a not-yet-built ProductRevealFilm.
+- Updated the Creative Director and Remotion Producer skills, operating workflow, roadmap and state logs. The autonomous Director milestone remains incomplete; ChatGPT or another external model still makes the decision.
+- CI on the original feature branch passed 254/254 Node tests, 0 failures, 0 skipped, Python narration tests, TypeScript typecheck, example plan/project checks, storyboard QA and Studio build.
+- First representative render attempt (#44919892128, request `director-composition-selection-check-20261121-01`) passed the frozen-candidate gate, render-request validation and the new Director composition gate. SORA project validation and audio preparation passed, but strict asset evidence correctly stopped the render: the legacy plan did not include `acceptanceCoverage`, so the evidence report status was `criteria-unavailable`. No render was attempted and no MP4 was produced.
+- Fixed SORA's production plan by mapping its five acceptance criteria to the relevant shot IDs with rationales. Asset manifest and original vector files are present with documented provenance/rights. This is a real plan-quality improvement, not a bypass of the strict gate.
+- Opened a clean branch from the tested Director feature commit so the final PR excludes temporary `render-request.json` changes. Current branch: `feat/director-composition-selection-final`; plan-fix candidate: `fc3bbba9075adc47e2a345691e168b1ebd598e9a`.
+- Prior PR #120 is being superseded by clean PR #121. CI for the plan-fix commit and representative render are pending; do not mark the video-production gate complete until the actual MP4 is rendered and inspected.
+
 
 ## 2026-11-18 — User-provided gameplay footage integration merged (PR #58)
 

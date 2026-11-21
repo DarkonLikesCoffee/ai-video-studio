@@ -1,24 +1,22 @@
 # AI Video Studio — Project State
 
-## 2026-11-21 — Explicit Director composition selection (PR #120 open; CI green)
+## 2026-11-21 — Explicit Director composition selection (PR #121; CI pending)
 
-- Started `feat/director-composition-selection` from verified main `c148c3002f8364926ad7a71e870ea41411aa5c56`.
-- Adds a model-facing catalogue of the compositions registered in RemotionRoot, including intended use, strengths, limitations and whether each is selectable. Test/reference-only compositions are excluded from production selection.
-- Extends the storyboard handoff and production-plan contract with one top-level `renderStrategy`: renderer, composition ID, registered/to-be-built status, rationale, required capabilities and fallback. This is a whole-video renderer choice, separate from per-shot `visualMethod`.
-- Updates the four checked-in production-plan examples with explicit renderer choices. The generic 3D product example honestly marks its bespoke composition as `to-be-built`.
-- Adds a pre-render gate that verifies the chosen ID is registered and, when a conventional adjacent production plan exists, that the plan's registered renderer/composition matches the render request. Legacy projects without a production plan remain supported but still require a registered composition.
-- Updates Director/Remotion guidance and marks only the composition-selection registry/gate roadmap slice complete. The broader autonomous Director workflow remains incomplete: ChatGPT or another external model still makes the creative decision; the repository does not call an LLM.
-- PR #120: https://github.com/DarkonLikesCoffee/ai-video-studio/pull/120. Latest branch commit: `98842fd5957a62ab3462747ab983dce133f795b3`.
-- CI runs #44919449799 and #44919454705 passed on that commit. Confirmed summary: 254 tests passed, 0 failed, 0 skipped; Python narration tests, TypeScript typecheck, all example production-plan validators, storyboard preview/critic/QA, project/audio validation and Studio build also passed.
-- The first CI attempts exposed outdated asset-evidence test fixtures and a validation-message assertion mismatch; both were corrected. The final run is fully green.
-- No video render was requested because this is a planning/render-selection architecture change, not a visual-composition implementation. No video-output claim is made.
-- Next: merge PR #120 after confirming the required PR checks remain green. The PR is mergeable.
+- Started the clean development branch `feat/director-composition-selection-final` from the verified Director feature commit `a27629b803d4cea4b5f62458c83794ccc6e99efc`. This branch intentionally excludes temporary render-request commits from the earlier smoke attempt.
+- Adds a model-facing catalogue of the compositions registered in RemotionRoot, with purpose, strengths, limitations and selection status. Test/reference-only compositions cannot be selected by the production-plan validator.
+- Extends the storyboard handoff and production-plan contract with one top-level `renderStrategy`: renderer, whole-video composition ID, registered/to-be-built status, rationale, required capabilities and fallback. This is separate from per-shot `visualMethod`.
+- Migrates the four checked-in plans with explicit strategies. The generic 3D product example proposes `ProductRevealFilm` as `to-be-built`; narrated sky selects `NarratedSkyExplainer`; legacy SORA and VALORANT explicitly select `ProjectVideo`.
+- Adds a pre-render gate that verifies composition registration and, when an adjacent production plan exists, agreement between its registered renderer/composition and the render request. Legacy plans without a production plan remain supported with composition-registration validation.
+- Updates Director/Remotion playbooks, operating workflow, roadmap and continuity documents. Only the composition-catalogue/selection-gate roadmap slice is marked complete; the broader autonomous AI Production Director remains unfinished and no LLM is embedded.
+- Initial code CI on the prior branch passed 254/254 tests, 0 failed, 0 skipped, and the full Studio build. The SORA fixture now additionally has explicit five-criterion acceptance coverage mapped to the relevant four shots; CI for this clean branch is pending.
+- A prior smoke attempt (#44919892128) passed freeze-candidate validation, request validation and the new Director composition gate. SORA project validation and audio prep passed, but strict asset evidence correctly blocked rendering because its legacy production plan lacked `acceptanceCoverage`. No MP4 was produced. The missing criterion-to-shot mapping is now added; the smoke test will be repeated on a separate branch to keep the PR free of render-trigger commits.
+- Current clean branch head: `fc3bbba9075adc47e2a345691e168b1ebd598e9a`. PR #121 is being opened from this branch.
 
 **Last verified:** 2026-11-21  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
 **Last verified main commit:** `c148c3002f8364926ad7a71e870ea41411aa5c56` (includes the render-candidate freeze gate from PR #115). PR #116 is also marked merged; recheck the live main ref before relying on its merge SHA.  
-**Current development branch:** `feat/director-composition-selection` — PR #120 open; latest commit `98842fd5957a62ab3462747ab983dce133f795b3`; CI passed with 254 tests, 0 failed, 0 skipped.
+**Current development branch:** `feat/director-composition-selection-final` — clean PR #121; head will be updated with this continuity-note commit. The composition-selection code has passed CI; the SORA acceptance-coverage follow-up is being validated.
 
 PR #105 added the strict production asset-evidence gate and merged as `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`. Its exact-head CI #44719701055 passed 233 tests with 0 skipped. Render v6 (#44719959584, artifact #14622220762) proved the gate reports `ready` for the benchmark: 6/6 acceptance criteria linked, 18 assets, and zero unresolved refs, missing files, unsafe paths, rights/provenance gaps or issues.
 
