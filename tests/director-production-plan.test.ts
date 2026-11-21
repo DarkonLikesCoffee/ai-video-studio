@@ -153,5 +153,5 @@ test("conversion rejects an unregistered composition falsely marked as available
 test("conversion rejects a renderer that conflicts with the selected composition", () => {
   const draft = storyboard();
   draft.renderStrategy.renderer = "project-video";
-  assert.throws(() => buildProductionPlanFromStoryboard(brief, draft), /must be "custom-remotion"/);
+  assert.throws(() => buildProductionPlanFromStoryboard(brief, draft), /must use renderer "custom-remotion"/);
 });

@@ -11,6 +11,14 @@ const makePlan = () => ({
   id: "asset-evidence-test",
   title: "Asset Evidence Test",
   delivery: { durationSeconds: 3, width: 1920, height: 1080, fps: 30, format: "mp4" },
+  renderStrategy: {
+    renderer: "project-video",
+    compositionId: "ProjectVideo",
+    availability: "registered",
+    rationale: "This synthetic asset-evidence fixture uses a structured 2D project, so ProjectVideo is the selected compatibility renderer.",
+    requiredCapabilities: ["asset layers", "2D graphics"],
+    fallback: "Use a custom Remotion composition if the project requires a different visual grammar or capabilities outside the ProjectVideo schema.",
+  },
   creativeDirection: {
     objective: "Demonstrate evidence linking.",
     audience: "Reviewers",
