@@ -56,6 +56,14 @@ jobs:
         run: npm test
       - name: Validate example production plan
         run: npm run validate:plan -- projects/examples/production-plan.json
+      - name: Validate ORBITAL BLOOM production plan
+        run: npm run validate:plan -- projects/orbital-bloom/production/production-plan.json
+      - name: Enforce ORBITAL BLOOM strict procedural asset evidence
+        run: |
+          mkdir -p review-output
+          npm run director:asset-evidence -- projects/orbital-bloom/production/production-plan.json projects/orbital-bloom/production/asset-manifest.json review-output/orbital-bloom.asset-evidence.json --strict
+      - name: Review ORBITAL BLOOM storyboard risk
+        run: npm run storyboard:qa -- projects/orbital-bloom/production/production-plan.json
       - name: Generate storyboard planning previews
         run: |
           mkdir -p review-output
