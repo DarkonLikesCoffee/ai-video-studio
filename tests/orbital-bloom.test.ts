@@ -58,6 +58,7 @@ test("Remotion root and render workflow register, generate and master Orbital Bl
   assert.match(workflow, /composition_id == 'OrbitalBloom3D'/);
   assert.match(workflow, /generate-soundscape\.mjs/);
   assert.match(workflow, /Master Orbital Bloom soundtrack/);
+  assert.match(workflow, /COMPOSITION_ID.*OrbitalBloom3D[\\s\\S]*--concurrency=1.*--gl=swangle/);
   assert.match(source, /assets\/audio\/orbital-bloom\.wav/);
 });
 
