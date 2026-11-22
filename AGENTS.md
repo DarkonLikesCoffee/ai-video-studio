@@ -52,3 +52,8 @@ For code changes: relevant tests, typecheck, validation and CI pass; the impleme
 For a video-production feature: additionally render a representative real project, retrieve the exact MP4 artifact, inspect the actual frames and motion, and listen to the audio when possible. Report when audio was measured but not listened to. Verify narration/captions, shot variety, pacing, transitions, sound design and technical metadata.
 
 For every completed development session: update `PROJECT_STATE.md`, `ROADMAP.md` and `PROGRESS_LOG.md` so another AI can continue without the conversation history.
+
+
+## Mandatory shot-differentiation gate
+
+For every video request, read `agent/skills/shot-differentiation/SKILL.md` before storyboarding or implementation. Enforce its pre-render rejection checklist and shot-to-code audit. The storyboard must specify visual events/compositions; implementation must prove these are actually distinct; final MP4 inspection must compare the shots to that audit. Text-only variation over a repeated scene is a major failure. Do not request a render when the project fails this gate, and do not deliver a failed video—fix it and render a new frozen candidate.

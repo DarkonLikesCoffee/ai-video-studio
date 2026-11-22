@@ -56,3 +56,8 @@ Do not consume the entire project history or every large reference file at the s
 ## Non-negotiable quality principle
 
 A technically valid MP4 can still be a bad video. Judge it against the original brief: story, shot variety, meaningful motion, editing rhythm, visual relevance, narration, sound, synchronization and ending. If it looks like a slideshow when the brief calls for a film, it has failed even if every automated test passes.
+
+
+## Mandatory creative QA addition
+
+For every video-production task, load `agent/skills/shot-differentiation/SKILL.md` in addition to the existing production skills. A shot is not distinct because its title, subtitle, color or text changes. Each shot needs a meaningful visual/compositional change and an implemented visual event. The assistant must map storyboard shots to the actual source implementation and verify the rendered frames. A repeated scene with copy changes is a major failure and blocks delivery.

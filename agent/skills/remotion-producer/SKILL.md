@@ -38,3 +38,8 @@ Translate the approved storyboard and asset manifest into a valid, deterministic
 - Do not create duplicate artifacts for unchanged content.
 - Preserve reproducibility: pinned package versions, local assets, deterministic animation and explicit render settings.
 - Never call a video "finished" based only on a successful build or composition discovery.
+
+
+## Mandatory shot-differentiation gate
+
+Before implementing or rendering, read `agent/skills/shot-differentiation/SKILL.md`. Create a shot-to-code implementation audit. Every shot must have an independently describable visual event and composition—not just a different text block. If several shots reuse a scene/component, list the concrete visual state, camera, geometry, asset, layers or action changes that distinguish them. Reject text-only shot variation. The audit and checklist are mandatory, not optional inspiration.

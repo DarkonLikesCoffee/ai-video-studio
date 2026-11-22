@@ -362,3 +362,11 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Added the lockfile to the CI npm-cache key, changed the README's clean setup command to `npm ci`, and documented dependency-change/lockfile rules in `docs/DEPENDENCY_MANAGEMENT.md` and `AGENTS.md`.
 - No package manifest versions or dependency declarations were changed in this step. Dependency pruning and upgrades remain deferred.
 - PR #131 CI run #45020610080 passed on the bootstrap-only source commit. A final full CI run using the committed lockfile and `npm ci` is required before merge.
+
+
+## 2026-11-22 — Mandatory shot-differentiation gate (PR pending)
+
+- Added a model-neutral `agent/skills/shot-differentiation/SKILL.md` contract to prevent text-only shot changes over a repeated scene/camera.
+- The contract requires shot cards (subject, composition, visible event, camera, transition, story contribution), adjacent-shot comparisons, shot-to-code implementation traceability and pre-render rejection checks. It also defines repeated-scene/text-only variation as a major post-render QA failure.
+- Linked the contract from Remotion Producer, Visual QA, shared production workflow, START_HERE and AGENTS so future assistants are required to load and apply it.
+- This is process documentation, not an automated semantic vision detector or a guarantee. It does not retroactively repair videos or add autonomous AI capabilities.
