@@ -288,3 +288,13 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 - PR #102 adds four generated-MP4 integration cases through `inspectMedia`: short freeze (warning/pass), excessive freeze (error/fail), short black interval (warning/pass), and excessive black interval (error/fail). Tests assert only the intended finding, continuous audio, aligned stream starts and duration drift below the independent threshold.
 - FFmpeg/FFprobe fixture recipes were manually executed on version 7.1.5: frozen intervals measured 2.0s and 3.0s; black intervals measured 0.8s and 1.4s. The repository tests were subsequently exercised by CI; PR #102 and its post-merge main validation passed.
 - No video render, full playback or audio listening is applicable to these test-only changes.
+
+
+## Repository maintenance follow-up — 2026-11-22
+
+- [x] First documentation cleanup merged in PR #124.
+- [x] Follow-up audit recorded in `docs/REPOSITORY_CLEANUP_FOLLOWUP.md`: the root scripts and production workflows remain in use, so no speculative removals were made.
+- [ ] Complete a lockfile-backed dependency usage audit before changing package dependencies.
+- [ ] Perform complete branch ancestry/PR protection analysis and prune safely deletable merged branches when branch-delete capability is available.
+- [ ] Analyze source-level unused exports/dead code with a complete import/dynamic-load graph and test evidence.
+- [ ] Consider CI modularization only if it preserves all validation gates and demonstrates a measurable benefit.

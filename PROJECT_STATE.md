@@ -324,3 +324,13 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Post-merge main CI #44669560240 passed on the merge commit.
 - PR #102 adds generated MP4 regressions through the real `inspectMedia` pipeline for frozen-video and black-frame intervals, including warning/pass and excessive/error thresholds. Fixture generation recipes were manually verified with FFmpeg/FFprobe 7.1.5; repository tests are pending CI.
 - No render gate applies to this QA-test-only slice. No full video playback or audio listening was performed.
+
+
+## 2026-11-22 — Repository cleanup follow-up (PR pending)
+
+- Created branch `chore/repository-cleanup-followup-2026-11-22` from live `main` for an evidence-based second cleanup pass.
+- Audited root npm scripts, workspace package manifests, CI and render workflows, agent instructions, documentation index and current open PRs.
+- Confirmed the 28 root npm scripts are still documented or referenced by CI/render or production/agent workflows; no safe script deletion was identified.
+- Preserved production-critical render logic, render request triggers, VALORANT gameplay archive, active PR branches and all project assets.
+- Added `docs/REPOSITORY_CLEANUP_FOLLOWUP.md` documenting findings and deferred work.
+- No code, dependency, workflow, asset, or branch deletion was attempted. Local tests/build/render were not run in this connector-only session; PR CI is required.
