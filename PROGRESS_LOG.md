@@ -691,3 +691,12 @@ Append one entry per meaningful development session:
 - The workflow's `npm ci` install, Python narration tests, TypeScript check, full Node tests, example/production-plan/project validations and Studio build all passed.
 - Compared root, Studio and video-engine manifest dependency/devDependency/optionalDependency declarations against their respective root lockfile workspace entries; there were no mismatches.
 - Verified GitHub Actions CI, GitHub Actions rendering, CircleCI rendering and README clean setup use `npm ci`. The temporary lockfile export step is removed.
+
+
+## 2026-11-22 — Reproducible npm installs PR #131 merged
+
+- Merged [PR #131](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/131) as `d4a2182cb2dc9a34f525ec203af9a24a07740a62`.
+- Added the npm-generated root `package-lock.json` (lockfile v3; 403 package/workspace entries; 194,120 bytes).
+- Switched GitHub Actions CI, GitHub Actions video rendering and CircleCI rendering to `npm ci`; added the lockfile to the CI npm cache key.
+- Added `docs/DEPENDENCY_MANAGEMENT.md`, linked it from `docs/README.md`, changed the README's clean-install command to `npm ci`, and documented lockfile rules in `AGENTS.md`.
+- PR CI #45021066792 and post-merge main CI #45021169591 passed. No dependency declarations, version ranges, runtime packages or production assets were changed.
