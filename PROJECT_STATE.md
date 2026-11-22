@@ -353,3 +353,12 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Moved `@types/three` from runtime dependencies to development dependencies in `packages/video-engine/package.json`, consistent with the other `@types/*` packages.
 - The `three` runtime dependency and all versions remain unchanged.
 - PR CI #45019205207 and post-merge main CI #45019314801 passed. No package versions or runtime dependencies changed.
+
+
+## 2026-11-22 — Reproducible npm workspace install (PR #131 pending)
+
+- Added a root npm-generated `package-lock.json` (lockfile version 3; 403 package/workspace entries; 194,120 bytes), exported from the repository's Node 22 CI install rather than manually assembled.
+- Switched GitHub Actions CI, GitHub Actions rendering and CircleCI rendering from `npm install` to `npm ci`.
+- Added the lockfile to the CI npm-cache key, changed the README's clean setup command to `npm ci`, and documented dependency-change/lockfile rules in `docs/DEPENDENCY_MANAGEMENT.md` and `AGENTS.md`.
+- No package manifest versions or dependency declarations were changed in this step. Dependency pruning and upgrades remain deferred.
+- PR #131 CI run #45020610080 passed on the bootstrap-only source commit. A final full CI run using the committed lockfile and `npm ci` is required before merge.
