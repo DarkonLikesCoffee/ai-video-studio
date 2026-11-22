@@ -306,7 +306,7 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 
 - [x] Identify and consolidate the duplicated Retry-After/backoff calculation used by NASA and Wikimedia Commons downloaders while preserving each provider's policy.
 - [ ] Continue a full import/export and dynamic-reference audit before proposing any dead-code removal.
-- [ ] Establish a committed npm lockfile and reproducible install workflow before dependency-pruning work.
+- [x] Commit an npm-generated workspace lockfile and switch CI/render installs to `npm ci`; verify a clean CI install before merging PR #131.
 - [ ] Review cross-provider HTTP/download code for further safe shared abstractions only where tests can prove behavior preservation.
 
 
@@ -315,3 +315,11 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 - [x] Move the type-only `@types/three` package to `devDependencies`; preserve the `three` runtime dependency.
 - [ ] Generate and commit a reproducible npm lockfile before performing dependency removal or version upgrades.
 - [ ] Compare all declared dependencies against actual imports and build/runtime workflows before pruning any package.
+
+
+## Reproducible npm workspace installs — 2026-11-22
+
+- [x] Add the npm-generated root `package-lock.json` and use `npm ci` in GitHub Actions CI, GitHub Actions rendering and CircleCI rendering (PR #131; final lockfile-backed CI still pending).
+- [x] Document clean installs, lockfile updates and dependency-change rules for contributors and agents.
+- [ ] Complete CI on the committed lockfile, including tests, type-check, project validations and Studio build, before merge.
+- [ ] Perform dependency-pruning/version-upgrade work separately, after tracing imports, build-time use, scripts, tests and dynamic loading.
