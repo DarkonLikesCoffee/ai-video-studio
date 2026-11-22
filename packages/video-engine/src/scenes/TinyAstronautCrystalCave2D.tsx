@@ -42,14 +42,14 @@ export const TinyAstronautCrystalCave2D: FC = () => {
   const landing = interpolate(f, [0, 100], [1, 0], clamp);
   const walk = interpolate(f, [90, 315], [0, 1], clamp);
   const astronautX = interpolate(f, [0, 120, 320, 470, 600], [480, 480, 1020, 1270, 1270], clamp);
-  const astronautOpacity = interpolate(f, [0, 30, 560, 600], [0, 1, 1, 0.65], clamp);
+  const astronautOpacity = interpolate(f, [0, 30], [0, 1], clamp) * interpolate(f, [560, 600], [1, 0.65], clamp);
   const caveReveal = interpolate(f, [210, 360], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
-  const crystalPulse = 0.7 + Math.sin(f * 0.075) * 0.22 + interpolate(f, [340, 430], [0, 0.55], clamp);
+  
   const crystalScale = 1 + Math.sin(f * 0.06) * 0.025;
-  const podY = interpolate(f, [0, 70, 125], [420, 360, 360], clamp);
-  const podOpacity = interpolate(f, [0, 0, 85, 160], [0, 1, 1, 0], clamp);
+  const podY = interpolate(f, [0, 125], [420, 360], clamp);
+  const podOpacity = interpolate(f, [0, 25], [0, 1], clamp) * interpolate(f, [85, 160], [1, 0], clamp);
   const shootingStar = interpolate(f, [40, 95], [0, 1], clamp);
-  const crystalLight = interpolate(f, [350, 420, 520, 600], [0, 1, 0.85, 0.45], clamp);
+  const crystalLight = interpolate(f, [350, 420], [0, 1], clamp) * interpolate(f, [520, 600], [1, 0.45], clamp);
   return <AbsoluteFill style={{ backgroundColor: "#070d20" }}>
     <svg viewBox="0 0 1920 1080" width="100%" height="100%" style={{ position: "absolute" }}>
       <defs>
