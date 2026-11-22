@@ -72,6 +72,21 @@ export const COMPOSITION_REGISTRY: readonly CompositionCapability[] = [
     limitations: ["The product model, brand copy, timing and shot structure are hard-coded; do not reuse unchanged for unrelated products."],
   },
   {
+    id: "LighthouseRepairFilm",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "Original wordless cinematic story composition for a lighthouse repair during a storm.",
+    strengths: [
+      "Six distinct camera-designed story shots",
+      "Procedural lighthouse, small articulated service robot and mechanical beacon",
+      "Storm rain, moving sea, lightning, warm beacon ignition and sweeping beam",
+    ],
+    limitations: [
+      "A bespoke short-film composition, not a general-purpose project renderer",
+      "The current environment and shot timings are authored for The Stormlight Keeper",
+    ],
+  },
+  {
     id: "NarratedSkyExplainer",
     renderer: "custom-remotion",
     selectable: true,
