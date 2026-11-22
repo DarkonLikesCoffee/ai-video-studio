@@ -700,3 +700,21 @@ Append one entry per meaningful development session:
 - Switched GitHub Actions CI, GitHub Actions video rendering and CircleCI rendering to `npm ci`; added the lockfile to the CI npm cache key.
 - Added `docs/DEPENDENCY_MANAGEMENT.md`, linked it from `docs/README.md`, changed the README's clean-install command to `npm ci`, and documented lockfile rules in `AGENTS.md`.
 - PR CI #45021066792 and post-merge main CI #45021169591 passed. No dependency declarations, version ranges, runtime packages or production assets were changed.
+
+
+## 2026-11-22 — GitHub Actions FFmpeg setup reliability (PR #133 merged)
+
+- Replaced `AnimMouse/setup-ffmpeg@v1` in `.github/workflows/ci.yml` and `.github/workflows/render.yml`. The workflows now check for both `ffmpeg` and `ffprobe`, install Ubuntu's `ffmpeg` package only if either binary is unavailable, then verify both binaries.
+- Root cause in main CI #639: the third-party setup action downloaded a response that was not an XZ archive, so the job failed before Node tests ran.
+- PR #133 merged as `607518fccb4f5f80c9850d6d6081c4bc05561cb2`. PR CI #45034977395 passed 259 Node tests (0 failures, 0 skips); its logs confirm Ubuntu installed FFmpeg 8.0.1 and FFprobe. Post-merge main CI #45035118531 passed.
+- The same fallback pattern is already used by CircleCI. The GitHub Actions render workflow was updated, but no production render was requested; render-time verification remains pending.
+- No application code, project assets, dependencies or render requests changed.
+
+## 2026-11-22 — Model-neutral assistant workflow clarified (PR #134 merged)
+
+- Updated `AGENTS.md` and `START_HERE.md` so new assistants load the current project snapshot and only the roadmap, history, README sections and skills relevant to their task. Removed the previous requirement to read the full `PROJECT_STATE.md`, `ROADMAP.md`, `PROGRESS_LOG.md` and `README.md` at every startup.
+- Clarified that `agent/skills/` and the shared production workflow are model-neutral guidance for ChatGPT, Claude and other assistants. The active assistant supplies creative reasoning; repository CLI scripts generate handoffs, validate artifacts, render deterministic projects and report checks, but do not call an LLM or autonomously direct a video.
+- Corrected `.claude/skills/video-engine/PROJECT-INTEGRATION.md`: the repository has an optional Kokoro ONNX narration adapter on the GitHub Actions render worker for documented Spanish and US English paths. The upstream vendored skill was left unchanged; its ElevenLabs/Fish Audio examples are not configured project providers by default.
+- PR #134 merged as `ce1dc23c1f80d1191272fc516fb517fa6428409c`. PR CI #45035261813 passed 259 Node tests (0 failures, 0 skips); post-merge main CI #45035430951 passed.
+- No application code, LLM integration, model/API dependency, render engine, project assets or production renders changed. This improves assistant discoverability and removes incorrect documentation; it does not make the Creative Director autonomous.
+
