@@ -2,9 +2,9 @@
 
 ## Current verified snapshot — 2026-11-22
 
-The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `12983e7bd7c9c1ab186f0c64e8c149a5e74cc3c4`; PR #124 and PR #125 are merged, and post-merge main CI [#45018480555](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018480555) passed.
+The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `21783b093029cb6c9ae688db4be33c415563f458`; PRs #124, #125 and #126 are merged, and post-merge main CI [#45018877315](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018877315) passed.
 
-The second cleanup pass is documentation-only. The current source-level cleanup is [PR #126](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/126), which extracts the duplicated Retry-After/backoff calculation shared by the Wikimedia Commons and NASA downloaders without changing either provider's retry policy. Its CI run #45018692424 must pass before merge. Other production PRs remain open; inspect the actual render/creative evidence before accepting those videos.
+The source-level cleanup in PR #126 consolidated the Retry-After/backoff calculation used by the Wikimedia Commons and NASA asset downloaders. Their existing public wrapper functions and provider-specific delay limits remain unchanged. PR CI #45018775059 and post-merge main CI #45018877315 both passed. No production render was requested for this internal helper refactor.
 
 PR #123 improved the Creative Director's model-neutral handoff (creative territory comparison, evolving visual grammar and distinct shot-level visual events). It does **not** add an LLM integration or complete the autonomous Director. PR #121's explicit composition selection and render-strategy checks are merged. The highest-value remaining product work is still to turn strong plans into genuinely varied, well-edited videos and inspect/repair the actual output.
 
