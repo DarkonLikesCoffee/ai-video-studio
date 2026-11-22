@@ -64,9 +64,9 @@ This is a technical safety gate, not proof of creative readiness. Existing proje
 
 ## Current capability truth
 
-The existing engine has a capable data-driven 2D Remotion composition, vector graphics, keyframed animation, SVG path morphing, deterministic particles, scene transitions, subtitles and a global audio timeline with offline DSP/mastering. A separate Three.js showcase and a custom AURA benchmark demonstrate basic custom 3D composition work.
+The existing engine has a capable data-driven 2D Remotion composition, vector graphics, keyframed animation, SVG path morphing, deterministic particles, scene transitions, subtitles and a global audio timeline with offline DSP/mastering. The registered `ThreeDShowcase`, `CinematicAdBenchmark`, `NarratedSkyExplainer`, `MadridTrip` and `MadridNewYorkParis` compositions demonstrate bespoke composition work; they are specific production paths, not a general-purpose 3D authoring schema.
 
-The repository does not yet contain an automatic prompt-to-project model, automatic asset-generation service, built-in voice generation/transcription, a general-purpose 3D scene authoring schema, or an automatic video-understanding/QA model. The agent can orchestrate available tools and inspect rendered artifacts, but these capabilities must not be represented as already built into the product.
+The repository does not yet contain an automatic prompt-to-project model, automatic asset-generation service, a general-purpose voice-provider or transcription system (the render worker has an optional Kokoro ONNX text-to-speech and word-alignment adapter), a general-purpose 3D scene authoring schema, or an automatic video-understanding/QA model. The agent can orchestrate available tools and inspect rendered artifacts, but these capabilities must not be represented as already built into the product.
 
 ## Quality principles
 

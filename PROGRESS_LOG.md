@@ -619,3 +619,14 @@ Append one entry per meaningful development session:
 - CI passed: #44801247196 for PR #115 and #44801549483 for PR #116 (typecheck, test suite and studio build all succeeded). PR #115 targets `main`; PR #116 applies the same protection to the active Biceps production branch.
 - The Biceps v10 request and its `render-request.json` were left untouched; this change did not trigger another render. Existing render run #44797815155 had already completed successfully.
 - Limitation: a machine cannot infer whether a creative concept is artistically finished. The new gate guarantees a separate frozen candidate, checks the technical request boundary and prevents duplicate submissions; the agent's render-ready review and existing project/asset/media QA remain required.
+
+
+## 2026-11-22 — Repository cleanup audit
+
+- Audited the live `main` tree at `12d037f9d0382c302d069e9aa9104a2a8d2b2c77`: 232 tracked tree entries, 144 remote branches and seven open PRs.
+- Kept all seven open PR branches untouched. No remote branches were deleted; merged/history branches still need individual ancestry and unmerged-work review before removal.
+- Identified and retained the 10,530,125-byte VALORANT gameplay ZIP because `.github/workflows/render.yml` extracts it during the VALORANT render path. A future migration to Git LFS or external artifact storage must update and verify that workflow before removal.
+- Retained `render-request.json` and `circleci-status-request.json`: they are deliberate GitHub Actions workflow triggers, not throwaway request files. The render request remains subject to the frozen-candidate, request-only commit rule.
+- Found stale status statements in the roadmap/project-state docs and contradictory README claims about Kokoro text-to-speech. Refreshed the current snapshot, corrected those known stale claims, and added a documentation index.
+- Preserved the chronological progress log and all production projects/assets. This audit did not delete application code or dependencies: static repository browsing alone is not sufficient evidence that a module or package is unused.
+- Main CI run #45013735955 and PR #123 validation #45013634377 passed before this cleanup branch was created. The cleanup PR receives its own CI validation.
