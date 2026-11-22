@@ -16,6 +16,21 @@ export type CompositionCapability = {
 // that each catalogue entry is registered; unlisted IDs are not selectable.
 export const COMPOSITION_REGISTRY: readonly CompositionCapability[] = [
   {
+    id: "TinyAstronautCrystalCave",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "A cinematic, text-free 3D alien-planet exploration story with an astronaut and glowing cave crystal.",
+    strengths: [
+      "Original Three.js planet terrain, astronaut character, cave geometry and emissive crystal",
+      "Continuous camera travel, astronaut locomotion, drifting atmosphere and animated crystal awakening",
+      "Dedicated 20-second narrative composition with no editorial text overlays",
+    ],
+    limitations: [
+      "Procedural stylized 3D rather than photorealistic rendered assets",
+      "Sound design is intentionally omitted for this silent visual story",
+    ],
+  },
+  {
     id: "DemoVideo",
     renderer: "custom-remotion",
     selectable: false,
