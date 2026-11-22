@@ -142,10 +142,36 @@ const Cave: FC<{ frame: number }> = ({ frame }) => {
       <color attach="background" args={["#070a17"]} />
       <fog attach="fog" args={["#0a1020", 6, 22]} />
       <ambientLight intensity={0.3 + light * 0.34} />
-      <mesh position={[0, 0, -3.9]} scale={[1.4, 0.9, 1]}>
-        <sphereGeometry args={[6.2, 24, 18]} />
-        <meshStandardMaterial color="#241c31" roughness={1} side={DoubleSide} />
+      {/* Open-front cavern: solid rock shell kept around the edges, never across the lens. */}
+      <mesh position={[0, 3.15, -2.7]}>
+        <boxGeometry args={[12.4, 0.7, 17]} />
+        <meshStandardMaterial color="#392c48" roughness={1} />
       </mesh>
+      <mesh position={[-6.05, 0.35, -2.7]}>
+        <boxGeometry args={[0.75, 5.2, 17]} />
+        <meshStandardMaterial color="#46334d" roughness={1} />
+      </mesh>
+      <mesh position={[6.05, 0.35, -2.7]}>
+        <boxGeometry args={[0.75, 5.2, 17]} />
+        <meshStandardMaterial color="#46334d" roughness={1} />
+      </mesh>
+      <mesh position={[0, 0.25, -11.1]}>
+        <boxGeometry args={[12.4, 5.8, 0.8]} />
+        <meshStandardMaterial color="#30243b" roughness={1} />
+      </mesh>
+      {/* Broken rock shoulders frame the opening without hiding the scene. */}
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * 5.0, -0.45, -0.2]} rotation={[0, side * -0.12, side * 0.08]}>
+          <mesh position={[0, 0.5, 0]}>
+            <dodecahedronGeometry args={[1.15, 0]} />
+            <meshStandardMaterial color="#55405a" roughness={1} flatShading />
+          </mesh>
+          <mesh position={[side * -0.3, 1.6, -1.9]} rotation={[0.2, 0, side * 0.18]}>
+            <coneGeometry args={[0.72, 2.4, 5]} />
+            <meshStandardMaterial color="#4a384f" roughness={1} flatShading />
+          </mesh>
+        </group>
+      )}
       {/* Cave floor */}
       <mesh position={[0, -1.55, -2]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[18, 28]} />
