@@ -334,3 +334,14 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Preserved production-critical render logic, render request triggers, VALORANT gameplay archive, active PR branches and all project assets.
 - Added `docs/REPOSITORY_CLEANUP_FOLLOWUP.md` documenting findings and deferred work.
 - No code, dependency, workflow, asset, or branch deletion was attempted. Local tests/build/render were not run in this connector-only session; PR CI is required.
+
+
+## 2026-11-22 — Source-code cleanup: shared HTTP retry-delay helper (PR pending)
+
+- Created branch `chore/source-code-cleanup-2026-11-22` from post-PR #125 main commit `12983e7bd7c9c1ab186f0c64e8c149a5e74cc3c4`.
+- Audited the complete recursive tree (186 tracked files) and traced candidate utility modules to their production imports and tests.
+- Found duplicated Retry-After parsing and exponential-backoff calculations in the Wikimedia Commons and NASA asset downloaders.
+- Extracted the pure calculation to `scripts/retry-delay.mjs`; kept both public wrappers and provider-specific delay policies intact.
+- Added focused tests for numeric/date Retry-After handling, caps, backoff and invalid values.
+- Confirmed the inspected core utility modules and EiffelTower component are referenced; no dead code was removed.
+- CI is required on the PR; no local tests/build/render were run in this connector-only session.
