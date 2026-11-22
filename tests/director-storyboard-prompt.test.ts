@@ -45,3 +45,12 @@ test("handoff includes the verified composition registry and requires an explici
   assert.match(prompt, /"availability": "registered \| to-be-built"/);
   assert.match(prompt, /new PascalCase ID/);
 });
+
+test("handoff requires a deliberate creative-territory choice and evolving visual grammar", () => {
+  const prompt = buildStoryboardDirectorPrompt(brief);
+  assert.match(prompt, /compare at least three different creative approaches/i);
+  assert.match(prompt, /visual grammar/i);
+  assert.match(prompt, /visual event—not just an image/i);
+  assert.match(prompt, /only change is replacing text, color or background/i);
+  assert.match(prompt, /not the easiest registered renderer\/template/i);
+});
