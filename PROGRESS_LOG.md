@@ -718,3 +718,11 @@ Append one entry per meaningful development session:
 - PR #134 merged as `ce1dc23c1f80d1191272fc516fb517fa6428409c`. PR CI #45035261813 passed 259 Node tests (0 failures, 0 skips); post-merge main CI #45035430951 passed.
 - No application code, LLM integration, model/API dependency, render engine, project assets or production renders changed. This improves assistant discoverability and removes incorrect documentation; it does not make the Creative Director autonomous.
 
+
+
+## 2026-11-22 — Prevent repeated-scene/text-only videos (shot-differentiation gate)
+
+- Root cause from the AURA benchmark failure: the project workflow guidance stated that shots should vary, but the implementation/QA handoff did not force a shot-by-shot proof. A custom composition could reuse one scene, camera and object animation while text changed, and this could still reach render/delivery.
+- Added `agent/skills/shot-differentiation/SKILL.md`: mandatory shot cards, adjacent-shot contrast, minimum meaningful variety, implementation-to-source audit, pre-render rejection checklist and post-render failure rule.
+- Linked the new contract from Remotion Producer, Visual QA, `docs/agent-production-workflow.md`, `START_HERE.md` and `AGENTS.md`. Future assistants are instructed to stop before rendering if adjacent shots are not visually distinguishable without text; final MP4 repetition is a major failure.
+- Limit: this change is an explicit process gate, not automated semantic frame-difference detection. CI passing does not prove the video has creative variety. The actual MP4 must still be inspected.
