@@ -2,13 +2,13 @@
 
 ## Current verified snapshot — 2026-11-22
 
-The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `6ea141c189d6406bb9648cd0dd45652c4ec5d702`; cleanup PRs #124, #125, #126, #127 and #128 are merged. Post-merge main CI [#45019314801](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45019314801) passed.
+The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `84c28138567de5b6ae6631e74bdc514ed31fe7a7`; cleanup PRs #124–#129 are merged. Post-merge main CI [#45019569110](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45019569110) passed.
 
-PR #126 consolidated the shared Retry-After/backoff calculation used by the Wikimedia Commons and NASA asset downloaders. Existing public wrapper functions and provider-specific delay policies remain unchanged. PR CI #45018775059 and post-merge main CI #45018877315 passed.
+[PR #131](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/131) adds the root npm-generated `package-lock.json`, changes GitHub Actions CI/render and CircleCI rendering to `npm ci`, and documents dependency maintenance. Its final full CI run [#45020893580](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45020893580) passed on the committed lockfile. The PR remains open pending merge.
 
-PR #128 moved the type-only `@types/three` package from `dependencies` to `devDependencies`, consistent with the other `@types/*` declarations. The `three` runtime dependency and all version pins remain unchanged. PR CI #45019205207 and post-merge main CI #45019314801 passed.
+PR #126 consolidated the shared Retry-After/backoff calculation used by the Wikimedia Commons and NASA asset downloaders while preserving both provider policies. PR #128 corrected the type-only `@types/three` dependency classification. Their PR and post-merge CI runs passed.
 
-PR #123 improved the Creative Director's model-neutral handoff (creative territory comparison, evolving visual grammar and distinct shot-level visual events). It does **not** add an LLM integration or complete the autonomous Director. PR #121's explicit composition selection and render-strategy checks are merged. The highest-value remaining product work is still to turn strong plans into genuinely varied, well-edited videos and inspect/repair the actual output.
+PR #123 improved the Creative Director's model-neutral handoff; it does **not** add an LLM integration or complete the autonomous Director. PR #121's explicit composition selection and render-strategy checks are merged. The highest-value remaining product work is still to turn strong plans into genuinely varied, well-edited videos and inspect/repair the actual output.
 
 This roadmap describes the intended product, not current implementation. Update checkboxes only after code and evidence demonstrate the capability. Keep it aligned with the verified project state and actual renders.
 
@@ -321,5 +321,5 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 
 - [x] Add the npm-generated root `package-lock.json` and use `npm ci` in GitHub Actions CI, GitHub Actions rendering and CircleCI rendering (PR #131; final lockfile-backed CI still pending).
 - [x] Document clean installs, lockfile updates and dependency-change rules for contributors and agents.
-- [ ] Complete CI on the committed lockfile, including tests, type-check, project validations and Studio build, before merge.
+- [x] Complete CI on the committed lockfile, including tests, type-check, project validations and Studio build (PR #131 run #45020893580 passed).
 - [ ] Perform dependency-pruning/version-upgrade work separately, after tracing imports, build-time use, scripts, tests and dynamic loading.
