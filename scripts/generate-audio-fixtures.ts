@@ -1,234 +1,169 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+export type RendererKind = "project-video" | "custom-remotion";
+export type CompositionAvailability = "registered" | "to-be-built";
 
-const sampleRate = 22_050;
-const bitsPerSample = 16;
-const bytesPerSample = bitsPerSample / 8;
-
-const writeMonoWav = async (
-  filePath: string,
-  durationSeconds: number,
-  sampleAt: (timeSeconds: number) => number
-): Promise<void> => {
-  const sampleCount = Math.ceil(sampleRate * durationSeconds);
-  const dataBytes = sampleCount * bytesPerSample;
-  const buffer = Buffer.alloc(44 + dataBytes);
-
-  buffer.write("RIFF", 0);
-  buffer.writeUInt32LE(36 + dataBytes, 4);
-  buffer.write("WAVE", 8);
-  buffer.write("fmt ", 12);
-  buffer.writeUInt32LE(16, 16);
-  buffer.writeUInt16LE(1, 20);
-  buffer.writeUInt16LE(1, 22);
-  buffer.writeUInt32LE(sampleRate, 24);
-  buffer.writeUInt32LE(sampleRate * bytesPerSample, 28);
-  buffer.writeUInt16LE(bytesPerSample, 32);
-  buffer.writeUInt16LE(bitsPerSample, 34);
-  buffer.write("data", 36);
-  buffer.writeUInt32LE(dataBytes, 40);
-
-  for (let index = 0; index < sampleCount; index += 1) {
-    const timeSeconds = index / sampleRate;
-    const sample = Math.max(-1, Math.min(1, sampleAt(timeSeconds)));
-    buffer.writeInt16LE(Math.round(sample * 32_767), 44 + index * bytesPerSample);
-  }
-
-  await mkdir(dirname(filePath), { recursive: true });
-  await writeFile(filePath, buffer);
+export type CompositionCapability = {
+  id: string;
+  renderer: RendererKind;
+  selectable: boolean;
+  purpose: string;
+  strengths: string[];
+  limitations: string[];
 };
 
-const legacyAudioDirectory = resolve("projects/examples/three-scene-story/assets/audio");
-await writeMonoWav(resolve(legacyAudioDirectory, "ambient-bed.wav"), 10, (time) => {
-  const envelope = Math.max(0, Math.min(1, time / 1.6, (10 - time) / 1.8));
-  const chord =
-    Math.sin(2 * Math.PI * 130.81 * time) * 0.34 +
-    Math.sin(2 * Math.PI * 155.56 * time) * 0.26 +
-    Math.sin(2 * Math.PI * 196 * time) * 0.22 +
-    Math.sin(2 * Math.PI * 261.63 * time) * 0.12;
-  const shimmer = Math.sin(2 * Math.PI * 523.25 * time + Math.sin(time * 0.7)) * 0.06;
-  return (chord + shimmer) * envelope * 0.24;
+// This is the model-facing catalogue of compositions actually registered by
+// packages/video-engine/src/root.tsx on the current branch. Add every new
+// production composition here before the Director can select it. Tests verify
+// that each catalogue entry is registered; unlisted IDs are not selectable.
+export const COMPOSITION_REGISTRY: readonly CompositionCapability[] = [
+  {
+    id: "DemoVideo",
+    renderer: "custom-remotion",
+    selectable: false,
+    purpose: "Engine smoke test only.",
+    strengths: ["Verifies the basic Remotion render path."],
+    limitations: ["Not a production creative template."],
+  },
+  {
+    id: "ProjectVideo",
+    renderer: "project-video",
+    selectable: true,
+    purpose: "General-purpose compatibility renderer for structured 2D projects.",
+    strengths: [
+      "Layered local/remote image and video assets",
+      "2D vector graphics, text, SVG path animation and particles",
+      "Keyframed transforms, scene transitions, captions and global audio tracks",
+    ],
+    limitations: [
+      "Uses a recurring scene layout and title/editorial framing",
+      "Does not create arbitrary 3D geometry or a true 3D camera",
+      "Do not choose it merely because it is the easiest or default renderer",
+    ],
+  },
+  {
+    id: "ThreeDShowcase",
+    renderer: "custom-remotion",
+    selectable: false,
+    purpose: "Reference/showcase composition demonstrating a narrow set of 3D techniques.",
+    strengths: ["Provides a reference for basic Three.js integration."],
+    limitations: ["A showcase, not a general-purpose production composition."],
+  },
+  {
+    id: "MadridNewYorkParis",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "Specialized animated city-route travel story.",
+    strengths: ["Animated map routes, location labels and a Three.js Eiffel Tower reveal."],
+    limitations: ["Its story, cities and visual structure are hard-coded; adapt or create a new composition for other itineraries."],
+  },
+  {
+    id: "MadridTrip",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "Specialized Madrid travel/geography composition.",
+    strengths: ["Custom geographic framing and route-oriented visual storytelling."],
+    limitations: ["Not a general-purpose map or travel renderer; inspect its scope before reuse."],
+  },
+  {
+    id: "CinematicAdBenchmark",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "Specialized premium product-ad benchmark built around a 3D speaker product.",
+    strengths: ["Three.js product geometry, moving camera, studio lighting, exploded-view sequence and editorial overlays."],
+    limitations: ["The product model, brand copy, timing and shot structure are hard-coded; do not reuse unchanged for unrelated products."],
+  },
+  {
+    id: "NarratedSkyExplainer",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "Specialized narrated science/space explainer combining 3D scenes and optional footage clips.",
+    strengths: ["Three.js visual sequences, narration, subtitles, music and footage integration."],
+    limitations: ["Its built-in scene language is tailored to the sky/space explainer; unrelated topics may need a new composition."],
+  },
+] as const;
+
+export const getCompositionCapability = (id: string): CompositionCapability | undefined =>
+  COMPOSITION_REGISTRY.find((composition) => composition.id === id);
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const nonEmpty = (value: unknown): value is string =>
+  typeof value === "string" && value.trim().length > 0;
+
+export const validateRenderStrategy = (value: unknown): string[] => {
+  if (!isRecord(value)) return ["renderStrategy is required and must be an object."];
+
+  const errors: string[] = [];
+  const { renderer, compositionId, availability, rationale, requiredCapabilities, fallback } = value;
+
+  if (renderer !== "project-video" && renderer !== "custom-remotion") {
+    errors.push('renderStrategy.renderer must be "project-video" or "custom-remotion".');
+  }
+  if (typeof compositionId !== "string" || !/^[A-Z][A-Za-z0-9]{1,63}$/.test(compositionId)) {
+    errors.push("renderStrategy.compositionId must be a PascalCase Remotion composition ID.");
+  }
+  if (availability !== "registered" && availability !== "to-be-built") {
+    errors.push('renderStrategy.availability must be "registered" or "to-be-built".');
+  }
+  if (!nonEmpty(rationale) || rationale.length > 500) {
+    errors.push("renderStrategy.rationale must be a non-empty string of at most 500 characters.");
+  }
+  if (!Array.isArray(requiredCapabilities) || requiredCapabilities.length === 0 ||
+      requiredCapabilities.length > 12 || requiredCapabilities.some((item) => !nonEmpty(item) || item.length > 160)) {
+    errors.push("renderStrategy.requiredCapabilities must contain 1–12 non-empty strings of at most 160 characters.");
+  }
+  if (!nonEmpty(fallback) || fallback.length > 500) {
+    errors.push("renderStrategy.fallback must be a non-empty string of at most 500 characters.");
+  }
+
+  if (typeof compositionId === "string" && availability === "registered") {
+    const selected = getCompositionCapability(compositionId);
+    if (!selected) {
+      errors.push(`renderStrategy.compositionId "${compositionId}" is not registered in the current composition catalogue.`);
+    } else if (!selected.selectable) {
+      errors.push(`renderStrategy.compositionId "${compositionId}" is registered for reference/testing only, not production selection.`);
+    } else if (renderer !== selected.renderer) {
+      errors.push(`renderStrategy.renderer must be "${selected.renderer}" for composition "${compositionId}".`);
+    }
+  }
+
+  if (availability === "to-be-built") {
+    if (renderer !== "custom-remotion") errors.push('A "to-be-built" composition must use renderer "custom-remotion".');
+    if (typeof compositionId === "string" && getCompositionCapability(compositionId)) {
+      errors.push(`renderStrategy.compositionId "${compositionId}" already exists; select its registered availability instead.`);
+    }
+  }
+
+  if (renderer === "project-video" &&
+      (compositionId !== "ProjectVideo" || availability !== "registered")) {
+    errors.push('The "project-video" renderer must select registered composition "ProjectVideo".');
+  }
+  if (renderer === "custom-remotion" && compositionId === "ProjectVideo") {
+    errors.push('Use renderer "project-video" for composition "ProjectVideo".');
+  }
+
+  return errors;
+};
+
+export const renderCompositionRegistryForPrompt = (): string =>
+  COMPOSITION_REGISTRY.map((composition) => {
+    const status = composition.selectable ? "selectable" : "reference/test only — do not select";
+    return [
+      `- ${composition.id} [${composition.renderer}; ${status}]`,
+      `  Purpose: ${composition.purpose}`,
+      `  Strengths: ${composition.strengths.join("; ")}`,
+      `  Limitations: ${composition.limitations.join("; ")}`,
+    ].join("\n");
+  }).join("\n");
+const jumpingCatDirectory = resolve("packages/video-engine/public/audio");
+const windDuration = 20;
+await writeMonoWav(resolve(jumpingCatDirectory, "jumping-cat-wind.wav"), windDuration, (time) => {
+  const slow = Math.sin(2 * Math.PI * 0.17 * time) * 0.36 +
+    Math.sin(2 * Math.PI * 0.31 * time + 0.8) * 0.24 +
+    Math.sin(2 * Math.PI * 0.071 * time + 1.4) * 0.18;
+  const gust = 0.76 + 0.24 * Math.sin(2 * Math.PI * 0.055 * time + 0.4);
+  const noise = Math.sin(time * 117.1) * 0.055 +
+    Math.sin(time * 173.7) * 0.038 +
+    Math.sin(time * 241.3) * 0.024;
+  return (slow + noise) * gust * 0.22;
 });
-await writeMonoWav(resolve(legacyAudioDirectory, "transition-chime.wav"), 1.6, (time) => {
-  const envelope = Math.min(1, time / 0.012) * Math.exp(-time * 3.8);
-  const partials =
-    Math.sin(2 * Math.PI * 880 * time) +
-    Math.sin(2 * Math.PI * 1320 * time) * 0.38 +
-    Math.sin(2 * Math.PI * 1760 * time) * 0.16;
-  return partials * envelope * 0.34;
-});
-
-const showcaseDirectory = resolve("projects/showcase-motion/assets/audio");
-const showcaseDuration = 16;
-const chordSets = [
-  [110, 164.81, 220, 261.63],
-  [98, 146.83, 196, 246.94],
-  [123.47, 185, 246.94, 293.66],
-  [110, 164.81, 220, 261.63],
-];
-
-await writeMonoWav(resolve(showcaseDirectory, "score.wav"), showcaseDuration, (time) => {
-  const fadeIn = Math.min(1, time / 1.1);
-  const fadeOut = Math.min(1, (showcaseDuration - time) / 1.5);
-  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
-  const chord = chordSets[Math.min(3, Math.floor(time / 4))]!;
-  const pad = chord.reduce((sum, frequency, index) => {
-    const slowDetune = Math.sin(2 * Math.PI * (frequency * (index % 2 === 0 ? 1 : 1.003)) * time);
-    return sum + slowDetune * (0.16 - index * 0.018);
-  }, 0);
-  const beat = time % (60 / 92);
-  const kickEnvelope = Math.exp(-beat * 28);
-  const kickFrequency = 48 + 42 * Math.exp(-beat * 18);
-  const kick = Math.sin(2 * Math.PI * kickFrequency * beat) * kickEnvelope * 0.16;
-  const pulse = 0.78 + 0.22 * Math.sin(2 * Math.PI * 0.115 * time);
-  const highTexture =
-    Math.sin(2 * Math.PI * 440 * time) * 0.028 +
-    Math.sin(2 * Math.PI * 659.25 * time + Math.sin(time * 0.6)) * 0.024 +
-    Math.sin(2 * Math.PI * 880 * time) * 0.012;
-  return (pad + kick + highTexture) * pulse * envelope * 0.72;
-});
-
-await writeMonoWav(resolve(showcaseDirectory, "transition-whoosh.wav"), 1.35, (time) => {
-  const envelope = Math.pow(Math.sin(Math.PI * time / 1.35), 1.7);
-  const noise =
-    Math.sin(time * 1281.7) * 0.36 +
-    Math.sin(time * 1997.3) * 0.28 +
-    Math.sin(time * 2873.1) * 0.2 +
-    Math.sin(time * 4079.9) * 0.16;
-  const tonalSweep = Math.sin(2 * Math.PI * (160 + 850 * time) * time) * 0.2;
-  return (noise + tonalSweep) * envelope * 0.28;
-});
-
-await writeMonoWav(resolve(showcaseDirectory, "impact.wav"), 1.1, (time) => {
-  const envelope = Math.exp(-time * 5.6);
-  const frequency = 78 - 26 * (1 - Math.exp(-time * 9));
-  const body = Math.sin(2 * Math.PI * frequency * time) * 0.7;
-  const click = Math.sin(2 * Math.PI * 1480 * time) * Math.exp(-time * 65) * 0.3;
-  return (body + click) * envelope * 0.48;
-});
-
-await writeMonoWav(resolve(showcaseDirectory, "transition-chime.wav"), 1.55, (time) => {
-  const envelope = Math.min(1, time / 0.012) * Math.exp(-time * 3.1);
-  const chord =
-    Math.sin(2 * Math.PI * 659.25 * time) * 0.42 +
-    Math.sin(2 * Math.PI * 880 * time) * 0.32 +
-    Math.sin(2 * Math.PI * 1318.5 * time) * 0.22 +
-    Math.sin(2 * Math.PI * 1760 * time) * 0.12;
-  return chord * envelope * 0.42;
-});
-
-// This muted test signal is used only as the sidechain key for automatic music ducking.
-await writeMonoWav(resolve(showcaseDirectory, "ducking-key.wav"), showcaseDuration, (time) => {
-  const phrases = [[5.1, 6.7], [10.0, 11.2]];
-  const active = phrases.some(([start, end]) => time >= start! && time <= end!);
-  if (!active) return 0;
-  const pulse = 0.25 + 0.75 * Math.pow(Math.max(0, Math.sin((time - Math.floor(time * 3.2) / 3.2) * Math.PI * 3.2)), 2);
-  const syllable = Math.sin(2 * Math.PI * 185 * time) * 0.62 +
-    Math.sin(2 * Math.PI * 370 * time) * 0.25 +
-    Math.sin(2 * Math.PI * 555 * time) * 0.13;
-  return syllable * pulse * 0.34;
-});
-
-const pulseDirectory = resolve("projects/showcase-pulse/assets/audio");
-const pulseDuration = 20;
-const pulseChords = [
-  [82.41, 123.47, 164.81, 207.65],
-  [73.42, 110, 146.83, 185],
-  [98, 146.83, 196, 246.94],
-  [87.31, 130.81, 174.61, 220],
-];
-
-await writeMonoWav(resolve(pulseDirectory, "score.wav"), pulseDuration, (time) => {
-  const fadeIn = Math.min(1, time / 0.8);
-  const fadeOut = Math.min(1, (pulseDuration - time) / 1.4);
-  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
-  const chord = pulseChords[Math.min(3, Math.floor(time / 5))]!;
-  const pad = chord.reduce((sum, frequency, index) =>
-    sum + Math.sin(2 * Math.PI * frequency * time) * (0.12 - index * 0.015), 0
-  );
-  const beatLength = 60 / 112;
-  const beat = time % beatLength;
-  const kick = Math.sin(2 * Math.PI * (52 + 38 * Math.exp(-beat * 20)) * beat) *
-    Math.exp(-beat * 24) * 0.24;
-  const offBeat = (time + beatLength / 2) % beatLength;
-  const snap = Math.sin(2 * Math.PI * 1650 * time) * Math.exp(-offBeat * 55) * 0.045;
-  const arpeggioNotes = [329.63, 392, 493.88, 587.33, 493.88, 392, 293.66, 392];
-  const step = Math.floor(time / (beatLength / 2)) % arpeggioNotes.length;
-  const notePhase = (time % (beatLength / 2)) / (beatLength / 2);
-  const pluck = Math.sin(2 * Math.PI * arpeggioNotes[step]! * time) *
-    Math.exp(-notePhase * 4) * 0.07;
-  const texture = Math.sin(2 * Math.PI * 880 * time) * 0.012 +
-    Math.sin(2 * Math.PI * 1320 * time + Math.sin(time * 0.7)) * 0.009;
-  return (pad + kick + snap + pluck + texture) * envelope * 0.82;
-});
-
-await writeMonoWav(resolve(pulseDirectory, "transition-whoosh.wav"), 1.25, (time) => {
-  const envelope = Math.pow(Math.sin(Math.PI * time / 1.25), 1.4);
-  const noise = Math.sin(time * 1511.3) * 0.34 +
-    Math.sin(time * 2387.1) * 0.28 +
-    Math.sin(time * 3319.7) * 0.2;
-  const sweep = Math.sin(2 * Math.PI * (120 + 1100 * time) * time) * 0.28;
-  return (noise + sweep) * envelope * 0.3;
-});
-
-await writeMonoWav(resolve(pulseDirectory, "impact.wav"), 0.95, (time) => {
-  const envelope = Math.exp(-time * 5.1);
-  const sub = Math.sin(2 * Math.PI * (72 - 18 * time) * time) * 0.72;
-  const transient = Math.sin(2 * Math.PI * 1900 * time) * Math.exp(-time * 48) * 0.28;
-  return (sub + transient) * envelope * 0.52;
-});
-
-
-const soraDirectory = resolve("projects/sora/assets/audio");
-const soraDuration = 12;
-const soraChords = [
-  [130.81, 164.81, 196, 261.63],
-  [110, 146.83, 174.61, 220],
-  [123.47, 155.56, 185, 246.94],
-  [130.81, 164.81, 196, 261.63],
-];
-await writeMonoWav(resolve(soraDirectory, "score.wav"), soraDuration, (time) => {
-  const fadeIn = Math.min(1, time / 1.4);
-  const fadeOut = Math.min(1, (soraDuration - time) / 1.8);
-  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
-  const chord = soraChords[Math.min(3, Math.floor(time / 3))]!;
-  const warmPad = chord.reduce((sum, frequency, index) =>
-    sum + Math.sin(2 * Math.PI * frequency * time + Math.sin(time * 0.23 + index) * 0.08) * (0.12 - index * 0.018), 0
-  );
-  const beatLength = 60 / 86;
-  const beat = time % beatLength;
-  const lowPulse = Math.sin(2 * Math.PI * (48 + 18 * Math.exp(-beat * 8)) * beat) * Math.exp(-beat * 15) * 0.13;
-  const tickPhase = (time + beatLength / 2) % beatLength;
-  const softTick = Math.sin(2 * Math.PI * 1850 * time) * Math.exp(-tickPhase * 42) * 0.018;
-  const airy = Math.sin(2 * Math.PI * 659.25 * time + Math.sin(time * 0.4)) * 0.018 +
-    Math.sin(2 * Math.PI * 987.77 * time) * 0.009;
-  return (warmPad + lowPulse + softTick + airy) * envelope * 0.56;
-});
-
-
-
-const madridTravelDirectory = resolve("packages/video-engine/public/audio");
-const madridTravelDuration = 24;
-const madridTravelChords = [
-  [110, 164.81, 220, 261.63],
-  [98, 146.83, 196, 246.94],
-  [130.81, 164.81, 196, 261.63],
-  [110, 164.81, 220, 261.63],
-];
-await writeMonoWav(resolve(madridTravelDirectory, "madrid-travel-score.wav"), madridTravelDuration, (time) => {
-  const fadeIn = Math.min(1, time / 2.2);
-  const fadeOut = Math.min(1, (madridTravelDuration - time) / 2.2);
-  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
-  const chord = madridTravelChords[Math.min(3, Math.floor(time / 7.5))]!;
-  const pad = chord.reduce((sum, frequency, index) => {
-    const modulation = Math.sin(2 * Math.PI * 0.08 * time + index * 0.7) * 0.035;
-    return sum + Math.sin(2 * Math.PI * frequency * time + modulation) * (0.13 - index * 0.014);
-  }, 0);
-  const airy = Math.sin(2 * Math.PI * 392 * time + Math.sin(time * 0.35)) * 0.025 +
-    Math.sin(2 * Math.PI * 587.33 * time + Math.sin(time * 0.23)) * 0.018 +
-    Math.sin(2 * Math.PI * 783.99 * time) * 0.01;
-  const pulse = 0.92 + 0.08 * Math.sin(2 * Math.PI * 0.12 * time);
-  return (pad + airy) * pulse * envelope * 0.52;
-});
-
-console.log("Generated legacy samples, original Aether, PULSE, SORA, and Madrid travel audio fixtures.");

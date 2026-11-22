@@ -16,6 +16,14 @@ export type CompositionCapability = {
 // that each catalogue entry is registered; unlisted IDs are not selectable.
 export const COMPOSITION_REGISTRY: readonly CompositionCapability[] = [
   {
+    id: "JumpingCat",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "Original 2D animated cat short with expressive squash-and-stretch jumping and a quiet outdoor ambience.",
+    strengths: ["Dedicated 2D illustration and character animation", "Continuous custom wind ambience", "No text or reusable editorial template"],
+    limitations: ["Purpose-built for a single playful jumping-cat scene."],
+  },
+  {
     id: "DemoVideo",
     renderer: "custom-remotion",
     selectable: false,
