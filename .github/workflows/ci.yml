@@ -63,7 +63,9 @@ jobs:
       - name: Run Stormlight Keeper storyboard QA
         run: npm run storyboard:qa -- projects/stormlight-keeper/production/production-plan.json
       - name: Enforce Stormlight Keeper local asset evidence
-        run: npm run director:asset-evidence -- projects/stormlight-keeper/production/production-plan.json projects/stormlight-keeper/production/asset-manifest.json review-output/stormlight-keeper.asset-evidence.json --strict
+        run: |
+          mkdir -p review-output
+          npm run director:asset-evidence -- projects/stormlight-keeper/production/production-plan.json projects/stormlight-keeper/production/asset-manifest.json review-output/stormlight-keeper.asset-evidence.json --strict
       - name: Verify Stormlight Keeper audio fixtures
         run: |
           test -s projects/stormlight-keeper/assets/audio/stormlight-score.wav
