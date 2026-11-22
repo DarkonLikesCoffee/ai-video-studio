@@ -1,56 +1,58 @@
 # START HERE — AI Video Studio
 
-This is the entry point for **any AI assistant, model, or new conversation** continuing this repository. Read this file first, then follow the reading order below before changing code.
+This is the shared entry point for **any AI assistant, model, or new conversation** working in this repository. It is designed to be model/provider-neutral: ChatGPT, Claude, compatible local models, and other assistants should follow the same repository workflow.
 
-## One-line project goal
+## Product goal
 
-Build an AI video producer that turns an ordinary text prompt into a complete, polished video: it understands the brief, plans the story, creates or finds the right visual and audio assets, edits everything together, checks the actual result, fixes problems, and delivers the final MP4.
+Turn an ordinary video prompt into a compelling finished MP4. The goal is not merely a valid render or animated slides; it is purposeful visual storytelling, suitable footage/assets, real motion, strong editing, intentional sound and verified quality.
 
-The goal is **not** merely to render slides or generate a valid MP4. The goal is a compelling finished video with purposeful visuals, real motion, strong editing, good sound, and quality appropriate to the brief.
+## Resume prompt
 
-## How to resume in a new conversation
-
-The user can simply send:
-
-> Continue developing this project. Start by reading `START_HERE.md` in the GitHub repository, then read every file it references. Check the actual current state of the repository and its CI before doing anything. Continue autonomously from the highest-priority next step in the roadmap. Do not ask me to repeat project context or ask permission for routine implementation decisions. Do not claim work is complete until it is tested and verified.
+> Continue working in `DarkonLikesCoffee/ai-video-studio`. Read `AGENTS.md` and `START_HERE.md`, verify the live GitHub state, then load only the context relevant to the task. Continue from the highest-priority actionable roadmap item. Make routine implementation decisions autonomously, use a branch and PR, and report only work that has been tested and verified.
 
 Repository: https://github.com/DarkonLikesCoffee/ai-video-studio
 
-## Mandatory reading order
+## Fast context-loading path
 
-1. `PROJECT_STATE.md` — what the product is, what exists today, and what is not implemented.
-2. `ROADMAP.md` — priorities, milestones, and acceptance criteria.
-3. `PROGRESS_LOG.md` — dated history, important decisions, failures, and the latest handoff.
-4. `AGENTS.md` — operating rules for any AI working in this repository.
-5. `README.md` — actual engine architecture, project schema, commands, workflows, asset rules.
-6. `docs/README.md` — documentation map and source-of-truth rules.
-7. `agent/README.md` and `docs/agent-production-workflow.md` — production process and existing agent playbooks.
-8. Relevant skill files under `agent/skills/` and the implementation/tests for the subsystem you intend to change.
+Do not consume the entire project history or every large reference file at the start of every conversation. Load context in this order:
 
-Do not rely on this handoff alone when the live repository can be inspected. Verify branch, latest commit, open PRs, workflow runs, render artifacts and current files. These can change after this document was written.
+1. **`AGENTS.md` and this file** — repository-wide rules and the continuation workflow.
+2. **`PROJECT_STATE.md`** — read the current verified snapshot at the top, stopping at the marker that introduces older historical entries. Read older entries only when the task depends on that history.
+3. **`ROADMAP.md`** — read the north-star, strategic direction, priority policy, release gate, and the specific milestone relevant to the task. Historical appendices are not required for routine work.
+4. **`PROGRESS_LOG.md`** — read the latest two or three dated entries at the end. Search for an older topic, PR or failure only when relevant; do not read the entire log by default.
+5. **`docs/README.md`** — use it as the documentation index. Read only the relevant sections of `README.md`, not the entire file by default.
+6. **For video production:** read `agent/README.md`, `docs/agent-production-workflow.md`, then the relevant skill(s) under `agent/skills/`.
+7. **For code changes:** inspect the implementation, schemas, tests and workflows that directly govern the selected change. Read additional skills or documentation only as needed.
 
-## What to do after reading
+### Which instructions are universal?
 
-1. Confirm the current branch and latest `main` commit. Check open PRs and recent CI/render workflows. Identify unfinished work or a conflicting in-progress branch.
-2. Compare the live code against `PROJECT_STATE.md` and `ROADMAP.md`. If the documents are stale, correct them as part of the work.
-3. Select the single highest-priority actionable milestone. Prefer a small end-to-end capability that improves the actual final video over adding more abstract infrastructure.
-4. Write or update a short implementation plan, then implement it. Make ordinary technical and creative decisions autonomously.
-5. Run relevant tests, typecheck, project validation and the actual render workflow. Inspect the resulting MP4, not just CI.
-6. If quality fails, fix and rerender. Do not call a successful render a successful video.
-7. Use a branch and PR. Merge after required checks pass and the output meets acceptance criteria. The user has already said routine merge approval is not needed; do not repeatedly ask whether to merge. This does not waive testing or quality gates.
-8. Update `PROJECT_STATE.md`, `ROADMAP.md` and append to `PROGRESS_LOG.md` before finishing. Include commit/PR/run links, test outcomes, artifact location and honest limitations.
+- `AGENTS.md`, this file, `agent/README.md`, `docs/agent-production-workflow.md` and `agent/skills/` are the shared, model-neutral repository guidance.
+- `agent/skills/` contains the canonical cross-assistant playbooks. Any assistant that can read repository files can use them; they are not separate running agents.
+- `.claude/skills/` is supplementary integration for Claude Code. Its project integration notes explain local differences. Do not assume upstream skill examples, commands or paid providers are installed or configured.
+- The assistant currently interacting with the user supplies the creative reasoning. Repository scripts generate handoffs, validate artifacts, render deterministic projects and inspect media; they do not call an LLM or autonomously make creative decisions.
+
+## Before changing anything
+
+1. Check the live `main` head, current branch, open PRs, recent CI and render workflow runs. Check for conflicting in-progress work.
+2. Compare the live code and workflows with the current `PROJECT_STATE.md` snapshot. Treat stale status text as a documentation issue, not as evidence of current implementation.
+3. Select one high-priority, actionable slice. Prefer an end-to-end improvement to the actual video over more abstract infrastructure or one-off demos.
+4. Follow the relevant model-neutral playbooks and verify every claimed engine capability in code.
+5. Make changes on a feature, fix or docs branch and open a PR; never push directly to `main`.
+6. Run relevant tests, type-checks, schema/project validations and CI. Do not weaken checks or hide failures to obtain a green result.
+7. For video-producing changes, obey the render freeze protocol in `AGENTS.md`; inspect the exact rendered MP4 and its audio/visual evidence. A successful render or contact sheet alone is not creative acceptance.
+8. Update `PROJECT_STATE.md`, `ROADMAP.md` and append to `PROGRESS_LOG.md` so another assistant can continue without the conversation history.
 
 ## Source-of-truth rules
 
 - Code, tests, schemas and successful workflow outputs are authoritative for implemented capability.
-- `README.md` documents engine behavior; inspect implementation if a capability matters to the change.
-- `PROJECT_STATE.md` describes the verified state at its last update, not a promise that it is still current.
-- `ROADMAP.md` is the intended direction, not evidence that a feature exists.
-- A plan, skill, storyboard, fixture, mock or demo is not an implemented autonomous capability.
-- Distinguish **implemented**, **partially implemented**, **manual workflow**, **planned**, and **not implemented**.
+- `README.md` documents engine behavior; inspect implementation when a specific capability matters.
+- `PROJECT_STATE.md` is a snapshot of verified state at its last update, not a promise that it is still current.
+- `ROADMAP.md` describes intended work, not evidence that a feature exists.
+- A prompt, playbook, storyboard, fixture, mock or orchestration stub is not an autonomous AI capability.
+- Distinguish **implemented**, **partially implemented**, **manual/model-led workflow**, **planned** and **not implemented**.
 - Never invent a successful test, asset, license, render, visual inspection or user approval.
-- Do not expose credentials, tokens, private data or secrets in repository files.
+- Never incur paid API/model costs without explicit user consent. Do not expose credentials, tokens or private data in repository files.
 
-## Non-negotiable product principle
+## Non-negotiable quality principle
 
-A technically valid MP4 can still be a bad video. Judge success by the actual audiovisual result and the original brief: storytelling, shot variety, meaningful motion, editing rhythm, imagery, narration, music, sound effects, synchronization and ending. If the output looks like a slideshow, it has failed the creative goal even if all automated tests pass.
+A technically valid MP4 can still be a bad video. Judge it against the original brief: story, shot variety, meaningful motion, editing rhythm, visual relevance, narration, sound, synchronization and ending. If it looks like a slideshow when the brief calls for a film, it has failed even if every automated test passes.
