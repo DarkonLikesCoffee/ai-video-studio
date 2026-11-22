@@ -242,7 +242,7 @@ export const buildAssetReviewHtml = (
     "<h1>Asset review: " + escapeHtml(projectName) + "</h1>" +
     '<p class="muted">' + manifest.summary.assetCount + " image assets · " +
     manifest.summary.pageCount + " preview pages · " + manifest.summary.skippedCount +
-    " skipped files</p><div class="notice"><strong>Required next step:</strong> open and inspect every preview page. " +
+    ' skipped files</p><div class="notice"><strong>Required next step:</strong> open and inspect every preview page. ' +
     "The tool only renders the assets; it does not judge whether they look good. Correct weak source assets and regenerate the previews before building scenes.</div>" +
     (pageSections || "<p>No supported static image assets were found in the project's assets directory.</p>") +
     "<details><summary>Included image files (" + manifest.assets.length + ")</summary><ul>" +
