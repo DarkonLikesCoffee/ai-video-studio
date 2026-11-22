@@ -1,6 +1,8 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "ProjectVideo",
+  "outputName": "golden-hour-dog-walk",
+  "requestId": "golden-hour-dog-walk-20261122-1744-audio",
+  "projectPath": "projects/golden-hour-dog-walk/scene.json",
+  "candidateSha": "501a56d1eee1624267ea23d59169eb8f96a2f1ad"
 }
