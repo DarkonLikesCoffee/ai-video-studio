@@ -171,7 +171,7 @@ const Cave: FC<{ frame: number }> = ({ frame }) => {
             <meshStandardMaterial color="#4a384f" roughness={1} flatShading />
           </mesh>
         </group>
-      )}
+      ))}
       {/* Cave floor */}
       <mesh position={[0, -1.55, -2]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[18, 28]} />
