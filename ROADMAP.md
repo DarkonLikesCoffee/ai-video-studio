@@ -323,3 +323,8 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 - [x] Document clean installs, lockfile updates and dependency-change rules for contributors and agents.
 - [x] Complete CI on the committed lockfile, including tests, type-check, project validations and Studio build (PR #131 run #45020893580 passed).
 - [ ] Perform dependency-pruning/version-upgrade work separately, after tracing imports, build-time use, scripts, tests and dynamic loading.
+
+
+## 2026-11-22 — Shot differentiation process gate (PR pending)
+
+Added a shared model-neutral shot differentiation contract and wired it into the producer, visual-QA, agent workflow, startup guide and repository instructions. The gate specifically rejects repeated scene/camera/object composition where only text changes and requires shot-to-code traceability plus actual MP4 inspection. This is a process safeguard; automatic semantic video QA remains unimplemented.
