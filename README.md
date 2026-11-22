@@ -170,10 +170,10 @@ The [PULSE — Editorial Motion Film](projects/showcase-pulse/scene.json) is a 2
 
 ### Local rendering
 
-Requirements: Node.js 22+, npm and FFmpeg on PATH.
+Requirements: Node.js 22+, npm and FFmpeg on PATH. The root `package-lock.json` pins the npm workspace dependency tree; use `npm ci` for a clean, reproducible install. See [dependency management](docs/DEPENDENCY_MANAGEMENT.md) before changing package dependencies.
 
 ```bash
-npm install
+npm ci
 npm run typecheck
 npm test
 npm run assets:audio
