@@ -649,3 +649,12 @@ Append one entry per meaningful development session:
 - Kept existing exported retry-delay functions as wrappers with the exact prior Commons and NASA delay limits.
 - Added tests for seconds/date parsing, provider-specific bounds, exponential fallback and invalid headers.
 - Added `docs/REPOSITORY_CLEANUP_SOURCE_AUDIT.md`. Await CI before merge; local tests/build/render were not run in this connector-only session.
+
+
+## 2026-11-22 — Source cleanup PR #126 merged
+
+- Merged [PR #126](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/126) as `21783b093029cb6c9ae688db4be33c415563f458`.
+- The refactor extracts the shared Retry-After parser and bounded exponential-backoff calculation into `scripts/retry-delay.mjs`.
+- Wikimedia Commons and NASA keep their separate delay bounds and existing exported wrapper functions. Request loops, timeouts, retry counts, headers, cancellation and URL allow-lists were unchanged.
+- Added four direct unit tests. PR CI #45018775059 passed; post-merge main CI #45018877315 passed.
+- Refreshed the verified current snapshot and roadmap. No production render was needed for this internal retry utility refactor.

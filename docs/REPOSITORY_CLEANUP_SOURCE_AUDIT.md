@@ -6,7 +6,7 @@ A source-level follow-up after PR #125, focused on concrete duplication with exi
 
 ## Repository inventory
 
-The recursive Git tree on the post-PR #125 main commit contained 186 tracked files: 6 under `apps/`, 24 under `packages/`, 33 under `scripts/`, 34 under `tests/`, 44 under `projects/`, 10 under `agent/`, 3 under `docs/`, and 2 under `schemas/`. The tree response was complete (not truncated).
+The first complete recursive inventory used during source review was captured at main commit `f2a2b7328ac357c3d77e48b2ecde6f2213e9a064` before PR #125 was merged; it reported 186 tracked files (the API response was not truncated). The source review itself was performed on the cleanup branch based on post-PR #125 main. After PR #126 merged, the complete recursive tree at main commit `21783b093029cb6c9ae688db4be33c415563f458` contains 190 tracked files (not truncated).
 
 ## Finding: duplicated HTTP retry-delay algorithm
 
