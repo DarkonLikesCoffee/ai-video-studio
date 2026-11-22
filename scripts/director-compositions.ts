@@ -72,6 +72,23 @@ export const COMPOSITION_REGISTRY: readonly CompositionCapability[] = [
     limitations: ["The product model, brand copy, timing and shot structure are hard-coded; do not reuse unchanged for unrelated products."],
   },
   {
+    id: "AcousticProductFilm",
+    renderer: "custom-remotion",
+    selectable: true,
+    purpose: "A 20-second fictional premium headphone launch film built around tactile 3D material reveals, an exploded earcup detail and a restrained hero frame.",
+    strengths: [
+      "Procedural Three.js over-ear headphone geometry with consistent identity across shots",
+      "Physically based brushed-metal, satin-polymer and cushion materials",
+      "Shot-specific macro, orbit, detail, exploded-view and hero camera paths",
+      "Original locally generated music and Foley",
+    ],
+    limitations: [
+      "A benchmark composition for one stylized fictional headphone design, not a general product-model importer",
+      "Uses procedural geometry rather than a user-supplied or photogrammetric 3D model",
+      "Requires WebGL rendering; GitHub Actions uses single-concurrency software WebGL",
+    ],
+  },
+  {
     id: "NarratedSkyExplainer",
     renderer: "custom-remotion",
     selectable: true,

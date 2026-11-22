@@ -232,3 +232,64 @@ await writeMonoWav(resolve(madridTravelDirectory, "madrid-travel-score.wav"), ma
 });
 
 console.log("Generated legacy samples, original Aether, PULSE, SORA, and Madrid travel audio fixtures.");
+
+// Original soundtrack and tactile Foley for the 20-second Acoustic Product Film benchmark.
+const acousticFilmAudioDirectory = resolve("projects/acoustic-product-film/assets/audio");
+const acousticFilmDuration = 20;
+const acousticFilmChords = [
+  [130.81, 155.56, 196, 261.63],
+  [110, 146.83, 174.61, 220],
+  [123.47, 155.56, 185, 246.94],
+  [130.81, 164.81, 196, 261.63],
+];
+
+await writeMonoWav(resolve(acousticFilmAudioDirectory, "score.wav"), acousticFilmDuration, (time) => {
+  const fadeIn = Math.min(1, time / 1.25);
+  const fadeOut = Math.min(1, (acousticFilmDuration - time) / 1.7);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const chord = acousticFilmChords[Math.min(3, Math.floor(time / 5))]!;
+  const pad = chord.reduce((sum, frequency, index) => {
+    const movement = Math.sin(2 * Math.PI * 0.07 * time + index * 0.65) * 0.035;
+    return sum + Math.sin(2 * Math.PI * frequency * time + movement) * (0.14 - index * 0.018);
+  }, 0);
+  const beatLength = 60 / 86;
+  const beat = time % beatLength;
+  const lowPulse = Math.sin(2 * Math.PI * (48 + 14 * Math.exp(-beat * 8)) * beat) * Math.exp(-beat * 14) * 0.09;
+  const noteSet = [329.63, 392, 493.88, 440, 392, 293.66, 349.23, 392];
+  const stepLength = beatLength / 2;
+  const step = Math.floor(time / stepLength) % noteSet.length;
+  const stepPhase = (time % stepLength) / stepLength;
+  const pluck = Math.sin(2 * Math.PI * noteSet[step]! * time) * Math.exp(-stepPhase * 5) * 0.034;
+  const air = Math.sin(2 * Math.PI * 659.25 * time + Math.sin(time * 0.32)) * 0.012;
+  return (pad + lowPulse + pluck + air) * envelope * 0.68;
+});
+
+await writeMonoWav(resolve(acousticFilmAudioDirectory, "metal-brush.wav"), 1.8, (time) => {
+  const envelope = Math.pow(Math.max(0, Math.sin(Math.PI * time / 1.8)), 1.4);
+  const grain =
+    Math.sin(time * 1723.1) * 0.27 +
+    Math.sin(time * 2381.7) * 0.21 +
+    Math.sin(time * 3117.3) * 0.16 +
+    Math.sin(time * 4279.9) * 0.12;
+  const resonantSweep = Math.sin(2 * Math.PI * (520 + 1180 * time) * time) * 0.22;
+  return (grain + resonantSweep) * envelope * 0.22;
+});
+
+await writeMonoWav(resolve(acousticFilmAudioDirectory, "control-click.wav"), 0.38, (time) => {
+  const first = Math.sin(2 * Math.PI * 1680 * time) * Math.exp(-time * 78);
+  const body = Math.sin(2 * Math.PI * 196 * time) * Math.exp(-time * 15) * 0.24;
+  const secondTime = Math.max(0, time - 0.095);
+  const second = Math.sin(2 * Math.PI * 2240 * secondTime) * Math.exp(-secondTime * 92) * 0.32;
+  return (first * 0.58 + body + second) * 0.44;
+});
+
+await writeMonoWav(resolve(acousticFilmAudioDirectory, "hero-impact.wav"), 1.05, (time) => {
+  const envelope = Math.exp(-time * 4.8);
+  const subFrequency = 74 - 20 * (1 - Math.exp(-time * 8));
+  const sub = Math.sin(2 * Math.PI * subFrequency * time) * 0.64;
+  const transient = Math.sin(2 * Math.PI * 1420 * time) * Math.exp(-time * 56) * 0.26;
+  const shimmer = Math.sin(2 * Math.PI * 880 * time) * Math.exp(-time * 3.2) * 0.08;
+  return (sub + transient + shimmer) * envelope * 0.46;
+});
+
+console.log("Generated original Acoustic Product Film score and Foley fixtures.");

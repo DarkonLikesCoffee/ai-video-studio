@@ -1,0 +1,45 @@
+{
+  "project": "AURA — Sound, shaped around you",
+  "assets": [
+    {
+      "id": "studio-score",
+      "file": "audio/score.wav",
+      "type": "original procedural music",
+      "shotIds": [
+        "all"
+      ],
+      "provenance": "Generated deterministically by scripts/generate-audio-fixtures.ts for this benchmark; no external source.",
+      "license": "Original project audio; created for AI Video Studio."
+    },
+    {
+      "id": "metal-brush",
+      "file": "audio/metal-brush.wav",
+      "type": "original Foley sound effect",
+      "shotIds": [
+        "material-macro"
+      ],
+      "provenance": "Generated deterministically by scripts/generate-audio-fixtures.ts for this benchmark; no external source.",
+      "license": "Original project audio; created for AI Video Studio."
+    },
+    {
+      "id": "control-click",
+      "file": "audio/control-click.wav",
+      "type": "original Foley sound effect",
+      "shotIds": [
+        "interface-detail"
+      ],
+      "provenance": "Generated deterministically by scripts/generate-audio-fixtures.ts for this benchmark; no external source.",
+      "license": "Original project audio; created for AI Video Studio."
+    },
+    {
+      "id": "hero-impact",
+      "file": "audio/hero-impact.wav",
+      "type": "original Foley sound effect",
+      "shotIds": [
+        "hero-payoff"
+      ],
+      "provenance": "Generated deterministically by scripts/generate-audio-fixtures.ts for this benchmark; no external source.",
+      "license": "Original project audio; created for AI Video Studio."
+    }
+  ]
+}

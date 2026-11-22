@@ -87,6 +87,18 @@ jobs:
         run: npm run validate:plan -- projects/valorant-immortal-decision-making/production/production-plan.json
       - name: Generate original audio fixtures
         run: npm run assets:audio
+      - name: Validate Acoustic Product Film creative brief
+        run: npm run director:brief -- projects/acoustic-product-film/production/creative-brief.json
+      - name: Validate Acoustic Product Film production plan
+        run: npm run validate:plan -- projects/acoustic-product-film/production/production-plan.json
+      - name: Review Acoustic Product Film storyboard risks
+        run: npm run storyboard:qa -- projects/acoustic-product-film/production/production-plan.json
+      - name: Generate Acoustic Product Film storyboard preview
+        run: npm run storyboard:preview -- projects/acoustic-product-film/production/production-plan.json review-output/acoustic-product-film.html
+      - name: Check Acoustic Product Film asset evidence
+        run: npm run director:asset-evidence -- projects/acoustic-product-film/production/production-plan.json projects/acoustic-product-film/production/asset-manifest.json review-output/acoustic-product-film.asset-evidence.json --strict
+      - name: Validate Acoustic Product Film composition metadata
+        run: node -e 'const p = JSON.parse(require("node:fs").readFileSync("projects/acoustic-product-film/composition.json", "utf8")); if (p.brandName !== "AURA" || p.productName !== "Wireless Headphones" || p.tagline !== "Sound, shaped around you.") throw new Error("Invalid AcousticProductFilm props");'
       - name: Stage VALORANT audio fixtures for validation
         run: |
           PROJECT_DIR="projects/valorant-immortal-decision-making"

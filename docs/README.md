@@ -47,3 +47,7 @@ The current snapshot at the top of PROJECT_STATE.md takes precedence over older 
 - projects/valorant-immortal-decision-making/assets/valorant-gameplay-selected.zip is consumed by the render workflow. Keep it until a replacement storage path has been implemented and verified.
 - Keep project assets and historical benchmark projects unless code references, project plans and render workflows have all been checked. File names alone are not evidence that an asset is unused.
 - Avoid duplicating status documents. Update the current snapshot, append to the progress log, and put future work in the roadmap.
+
+## Creative production benchmarks
+
+- [Acoustic Product Film](../projects/acoustic-product-film/README.md) — 20-second procedural 3D product-film benchmark for model-led creative planning, custom composition rendering and actual-output review.

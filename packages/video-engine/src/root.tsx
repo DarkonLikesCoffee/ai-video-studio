@@ -7,6 +7,7 @@ import { ThreeDShowcase } from "./scenes/ThreeDShowcase";
 import { MadridNewYorkParis } from "./scenes/MadridNewYorkParis";
 import { MadridTrip, MADRID_TRIP_DURATION, FPS as MADRID_TRIP_FPS, WIDTH as MADRID_TRIP_WIDTH, HEIGHT as MADRID_TRIP_HEIGHT } from "./scenes/MadridTrip";
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
+import { AcousticProductFilm } from "./scenes/AcousticProductFilm";
 import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
 
 // Remotion merges partial --props over defaultProps. Do not leak the example
@@ -68,6 +69,14 @@ export const RemotionRoot = () => (
     <Composition
       id="CinematicAdBenchmark"
       component={CinematicAdBenchmark}
+      durationInFrames={600}
+      fps={30}
+      width={1920}
+      height={1080}
+    />
+    <Composition
+      id="AcousticProductFilm"
+      component={AcousticProductFilm}
       durationInFrames={600}
       fps={30}
       width={1920}
