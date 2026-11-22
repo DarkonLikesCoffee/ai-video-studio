@@ -186,10 +186,10 @@
     "No text, captions, logos or dialogue appear."
   ],
   "renderStrategy": {
-    "renderer": "remotion-svg",
+    "renderer": "custom-remotion",
     "compositionId": "LighthouseRepairFilm",
     "availability": "registered",
-    "rationale": "A dedicated SVG/Remotion renderer guarantees deterministic headless rendering on GitHub-hosted runners without WebGL/GPU support. The six-shot artwork uses layered SVG paths/shapes and animated transforms, with original robot, lighthouse, storm, mechanism, Fresnel and vessel designs.",
+    "rationale": "A dedicated custom Remotion composition using GPU-independent SVG vector rendering guarantees deterministic headless output on GitHub-hosted runners without WebGL/GPU support. The six-shot artwork uses layered SVG paths/shapes and animated transforms, with original robot, lighthouse, storm, mechanism, Fresnel and vessel designs.",
     "requiredCapabilities": [
       "Vector lighthouse, storm coastline, articulated maintenance robot, spiral stairwell, repair mechanism, rotating Fresnel lens and distant vessel",
       "Six distinct scene framings with continuous character, water, rain, gear and beacon motion",
