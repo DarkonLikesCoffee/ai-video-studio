@@ -187,7 +187,7 @@
   "renderStrategy": {
     "renderer": "custom-remotion",
     "compositionId": "LighthouseRepairFilm",
-    "availability": "to-be-built",
+    "availability": "registered",
     "rationale": "The brief requires a custom camera-driven coastal 3D sequence, a persistent robot character, mechanical repair animation and a rotating Fresnel beacon with atmospheric lighting. No existing registered composition supports this story.",
     "requiredCapabilities": [
       "Procedural 3D lighthouse/coast/robot modelling",
