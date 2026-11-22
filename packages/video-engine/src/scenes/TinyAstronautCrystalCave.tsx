@@ -325,12 +325,12 @@ export const TinyAstronautCrystalCave: FC = () => {
       >
         {frame < 300 ? <PlanetScene frame={frame} /> : <Cave frame={frame} />}
         {frame >= 270 && frame < 430 ? (
-          <group position={[-1.4 + cave * 1.6, -0.52, -0.4]} rotation={[0, 0.3, 0]}>
+          <group position={[-1.4 + cave * 1.6, 0.08, -0.4]} rotation={[0, 0.3, 0]}>
             <Astronaut frame={frame} scale={0.7} />
           </group>
         ) : null}
         {frame >= 430 ? (
-          <group position={[1.45 - reveal * 1.0, -0.75, 0.55]} rotation={[0, -0.3, 0]}>
+          <group position={[1.45 - reveal * 1.0, 0.08, 0.55]} rotation={[0, -0.3, 0]}>
             <Astronaut frame={frame} scale={0.72 + awaken * 0.02} />
           </group>
         ) : null}
