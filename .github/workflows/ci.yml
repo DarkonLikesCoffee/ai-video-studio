@@ -40,6 +40,12 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: npm install --no-audit --no-fund --prefer-offline
+      # Temporary bootstrap-only step: export npm's generated workspace lockfile.
+      # Removed in the same PR after the lockfile is materialized into the branch.
+      - name: Export generated npm lockfile for bootstrap
+        if: startsWith(github.head_ref, 'chore/npm-lockfile-bootstrap-2026-11-22')
+        run: |
+          node -e 'const fs = require("node:fs"); const data = fs.readFileSync("package-lock.json"); console.log("NPM_LOCKFILE_B64_BEGIN"); console.log(data.toString("base64")); console.log("NPM_LOCKFILE_B64_END");'
       - name: Test narration alignment mapping
         run: python -m unittest discover -s tests -p "test_*.py"
       - name: Type-check
