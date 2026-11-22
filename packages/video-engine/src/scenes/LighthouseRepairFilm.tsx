@@ -1,454 +1,246 @@
-import { ThreeCanvas } from "@remotion/three";
-import type { FC } from "react";
-import {
-  AbsoluteFill,
-  Audio,
-  Easing,
-  interpolate,
-  staticFile,
-  useCurrentFrame,
-} from "remotion";
-import { useThree } from "@react-three/fiber";
-import { BackSide, Vector3 } from "three";
+import type { FC, CSSProperties } from "react";
+import { AbsoluteFill, Audio, Easing, interpolate, staticFile, useCurrentFrame } from "remotion";
 
 const clamp = { extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const };
-const smooth = (frame: number, start: number, end: number) =>
-  interpolate(frame, [start, end], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
-const point = (angle: number, radius: number, y: number): [number, number, number] =>
-  [Math.cos(angle) * radius, y, Math.sin(angle) * radius];
+const smooth = (f: number, a: number, b: number) => interpolate(f, [a,b], [0,1], {...clamp, easing:Easing.inOut(Easing.cubic)});
+const point = (cx:number,cy:number,r:number,a:number) => [cx+Math.cos(a)*r,cy+Math.sin(a)*r] as const;
 
-const CameraRig: FC<{ position: Vector3; target: Vector3 }> = ({ position, target }) => {
-  const camera = useThree((state) => state.camera);
-  camera.position.copy(position);
-  camera.lookAt(target);
-  camera.updateProjectionMatrix();
-  return null;
-};
-
-const Robot: FC<{ frame: number; scale?: number; repair?: number; facing?: number }> = ({
-  frame, scale = 1, repair = 0, facing = 0,
-}) => {
-  const walk = Math.sin(frame * 0.22);
-  const armReach = interpolate(repair, [0, 0.2, 0.62, 0.86, 1], [0.08, -0.35, -1.12, -0.75, 0.04], clamp);
-  const toolGlow = smooth(repair, 0.53, 0.72);
-  return (
-    <group scale={scale} rotation={[0, facing + Math.sin(frame * 0.025) * 0.035, 0]}>
-      <mesh position={[0, 0.69, 0]} castShadow>
-        <capsuleGeometry args={[0.31, 0.63, 7, 14]} />
-        <meshPhysicalMaterial color="#c8c1ad" metalness={0.5} roughness={0.42} clearcoat={0.55} />
-      </mesh>
-      <mesh position={[0, 1.31, 0.04]} castShadow>
-        <boxGeometry args={[0.58, 0.43, 0.48]} />
-        <meshPhysicalMaterial color="#e0d7c1" metalness={0.38} roughness={0.34} />
-      </mesh>
-      <mesh position={[0, 1.34, 0.292]}>
-        <boxGeometry args={[0.39, 0.14, 0.035]} />
-        <meshStandardMaterial color="#172c37" emissive="#dc9d52" emissiveIntensity={1.35} />
-      </mesh>
-      <mesh position={[0, 1.34, 0.317]}>
-        <sphereGeometry args={[0.052, 16, 12]} />
-        <meshBasicMaterial color="#fff0bf" />
-      </mesh>
-      <mesh position={[0, 1.64, 0.02]}>
-        <torusGeometry args={[0.14, 0.035, 10, 24]} />
-        <meshStandardMaterial color="#be995d" metalness={0.85} roughness={0.24} />
-      </mesh>
-      {([-1, 1] as const).map((side) => (
-        <group key={side} position={[side * 0.36, 0.92, 0]}>
-          <mesh rotation={[0, 0, side * 0.16]}>
-            <cylinderGeometry args={[0.09, 0.09, 0.4, 14]} />
-            <meshStandardMaterial color="#7d8b88" metalness={0.78} roughness={0.28} />
-          </mesh>
-          <group position={[side * 0.015, -0.22, 0.02]} rotation={[0, 0, side === 1 ? armReach : -0.14]}>
-            <mesh position={[0, -0.19, 0]}>
-              <cylinderGeometry args={[0.068, 0.068, 0.39, 12]} />
-              <meshStandardMaterial color="#bda36e" metalness={0.8} roughness={0.25} />
-            </mesh>
-            <mesh position={[0, -0.4, 0.04]}>
-              <sphereGeometry args={[0.09, 12, 8]} />
-              <meshStandardMaterial color="#dec58d" metalness={0.8} roughness={0.22} />
-            </mesh>
-            <group position={[0, -0.48, 0.09]}>
-              <mesh position={[-0.045, -0.045, 0]}>
-                <boxGeometry args={[0.045, 0.12, 0.06]} />
-                <meshStandardMaterial color="#d8bd83" metalness={0.85} />
-              </mesh>
-              <mesh position={[0.045, -0.045, 0]}>
-                <boxGeometry args={[0.045, 0.12, 0.06]} />
-                <meshStandardMaterial color="#d8bd83" metalness={0.85} />
-              </mesh>
-              <pointLight intensity={toolGlow * 0.8} color="#ffbf66" distance={0.8} />
-            </group>
-          </group>
-        </group>
-      ))}
-      {([-1, 1] as const).map((side) => (
-        <group key={side} position={[side * 0.18, 0.33, 0]}>
-          <mesh position={[0, -0.16, 0]} rotation={[0, 0, side * walk * 0.28]}>
-            <cylinderGeometry args={[0.105, 0.13, 0.35, 12]} />
-            <meshStandardMaterial color="#526267" metalness={0.75} />
-          </mesh>
-          <mesh position={[0, -0.36, 0.08]}>
-            <boxGeometry args={[0.23, 0.13, 0.36]} />
-            <meshStandardMaterial color="#263c45" metalness={0.62} roughness={0.38} />
-          </mesh>
-        </group>
-      ))}
-    </group>
-  );
-};
-
-const Tower: FC<{ frame: number; doorOpen: number; beacon: number }> = ({ frame, doorOpen, beacon }) => {
-  const lensRotation = frame * 0.034 * beacon;
-  return (
-    <group position={[2.6, 0, 0]}>
-      <mesh position={[0, -0.28, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[1.5, 1.9, 0.78, 48]} />
-        <meshStandardMaterial color="#35434a" roughness={0.96} />
-      </mesh>
-      <mesh position={[0, 1.94, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.8, 1.22, 3.75, 48, 1]} />
-        <meshStandardMaterial color="#858679" roughness={0.9} />
-      </mesh>
-      {Array.from({ length: 9 }, (_, i) => (
-        <mesh key={i} position={[0, -0.55 + i * 0.42, 0.82]}>
-          <boxGeometry args={[1.62 - i * 0.07, 0.035, 0.04]} />
-          <meshStandardMaterial color="#c2b69c" roughness={1} />
-        </mesh>
-      ))}
-      <mesh position={[0, -0.28, 1.045]}>
-        <boxGeometry args={[0.95, 1.42, 0.07]} />
-        <meshStandardMaterial color="#101c24" roughness={0.92} />
-      </mesh>
-      <group position={[-0.4, -0.27, 1.1]} rotation={[0, -doorOpen * 1.12, 0]}>
-        <mesh position={[0.4, 0, 0]} castShadow>
-          <boxGeometry args={[0.78, 1.35, 0.09]} />
-          <meshStandardMaterial color="#343f42" metalness={0.64} roughness={0.5} />
-        </mesh>
-        {Array.from({ length: 6 }, (_, i) => (
-          <mesh key={i} position={[0.4, -0.54 + i * 0.21, 0.055]}>
-            <sphereGeometry args={[0.035, 10, 8]} />
-            <meshStandardMaterial color="#c6a46d" metalness={0.82} />
-          </mesh>
-        ))}
-        <mesh position={[0.69, 0, 0.1]}>
-          <torusGeometry args={[0.09, 0.022, 8, 18]} />
-          <meshStandardMaterial color="#d7b876" metalness={0.9} />
-        </mesh>
-      </group>
-      <mesh position={[0, 4.12, 0]}>
-        <cylinderGeometry args={[0.92, 0.92, 0.38, 48]} />
-        <meshStandardMaterial color="#253944" metalness={0.7} roughness={0.36} />
-      </mesh>
-      <mesh position={[0, 4.35, 0]}>
-        <cylinderGeometry args={[0.96, 0.96, 0.07, 48]} />
-        <meshStandardMaterial color="#c5a56e" metalness={0.8} />
-      </mesh>
-      <group position={[0, 4.82, 0]}>
-        <mesh>
-          <cylinderGeometry args={[0.84, 0.84, 1.15, 32, 1, true]} />
-          <meshPhysicalMaterial color="#9fc4cf" transparent opacity={0.16} roughness={0.08} side={BackSide} />
-        </mesh>
-        <group rotation={[0, lensRotation, 0]}>
-          <mesh>
-            <cylinderGeometry args={[0.5, 0.5, 0.46, 32]} />
-            <meshStandardMaterial color="#d8b56f" emissive="#ffb45c" emissiveIntensity={beacon * 4} metalness={0.83} roughness={0.2} />
-          </mesh>
-          {Array.from({ length: 8 }, (_, i) => (
-            <mesh key={i} rotation={[0, (i * Math.PI) / 4, 0]}>
-              <boxGeometry args={[0.085, 0.96, 0.085]} />
-              <meshPhysicalMaterial color="#f2d49b" emissive="#ffb65d" emissiveIntensity={beacon * 2.8} metalness={0.38} roughness={0.15} />
-            </mesh>
-          ))}
-        </group>
-        <pointLight color="#ffc36e" intensity={beacon * 175} distance={28} />
-      </group>
-      <mesh position={[0, 5.55, 0]}>
-        <coneGeometry args={[1.2, 0.52, 48]} />
-        <meshStandardMaterial color="#182a32" metalness={0.75} />
-      </mesh>
-      <mesh position={[0, 6.0, 0]}>
-        <coneGeometry args={[0.28, 0.56, 32]} />
-        <meshStandardMaterial color="#a88d60" metalness={0.8} />
-      </mesh>
-      <pointLight position={[0, 4.85, 0]} color="#ffc274" intensity={beacon * 65} distance={14} />
-      <pointLight position={[0, 0.9, 0.9]} color="#e6a75b" intensity={doorOpen * 1.5} distance={4} />
-    </group>
-  );
-};
-
-const Storm: FC<{ frame: number }> = ({ frame }) => {
-  const rain = Array.from({ length: 240 }, (_, i) => ({
-    x: ((i * 73) % 190) / 10 - 9.5,
-    y: ((i * 47) % 95) / 10 - 4.7,
-    z: ((i * 29) % 70) / 10 - 3.5,
-    phase: i * 0.29,
-  }));
-  const lightning = Math.max(
-    0,
-    interpolate(frame, [43, 46, 51], [0, 1, 0], clamp),
-    interpolate(frame, [181, 184, 188], [0, 0.92, 0], clamp),
-    interpolate(frame, [338, 340, 343], [0, 0.82, 0], clamp),
-  );
-  return (
-    <group>
-      {rain.map((drop, i) => {
-        const fall = (frame * 0.17 + drop.phase) % 8.8;
-        return (
-          <mesh key={i} position={[drop.x + fall * 0.22, drop.y - fall, drop.z]} rotation={[0, 0, -0.2]}>
-            <cylinderGeometry args={[0.006, 0.006, 0.22, 5]} />
-            <meshBasicMaterial color="#b9d3db" transparent opacity={0.32} />
-          </mesh>
-        );
-      })}
-      {Array.from({ length: 18 }, (_, i) => (
-        <mesh key={i} position={[-9 + i * 1.1, -2.35 + Math.sin(frame * 0.08 + i) * 0.13, -2.7]} scale={[1.2, 0.15 + 0.035 * Math.sin(frame * 0.11 + i), 1]}>
-          <sphereGeometry args={[1, 18, 10]} />
-          <meshStandardMaterial color="#31566b" roughness={0.28} metalness={0.18} />
-        </mesh>
-      ))}
-      <ambientLight color="#668295" intensity={0.22} />
-      <directionalLight position={[-6, 8, 5]} color="#8da5b7" intensity={0.9} />
-      <pointLight position={[-5, 5, -3]} color="#7aa6ba" intensity={0.55} distance={20} />
-    </group>
-  );
-};
-
-const Coast: FC<{ frame: number }> = ({ frame }) => (
-  <group>
-    <mesh position={[0, -2.68, -1.9]} receiveShadow>
-      <boxGeometry args={[31, 1.12, 13]} />
-      <meshStandardMaterial color="#202f36" roughness={1} />
-    </mesh>
-    <mesh position={[0, -3.36, -3]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[45, 24]} />
-      <meshStandardMaterial color="#071622" roughness={0.46} metalness={0.18} />
-    </mesh>
-    {Array.from({ length: 22 }, (_, i) => (
-      <mesh key={i} position={[-12 + i * 1.12, -2.94 + Math.sin(frame * 0.1 + i) * 0.16, -1 - (i % 4)]} scale={[1.35, 0.24, 1]}>
-        <sphereGeometry args={[1, 18, 10]} />
-        <meshStandardMaterial color="#315568" roughness={0.38} transparent opacity={0.88} />
-      </mesh>
-    ))}
-    {Array.from({ length: 9 }, (_, i) => (
-      <mesh key={i} position={[-7.8 + i * 1.85, -2.12 + Math.sin(i * 2.2) * 0.18, -3.3 - Math.sin(i * 1.4) * 0.65]} rotation={[0, 0, Math.sin(i) * 0.28]}>
-        <coneGeometry args={[0.68, 1.55, 5]} />
-        <meshStandardMaterial color="#26383e" roughness={1} />
-      </mesh>
-    ))}
-  </group>
-);
-
-const SpiralStairs: FC<{ frame: number }> = ({ frame }) => (
-  <group position={[2.6, 0.2, 0]}>
-    <mesh>
-      <cylinderGeometry args={[1.5, 1.5, 4.8, 48, 1, true]} />
-      <meshStandardMaterial color="#43515a" side={BackSide} roughness={0.95} />
-    </mesh>
-    <mesh>
-      <cylinderGeometry args={[0.22, 0.22, 4.6, 24]} />
-      <meshStandardMaterial color="#71634d" metalness={0.45} />
-    </mesh>
-    {Array.from({ length: 28 }, (_, i) => {
-      const angle = i * 0.48 + frame * 0.002;
-      return (
-        <group key={i} position={point(angle, 0.92, -1.75 + i * 0.125)} rotation={[0, -angle, 0]}>
-          <mesh>
-            <boxGeometry args={[0.76, 0.12, 0.46]} />
-            <meshStandardMaterial color={i % 2 === 0 ? "#8b806a" : "#5b5d55"} roughness={0.9} />
-          </mesh>
-          <mesh position={[0.25, 0.1, 0]}>
-            <boxGeometry args={[0.055, 0.3, 0.055]} />
-            <meshStandardMaterial color="#b9a174" metalness={0.68} />
-          </mesh>
-        </group>
-      );
+const Rain:FC<{frame:number; density?:number}> = ({frame,density=75}) => (
+  <g opacity=".57" stroke="#a8c6d1" strokeWidth="2" strokeLinecap="round">
+    {Array.from({length:density},(_,i)=>{
+      const x=(i*137+Math.floor(frame*7.3))%1960;
+      const y=(i*79+Math.floor(frame*17.2))%1110;
+      return <path key={i} d={`M${x} ${y} l-15 34`} opacity={.18+(i%5)*.055}/>;
     })}
-    <pointLight position={[0, 1.8, 0]} color="#d49c5c" intensity={1.3} distance={8} />
-  </group>
+  </g>
 );
 
-const RepairMechanism: FC<{ frame: number }> = ({ frame }) => {
-  const repair = smooth(frame, 365, 438);
-  const coupling = interpolate(repair, [0, 0.38, 0.62, 1], [-0.32, -0.12, 0.02, 0], clamp);
-  const pin = interpolate(repair, [0, 0.46, 0.7, 1], [-0.42, -0.28, 0.01, 0], clamp);
-  return (
-    <group position={[2.6, 4.82, 0]}>
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.78, 0.12, 12, 48]} />
-        <meshStandardMaterial color="#8e744d" metalness={0.86} roughness={0.24} />
-      </mesh>
-      {Array.from({ length: 12 }, (_, i) => (
-        <mesh key={i} position={point((i * Math.PI) / 6, 0.79, 0)}>
-          <boxGeometry args={[0.22, 0.18, 0.2]} />
-          <meshStandardMaterial color="#b4945b" metalness={0.85} roughness={0.24} />
-        </mesh>
-      ))}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.29, 0.29, 0.24, 36]} />
-        <meshStandardMaterial color="#273f48" metalness={0.82} roughness={0.28} />
-      </mesh>
-      <mesh position={[coupling, 0, 0.05]}>
-        <cylinderGeometry args={[0.14, 0.14, 0.36, 24]} />
-        <meshStandardMaterial color="#c59d60" metalness={0.9} roughness={0.18} />
-      </mesh>
-      <mesh position={[0.34 + coupling * 0.18, 0.04, 0.05]}>
-        <cylinderGeometry args={[0.12, 0.12, 0.28, 24]} />
-        <meshStandardMaterial color="#ad8c5d" metalness={0.92} roughness={0.18} />
-      </mesh>
-      <mesh position={[pin, 0.2, 0.25]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.035, 0.035, 0.64, 12]} />
-        <meshStandardMaterial color="#e3c78e" metalness={0.93} roughness={0.17} />
-      </mesh>
-      <mesh position={[0, 0.88, 0.28]} rotation={[0, 0, interpolate(repair, [0, 0.48, 0.72, 1], [-0.9, -0.65, 0.12, 0.08], clamp)]}>
-        <cylinderGeometry args={[0.07, 0.07, 0.62, 12]} />
-        <meshStandardMaterial color="#b59b70" metalness={0.9} roughness={0.24} />
-      </mesh>
-      <mesh position={[0.1, 0.58, 0.35]}>
-        <sphereGeometry args={[0.11, 12, 8]} />
-        <meshStandardMaterial color="#d3b980" metalness={0.86} />
-      </mesh>
-      <pointLight position={[0, 0.2, 0.4]} color="#ffb95f" intensity={repair * 3.2} distance={2.2} />
-    </group>
-  );
+const Ocean:FC<{frame:number}> = ({frame}) => (
+  <g>
+    <path d="M0 680 Q200 645 400 686 T800 678 T1200 685 T1600 672 T1920 681 V1080 H0Z" fill="#0a2638"/>
+    <path d="M0 748 Q140 700 290 744 T580 744 T870 737 T1160 744 T1450 736 T1740 742 T2040 734" fill="none" stroke="#628b9b" strokeWidth="9" opacity=".38"/>
+    <path d="M0 836 Q160 802 320 835 T640 838 T960 832 T1280 837 T1600 829 T1920 839" fill="none" stroke="#a0bec7" strokeWidth="4" opacity=".25"/>
+    <path d="M0 920 Q160 891 320 923 T640 922 T960 920 T1280 924 T1600 914 T1920 923" fill="none" stroke="#63889a" strokeWidth="13" opacity=".28"/>
+    {Array.from({length:15},(_,i)=><path key={i} d={`M${i*145-20} ${760+(i%4)*58+Math.sin(frame*.08+i)*7} q42 -15 90 0`} stroke="#bdd1d4" strokeWidth="5" opacity=".24" fill="none"/>)}
+  </g>
+);
+
+const Cliff:FC = () => <g>
+  <path d="M360 1080 520 870 690 830 810 735 1010 780 1215 630 1410 820 1580 1080Z" fill="#172b34"/>
+  <path d="M450 1080 670 875 790 885 960 770 1110 840 1330 670 1510 880" fill="none" stroke="#5a6661" strokeWidth="20" opacity=".45"/>
+  <path d="M700 1080 840 900 970 930 1100 840 1240 910" fill="none" stroke="#a09376" strokeWidth="8" opacity=".32"/>
+</g>;
+
+const Lighthouse:FC<{frame:number;door:number;beacon:number;wide?:boolean}> = ({frame,door,beacon,wide=false}) => {
+ const rotation=frame*.035;
+ const beamOpacity=beacon*.24;
+ return <g>
+  <path d="M1050 850 L1120 230 Q1200 193 1280 230 L1355 850Z" fill="#827e70" stroke="#c7bca4" strokeWidth="12"/>
+  {Array.from({length:8},(_,i)=><path key={i} d={`M${1080-i*5} ${310+i*70} h${245+i*10}`} stroke={i%2?"#555f60":"#d0c5ab"} strokeWidth="12" opacity=".54"/>)}
+  <path d="M1122 240 L1148 142 H1273 L1302 240Z" fill="#263a44" stroke="#b7ab8e" strokeWidth="10"/>
+  <path d="M1132 145 H1290 L1268 105 H1153Z" fill="#9a805e" stroke="#d4bf93" strokeWidth="8"/>
+  <path d="M1191 100 V52 H1220 V100" fill="#bbae90" stroke="#594c3d" strokeWidth="6"/>
+  <path d="M1175 53 H1236" stroke="#594c3d" strokeWidth="10"/>
+  <rect x="1155" y="163" width="114" height="70" fill="#ffcf86" opacity={.5+beacon*.48}/>
+  <path d="M1167 165 V232 M1209 165 V232 M1255 165 V232" stroke="#283c45" strokeWidth="8"/>
+  <path d="M1177 164 H1247" stroke="#f1dba8" strokeWidth="5"/>
+  <g transform="translate(1230 202)">
+    <g transform={`rotate(${rotation*57.2958})`}>
+      {Array.from({length:8},(_,i)=><path key={i} d="M-4 -6 L-13 -64 L0 -78 L13 -64 L4 -6Z" fill="#f6d99c" opacity={.84}/>)}
+    </g>
+    <circle r="21" fill="#ffe9b2" opacity={beacon*.75}/>
+  </g>
+  <path d="M1198 244 L1198 330" stroke="#e5ad66" strokeWidth="8" opacity=".45"/>
+  <g transform="translate(1198 840)">
+   <path d="M-59 -1 V-122 Q0 -151 59 -122 V-1Z" fill="#121e25" stroke="#bcaa84" strokeWidth="9"/>
+   <g transform={`translate(0 0) rotate(${door*72})`}>
+    <path d="M-54 -4 V-120 Q0 -147 54 -120 V-4Z" fill="#344147" stroke="#8e8d7e" strokeWidth="9"/>
+    {Array.from({length:7},(_,i)=><circle key={i} cx={i%2?39:-39} cy={-24-i*13} r="4" fill="#d9ba7c"/>)}
+    <circle cx="36" cy="-63" r="7" fill="#e3c27f"/>
+   </g>
+   <rect x="-75" y="0" width="150" height="26" fill="#292e30"/>
+  </g>
+  {wide && <g transform={`translate(1230 202) rotate(${rotation*57.2958})`}>
+    <path d="M0 0 L-980 -245 L-1020 210Z" fill="#ffd58a" opacity={beamOpacity*.8}/>
+    <path d="M0 0 L-950 -90 L-960 100Z" fill="#fff0c6" opacity={beamOpacity*.42}/>
+  </g>}
+ </g>;
 };
 
-const Vessel: FC<{ frame: number }> = ({ frame }) => (
-  <group position={[-4.1 + Math.sin(frame * 0.025) * 0.12, -2.3 + Math.sin(frame * 0.08) * 0.045, -2.2]} rotation={[0, 0.1, Math.sin(frame * 0.06) * 0.02]} scale={0.78}>
-    <mesh>
-      <boxGeometry args={[1.55, 0.28, 0.48]} />
-      <meshStandardMaterial color="#62767b" metalness={0.45} roughness={0.45} />
-    </mesh>
-    <mesh position={[0.1, 0.28, 0]}>
-      <boxGeometry args={[0.62, 0.34, 0.4]} />
-      <meshStandardMaterial color="#9b9b88" roughness={0.75} />
-    </mesh>
-    <mesh position={[0.06, 0.48, 0]}>
-      <boxGeometry args={[0.055, 0.38, 0.06]} />
-      <meshStandardMaterial color="#cbb783" metalness={0.75} />
-    </mesh>
-    <pointLight position={[0.62, 0.25, 0.25]} color="#ffbd66" intensity={1.2} distance={1.4} />
-  </group>
-);
-
-const BeaconBeam: FC<{ frame: number; strength: number; wide: boolean }> = ({ frame, strength, wide }) => (
-  <group position={[2.6, 4.82, 0]} rotation={[0, frame * 0.034, -Math.PI / 2]}>
-    <mesh>
-      <coneGeometry args={[wide ? 2.1 : 0.78, wide ? 20 : 12, 36, 1, true]} />
-      <meshBasicMaterial color="#ffd58d" transparent opacity={strength * (wide ? 0.105 : 0.14)} side={BackSide} depthWrite={false} />
-    </mesh>
-    <pointLight color="#ffd28b" intensity={strength * (wide ? 24 : 10)} distance={wide ? 40 : 23} />
-  </group>
-);
-
-const ShotScene: FC<{ frame: number; shot: number }> = ({ frame, shot }) => {
-  const local = frame - shot * 120;
-  const doorOpen = smooth(frame, 165, 215);
-  const beacon = smooth(frame, 485, 525);
-  const cameraConfigs = [
-    { p: [-5.2, 2.7, 14], t: [0.5, 0.1, 0], fov: 45 },
-    { p: [-1.9, -0.8, 6.2], t: [1.8, 0.15, 0], fov: 42 },
-    { p: [2.9, 5.3, 5.6], t: [2.6, 0.25, 0], fov: 49 },
-    { p: [2.4, 5.1, 3.3], t: [2.6, 4.82, 0], fov: 38 },
-    { p: [2.2, 4.9, 6.4], t: [2.6, 4.82, 0], fov: 43 },
-    { p: [-7.5, -0.2, 15], t: [0.2, 0.2, 0], fov: 47 },
-  ] as const;
-  const config = cameraConfigs[shot] ?? cameraConfigs[0];
-  const drift = new Vector3(
-    Math.sin(frame * (shot === 3 ? 0.012 : 0.017)) * (shot === 3 ? 0.06 : 0.26),
-    Math.sin(frame * 0.021) * 0.09,
-    Math.cos(frame * 0.016) * 0.11,
-  );
-  const camera = new Vector3(...config.p).add(drift);
-  const target = new Vector3(...config.t);
-  const lightning = Math.max(
-    0,
-    smooth(frame, 43, 45) * (1 - smooth(frame, 49, 51)),
-    smooth(frame, 181, 184) * (1 - smooth(frame, 187, 190)),
-    smooth(frame, 338, 340) * (1 - smooth(frame, 342, 345)),
-  );
-  return (
-    <ThreeCanvas
-      camera={{ position: camera.toArray(), fov: config.fov }}
-      width={1920}
-      height={1080}
-      style={{ width: "100%", height: "100%" }}
-      gl={{ antialias: true, alpha: false }}
-    >
-      <CameraRig position={camera} target={target} />
-      <color attach="background" args={["#071523"]} />
-      <fog attach="fog" args={["#112a38", shot === 3 ? 2.2 : 9, 31]} />
-      <ambientLight color="#8398a6" intensity={0.3} />
-      <directionalLight
-        position={[-5, 8, 6]}
-        color={lightning > 0.1 ? "#eaf5fc" : "#8daabe"}
-        intensity={0.85 + lightning * 2.8}
-      />
-      <pointLight position={[2.6, 4.8, 0]} color="#f8b865" intensity={beacon * 55 + doorOpen * 1.2} distance={28} />
-      <Storm frame={frame} />
-      <Coast frame={frame} />
-      {shot !== 2 && <Tower frame={frame} doorOpen={shot === 1 ? doorOpen : 0} beacon={shot >= 4 ? beacon : 0} />}
-      {shot === 0 && <Robot frame={frame} scale={0.43} />}
-      {shot === 1 && (
-        <>
-          <Robot frame={frame} scale={0.75} />
-          <group position={[2.6, -2.0, 1.85]}>
-            {Array.from({ length: 5 }, (_, i) => (
-              <mesh key={i} position={[0, 0.22 + i * 0.15, i * 0.31]}>
-                <boxGeometry args={[1.9 - i * 0.12, 0.13, 0.48]} />
-                <meshStandardMaterial color="#626761" roughness={0.93} />
-              </mesh>
-            ))}
-          </group>
-        </>
-      )}
-      {shot === 2 && (
-        <>
-          <SpiralStairs frame={frame} />
-          <group position={[3.3, 0.02 + smooth(local, 12, 110) * 0.55, 0.08]}>
-            <Robot frame={frame} scale={0.42} facing={-0.3} />
-          </group>
-        </>
-      )}
-      {shot === 3 && <RepairMechanism frame={frame} />}
-      {shot === 4 && (
-        <>
-          <Robot frame={frame} scale={0.64} facing={Math.PI / 2} />
-          <BeaconBeam frame={frame} strength={beacon} wide={false} />
-        </>
-      )}
-      {shot === 5 && (
-        <>
-          <Vessel frame={frame} />
-          <BeaconBeam frame={frame} strength={beacon} wide />
-        </>
-      )}
-    </ThreeCanvas>
-  );
+const Robot:FC<{x:number;y:number;scale:number;frame:number;reach?:number;walk?:number;glow?:number;turn?:number}> = ({x,y,scale,frame,reach=0,walk=0,glow=0,turn=0}) => {
+ const stride=Math.sin(frame*.23)*walk;
+ const armAngle=-.2+reach*.95;
+ return <g transform={`translate(${x} ${y}) scale(${scale}) rotate(${turn})`}>
+  <ellipse cx="0" cy="6" rx="66" ry="16" fill="#02080d" opacity=".55"/>
+  <path d="M-24 -42 L-29 -4 M24 -42 L32 -4" stroke="#67777a" strokeWidth="22" strokeLinecap="round"/>
+  <g transform={`translate(-25 -5) rotate(${stride*26})`}><rect x="-12" y="-4" width="24" height="57" rx="11" fill="#85908a"/><path d="M-25 48 H24" stroke="#303e43" strokeWidth="18" strokeLinecap="round"/></g>
+  <g transform={`translate(27 -5) rotate(${-stride*26})`}><rect x="-12" y="-4" width="24" height="57" rx="11" fill="#85908a"/><path d="M-25 48 H24" stroke="#303e43" strokeWidth="18" strokeLinecap="round"/></g>
+  <rect x="-50" y="-158" width="100" height="126" rx="29" fill="#c7c3b2" stroke="#55666b" strokeWidth="8"/>
+  <path d="M-37 -139 H37 M-40 -62 H40" stroke="#e9dec8" strokeWidth="5" opacity=".65"/>
+  <g transform="translate(0 -198)">
+   <rect x="-63" y="-45" width="126" height="88" rx="26" fill="#e2d8c2" stroke="#566a6e" strokeWidth="8"/>
+   <rect x="-49" y="-23" width="98" height="34" rx="15" fill="#102731" stroke="#c1995d" strokeWidth="4"/>
+   <rect x="-40" y="-15" width="80" height="18" rx="8" fill="#e5ab5e" opacity=".94"/>
+   <circle cx="0" cy="-6" r="8" fill="#fff0c9"/>
+   <path d="M-31 -47 V-61 M31 -47 V-61" stroke="#c39f69" strokeWidth="7" strokeLinecap="round"/>
+   <circle cx="-31" cy="-64" r="8" fill="#edbd70"/><circle cx="31" cy="-64" r="8" fill="#edbd70"/>
+  </g>
+  <g transform={`translate(-55 -133) rotate(12)`}>
+   <path d="M0 0 L-27 60" stroke="#7d8d8b" strokeWidth="19" strokeLinecap="round"/>
+   <path d="M-27 60 L-18 108" stroke="#bca775" strokeWidth="16" strokeLinecap="round"/>
+   <path d="M-18 108 l-11 17 m11 -17 12 16" stroke="#d5ba81" strokeWidth="7" strokeLinecap="round"/>
+  </g>
+  <g transform={`translate(55 -133) rotate(${armAngle*57.2958})`}>
+   <path d="M0 0 L28 57" stroke="#7d8d8b" strokeWidth="19" strokeLinecap="round"/>
+   <path d="M28 57 L31 103" stroke="#bca775" strokeWidth="16" strokeLinecap="round"/>
+   <path d="M31 103 l-11 17 m11 -17 12 16" stroke="#d5ba81" strokeWidth="7" strokeLinecap="round"/>
+   <circle cx="31" cy="102" r="5" fill="#ffcc80" opacity={glow}/>
+  </g>
+  <circle cx="0" cy="-365" r="11" fill="#edba72" opacity=".8"/>
+ </g>;
 };
 
-export const LighthouseRepairFilm: FC = () => {
-  const frame = useCurrentFrame();
-  const shot = Math.min(5, Math.floor(frame / 120));
-  const fadeIn = interpolate(frame, [0, 20], [0, 1], clamp);
-  const fadeOut = interpolate(frame, [702, 720], [1, 0], clamp);
-  return (
-    <AbsoluteFill style={{ backgroundColor: "#071523", opacity: fadeIn * fadeOut }}>
-      <ShotScene frame={frame} shot={shot} />
-      <AbsoluteFill
-        style={{
-          pointerEvents: "none",
-          background: "radial-gradient(ellipse at center, transparent 48%, rgba(1,7,13,.56) 100%)",
-        }}
-      />
-      <AbsoluteFill
-        style={{
-          pointerEvents: "none",
-          background: "linear-gradient(180deg, rgba(3,12,20,.08), transparent 24%, transparent 72%, rgba(2,9,15,.35))",
-        }}
-      />
-      <Audio src={staticFile("assets/audio/stormlight-score.wav")} volume={0.62} />
-      <Audio src={staticFile("assets/audio/stormlight-atmosphere.wav")} volume={0.5} />
-    </AbsoluteFill>
-  );
+const DoorClose:FC<{frame:number;open:number}> = ({frame,open}) => (
+ <g>
+  <path d="M0 1080V370 Q960 -70 1920 370 V1080Z" fill="#26383e"/>
+  <path d="M550 1080V460 Q960 105 1370 460 V1080Z" fill="#131f26" stroke="#9a9077" strokeWidth="28"/>
+  <g transform={`translate(960 1080) rotate(${-open*48})`}>
+   <path d="M-360 0V-615 Q0 -900 360 -615 V0Z" fill="#3c4848" stroke="#b9a16f" strokeWidth="26"/>
+   <path d="M-310 -15V-600 Q0 -830 310 -600 V-15" fill="none" stroke="#66736f" strokeWidth="15"/>
+   {Array.from({length:16},(_,i)=><circle key={i} cx={i%2?290:-290} cy={-100-i*31} r="12" fill="#c3a46b"/>)}
+   <circle cx="230" cy="-310" r="25" fill="#dfb975"/>
+  </g>
+  <Robot x={725+open*160} y={950} scale={1.18} frame={frame} walk={0} glow={.7}/>
+  <path d="M1000 805 Q1120 700 1275 792" fill="none" stroke="#edbd76" strokeWidth="12" opacity={open*.65}/>
+ </g>
+);
+
+const StairShot:FC<{frame:number;climb:number}> = ({frame,climb}) => (
+ <g>
+  <rect width="1920" height="1080" fill="#0a1720"/>
+  <circle cx="960" cy="520" r="600" fill="#1b3038" stroke="#978668" strokeWidth="44"/>
+  <circle cx="960" cy="520" r="355" fill="#02090f" stroke="#d0b37a" strokeWidth="18"/>
+  {Array.from({length:24},(_,i)=>{
+   const a=i*.52+frame*.003;
+   const p=point(960,520,465,a);
+   return <g key={i} transform={`translate(${p[0]} ${p[1]}) rotate(${a*57.2958})`}>
+     <path d="M-110 -25 H110 L89 48 H-90Z" fill={i%2?"#83785f":"#b19b72"} stroke="#cdb77e" strokeWidth="6"/>
+     <path d="M-86 -9 H86" stroke="#e0d1ab" strokeWidth="8" opacity=".6"/>
+    </g>;
+  })}
+  <path d="M960 520 m-320 0 a320 320 0 1 1 640 0 a320 320 0 1 1 -640 0" fill="none" stroke="#9c8b68" strokeWidth="18" strokeDasharray="18 12"/>
+  <g transform={`translate(960 ${820-climb*370})`}>
+   <Robot x={0} y={0} scale={.62} frame={frame} walk={.8}/>
+  </g>
+  <path d="M0 0 H1920 V1080 H0Z" fill="none" stroke="#000" strokeWidth="150" opacity=".2"/>
+ </g>
+);
+
+const RepairShot:FC<{frame:number;repair:number}> = ({frame,repair}) => {
+ const coupled=smooth(frame,380,411);
+ const pinned=smooth(frame,412,434);
+ const turned=smooth(frame,436,466);
+ return <g>
+  <rect width="1920" height="1080" fill="#101e27"/>
+  <circle cx="970" cy="545" r="340" fill="#253943" stroke="#b18e59" strokeWidth="30"/>
+  <circle cx="970" cy="545" r="250" fill="#10232d" stroke="#e0bd78" strokeWidth="13"/>
+  <g transform={`rotate(${frame*.8} 970 545)`}>
+   {Array.from({length:12},(_,i)=>{
+    const a=i*Math.PI/6;
+    const p=point(970,545,295,a);
+    return <rect key={i} x={p[0]-32} y={p[1]-25} width="64" height="50" rx="8" fill="#bd9b60" stroke="#e2c889" strokeWidth="6" transform={`rotate(${i*30} ${p[0]} ${p[1]})`}/>;
+   })}
+  </g>
+  <g>
+   <circle cx="970" cy="545" r="112" fill="#172a31" stroke="#a88350" strokeWidth="22"/>
+   <path d={`M${730+coupled*180} 545 H${1205-pinned*120}`} stroke="#d2ad6c" strokeWidth="66" strokeLinecap="round"/>
+   <path d={`M${820+coupled*120} 545 H${1120-pinned*110}`} stroke="#f1d79e" strokeWidth="14" strokeLinecap="round"/>
+   <path d={`M${970-turned*40} 310 L${970-turned*40} 780`} stroke="#b99156" strokeWidth="28" strokeLinecap="round"/>
+   <circle cx="970" cy="545" r="46" fill="#f4c979" opacity={.2+turned*.8}/>
+  </g>
+  <Robot x={350+coupled*90} y={890} scale={.98} frame={frame} reach={repair} glow={pinned}/>
+  {Array.from({length:12},(_,i)=>{
+    const t=smooth(frame,428+i*.8,430+i*.8)*(1-smooth(frame,437+i*.8,440+i*.8));
+    const x=990+Math.sin(i*4.1)*110;
+    const y=515+Math.cos(i*3.7)*120;
+    return <circle key={i} cx={x} cy={y} r={3+t*12} fill="#ffe1a0" opacity={t}/>;
+  })}
+ </g>;
+};
+
+const LensShot:FC<{frame:number;power:number}> = ({frame,power}) => (
+ <g>
+  <rect width="1920" height="1080" fill="#0b1720"/>
+  <circle cx="960" cy="520" r="420" fill="#f6c774" opacity={power*.1}/>
+  <circle cx="960" cy="520" r="300" fill="#263a43" stroke="#c59d61" strokeWidth="28"/>
+  <circle cx="960" cy="520" r="247" fill="#101e27" stroke="#f0d99f" strokeWidth="15"/>
+  <g transform={`rotate(${frame*1.3} 960 520)`}>
+   {Array.from({length:12},(_,i)=><path key={i} d="M960 520 L916 208 Q960 176 1004 208Z" fill="#ffe8b6" stroke="#c6a16a" strokeWidth="7" opacity=".88" transform={`rotate(${i*30} 960 520)`}/>)}
+   <circle cx="960" cy="520" r="125" fill="#f6cc7e" stroke="#fff0c6" strokeWidth="18"/>
+   <circle cx="960" cy="520" r="70" fill="#fff1c5" opacity={power}/>
+  </g>
+  <g transform="translate(1500 800) scale(.95)"><Robot x={0} y={0} scale={.7} frame={frame} turn={-8}/></g>
+  <path d={`M960 520 L${960+Math.cos(frame*.06)*1600} ${520+Math.sin(frame*.06)*1600} L${960+Math.cos(frame*.06+.12)*1600} ${520+Math.sin(frame*.06+.12)*1600}Z`} fill="#ffd98f" opacity={power*.19}/>
+ </g>
+);
+
+const FinalShot:FC<{frame:number;power:number}> = ({frame,power}) => (
+ <g>
+  <rect width="1920" height="1080" fill="#091725"/>
+  <Ocean frame={frame}/>
+  <Cliff/>
+  <Lighthouse frame={frame} door={1} beacon={power} wide/>
+  <g transform={`translate(${520+Math.sin(frame*.04)*18} ${720+Math.sin(frame*.1)*6})`}>
+   <path d="M-80 0 H70 L48 42 H-53Z" fill="#61777e" stroke="#c2c6b2" strokeWidth="6"/>
+   <path d="M-26 0 V-47 H42 V0Z" fill="#929e92" stroke="#d3c6a0" strokeWidth="5"/>
+   <circle cx="48" cy="-22" r="7" fill="#ffc577"/>
+   <path d="M-13 -45V-95" stroke="#d1c29b" strokeWidth="5"/>
+   <path d="M-13 -93 L-85 -49 H-13Z" fill="#d4d9ca" opacity=".52"/>
+  </g>
+  <path d={`M1230 202 L${1230+Math.cos(frame*.035)*1750} ${202+Math.sin(frame*.035)*1750} L${1230+Math.cos(frame*.035+.14)*1750} ${202+Math.sin(frame*.035+.14)*1750}Z`} fill="#ffe1a7" opacity={power*.17}/>
+  <path d="M0 0 H1920 V1080 H0Z" fill="url(#shade)"/>
+ </g>
+);
+
+const shadeDef = <defs><radialGradient id="shade"><stop offset=".45" stopColor="#000" stopOpacity="0"/><stop offset="1" stopColor="#000" stopOpacity=".48"/></radialGradient><linearGradient id="sky" x2="0" y2="1"><stop stopColor="#071321"/><stop offset="1" stopColor="#1f3a48"/></linearGradient></defs>;
+
+const StoryFrame:FC<{frame:number;shot:number}> = ({frame,shot}) => {
+ const local=frame-shot*120;
+ const approach=smooth(local,0,116);
+ const door=smooth(frame,163,215);
+ const climb=smooth(local,12,110);
+ const repair=smooth(frame,360,452);
+ const beacon=smooth(frame,482,532);
+ const zoom=shot===0?1.06+approach*.08:shot===1?1.16+door*.06:shot===2?1.1:shot===3?1.08:shot===4?1.04:1.02;
+ const pan=shot===0?interpolate(local,[0,119],[-42,22],clamp):shot===1?-30:shot===2?0:shot===3?0:shot===4?0:interpolate(local,[0,119],[36,-26],clamp);
+ const camera:CSSProperties={transform:`translate(${pan}px,0) scale(${zoom})`,transformOrigin:shot===0?"53% 55%":shot===1?"50% 70%":"50% 50%"};
+ return (
+  <svg viewBox="0 0 1920 1080" width="100%" height="100%" style={{display:"block",background:"#071321"}}>
+   {shadeDef}
+   <rect width="1920" height="1080" fill="url(#sky)"/>
+   <g style={camera}>
+    {shot===0 && <><Ocean frame={frame}/><Cliff/><Lighthouse frame={frame} door={0} beacon={0}/><Robot x={400+approach*520} y={975-approach*90} scale={.42} frame={frame} walk={1}/></>}
+    {shot===1 && <DoorClose frame={frame} open={door}/>}
+    {shot===2 && <StairShot frame={frame} climb={climb}/>}
+    {shot===3 && <RepairShot frame={frame} repair={repair}/>}
+    {shot===4 && <LensShot frame={frame} power={beacon}/>}
+    {shot===5 && <FinalShot frame={frame} power={beacon}/>}
+   </g>
+   {shot!==2 && shot!==3 && <Rain frame={frame} density={shot===4?35:75}/>}
+   {shot===0 && <g opacity={Math.max(0,Math.sin(frame*.11))*.12}><path d="M100 0 160 0 0 320Z" fill="#e0f1f5"/></g>}
+   <rect width="1920" height="1080" fill="url(#shade)" pointerEvents="none"/>
+  </svg>
+ );
+};
+
+export const LighthouseRepairFilm:FC = () => {
+ const frame=useCurrentFrame();
+ const shot=Math.min(5,Math.floor(frame/120));
+ const fadeIn=interpolate(frame,[0,20],[0,1],clamp);
+ const fadeOut=interpolate(frame,[702,720],[1,0],clamp);
+ return <AbsoluteFill style={{backgroundColor:"#071321",opacity:fadeIn*fadeOut}}>
+   <StoryFrame frame={frame} shot={shot}/>
+   <Audio src={staticFile("assets/audio/stormlight-score.wav")} volume={.68}/>
+   <Audio src={staticFile("assets/audio/stormlight-atmosphere.wav")} volume={.52}/>
+ </AbsoluteFill>;
 };
