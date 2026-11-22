@@ -2,13 +2,12 @@
 
 ## Current verified snapshot — 2026-11-22
 
-The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is at `ce1dc23c1f80d1191272fc516fb517fa6428409c`; post-merge CI [#45035430951](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45035430951) passed. There are no open pull requests.
+Main is at `91e0cb1e66d95a9be3bc2fa93eebe365726ea9ed`. Draft [PR #141](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/141) contains a dedicated original 3D short, `TinyAstronautCrystalCave`, on `feat/tiny-astronaut-crystal-cave`.
 
-PR #133 fixed the GitHub Actions FFmpeg setup failure by replacing the third-party download action in CI and GitHub Actions rendering with a command check and Ubuntu package fallback. PR CI #45034977395 and post-merge main CI #45035118531 passed; 259 Node tests passed with 0 failures and 0 skips. The render workflow's setup was updated but no video render was requested.
+The candidate is a 20-second, text-free, 1920×1080, 30fps composition using procedural Three.js geometry, a camera path, an animated astronaut and a pulsing cave crystal. The actual composition was rendered as five still PNGs; all five were inspected. Review corrections addressed cave occlusion, astronaut floor clipping and lander/astronaut timing. The review record is `projects/tiny-astronaut-crystal-cave/production/asset-visual-review.md`.
 
-PR #134 made the shared assistant entry point model-neutral and task-specific. It clarifies that `agent/skills/` is the cross-assistant playbook library and that the active assistant—not an embedded repository LLM—makes creative decisions. Claude-specific integration notes now accurately describe the optional Kokoro ONNX narration adapter. PR CI #45035261813 and post-merge main CI #45035430951 passed; 259 Node tests passed with 0 failures and 0 skips.
+CI [#45058032630](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45058032630) passed typecheck, tests, still-frame render/upload and Studio build on candidate `3c91c215efd0bbd1ea1880aa7a61fccacbf628d0`. The candidate is visually ready for a full-motion render. The production render has not yet been requested; `render-request.json` must only be updated in the separate candidateSha-guarded request commit after the project is frozen.
 
-These are workflow/documentation and CI reliability improvements, not new creative-production capabilities. The highest-value product work remains a real prompt-to-video benchmark, followed by targeted improvements to reusable visual production and evidence-based critique/iteration. Do not mark autonomous directing or semantic video QA complete until verified on actual outputs.
 
 This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
 

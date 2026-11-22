@@ -718,3 +718,11 @@ Append one entry per meaningful development session:
 - PR #134 merged as `ce1dc23c1f80d1191272fc516fb517fa6428409c`. PR CI #45035261813 passed 259 Node tests (0 failures, 0 skips); post-merge main CI #45035430951 passed.
 - No application code, LLM integration, model/API dependency, render engine, project assets or production renders changed. This improves assistant discoverability and removes incorrect documentation; it does not make the Creative Director autonomous.
 
+
+## 2026-11-22 — Tiny Astronaut Crystal Cave pre-render visual acceptance
+
+- Built the new standalone Remotion composition `TinyAstronautCrystalCave` for PR #141 / branch `feat/tiny-astronaut-crystal-cave`. The 20-second 3D short has original procedural astronaut, lander, alien terrain, cave, crystal shards and glowing core; it uses a continuous camera path, walking animation, drifting particles, fog and an awakening crystal. No text overlays or audio tracks.
+- Registered the new composition in RemotionRoot and the Director composition catalogue. Added a creative brief and shot plan under `projects/tiny-astronaut-crystal-cave/`.
+- The visual assets are inline Three.js geometry, not standalone SVGs. Rendered actual composition stills at frames 75, 210, 330, 450 and 575; inspected every PNG. Corrected the initial cave camera occlusion, character/floor clipping and premature astronaut exit during lander descent. Final five stills were accepted and recorded in `production/asset-visual-review.md`.
+- Candidate commit `3c91c215efd0bbd1ea1880aa7a61fccacbf628d0`. GitHub Actions CI [#45058032630](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45058032630) passed TypeScript, tests, five scene still renders/uploads and Studio build.
+- **Render gate:** no MP4 render has been requested yet. The existing render request file was kept untouched during build and iteration. The next step is a separate request-only commit with `candidateSha` equal to this frozen branch head and a unique request ID, then visual inspection of the exact rendered MP4.
