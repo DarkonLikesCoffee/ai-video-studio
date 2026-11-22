@@ -1,4 +1,4 @@
-import type { FC, CSSProperties } from "react";
+import React, { type FC, type CSSProperties } from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, staticFile, useCurrentFrame } from "remotion";
 
 const clamp = { extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const };
