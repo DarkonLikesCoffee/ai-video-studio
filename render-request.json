@@ -1,6 +1,7 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "LighthouseRepairFilm",
+  "outputName": "stormlight-keeper",
+  "projectPath": "projects/stormlight-keeper/scene.json",
+  "requestId": "stormlight-keeper-20261122-final-visual-audio-01"
 }
