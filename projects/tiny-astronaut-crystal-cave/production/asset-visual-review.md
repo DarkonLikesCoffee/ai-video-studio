@@ -1,12 +1,15 @@
 # Pre-animation visual review
 
-## Review result: pending / blocked by environment
+## Standalone SVG/raster assets
+None are used. All visible artwork is original procedural Three.js geometry and materials authored directly in `TinyAstronautCrystalCave.tsx`; the external-asset SVG preview utility therefore has no source assets to render.
 
-This composition is built from procedural Three.js geometry and inline JSX rather than standalone SVG or raster assets. The repository's `assets:visual-review` command only previews static files under a project's assets/ directory; it cannot review inline Three.js geometry, materials, composition or animation states.
+## 3D still-preview requirement
+Render the actual composition at frames 75, 210, 330, 450 and 575. Inspect the PNGs at full resolution for:
+- astronaut silhouette, scale, visibility, helmet visor, limb alignment and ground contact;
+- terrain and lander proportions, planet/moon framing and readable exterior depth;
+- cave roof/wall/floor enclosure, stalactite placement and crystal shard detail;
+- central crystal facet readability, clipping, brightness, bloom/spill and astronaut scale;
+- consistency between the exterior-to-cave cut and continuous camera movement.
 
-Required before render:
-- Generate still PNG previews of the actual composition at representative frames (exterior/astronaut, cave entry, crystal reveal, crystal fully awakened).
-- Open each PNG in image vision and inspect astronaut silhouette/proportions, cave geometry, crystal facets, framing, clipping and lighting.
-- Correct source geometry/material/camera defects and regenerate previews until ready.
-
-No visual approval is claimed in this note.
+## Disposition
+No visual approval is claimed until the still PNGs have been rendered and inspected. Correct defects in the 3D source and rerender the preview states before requesting the production MP4.

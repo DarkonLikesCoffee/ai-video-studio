@@ -69,6 +69,14 @@ jobs:
           name: storyboard-planning-previews
           path: review-output/*.html
           retention-days: 7
+      - name: Render Tiny Astronaut scene still previews
+        run: node scripts/qa-tiny-astronaut-previews.mjs review-output/tiny-astronaut
+      - name: Upload Tiny Astronaut scene still previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiny-astronaut-scene-still-previews
+          path: review-output/tiny-astronaut/*.png
+          retention-days: 7
       - name: Generate storyboard critic report on launch-film example
         run: npm run storyboard:critic -- projects/examples/production-plan.json review-output/launch-film-critique.md
       - name: Run storyboard risk report on launch-film example
