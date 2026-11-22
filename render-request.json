@@ -2,7 +2,7 @@
   "provider": "github-actions",
   "projectPath": "projects/windy-tree/scene.json",
   "compositionId": "ProjectVideo",
-  "outputName": "windy-tree-calm-breeze",
-  "requestId": "windy-tree-calm-breeze-20261122-01",
-  "candidateSha": "5177f025c267d577f5a736956cc45cabddf7f31c"
+  "outputName": "windy-tree-calm-breeze-v2",
+  "requestId": "windy-tree-calm-breeze-20261122-02",
+  "candidateSha": "b415615ea792e38212bc8644b7707b72b66e2d49"
 }
