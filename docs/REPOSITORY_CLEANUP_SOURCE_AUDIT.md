@@ -28,7 +28,7 @@ Their policies are not identical and remain distinct:
 
 - No dependencies, npm scripts, render workflows, production compositions or source assets were changed.
 - No supposedly unused modules were removed. The candidate utility files inspected (`animation.ts`, `footage.ts`, `narration.ts`, `narration-timeline.ts`, `svg-path.ts` and `transitions.ts`) are referenced by production code/tests. `EiffelTower.tsx` is imported by `EiffelScene.tsx`; it is not orphaned.
-- No package lockfile was present in the tracked repository tree, so dependency removal remains deferred until dependency installation can be made reproducible and audited.
+- At the time of this source review no lockfile was present. A later dedicated follow-up generated and committed the root npm workspace lockfile; dependency removal remains deferred until a complete usage audit is performed.
 
 ## Verification
 
@@ -50,4 +50,13 @@ Their policies are not identical and remain distinct:
 - Merged PR #128 as `6ea141c189d6406bb9648cd0dd45652c4ec5d702`.
 - Moved the type-only `@types/three` package from `dependencies` to `devDependencies` in `packages/video-engine/package.json`. The `three` runtime package and all version pins are unchanged.
 - PR CI #45019205207 and post-merge main CI #45019314801 passed.
-- The repository still has no tracked npm lockfile. Dependency removal/version upgrades remain deferred until a real npm-generated lockfile and reproducible clean install can be verified.
+- The root npm-generated lockfile was added in PR #131 and verified by a clean `npm ci`; dependency removal/version upgrades remain deferred until a separate usage audit is complete.
+
+
+## Reproducible npm installs — PR #131 CI passed
+
+- Generated the root `package-lock.json` with the repository's existing Node 22 CI install environment; npm lockfile version 3, 403 package/workspace entries, 194,120 bytes.
+- The lockfile was exported from the completed CI runner and committed unchanged; it was not manually assembled.
+- Changed GitHub Actions CI, GitHub Actions rendering and CircleCI rendering to use `npm ci`; included the lockfile in the CI npm-cache key.
+- Changed the README clean-install command to `npm ci`; added dependency update/lockfile rules to `AGENTS.md` and `docs/DEPENDENCY_MANAGEMENT.md`.
+- No dependency declarations, package versions or source dependencies were changed. Final PR CI #45020893580 passed using the committed lockfile and `npm ci`, including full tests, type-check, project validations and Studio build.

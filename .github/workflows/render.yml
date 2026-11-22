@@ -39,7 +39,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.request.outputs.provider == 'github-actions'
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Set up Python for optional narration
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.narration_path != ''

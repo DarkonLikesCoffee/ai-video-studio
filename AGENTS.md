@@ -22,6 +22,15 @@ Help build AI Video Studio into a prompt-to-finished-video production system. Do
 - Do not ask whether to merge. Merge when required CI, render and quality gates pass. If a gate fails, diagnose and fix it first.
 - Do not hide failures, skip failed tests, weaken validation merely to get green CI, or call a failed/partial run successful.
 
+## Dependency installation and lockfile rules
+
+- This repository is an npm workspace rooted at the repository root and requires Node.js 22 or newer.
+- Use `npm ci` from the repository root for clean installs. Do not use an unqualified `npm install` merely to set up a checkout.
+- `package-lock.json` is the committed source of truth for the resolved npm dependency tree. Never hand-edit it.
+- When intentionally adding, removing or upgrading a dependency, run npm from the repository root with the appropriate workspace selector, review all affected `package.json` files and the generated root lockfile, and commit them together.
+- After dependency changes, verify a clean `npm ci`, type-check, tests, project validations and Studio build. CI, GitHub Actions rendering and CircleCI must use `npm ci`, not floating `npm install`.
+- Do not prune dependencies using search results alone; trace imports, build-time use, scripts, tests, workflows and dynamic loading first.
+
 ## Render discipline — mandatory
 
 - **A normal project commit is a development checkpoint, not permission to render.** The Render video workflow is triggered by changes to `render-request.json`; do not edit or commit that file during ordinary build iterations.

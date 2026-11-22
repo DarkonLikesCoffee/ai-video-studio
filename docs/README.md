@@ -18,6 +18,10 @@ Use this page to find the right document before adding another status or handoff
 
 The current snapshot at the top of PROJECT_STATE.md takes precedence over older dated notes in the history and roadmap. A roadmap item is a plan, not proof of implementation.
 
+## Development and dependency management
+
+- [DEPENDENCY_MANAGEMENT.md](DEPENDENCY_MANAGEMENT.md) — reproducible npm workspace installs, lockfile updates and dependency-change verification.
+
 ## Production workflow and agent guidance
 
 - [agent/README.md](../agent/README.md) — agent roles, skills and operating model.
