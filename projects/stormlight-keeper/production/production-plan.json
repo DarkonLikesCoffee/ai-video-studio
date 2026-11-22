@@ -86,8 +86,8 @@
       ],
       "engineApproach": "custom-remotion",
       "visualMethod": "2.5D procedural close-up",
-      "action": "Robot braces against a gust, plants feet and forces the heavy door open; warm light spills into the rain.",
-      "visualProgression": "Start: robot fights the wind. Development: door shudders and opens. End: robot slips inside, amber lamp briefly visible."
+      "action": "Robot braces against repeated gusts, shifts stance, reaches for the handle and forces the heavy door open; warm light spills into the rain.",
+      "visualProgression": "Start: robot and door already move in the gusts. Development: robot reaches and the door swings open. End: robot slips inside, amber lamp visible."
     },
     {
       "id": "climb-and-discover",
