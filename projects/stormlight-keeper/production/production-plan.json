@@ -9,7 +9,8 @@
     "fps": 30,
     "format": "mp4",
     "platform": "web",
-    "language": "none"
+    "language": "none",
+    "audio": "Original 24-second atmospheric score and storm ambience; no narration."
   },
   "creativeDirection": {
     "objective": "Tell a wordless miniature rescue story: a small maintenance robot restores a lighthouse beacon during a violent storm.",
@@ -35,7 +36,7 @@
       "textureAndMaterials": "Weathered stone, wet iron, aged brass, chipped cream enamel, salt spray and rough ocean foam."
     },
     "motionLanguage": "Wind-driven rain and sea spray, robot footfalls and arm articulation, pulsing work lamp, spinning optics, mechanical repair action, lighthouse beam sweep and deliberate camera trucking/dolly moves.",
-    "soundDirection": "Original cinematic score with storm wind, distant thunder, crashing surf, metal footsteps and restrained mechanical clicks; no narration.",
+    "soundDirection": "Original low-string atmospheric score, storm wind, surf, spaced thunder and delicate metal repair accents. No narration.",
     "assumptions": [
       "The robot and lighthouse are fictional original designs.",
       "The entire story is told visually; no text and no spoken dialogue."
@@ -266,5 +267,6 @@
       ],
       "rationale": "No textual overlays or caption elements are authored in the composition."
     }
-  ]
+  ],
+  "audioManifestPath": "projects/stormlight-keeper/assets/audio"
 }
