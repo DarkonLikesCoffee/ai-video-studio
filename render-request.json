@@ -2,6 +2,6 @@
   "provider": "github-actions",
   "compositionId": "TinyAstronautCrystalCave2D",
   "outputName": "tiny-astronaut-crystal-cave-2d-svg",
-  "requestId": "2d-svg-crystal-cave-20261122-01",
-  "candidateSha": "cb11dd278b3ff20d60ccf20c21c07f69ae00cefd"
+  "requestId": "2d-svg-crystal-cave-20261122-02",
+  "candidateSha": "948df0814b3804b6bcf6fc5beb928443af4981ce"
 }
