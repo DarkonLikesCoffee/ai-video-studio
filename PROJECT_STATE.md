@@ -2,15 +2,13 @@
 
 ## Current verified snapshot — 2026-11-22
 
-- **Main:** `91e0cb1e66d95a9be3bc2fa93eebe365726ea9ed` (PR #136 merge). Current main state verified directly from GitHub.
-- **Open video production:** [PR #141](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/141), draft, branch `feat/tiny-astronaut-crystal-cave`, latest candidate `3c91c215efd0bbd1ea1880aa7a61fccacbf628d0`.
-- **New composition:** `TinyAstronautCrystalCave`, a dedicated 20-second, 1920×1080, 30fps, text-free 3D story. New source in `packages/video-engine/src/scenes/TinyAstronautCrystalCave.tsx`; registered in `packages/video-engine/src/root.tsx` and `scripts/director-compositions.ts`. It is not an adaptation of `ProjectVideo` or an existing specialised composition.
-- **Visual production:** procedural Three.js astronaut, landing pod, alien terrain, cave shell, shards and central crystal. No standalone SVG/raster source assets exist; the actual composition was rendered to five still PNGs and those PNGs were visually inspected.
-- **Visual iteration:** corrected cave foreground occlusion, removed duplicate cave geometry, lifted the astronaut to avoid floor clipping, and delayed the astronaut's exit until after lander touchdown. See `projects/tiny-astronaut-crystal-cave/production/asset-visual-review.md`.
-- **Candidate CI:** GitHub Actions run [#45058032630](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45058032630) passed. TypeScript check, full test step, five 3D still renders/uploads and Studio build all succeeded.
-- **Production render:** not yet requested. The existing `render-request.json` was deliberately left unchanged while building and iterating. The candidate is now visually approved for a full-motion render; after its exact branch head is frozen, use a separate request-only commit with `candidateSha` equal to that head and a unique request ID.
-- **Render discipline:** keep the request-only commit separate from normal project changes. After rendering, retrieve and inspect the exact MP4; still previews and green CI are not final video acceptance.
-- **Repository workflow:** the Director remains model-led; no embedded autonomous LLM is claimed. CI, render and visual acceptance remain separate evidence gates.
+- **Main:** `91e0cb1e66d95a9be3bc2fa93eebe365726ea9ed` (PR #136 merge).
+- **Open video production:** [PR #141](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/141), branch `feat/tiny-astronaut-crystal-cave`. Dedicated `TinyAstronautCrystalCave` composition is registered and the five still states were visually inspected and approved.
+- **Pre-render candidate CI:** run [#45058494255](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45058494255) passed TypeScript, tests, five rendered still previews/uploads and Studio build.
+- **First full render:** request commit `f52f59125f7b1af08a42566a5c61e439efe94f05` correctly froze candidate `066fcd1ebbbc92621708ceef92ccd76269fb846f`. Render [#45058773863](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45058773863) passed all preflight gates and dependency setup but failed at frame 0: Three.js could not obtain WebGL on the GPU-less GitHub runner because the generic custom-render branch omitted `--gl=swangle`.
+- **Render workflow correction in progress:** custom Remotion render paths are being changed to use `--concurrency=1 --gl=swangle`, following the same configuration already used successfully by the still-preview script. The non-WebGL `ProjectVideo` branch is unchanged. A fresh CI candidate and unique render request must follow; the failed request will not be reused.
+- **Existing render-request.json:** current file records the failed request for traceability. Do not edit it during normal code/validation work; only make a new request-only commit after the corrected candidate is frozen.
+- **Render acceptance:** after the next full render succeeds, download and inspect its exact MP4; the five stills are not a substitute for motion/temporal QA.
 
 Older entries below are dated history. Their phrases such as “pending”, “in progress” or “current branch” describe the state at the time they were written, not today's live repository state.
 

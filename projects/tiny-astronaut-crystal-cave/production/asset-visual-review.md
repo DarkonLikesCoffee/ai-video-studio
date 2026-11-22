@@ -31,3 +31,9 @@ Rendered and visually inspected all five final still PNGs:
 <approved>Approved for full-motion render based on the five inspected still states.</approved>
 
 This approval is limited to representative still compositions. The final MP4 must still be inspected for continuous motion, camera behavior, temporal continuity, technical metadata and any defects not represented by these five frames.
+
+## First full-render attempt — runtime-only failure
+- Render preflight, candidate freeze validation and composition registration all passed.
+- The actual render failed at frame 0 because the custom Remotion render invocation did not select software WebGL on the GPU-less GitHub-hosted runner.
+- The five scene still previews used `--gl=swangle` and rendered successfully. The render workflow is being corrected to use that same flag with concurrency 1 for all custom Remotion compositions.
+- No MP4 was produced; no visual acceptance of a full video is claimed.

@@ -726,3 +726,11 @@ Append one entry per meaningful development session:
 - The visual assets are inline Three.js geometry, not standalone SVGs. Rendered actual composition stills at frames 75, 210, 330, 450 and 575; inspected every PNG. Corrected the initial cave camera occlusion, character/floor clipping and premature astronaut exit during lander descent. Final five stills were accepted and recorded in `production/asset-visual-review.md`.
 - Candidate commit `3c91c215efd0bbd1ea1880aa7a61fccacbf628d0`. GitHub Actions CI [#45058032630](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45058032630) passed TypeScript, tests, five scene still renders/uploads and Studio build.
 - **Render gate:** no MP4 render has been requested yet. The existing render request file was kept untouched during build and iteration. The next step is a separate request-only commit with `candidateSha` equal to this frozen branch head and a unique request ID, then visual inspection of the exact rendered MP4.
+
+## 2026-11-22 — First Tiny Astronaut MP4 render: WebGL runner configuration failure
+
+- Submitted frozen candidate `066fcd1ebbbc92621708ceef92ccd76269fb846f` through the separate render-request-only commit `f52f59125f7b1af08a42566a5c61e439efe94f05`.
+- Render workflow [#45058773863](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45058773863) passed candidate freeze validation, request validation, and registered composition enforcement. Dependencies and FFmpeg setup succeeded.
+- MP4 render failed at frame 0 because Three.js could not create a WebGL context on the GPU-less GitHub Actions runner. The custom Remotion render branch omitted `--gl=swangle`; the scene's five still previews had already rendered successfully using that exact software-WebGL option.
+- Fix: pass `--concurrency=1 --gl=swangle` to custom Remotion render commands (including custom compositions using a props path), while leaving the non-WebGL ProjectVideo branch alone. This matches Remotion 4's documented recommendation for machines without a GPU.
+- The failed request was not retried or reused. A new candidate and new unique request ID are required after the workflow fix passes CI.
