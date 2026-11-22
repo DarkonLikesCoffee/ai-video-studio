@@ -1,6 +1,7 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "TinyAstronautCrystalCave2D",
+  "outputName": "tiny-astronaut-crystal-cave-2d-svg",
+  "requestId": "2d-svg-crystal-cave-20261122-01",
+  "candidateSha": "cb11dd278b3ff20d60ccf20c21c07f69ae00cefd"
 }
