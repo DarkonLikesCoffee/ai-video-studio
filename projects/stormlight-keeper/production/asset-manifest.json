@@ -12,11 +12,13 @@
       "sourceType": "generated-original",
       "source": "Original procedural vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 1920,
         "height": 1080
-      }
+      },
+      "file": "lighthouse-main.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "robot-main",
@@ -31,11 +33,13 @@
       "sourceType": "generated-original",
       "source": "Original vector character study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 600,
         "height": 800
-      }
+      },
+      "file": "robot-main.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "beacon-mechanism",
@@ -48,11 +52,13 @@
       "sourceType": "generated-original",
       "source": "Original mechanical vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 1000,
         "height": 700
-      }
+      },
+      "file": "beacon-mechanism.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "lighthouse-lens",
@@ -64,11 +70,13 @@
       "sourceType": "generated-original",
       "source": "Original Fresnel lens vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 800,
         "height": 900
-      }
+      },
+      "file": "lighthouse-lens.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "storm-sea",
@@ -80,11 +88,13 @@
       "sourceType": "generated-original",
       "source": "Original storm sea vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 1920,
         "height": 1080
-      }
+      },
+      "file": "storm-sea.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "lighthouse-door",
@@ -96,11 +106,13 @@
       "sourceType": "generated-original",
       "source": "Original iron door vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 900,
         "height": 900
-      }
+      },
+      "file": "lighthouse-door.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "spiral-stair",
@@ -112,11 +124,13 @@
       "sourceType": "generated-original",
       "source": "Original spiral stair vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 1000,
         "height": 1000
-      }
+      },
+      "file": "spiral-stair.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "robot-hands",
@@ -128,11 +142,13 @@
       "sourceType": "generated-original",
       "source": "Original articulated hand vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 1000,
         "height": 700
-      }
+      },
+      "file": "robot-hands.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "beacon-beam",
@@ -144,11 +160,13 @@
       "sourceType": "generated-original",
       "source": "Original beacon beam vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 1920,
         "height": 500
-      }
+      },
+      "file": "beacon-beam.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     },
     {
       "id": "distant-vessel",
@@ -160,11 +178,14 @@
       "sourceType": "generated-original",
       "source": "Original fishing vessel vector study authored for this video.",
       "creator": "AI assistant",
-      "license": "Original; no third-party assets.",
+      "license": "Original project artwork; created specifically for this production with no third-party material.",
       "dimensions": {
         "width": 600,
         "height": 350
-      }
+      },
+      "file": "distant-vessel.svg",
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
     }
-  ]
+  ],
+  "project": "The Stormlight Keeper"
 }
