@@ -345,3 +345,10 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Added focused tests for numeric/date Retry-After handling, caps, backoff and invalid values.
 - Confirmed the inspected core utility modules and EiffelTower component are referenced; no dead code was removed.
 - CI is required on the PR; no local tests/build/render were run in this connector-only session.
+
+
+## 2026-11-22 — Type dependency metadata cleanup (PR pending)
+
+- Moved `@types/three` from runtime dependencies to development dependencies in `packages/video-engine/package.json`, consistent with the other `@types/*` packages.
+- The `three` runtime dependency and all versions remain unchanged.
+- CI must verify workspace install, type-check, test suite and Studio build before merge.
