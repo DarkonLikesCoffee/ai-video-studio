@@ -2,7 +2,7 @@
   "provider": "github-actions",
   "projectPath": "projects/acoustic-product-film/composition.json",
   "compositionId": "AcousticProductFilm",
-  "outputName": "aura-acoustic-product-film-benchmark-v1",
-  "requestId": "aura-acoustic-product-film-20261122-v1",
-  "candidateSha": "dbfd9914214cbbf2f536cbf211f73078c37d15db"
+  "outputName": "aura-acoustic-product-film-benchmark-v2-corrected-construction",
+  "requestId": "aura-acoustic-product-film-20261122-v2-construction",
+  "candidateSha": "1dbcb87c45693871a101069c7411f5c851488858"
 }
