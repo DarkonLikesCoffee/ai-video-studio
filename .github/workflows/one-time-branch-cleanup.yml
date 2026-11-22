@@ -1,0 +1,40 @@
+name: One-time remote branch cleanup
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/one-time-branch-cleanup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: ${{ github.event.head_commit.message == 'chore: clean remote branches' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Keep main and delete all other remote branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$GITHUB_REPOSITORY"
+          default_branch="$(gh api "repos/$repo" --jq '.default_branch')"
+          if [[ "$default_branch" != "main" ]]; then
+            echo "Expected main as default branch, found $default_branch" >&2
+            exit 1
+          fi
+
+          mapfile -t branches < <(gh api --paginate --jq '.[].name' "repos/$repo/branches?per_page=100")
+          deleted=0
+          for branch in "${branches[@]}"; do
+            [[ "$branch" == "main" ]] && continue
+            ref="${branch//\//%2F}"
+            gh api --silent --method DELETE "repos/$repo/git/refs/heads/$ref"
+            echo "Deleted $branch"
+            ((deleted+=1))
+          done
+          echo "Preserved main; deleted $deleted other branches."
