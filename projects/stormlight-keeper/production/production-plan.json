@@ -197,5 +197,74 @@
       "Storm atmosphere with procedural rain, fog, waves and lightning"
     ],
     "fallback": "Implement and register LighthouseRepairFilm as a new custom Remotion composition; do not reuse ProjectVideo or any existing showcase composition."
-  }
+  },
+  "acceptanceCoverage": [
+    {
+      "criterion": "A new registered LighthouseRepairFilm composition is used and is not a modified prior composition.",
+      "shotIds": [
+        "storm-headland",
+        "door-and-machine",
+        "climb-and-discover",
+        "repair-macro",
+        "beacon-ignition",
+        "coast-relief"
+      ],
+      "rationale": "The plan and six separate camera configurations support a unique registered composition."
+    },
+    {
+      "criterion": "The robot has a consistent, readable silhouette and visible articulated repair action.",
+      "shotIds": [
+        "storm-headland",
+        "door-and-machine",
+        "repair-macro",
+        "beacon-ignition"
+      ],
+      "rationale": "The same articulated robot character appears at varied scale and performs the repair through changing arm pose."
+    },
+    {
+      "criterion": "The six shots differ in scale, camera placement and visual event; the sequence tells a complete wordless story.",
+      "shotIds": [
+        "storm-headland",
+        "door-and-machine",
+        "climb-and-discover",
+        "repair-macro",
+        "beacon-ignition",
+        "coast-relief"
+      ],
+      "rationale": "Each shot uses a distinct angle, camera distance, subject placement and story event."
+    },
+    {
+      "criterion": "Rain, surf, fog, lightning and lighthouse illumination create a coherent storm atmosphere without obscuring the subject.",
+      "shotIds": [
+        "storm-headland",
+        "door-and-machine",
+        "climb-and-discover",
+        "repair-macro",
+        "beacon-ignition",
+        "coast-relief"
+      ],
+      "rationale": "Storm conditions are represented in the environment and lighting; the warm practical lamp provides subject separation."
+    },
+    {
+      "criterion": "The beacon visibly transitions from dark/broken to rotating and illuminating the sea.",
+      "shotIds": [
+        "repair-macro",
+        "beacon-ignition",
+        "coast-relief"
+      ],
+      "rationale": "The mechanism transitions from repair and gear rotation to an illuminated lens and an exterior sweeping beam."
+    },
+    {
+      "criterion": "No text, captions, logos or dialogue appear.",
+      "shotIds": [
+        "storm-headland",
+        "door-and-machine",
+        "climb-and-discover",
+        "repair-macro",
+        "beacon-ignition",
+        "coast-relief"
+      ],
+      "rationale": "No textual overlays or caption elements are authored in the composition."
+    }
+  ]
 }
