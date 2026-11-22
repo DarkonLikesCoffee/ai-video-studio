@@ -1,7 +1,7 @@
 # Shot-to-code implementation audit
 
 - **00–04s — storm-headland:** `StoryFrame(shot=0)`; extreme-wide vector coastline, lighthouse on right, robot approaches from left, animated sea and diagonal rain.
-- **04–08s — door-and-machine:** `DoorClose`; low close-up of arched riveted iron door opening, warm interior spill and robot at threshold.
+- **04–08s — door-and-machine:** `DoorClose`; low close-up begins moving immediately: wind rocks the door, the robot braces, shifts its weight and reaches toward the iron handle as the heavy door swings open with warm interior spill.
 - **08–12s — climb-and-discover:** `StairShot`; top-down spiral well with individual descending wedge treads and robot ascending through the center.
 - **12–16s — repair-macro:** `RepairShot`; close mechanical coupling and gear teeth, separated brass pieces align, pin slides into place, cog turns and small sparks appear while robot's pincer reaches in.
 - **16–20s — beacon-ignition:** `LensShot`; centered faceted Fresnel lens rotates and brightens from dark to warm amber, robot watches from side and a beam begins.
