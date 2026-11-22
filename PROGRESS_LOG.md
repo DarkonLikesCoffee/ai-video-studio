@@ -630,3 +630,12 @@ Append one entry per meaningful development session:
 - Found stale status statements in the roadmap/project-state docs and contradictory README claims about Kokoro text-to-speech. Refreshed the current snapshot, corrected those known stale claims, and added a documentation index.
 - Preserved the chronological progress log and all production projects/assets. This audit did not delete application code or dependencies: static repository browsing alone is not sufficient evidence that a module or package is unused.
 - Main CI run #45013735955 and PR #123 validation #45013634377 passed before this cleanup branch was created. The cleanup PR receives its own CI validation.
+
+## 2026-11-22 — Second repository cleanup audit
+
+- Started `chore/repository-cleanup-followup-2026-11-22` from live `main` after PR #124.
+- Checked current package/workspace manifests, README and agent command references, CI, render workflow, source-of-truth docs and live open PRs.
+- Verified the root's 28 npm scripts remain part of documented or automated workflows; did not remove any.
+- Kept render request triggers, active project branches, production assets and full rendering/QA gates intact.
+- Added `docs/REPOSITORY_CLEANUP_FOLLOWUP.md` with findings and explicit follow-up candidates.
+- No code or dependency changes; no local CI/build/render execution in this connector-only session. Await GitHub PR CI for verification.
