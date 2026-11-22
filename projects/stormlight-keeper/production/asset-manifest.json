@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "lighthouse-main",
+      "path": "assets/lighthouse-main.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "storm-headland",
+        "coast-relief"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original procedural vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    {
+      "id": "robot-main",
+      "path": "assets/robot-main.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "storm-headland",
+        "door-and-machine",
+        "climb-and-discover",
+        "beacon-ignition"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original vector character study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 600,
+        "height": 800
+      }
+    },
+    {
+      "id": "beacon-mechanism",
+      "path": "assets/beacon-mechanism.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "climb-and-discover",
+        "repair-macro"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original mechanical vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 1000,
+        "height": 700
+      }
+    },
+    {
+      "id": "lighthouse-lens",
+      "path": "assets/lighthouse-lens.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "beacon-ignition"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original Fresnel lens vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 800,
+        "height": 900
+      }
+    },
+    {
+      "id": "storm-sea",
+      "path": "assets/storm-sea.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "storm-headland"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original storm sea vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    {
+      "id": "lighthouse-door",
+      "path": "assets/lighthouse-door.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "door-and-machine"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original iron door vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 900,
+        "height": 900
+      }
+    },
+    {
+      "id": "spiral-stair",
+      "path": "assets/spiral-stair.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "climb-and-discover"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original spiral stair vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      }
+    },
+    {
+      "id": "robot-hands",
+      "path": "assets/robot-hands.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "repair-macro"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original articulated hand vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 1000,
+        "height": 700
+      }
+    },
+    {
+      "id": "beacon-beam",
+      "path": "assets/beacon-beam.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "coast-relief"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original beacon beam vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 1920,
+        "height": 500
+      }
+    },
+    {
+      "id": "distant-vessel",
+      "path": "assets/distant-vessel.svg",
+      "type": "image/svg+xml",
+      "shotIds": [
+        "coast-relief"
+      ],
+      "sourceType": "generated-original",
+      "source": "Original fishing vessel vector study authored for this video.",
+      "creator": "AI assistant",
+      "license": "Original; no third-party assets.",
+      "dimensions": {
+        "width": 600,
+        "height": 350
+      }
+    }
+  ]
+}
