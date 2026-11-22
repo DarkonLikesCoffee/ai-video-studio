@@ -233,7 +233,7 @@ const Cave: FC<{ frame: number }> = ({ frame }) => {
 };
 
 const PlanetScene: FC<{ frame: number }> = ({ frame }) => {
-  const descent = smooth(frame, [0, 105]);
+  const descent = smooth(frame, [0, 80]);
   const walk = smooth(frame, [120, 285]);
   return (
     <>
@@ -276,15 +276,17 @@ const PlanetScene: FC<{ frame: number }> = ({ frame }) => {
         </mesh>
         {[-1, 1].map((side) => (
           <mesh key={side} position={[side * 0.82, -0.48, 0]} rotation={[0, 0, side * -0.2]}>
-            <boxGeometry args={[0.13, 0.95, 0.14]} />
+            <boxGeometry args={[0.13, 1.35, 0.14]} />
             <meshStandardMaterial color="#b5c0c3" metalness={0.68} roughness={0.36} />
           </mesh>
         ))}
       </group>
       {/* Tiny figure traverses the terrain */}
-      <group position={[0.7 - walk * 1.5, -0.12, -0.25]} rotation={[0, walk * 0.12, 0]}>
-        <Astronaut frame={frame} scale={0.63} />
-      </group>
+      {frame >= 90 ? (
+        <group position={[0.7 - walk * 1.5, -0.12, -0.25]} rotation={[0, walk * 0.12, 0]}>
+          <Astronaut frame={frame} scale={0.63} />
+        </group>
+      ) : null}
       {Array.from({ length: 24 }, (_, i) => {
         const x = -3.5 + ((i * 13) % 70) / 10;
         const y = -0.9 + ((i * 17) % 9) / 8;
