@@ -28,7 +28,7 @@ Their policies are not identical and remain distinct:
 
 - No dependencies, npm scripts, render workflows, production compositions or source assets were changed.
 - No supposedly unused modules were removed. The candidate utility files inspected (`animation.ts`, `footage.ts`, `narration.ts`, `narration-timeline.ts`, `svg-path.ts` and `transitions.ts`) are referenced by production code/tests. `EiffelTower.tsx` is imported by `EiffelScene.tsx`; it is not orphaned.
-- No package lockfile was present in the tracked repository tree, so dependency removal remains deferred until dependency installation can be made reproducible and audited.
+- At the time of this source review no lockfile was present. A later dedicated follow-up generated and committed the root npm workspace lockfile; dependency removal remains deferred until a complete usage audit is performed.
 
 ## Verification
 
@@ -51,3 +51,12 @@ Their policies are not identical and remain distinct:
 - Moved the type-only `@types/three` package from `dependencies` to `devDependencies` in `packages/video-engine/package.json`. The `three` runtime package and all version pins are unchanged.
 - PR CI #45019205207 and post-merge main CI #45019314801 passed.
 - The repository still has no tracked npm lockfile. Dependency removal/version upgrades remain deferred until a real npm-generated lockfile and reproducible clean install can be verified.
+
+
+## Reproducible npm installs — PR #131 pending
+
+- Generated the root `package-lock.json` with the repository's existing Node 22 CI install environment; npm lockfile version 3, 403 package/workspace entries, 194,120 bytes.
+- The lockfile was exported from the completed CI runner and committed unchanged; it was not manually assembled.
+- Changed GitHub Actions CI, GitHub Actions rendering and CircleCI rendering to use `npm ci`; included the lockfile in the CI npm-cache key.
+- Changed the README clean-install command to `npm ci`; added dependency update/lockfile rules to `AGENTS.md` and `docs/DEPENDENCY_MANAGEMENT.md`.
+- No dependency declarations, package versions or source dependencies were changed. The final PR run must verify `npm ci` against the committed lockfile before merge.
