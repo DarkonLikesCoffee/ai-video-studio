@@ -726,3 +726,14 @@ Append one entry per meaningful development session:
 - Added `agent/skills/shot-differentiation/SKILL.md`: mandatory shot cards, adjacent-shot contrast, minimum meaningful variety, implementation-to-source audit, pre-render rejection checklist and post-render failure rule.
 - Linked the new contract from Remotion Producer, Visual QA, `docs/agent-production-workflow.md`, `START_HERE.md` and `AGENTS.md`. Future assistants are instructed to stop before rendering if adjacent shots are not visually distinguishable without text; final MP4 repetition is a major failure.
 - Limit: this change is an explicit process gate, not automated semantic frame-difference detection. CI passing does not prove the video has creative variety. The actual MP4 must still be inspected.
+
+
+## 2026-11-22 — The Stormlight Keeper
+- Created and registered a new `LighthouseRepairFilm` Remotion composition with a six-shot wordless robot/lighthouse story.
+- Authored ten original SVG studies. Rendered individual PNG previews, inspected the contact sheets, and revised malformed or weakly legible door, tower, spiral-stair, and vessel designs through multiple preview passes.
+- Created the production plan, shot-to-code audit, local asset provenance manifest, and original procedural music/storm ambience.
+- Replaced a WebGL scene with GPU-independent SVG/Remotion after GitHub Actions runners could not create a WebGL2 context.
+- Fixed a missing React import discovered at runtime after the first SVG render.
+- CI passed TypeScript, 259 tests, production plan and storyboard validation, audio file/duration verification, strict asset evidence, and studio build.
+- The first successful MP4 (request 02) passed overall media QA but had a genuine 1.6-second freeze warning from 4.0–5.6s. Direct frame inspection confirmed the robot/door hold.
+- Corrected the scene to start door movement earlier and add wind-driven robot brace, arm reach, and camera drift. Corrected render request 03 is active; verify its MP4 and QA before closing out.
