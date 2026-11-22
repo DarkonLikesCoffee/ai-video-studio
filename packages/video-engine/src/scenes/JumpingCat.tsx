@@ -22,7 +22,7 @@ const Cat = ({ frame }: { frame: number }) => {
   const bodySquashY = 1 - crouch * 0.18 + land * 0.2;
   const bodySquashX = 1 + crouch * 0.13 - land * 0.12;
   const rotation = cycle < 55 ? -crouch * 0.08 : cycle < 110 ? smooth(cycle - 55, [0, 55], [-0.08, 0.13]) : 0;
-  const tailSwing = Math.sin(frame / 10) * 15 + (launch - fall) * 18;
+  const tailSwing = Math.sin(frame / 10) * 15 + (launch - (cycle > 80 && cycle < 110 ? 1 : 0)) * 18;
   const blink = cycle > 31 && cycle < 38 ? 0.08 : 1;
   return (
     <g transform={`translate(${960 + x} ${710 - height}) rotate(${rotation * 57.3})`}>
