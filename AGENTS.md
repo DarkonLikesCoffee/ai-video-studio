@@ -36,6 +36,7 @@ Help build AI Video Studio into a prompt-to-finished-video production system. Do
 - **A normal project commit is a development checkpoint, not permission to render.** The Render video workflow is triggered by changes to `render-request.json`; do not edit or commit that file during ordinary build iterations.
 - Build the entire selected video first: creative brief, direction, storyboard/production plan, assets and rights/provenance, scene/composition, narration, timing, transitions, captions and audio.
 - During BUILD/ITERATION, use non-render checks only: tests, typecheck, project validation, production-plan validation, asset-evidence validation, storyboard/QA reports and previews. Fix every blocking issue before requesting a render.
+- Before scene implementation, follow `agent/skills/asset-visual-review/SKILL.md`: render standalone local image/SVG assets into preview PNGs, inspect every page with image vision, correct defects and record the actual findings. The preview command does not provide semantic approval.
 - Do not create a render request until you have explicitly reviewed the complete project and declared the candidate **RENDER-READY**. A render request is a deliberate production action, not a progress update or debugging probe.
 - Before requesting a render, validate the exact candidate and confirm: all files are committed; no planned edits remain; project path/composition/narration paths are correct; plan duration and frame count agree; shots are contiguous, frame-aligned and end exactly at delivery duration; all asset references resolve; asset evidence/rights checks pass; project and narration validation pass; and request ID is unique.
 - **One render request per frozen candidate commit.** Record the candidate commit SHA and request ID. Do not change the project while that render is running. Do not create another request just because the first is still queued or running.
@@ -53,6 +54,10 @@ For a video-production feature: additionally render a representative real projec
 
 For every completed development session: update `PROJECT_STATE.md`, `ROADMAP.md` and `PROGRESS_LOG.md` so another AI can continue without the conversation history.
 
+
+## Mandatory pre-animation asset visual-review gate
+
+For every video project with standalone local image/SVG assets, run `npm run assets:visual-review -- projects/<slug>` before composing them into scenes. The assistant must open and inspect each generated PNG, correct materially weak assets, repeat previews after changes and record findings in `production/asset-visual-review.md`. If image inspection is unavailable, disclose the limitation and do not claim approval.
 
 ## Mandatory shot-differentiation gate
 

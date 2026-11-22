@@ -26,7 +26,8 @@ Create or source a coherent set of visual and audio assets that makes the storyb
 7. Save approved assets under `projects/<slug>/assets/`. Use descriptive, stable filenames. Avoid remote URLs in final renders unless there is a compelling reason.
 8. Create an asset manifest containing filename, type, intended shot IDs, source/provenance, license/permission, generation prompt or source URL, dimensions/duration and any limitations.
 9. Check every file exists, opens, has the expected dimensions/codec and matches the storyboard. Replace broken or mismatched assets before rendering.
-10. Run `npm run director:asset-evidence -- <production-plan.json> [asset-manifest.json] [report.json]`. Review each acceptance criterion’s mapped shots and manifest assets, unresolved plan references, local file status, provenance and rights status. The GitHub Actions render workflow uses `--strict` when a production plan and manifest exist, so unresolved evidence blocks the render. The report verifies links and metadata—not whether an asset visually satisfies the shot or criterion.
+10. Apply agent/skills/asset-visual-review/SKILL.md before building scenes. Run `npm run assets:visual-review -- projects/<slug>`, open every rendered PNG page with image vision, correct materially weak artwork and regenerate previews. Record findings in production/asset-visual-review.md. The command renders previews only; it does not judge or approve them.
+11. Run `npm run director:asset-evidence -- <production-plan.json> [asset-manifest.json] [report.json]`. Review each acceptance criterion’s mapped shots and manifest assets, unresolved plan references, local file status, provenance and rights status. The GitHub Actions render workflow uses `--strict` when a production plan and manifest exist, so unresolved evidence blocks the render. The report verifies links and metadata—not whether an asset visually satisfies the shot or criterion.
 
 ## NASA public-domain video footage
 

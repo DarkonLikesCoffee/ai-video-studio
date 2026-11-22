@@ -726,3 +726,11 @@ Append one entry per meaningful development session:
 - Added `agent/skills/shot-differentiation/SKILL.md`: mandatory shot cards, adjacent-shot contrast, minimum meaningful variety, implementation-to-source audit, pre-render rejection checklist and post-render failure rule.
 - Linked the new contract from Remotion Producer, Visual QA, `docs/agent-production-workflow.md`, `START_HERE.md` and `AGENTS.md`. Future assistants are instructed to stop before rendering if adjacent shots are not visually distinguishable without text; final MP4 repetition is a major failure.
 - Limit: this change is an explicit process gate, not automated semantic frame-difference detection. CI passing does not prove the video has creative variety. The actual MP4 must still be inspected.
+
+## 2026-11-22 — Pre-animation visual asset review (implementation branch)
+
+- Added an isolated Remotion `AssetReview` still composition and `npm run assets:visual-review -- projects/<slug>`. It recursively collects supported local SVG/raster assets, creates bounded PNG preview pages plus an HTML index and a manifest, skips symlinks/oversized images, and keeps the preview composition out of the production composition catalogue.
+- Added unit coverage for recursive discovery, stable ordering, symlink/size handling, page chunking, explicit pending status, HTML escaping and CLI parsing.
+- Made model-led visual review a required stage between asset creation and scene implementation in the shared Asset Producer, Remotion Producer, Visual QA, AGENTS, START_HERE and production workflow guidance. Assistants must inspect the actual PNGs, fix weak assets and record findings; preview rendering alone does not approve anything.
+- Added a CI smoke step that renders the existing example SVG into preview PNGs and uploads the result as an artifact. This validates the still-render path without triggering a production MP4 render or modifying `render-request.json`.
+- No new dependencies or paid model/API calls. CI results and PR number are pending; no production video was rendered or visually accepted in this code change.

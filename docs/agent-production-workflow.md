@@ -13,7 +13,8 @@ Define how an AI agent turns a natural-language brief into a finished video usin
 | Composition selection | Creative direction + verified composition catalogue | Plan-level `renderStrategy` | One whole-video renderer/composition selected with rationale, capabilities, status and fallback |
 | Storyboard | Creative Brief + model storyboard JSON | Validated production plan + criterion-to-shot trace | Every criterion maps to known shot IDs; composition decision is preserved; delivery matches the brief; timing is contiguous and frame-aligned |
 | Assets | Shot list + production plan | Local assets + asset manifest + strict criterion/shot asset-evidence report (included in render artifact) | Planned references resolve; manifest shot IDs are valid; local files, provenance and rights evidence are complete before render |
-| Build | Storyboard + assets | `scene.json` or custom composition | Typecheck/tests/project validation pass |
+| Asset visual review | Local image/SVG assets + shot direction | Rendered Remotion PNG preview pages + assistant review notes | Assistant visually inspects actual preview images, corrects defects and records findings before scene implementation |
+| Build | Reviewed storyboard + assets | `scene.json` or custom composition | Typecheck/tests/project validation pass |
 | Render-ready freeze | Complete candidate project | Frozen commit SHA + unique render request | All project and production checks pass; no planned edits remain; exact candidate SHA is recorded |
 | Render | Frozen, valid project | MP4 artifact | Explicit request for that candidate completes |
 | QA | MP4 artifact | Timestamped issue report | Actual video inspected against criteria |
@@ -53,14 +54,15 @@ This is a technical safety gate, not proof of creative readiness. Existing proje
 5. Produce the shot-level storyboard JSON from the creative handoff (or author it directly). Import it with `npm run director:production-plan -- <creative-brief.json> <storyboard.json> <production-plan.json`. The importer requires exact delivery settings, frame-aligned contiguous timing, and complete acceptance-criterion mappings to known shot IDs with rationale. Coverage is an authored claim, not semantic proof; review each mapped shot against its criterion.
 6. Apply the Storyboard skill. Check adjacent-shot variety and use the preview as a review checkpoint. Where useful, label shots with narrativeBeat and run storyboard:beats; treat its prompts as review guidance, not a fixed narrative formula. If revisions are needed, initialize a revision artifact, select recommendations, export a Markdown report, and author explicit edits separately. Selection alone does not change the plan. For selected critiques, use storyboard:revision prompt to create a model-neutral handoff containing only affected shots and selected findings. Treat returned JSON edits as suggestions: import them with storyboard:revision import-edits. The importer limits edits to selected shot IDs, rejects duplicate/unknown IDs and unsupported fields, then validate/apply to a separate plan copy.
 7. Apply Asset Producer and Audio Designer. Create local assets and provenance/cue manifests. Run `npm run director:asset-evidence -- <production-plan.json> [asset-manifest.json] [report.json]` to map criterion→shots→manifest assets and verify local file/path safety plus provenance/rights fields. The render workflow enforces `--strict` for plans with manifests; procedural shots may intentionally have no asset. The report is not semantic proof that an asset satisfies a criterion.
-8. Map the storyboard into the existing project schema. If a requested shot needs unsupported 3D or other features, decide whether to implement a reusable engine feature or choose a different visual solution.
-9. **BUILD COMPLETE:** Finish all creative, asset, narration, timing, composition and caption work. Commit normal development checkpoints as needed, but do not touch `render-request.json`. The branch may have many commits; that is expected and must not create render requests.
-10. **PRE-RENDER GATE:** Validate the exact candidate: typecheck/tests, project validation, production plan validation, frame-aligned duration, contiguous shots, final shot ending exactly at delivery duration, asset evidence and rights/provenance, narration, paths and composition. Review the complete project and explicitly declare it RENDER-READY. If any blocker exists, continue building; do not render.
-11. **FREEZE:** Commit all candidate files and record the candidate SHA. Do not modify that candidate while rendering. Create exactly one unique `render-request.json` for that candidate. The request update triggers GitHub Actions; do not issue duplicate requests while it is queued or running.
-12. Render only the selected output. If it fails, inspect the logs and evidence before making changes. Do not retry the same candidate blindly. Fix the root cause, repeat the pre-render gate, commit a new candidate SHA, then request a render for that new candidate only.
-13. Download and inspect the exact MP4 artifact from that run. Read the included `*.provenance.json` manifest and workflow summary for source commit, request/project IDs, workflow run/attempt, artifact ID/URL/digest and QA-report linkage. Generate contact sheets and keyframes, and watch the full video if playback is available.
-14. Apply Visual QA. If it fails, change the fewest high-impact things and rerender only the corrected frozen candidate.
-15. Deliver only after the actual video is accepted. A successful render is a candidate, not acceptance.
+8. **Pre-animation visual review:** follow `agent/skills/asset-visual-review/SKILL.md` and run `npm run assets:visual-review -- projects/<slug>`. Open and inspect every rendered PNG page, fix weak assets and repeat the preview. Record the review in `production/asset-visual-review.md`. The renderer does not make a visual-quality decision; the assistant must inspect the images.
+9. Map the storyboard into the existing project schema. If a requested shot needs unsupported 3D or other features, decide whether to implement a reusable engine feature or choose a different visual solution.
+10. **BUILD COMPLETE: Finish all creative, asset, narration, timing, composition and caption work. Commit normal development checkpoints as needed, but do not touch `render-request.json`. The branch may have many commits; that is expected and must not create render requests.
+11. **PRE-RENDER GATE: Validate the exact candidate: typecheck/tests, project validation, production plan validation, frame-aligned duration, contiguous shots, final shot ending exactly at delivery duration, asset evidence and rights/provenance, narration, paths and composition. Review the complete project and explicitly declare it RENDER-READY. If any blocker exists, continue building; do not render.
+12. **FREEZE: Commit all candidate files and record the candidate SHA. Do not modify that candidate while rendering. Create exactly one unique `render-request.json` for that candidate. The request update triggers GitHub Actions; do not issue duplicate requests while it is queued or running.
+13. Render only the selected output. If it fails, inspect the logs and evidence before making changes. Do not retry the same candidate blindly. Fix the root cause, repeat the pre-render gate, commit a new candidate SHA, then request a render for that new candidate only.
+14. Download and inspect the exact MP4 artifact from that run. Read the included `*.provenance.json` manifest and workflow summary for source commit, request/project IDs, workflow run/attempt, artifact ID/URL/digest and QA-report linkage. Generate contact sheets and keyframes, and watch the full video if playback is available.
+15. Apply Visual QA. If it fails, change the fewest high-impact things and rerender only the corrected frozen candidate.
+16. Deliver only after the actual video is accepted. A successful render is a candidate, not acceptance.
 
 ## Current capability truth
 
@@ -76,6 +78,11 @@ The repository does not yet contain an automatic prompt-to-project model, automa
 - Source assets intentionally and preserve rights/provenance.
 - Local assets and deterministic renders are the default.
 - A successful render is a candidate, not an accepted deliverable.
+
+
+## Mandatory pre-animation asset visual-review gate
+
+For every project with standalone local image/SVG assets, run `npm run assets:visual-review -- projects/<slug>` before scene implementation. The assistant must open and inspect every generated PNG, correct defects, repeat previews after changes and record findings in `production/asset-visual-review.md`. The preview tool does not call an AI model or approve assets. Inline SVG/JSX and 3D assets require their own rendered still previews.
 
 
 ## Mandatory shot-differentiation gate (new)

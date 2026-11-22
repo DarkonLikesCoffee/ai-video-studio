@@ -26,7 +26,8 @@ The current snapshot at the top of PROJECT_STATE.md takes precedence over older 
 
 - [agent/README.md](../agent/README.md) — agent roles, skills and operating model.
 - [docs/agent-production-workflow.md](agent-production-workflow.md) — end-to-end brief-to-delivery workflow and render freeze protocol.
-- [agent/skills/](../agent/skills/) — focused playbooks for creative direction, storyboard, assets, narration, audio and QA.
+- [agent/skills/](../agent/skills/) — focused playbooks for creative direction, storyboard, asset production and pre-animation visual review, narration, audio and QA.
+- [Asset visual-review skill](../agent/skills/asset-visual-review/SKILL.md) — required rendered PNG inspection for standalone image/SVG assets before scene implementation.
 - [agent/EXTERNAL_SKILLS.md](../agent/EXTERNAL_SKILLS.md) — reviewed upstream skill references and license notes.
 - [.claude/skills/video-engine/](../.claude/skills/video-engine/) — vendored video-engine skill and repository integration references.
 
