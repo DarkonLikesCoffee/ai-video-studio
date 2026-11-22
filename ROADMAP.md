@@ -2,13 +2,13 @@
 
 ## Current verified snapshot — 2026-11-22
 
-The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `21783b093029cb6c9ae688db4be33c415563f458`; PRs #124, #125 and #126 are merged, and post-merge main CI [#45018877315](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018877315) passed.
+The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `6ea141c189d6406bb9648cd0dd45652c4ec5d702`; cleanup PRs #124, #125, #126, #127 and #128 are merged. Post-merge main CI [#45019314801](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45019314801) passed.
 
-The source-level cleanup in PR #126 consolidated the Retry-After/backoff calculation used by the Wikimedia Commons and NASA asset downloaders. Their existing public wrapper functions and provider-specific delay limits remain unchanged. PR CI #45018775059 and post-merge main CI #45018877315 both passed. No production render was requested for this internal helper refactor.
+PR #126 consolidated the shared Retry-After/backoff calculation used by the Wikimedia Commons and NASA asset downloaders. Existing public wrapper functions and provider-specific delay policies remain unchanged. PR CI #45018775059 and post-merge main CI #45018877315 passed.
+
+PR #128 moved the type-only `@types/three` package from `dependencies` to `devDependencies`, consistent with the other `@types/*` declarations. The `three` runtime dependency and all version pins remain unchanged. PR CI #45019205207 and post-merge main CI #45019314801 passed.
 
 PR #123 improved the Creative Director's model-neutral handoff (creative territory comparison, evolving visual grammar and distinct shot-level visual events). It does **not** add an LLM integration or complete the autonomous Director. PR #121's explicit composition selection and render-strategy checks are merged. The highest-value remaining product work is still to turn strong plans into genuinely varied, well-edited videos and inspect/repair the actual output.
-
-Historical CI IDs and dated “pending/in progress” notes below are retained as project history. They must not override the current live snapshot in PROJECT_STATE.md.
 
 This roadmap describes the intended product, not current implementation. Update checkboxes only after code and evidence demonstrate the capability. Keep it aligned with the verified project state and actual renders.
 
