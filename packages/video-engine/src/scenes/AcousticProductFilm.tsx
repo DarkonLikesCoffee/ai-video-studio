@@ -60,7 +60,7 @@ const shotPoses: ShotPose[] = [
   },
   {
     start: 360, end: 465,
-    cameraFrom: [2.72, 0.74, 2.45], cameraTo: [2.4, 0.76, 2.2],
+    cameraFrom: [3.0, 0.82, 2.75], cameraTo: [2.55, 0.82, 2.35],
     targetFrom: [1.2, -0.1, 0], targetTo: [1.2, -0.1, 0],
     rotationFrom: 0.38, rotationTo: 0.28,
     scaleFrom: 1.02, scaleTo: 0.96, explodeFrom: 0, explodeTo: 0.92,
