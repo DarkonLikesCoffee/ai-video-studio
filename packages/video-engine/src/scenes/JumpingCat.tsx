@@ -13,12 +13,16 @@ const GrassBlade = ({ index }: { index: number }) => {
 };
 
 const Cat = ({ frame }: { frame: number }) => {
-  const cycle = frame % 150;
+  const cycleLength = 143;
+  const cycleIndex = Math.floor(frame / cycleLength);
+  const cycle = frame % cycleLength;
   const crouch = 1 - smooth(cycle, [0, 20, 36, 46], [0, 0, 1, 0]);
   const launch = smooth(cycle, [40, 54, 72, 82], [0, 1, 1, 0]);
   const land = smooth(cycle, [106, 114, 125, 140], [0, 1, 0.25, 0]);
-  const height = cycle < 55 ? 0 : cycle < 110 ? Math.sin(((cycle - 55) / 55) * Math.PI) * 265 : 0;
-  const x = cycle < 55 ? smooth(cycle, [0, 55], [0, 18]) : cycle < 110 ? smooth(cycle - 55, [0, 55], [18, 46]) : smooth(cycle - 110, [0, 40], [46, 0]);
+  const jumpHeight = cycleIndex === 3 ? 205 : cycleIndex === 1 ? 245 : 265;
+  const height = cycle < 55 ? 0 : cycle < 110 ? Math.sin(((cycle - 55) / 55) * Math.PI) * jumpHeight : 0;
+  const leapTravel = cycleIndex === 3 ? 25 : 46;
+  const x = cycle < 55 ? smooth(cycle, [0, 55], [0, 18]) : cycle < 110 ? smooth(cycle - 55, [0, 55], [18, leapTravel]) : smooth(cycle - 110, [0, 40], [leapTravel, 0]);
   const bodySquashY = 1 - crouch * 0.18 + land * 0.2;
   const bodySquashX = 1 + crouch * 0.13 - land * 0.12;
   const rotation = cycle < 55 ? -crouch * 0.08 : cycle < 110 ? smooth(cycle - 55, [0, 55], [-0.08, 0.13]) : 0;
