@@ -1,6 +1,8 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "projectPath": "projects/acoustic-product-film/composition.json",
+  "compositionId": "AcousticProductFilm",
+  "outputName": "aura-acoustic-product-film-benchmark-v1",
+  "requestId": "aura-acoustic-product-film-20261122-v1",
+  "candidateSha": "dbfd9914214cbbf2f536cbf211f73078c37d15db"
 }
