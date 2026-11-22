@@ -2,7 +2,7 @@
 
 ## Current verified snapshot — 2026-11-22
 
-The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is at `d7f0e90fbe8f21ee0b8c63175259b9184f94c657`. PRs #136–#139 are open; this visual asset-review change is stacked on #136.
+The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is at `d7f0e90fbe8f21ee0b8c63175259b9184f94c657`. PRs #136–#140 are open; PR #140 is stacked on #136.
 
 PR #133 fixed the GitHub Actions FFmpeg setup failure by replacing the third-party download action in CI and GitHub Actions rendering with a command check and Ubuntu package fallback. PR CI #45034977395 and post-merge main CI #45035118531 passed; 259 Node tests passed with 0 failures and 0 skips. The render workflow's setup was updated but no video render was requested.
 
