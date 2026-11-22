@@ -100,20 +100,26 @@ const Robot:FC<{x:number;y:number;scale:number;frame:number;reach?:number;walk?:
  </g>;
 };
 
-const DoorClose:FC<{frame:number;open:number}> = ({frame,open}) => (
+const DoorClose:FC<{frame:number;open:number}> = ({frame,open}) => {
+ const gust=Math.sin(frame*.19);
+ const brace=Math.sin(frame*.27);
+ const shoulderReach=.18+Math.sin(frame*.17)*.12+open*.22;
+ return (
  <g>
   <path d="M0 1080V370 Q960 -70 1920 370 V1080Z" fill="#26383e"/>
   <path d="M550 1080V460 Q960 105 1370 460 V1080Z" fill="#131f26" stroke="#9a9077" strokeWidth="28"/>
-  <g transform={`translate(960 1080) rotate(${-open*48})`}>
+  <g transform={`translate(960 1080) rotate(${-open*48 + gust*1.3})`}>
    <path d="M-360 0V-615 Q0 -900 360 -615 V0Z" fill="#3c4848" stroke="#b9a16f" strokeWidth="26"/>
    <path d="M-310 -15V-600 Q0 -830 310 -600 V-15" fill="none" stroke="#66736f" strokeWidth="15"/>
    {Array.from({length:16},(_,i)=><circle key={i} cx={i%2?290:-290} cy={-100-i*31} r="12" fill="#c3a46b"/>)}
    <circle cx="230" cy="-310" r="25" fill="#dfb975"/>
   </g>
-  <Robot x={725+open*160} y={950} scale={1.18} frame={frame} walk={0} glow={.7}/>
+  <Robot x={725+open*160+gust*7} y={950+brace*4} scale={1.18} frame={frame} walk={.34} reach={shoulderReach} glow={.7} turn={gust*2.4}/>
   <path d="M1000 805 Q1120 700 1275 792" fill="none" stroke="#edbd76" strokeWidth="12" opacity={open*.65}/>
+  <path d={`M0 1010 Q380 ${960+brace*8} 760 1014`} fill="none" stroke="#8ba8ad" strokeWidth="5" opacity=".3"/>
  </g>
-);
+ );
+};
 
 const StairShot:FC<{frame:number;climb:number}> = ({frame,climb}) => (
  <g>
@@ -207,12 +213,12 @@ const shadeDef = <defs><radialGradient id="shade"><stop offset=".45" stopColor="
 const StoryFrame:FC<{frame:number;shot:number}> = ({frame,shot}) => {
  const local=frame-shot*120;
  const approach=smooth(local,0,116);
- const door=smooth(frame,163,215);
+ const door=smooth(local,8,92);
  const climb=smooth(local,12,110);
  const repair=smooth(frame,360,452);
  const beacon=smooth(frame,482,532);
  const zoom=shot===0?1.06+approach*.08:shot===1?1.16+door*.06:shot===2?1.1:shot===3?1.08:shot===4?1.04:1.02;
- const pan=shot===0?interpolate(local,[0,119],[-42,22],clamp):shot===1?-30:shot===2?0:shot===3?0:shot===4?0:interpolate(local,[0,119],[36,-26],clamp);
+ const pan=shot===0?interpolate(local,[0,119],[-42,22],clamp):shot===1?interpolate(local,[0,119],[-38,16],clamp)+Math.sin(local*.17)*3:shot===2?interpolate(local,[0,119],[-10,12],clamp):shot===3?0:shot===4?interpolate(local,[0,119],[8,-8],clamp):interpolate(local,[0,119],[36,-26],clamp);
  const camera:CSSProperties={transform:`translate(${pan}px,0) scale(${zoom})`,transformOrigin:shot===0?"53% 55%":shot===1?"50% 70%":"50% 50%"};
  return (
   <svg viewBox="0 0 1920 1080" width="100%" height="100%" style={{display:"block",background:"#071321"}}>
