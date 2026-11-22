@@ -2,13 +2,13 @@
 
 ## Current verified snapshot — 2026-11-22
 
-- **Main:** `12983e7bd7c9c1ab186f0c64e8c149a5e74cc3c4` (PR #125 merge).
-- **Main CI:** post-merge run [#45018480555](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018480555) passed.
-- **Recent cleanup:** PR #124 completed the first documentation pass; PR #125 added the documentation index/follow-up audit and merged as `12983e7bd7c9c1ab186f0c64e8c149a5e74cc3c4`. PR #125 CI [#45017417464](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45017417464) passed.
-- **Current source cleanup PR:** [#126 shared retry-delay calculation](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/126) is open. It consolidates duplicated Retry-After/backoff calculations while retaining the Wikimedia and NASA retry limits. Its CI run #45018692424 is the current validation run; do not call it merged until GitHub confirms.
+- **Main:** `21783b093029cb6c9ae688db4be33c415563f458` (PR #126 merge).
+- **Main CI:** post-merge run [#45018877315](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018877315) passed.
+- **Recent cleanup:** PR #124 completed the first documentation pass; PR #125 added the documentation index and follow-up audit; PR #126 extracted the shared retry-delay calculation. All three cleanup PRs are merged.
+- **PR #126 verification:** PR CI [#45018775059](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018775059) passed; post-merge main CI #45018877315 also passed. The NASA and Wikimedia Commons wrappers preserve their original retry policies.
 - **Other open PRs:** [#122 ORBITAL BLOOM](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/122), [#119 The Last Signal](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/119), [#118 sports car 3D](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/118), [#117 render-gate documentation](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/117), [#114 subtitle overlap](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/114), [#113 Solar System](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/113), and [#110 Madrid render retry](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/110). Their branches remain protected.
 - **Render caution:** the latest ORBITAL BLOOM retry visible in Actions, run [#44933442761](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44933442761), failed. PR #122 remains open; do not describe that video as accepted.
-- **Repository inventory:** the complete recursive tree contained 186 tracked files at the start of the source cleanup. The earlier branch count of 144 was a dated observation and has not been re-enumerated in this pass.
+- **Repository inventory:** the complete recursive tree contains 190 tracked files (the API response was not truncated). The earlier branch count of 144 was a dated observation; it has not been re-enumerated in this pass.
 - **Large asset retained:** `projects/valorant-immortal-decision-making/assets/valorant-gameplay-selected.zip` is 10,530,125 bytes and is explicitly extracted by the render workflow. It remains required until an alternative asset source is implemented and verified.
 - **Workflow control files retained:** `render-request.json` triggers video rendering and must be changed only through the frozen-candidate request protocol. `circleci-status-request.json` triggers the CircleCI status workflow. Neither is disposable.
 - **Product boundary:** the engine has registered Remotion compositions and a Kokoro ONNX narration adapter. The Creative Director remains a model-neutral handoff plus external model/human execution; it is not a built-in autonomous production agent.
