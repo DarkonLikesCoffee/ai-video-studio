@@ -1,6 +1,7 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "JumpingCat",
+  "outputName": "jumping-cat-meadow",
+  "requestId": "jumping-cat-20261122-01",
+  "candidateSha": "bcafca8cf81abc8f0435177b86dfefa878e1a9ab"
 }
