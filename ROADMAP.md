@@ -2,11 +2,11 @@
 
 ## Current verified snapshot — 2026-11-22
 
-The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `84c28138567de5b6ae6631e74bdc514ed31fe7a7`; cleanup PRs #124–#129 are merged. Post-merge main CI [#45019569110](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45019569110) passed.
+The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `d4a2182cb2dc9a34f525ec203af9a24a07740a62`; cleanup PRs #124–#129 and #131 are merged. Post-merge main CI [#45021169591](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45021169591) passed.
 
-[PR #131](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/131) adds the root npm-generated `package-lock.json`, changes GitHub Actions CI/render and CircleCI rendering to `npm ci`, and documents dependency maintenance. Its final full CI run [#45020893580](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45020893580) passed on the committed lockfile. The PR remains open pending merge.
+PR #131 added the npm-generated root `package-lock.json` (lockfile v3; 403 package/workspace entries), switched GitHub Actions CI/render and CircleCI rendering to `npm ci`, and documented dependency updates. PR CI #45021066792 and post-merge main CI #45021169591 passed with the committed lockfile.
 
-PR #126 consolidated the shared Retry-After/backoff calculation used by the Wikimedia Commons and NASA asset downloaders while preserving both provider policies. PR #128 corrected the type-only `@types/three` dependency classification. Their PR and post-merge CI runs passed.
+PR #126 consolidated Retry-After/backoff calculation for Wikimedia Commons and NASA while preserving their provider-specific delay policies. PR #128 moved the type-only `@types/three` package to devDependencies while retaining `three` at runtime. Both changes passed PR and post-merge CI.
 
 PR #123 improved the Creative Director's model-neutral handoff; it does **not** add an LLM integration or complete the autonomous Director. PR #121's explicit composition selection and render-strategy checks are merged. The highest-value remaining product work is still to turn strong plans into genuinely varied, well-edited videos and inspect/repair the actual output.
 
