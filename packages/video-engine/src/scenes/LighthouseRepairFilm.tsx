@@ -1,7 +1,8 @@
 import { ThreeCanvas } from "@remotion/three";
-import type { FC } from "react";
-import { AbsoluteFill, Easing, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+import React, { useEffect } from "react";\nimport type { FC } from "react";
+import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 import { BackSide, Vector3 } from "three";
+import { useThree } from "@react-three/fiber";
 
 const clamp = { extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const };
 const smooth = (f:number, a:number, b:number) => interpolate(f,[a,b],[0,1],{...clamp,easing:Easing.inOut(Easing.cubic)});
@@ -66,7 +67,7 @@ const Coast:FC<{frame:number}> = ({frame})=>{
  </group>;
 };
 
-const ShotScene:FC<{frame:number;shot:number}> = ({frame,shot})=>{
+const CameraRig:FC<{position:Vector3;target:Vector3;frame:number;shot:number}> = ({position,target,frame,shot})=>{\n const camera=useThree(state=>state.camera);\n useEffect(()=>{camera.position.copy(position);camera.lookAt(target);camera.updateProjectionMatrix();},[camera,position,target]);\n return null;\n};\n\nconst ShotScene:FC<{frame:number;shot:number}> = ({frame,shot})=>{
  const lightning = Math.max(0,interpolate(frame,[43,45,49],[0,1,0],clamp),interpolate(frame,[178,180,184],[0,0.9,0],clamp));
  const robotX = shot===0? -4.2+smooth(frame,0,110)*2.2 : shot===1? -0.9 : shot===2? -1.35 : shot===3? -0.15 : shot===4? 1.25 : -3;
  const robotY = shot===0?-1.9:shot===2?-2.2:shot===3?-1.15:shot===4?-0.85:-1.95;
@@ -77,7 +78,7 @@ const ShotScene:FC<{frame:number;shot:number}> = ({frame,shot})=>{
  const camMove=shot===0?new Vector3(Math.sin(frame/44)*0.65,Math.sin(frame/30)*0.16,0):shot===1?new Vector3(Math.sin(frame/30)*0.25,0,0):shot===2?new Vector3(Math.sin(frame/60)*0.35,0,0):shot===3?new Vector3(Math.sin(frame/28)*0.08,0,0):shot===4?new Vector3(Math.sin(frame/34)*0.22,0,0):new Vector3(Math.sin(frame/55)*0.8,0,0);
  const cameraPos=cam.clone().add(camMove);
  return <ThreeCanvas camera={{position:cameraPos.toArray(),fov:shot===3?42:shot===2?45:shot===0?48:40}} width={1920} height={1080} style={{width:"100%",height:"100%"}}>
-  <color attach="background" args={["#071321"]}/>
+  <CameraRig position={cameraPos} target={target} frame={frame} shot={shot}/>\n  <color attach="background" args={["#071321"]}/>
   <fog attach="fog" args={["#142b38",shot===3?5:shot===0?12:9,28]}/>
   <ambientLight intensity={shot===4?0.62:0.27} color="#7894a6"/>
   <directionalLight position={[-5,7,5]} intensity={0.85+lightning*2.4} color={lightning>0.1?"#d7efff":"#8ba7ba"}/>
