@@ -1,7 +1,19 @@
 # The Stormlight Keeper
 
-Wordless 24-second short film in six visually distinct shots. Original 3D procedural lighthouse, robot, storm environment and mechanism. No text, labels, dialogue or captions.
+A wordless 24-second short film about a small service robot restoring an abandoned lighthouse during a storm.
 
-Production steps: (1) author original SVG visual studies and asset manifest, (2) render and inspect all SVG preview PNGs before animation, (3) implement and register the new `LighthouseRepairFilm` composition, (4) verify shot-to-code audit, (5) run CI and plan validation, (6) freeze the candidate and submit a request-only render commit, (7) inspect the exact MP4, contact sheet, QA report and provenance.
+## Production
 
-The film does not require narration. Storm ambience, original score and mechanical repair accents support the wordless story.
+- New, registered composition: `LighthouseRepairFilm`
+- Six story beats: coastal approach, door entry, spiral climb, mechanical repair, beacon ignition, and a distant vessel finding the light
+- Ten original SVG design studies, each rendered to PNG preview and visually inspected before animation; multiple assets were revised following visual review
+- Original synthesized score and storm ambience
+- Production plan, asset/provenance manifest, and shot-to-code audit
+
+The final composition uses GPU-independent SVG and Remotion. A Three.js/WebGL draft was discarded after GitHub-hosted renderers failed to create a WebGL2 context.
+
+## Render and QA status
+
+- Render request 02 completed and produced a 24-second, 1920×1080, 30fps H.264 MP4 with 48kHz stereo AAC.
+- Automated media QA passed overall, with one warning: a 1.6-second visual hold at the beginning of the lighthouse-door shot (4.0–5.6s). I visually inspected the contact sheet and individual frames and confirmed the hold was real.
+- Render request 03 contains the correction: earlier door movement, gust-driven robot bracing and arm reach, and camera drift. Its MP4 and media-QA result still need final inspection before the production is considered complete.
