@@ -186,18 +186,17 @@
     "No text, captions, logos or dialogue appear."
   ],
   "renderStrategy": {
-    "renderer": "custom-remotion",
+    "renderer": "remotion-svg",
     "compositionId": "LighthouseRepairFilm",
     "availability": "registered",
-    "rationale": "The brief requires a custom camera-driven coastal 3D sequence, a persistent robot character, mechanical repair animation and a rotating Fresnel beacon with atmospheric lighting. No existing registered composition supports this story.",
+    "rationale": "A dedicated SVG/Remotion renderer guarantees deterministic headless rendering on GitHub-hosted runners without WebGL/GPU support. The six-shot artwork uses layered SVG paths/shapes and animated transforms, with original robot, lighthouse, storm, mechanism, Fresnel and vessel designs.",
     "requiredCapabilities": [
-      "Procedural 3D lighthouse/coast/robot modelling",
-      "Multiple distinct cinematic camera shots",
-      "Robot locomotion and articulated mechanical interaction",
-      "Rotating Fresnel lens and animated beacon light",
-      "Storm atmosphere with procedural rain, fog, waves and lightning"
+      "Vector lighthouse, storm coastline, articulated maintenance robot, spiral stairwell, repair mechanism, rotating Fresnel lens and distant vessel",
+      "Six distinct scene framings with continuous character, water, rain, gear and beacon motion",
+      "Animated camera-style pan/zoom, atmospheric lightning and warm/cool cinematic lighting",
+      "Original synthesized score and storm ambience"
     ],
-    "fallback": "Implement and register LighthouseRepairFilm as a new custom Remotion composition; do not reuse ProjectVideo or any existing showcase composition."
+    "fallback": "The main renderer is SVG/Remotion and requires no GPU."
   },
   "acceptanceCoverage": [
     {
