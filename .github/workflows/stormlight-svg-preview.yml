@@ -6,8 +6,7 @@ on:
     paths:
       - "projects/stormlight-keeper/assets/*.svg"
       - "scripts/preview-stormlight-svgs.mjs"
-      - "package.json"
-      - "package-lock.json"
+      - ".github/workflows/stormlight-svg-preview.yml"
 
 permissions:
   contents: read
@@ -17,12 +16,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install SVG renderer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends librsvg2-bin
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci --no-audit --no-fund
-      - run: npm run qa:svg-previews
+      - run: node scripts/preview-stormlight-svgs.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: stormlight-svg-previews
