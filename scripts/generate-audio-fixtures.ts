@@ -239,5 +239,5 @@ await writeMonoWav(resolve(jumpingCatDirectory, "jumping-cat-wind.wav"), windDur
   const slow = Math.sin(2 * Math.PI * 0.17 * time) * 0.36 + Math.sin(2 * Math.PI * 0.31 * time + 0.8) * 0.24 + Math.sin(2 * Math.PI * 0.071 * time + 1.4) * 0.18;
   const gust = 0.76 + 0.24 * Math.sin(2 * Math.PI * 0.055 * time + 0.4);
   const noise = Math.sin(time * 117.1) * 0.055 + Math.sin(time * 173.7) * 0.038 + Math.sin(time * 241.3) * 0.024;
-  return (slow + noise) * gust * 0.22;
+  return (slow + noise) * gust * 0.58;
 });
