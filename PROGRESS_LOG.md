@@ -639,3 +639,13 @@ Append one entry per meaningful development session:
 - Kept render request triggers, active project branches, production assets and full rendering/QA gates intact.
 - Added `docs/REPOSITORY_CLEANUP_FOLLOWUP.md` with findings and explicit follow-up candidates.
 - No code or dependency changes; no local CI/build/render execution in this connector-only session. Await GitHub PR CI for verification.
+
+
+## 2026-11-22 — Shared retry-delay cleanup
+
+- Inspected the full recursive source tree and traced the core animation, footage, narration, timeline and transition helpers to production/test references.
+- Identified duplicated Retry-After parsing and bounded exponential backoff in the Wikimedia Commons and NASA video downloaders.
+- Extracted only the pure delay calculation to `scripts/retry-delay.mjs`; kept the provider-specific request loops, timeouts, retry counts, cancellation, headers and URL checks unchanged.
+- Kept existing exported retry-delay functions as wrappers with the exact prior Commons and NASA delay limits.
+- Added tests for seconds/date parsing, provider-specific bounds, exponential fallback and invalid headers.
+- Added `docs/REPOSITORY_CLEANUP_SOURCE_AUDIT.md`. Await CI before merge; local tests/build/render were not run in this connector-only session.

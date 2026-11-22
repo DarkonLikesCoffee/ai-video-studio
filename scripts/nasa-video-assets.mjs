@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { calculateRetryDelayMs } from "./retry-delay.mjs";
 
 const execFileAsync = promisify(execFile);
 const MAX_BYTES = 150 * 1024 * 1024;
@@ -35,18 +36,13 @@ const isNasaSourcePage = (value) =>
 
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-export const getNasaRetryDelayMs = (retryAfter, attempt, now = Date.now()) => {
-  const header = String(retryAfter ?? "").trim();
-  if (header) {
-    const seconds = Number(header);
-    if (Number.isFinite(seconds) && seconds >= 0) {
-      return Math.max(1_000, Math.min(60_000, seconds * 1_000));
-    }
-    const date = Date.parse(header);
-    if (Number.isFinite(date)) return Math.max(1_000, Math.min(60_000, date - now));
-  }
-  return Math.min(15_000, 1_000 * (2 ** Math.max(0, attempt)));
-};
+export const getNasaRetryDelayMs = (retryAfter, attempt, now = Date.now()) =>
+  calculateRetryDelayMs(retryAfter, attempt, {
+    minRetryAfterMs: 1_000,
+    maxRetryAfterMs: 60_000,
+    baseDelayMs: 1_000,
+    maxBackoffMs: 15_000,
+  }, now);
 
 export const fetchNasaVideoWithRetries = async (
   url,
