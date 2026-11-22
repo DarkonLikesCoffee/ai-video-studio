@@ -48,3 +48,8 @@ Do not mark a video complete unless:
 - The final artifact is traceable to the exact source commit and render run.
 
 If it fails, report that it failed and iterate. Never equate a green CI check with professional visual quality.
+
+
+## Shot repetition is a major failure
+
+Read `agent/skills/shot-differentiation/SKILL.md` and compare the actual MP4 contact sheet with the storyboard and shot-to-code audit. At every shot boundary, verify a meaningful change in visual subject, framing, scene, depth, action or medium. Repeated background + same object silhouette + same camera path with only copy changes is a major failure. Do not deliver; require targeted rebuild and a new frozen render candidate.
