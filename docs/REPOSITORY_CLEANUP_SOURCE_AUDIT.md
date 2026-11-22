@@ -53,10 +53,11 @@ Their policies are not identical and remain distinct:
 - The root npm-generated lockfile was added in PR #131 and verified by a clean `npm ci`; dependency removal/version upgrades remain deferred until a separate usage audit is complete.
 
 
-## Reproducible npm installs — PR #131 CI passed
+## Reproducible npm installs — PR #131 merged
 
 - Generated the root `package-lock.json` with the repository's existing Node 22 CI install environment; npm lockfile version 3, 403 package/workspace entries, 194,120 bytes.
 - The lockfile was exported from the completed CI runner and committed unchanged; it was not manually assembled.
 - Changed GitHub Actions CI, GitHub Actions rendering and CircleCI rendering to use `npm ci`; included the lockfile in the CI npm-cache key.
 - Changed the README clean-install command to `npm ci`; added dependency update/lockfile rules to `AGENTS.md` and `docs/DEPENDENCY_MANAGEMENT.md`.
-- No dependency declarations, package versions or source dependencies were changed. Final PR CI #45020893580 passed using the committed lockfile and `npm ci`, including full tests, type-check, project validations and Studio build.
+- Merged PR #131 as `d4a2182cb2dc9a34f525ec203af9a24a07740a62`. PR CI #45021066792 and post-merge main CI #45021169591 passed using the committed lockfile and `npm ci`, including full tests, type-check, project validations and Studio build.
+- No dependency declarations, package versions or source dependencies were changed.

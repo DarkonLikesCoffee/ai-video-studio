@@ -46,7 +46,7 @@ No script was removed based on absence from one search result. The search result
 
 ## Deferred candidates
 
-1. A full dependency audit needs a reliable lockfile and install/build/test comparison. The repository root manifest alone is not sufficient evidence to remove a dependency.
+1. The lockfile and clean-install foundation is now in place: PR #131 committed the npm-generated workspace lockfile and verified `npm ci` through CI/build. The remaining dependency-usage audit must compare each declared package against source imports, build tooling, scripts, tests and runtime workflows before proposing any removal.
 2. Branch pruning needs complete enumeration across all pages plus per-branch merged-PR/ancestry checks and explicit protection for production experiments still awaiting creative review. This connector does not expose a branch-delete action.
 3. Source dead-code analysis requires repository-wide symbol/import and dynamic-loading analysis; search snippets are not sufficient.
 4. CI optimization should be a separate change with identical validation coverage and before/after runtime evidence.
@@ -54,3 +54,9 @@ No script was removed based on absence from one search result. The search result
 ## Verification boundary
 
 This pass used live repository manifests, key operating documents, the production CI/render workflows, the current open-PR listing and targeted usage searches. The audit record is documentation-only. Repository CI is required on the PR; no local test/build or render was performed in this connector-only session.
+
+
+## Reproducible dependency installation — completed 2026-11-22
+
+- PR #131 added the root npm workspace lockfile and moved GitHub Actions CI, GitHub Actions renders and CircleCI renders to `npm ci`.
+- The committed lockfile was validated by the full CI job and by post-merge main CI. Dependency pruning remains a separate evidence-based task.
