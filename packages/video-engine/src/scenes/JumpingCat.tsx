@@ -16,7 +16,6 @@ const Cat = ({ frame }: { frame: number }) => {
   const cycle = frame % 150;
   const crouch = 1 - smooth(cycle, [0, 20, 36, 46], [0, 0, 1, 0]);
   const launch = smooth(cycle, [40, 54, 72, 82], [0, 1, 1, 0]);
-  const fall = smooth(cycle, [82, 96, 108, 114], [0, 0, 1, 0]);
   const land = smooth(cycle, [106, 114, 125, 140], [0, 1, 0.25, 0]);
   const height = cycle < 55 ? 0 : cycle < 110 ? Math.sin(((cycle - 55) / 55) * Math.PI) * 265 : 0;
   const x = cycle < 55 ? smooth(cycle, [0, 55], [0, 18]) : cycle < 110 ? smooth(cycle - 55, [0, 55], [18, 46]) : smooth(cycle - 110, [0, 40], [46, 0]);
@@ -27,7 +26,7 @@ const Cat = ({ frame }: { frame: number }) => {
   const blink = cycle > 31 && cycle < 38 ? 0.08 : 1;
   return (
     <g transform={`translate(${960 + x} ${710 - height}) rotate(${rotation * 57.3})`}>
-      <ellipse cx="-8" cy="115" rx="122" ry="24" fill="#203d32" opacity={0.16 + height / 1300} transform={`scale(${1 - height / 650},1)`} />
+      <ellipse cx="-8" cy="115" rx="122" ry="24" fill="#203d32" opacity={Math.max(0.04,0.23-height/1400)} transform={`scale(${Math.max(.35,1 - height / 650)},1)`} />
       <g transform={`scale(${bodySquashX} ${bodySquashY})`}>
         <path d={`M 80 38 C 175 20 183 -76 125 -92 C 82 -104 73 -49 110 -39 C 148 -27 169 -77 151 -118`} fill="none" stroke="#d58b55" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" transform={`rotate(${tailSwing} 80 38)`} />
         <path d="M -112 30 C -130 -54 -68 -105 21 -91 C 95 -82 131 -14 104 43 C 83 93 -68 104 -112 30Z" fill="#e9aa70" />
@@ -54,9 +53,10 @@ export const JumpingCat = () => {
   const breeze = Math.sin(frame / 54) * 9;
   const sun = 0.5 + Math.sin(frame / 140) * 0.05;
   const backgroundDrift = Math.sin(frame / 105) * 13;
+  const endFade = interpolate(frame, [570, 599], [1, 0], clamp);
   return (
     <AbsoluteFill style={{ overflow: "hidden", background: "#dbe9d6" }}>
-      <Audio src={staticFile("audio/jumping-cat-wind.wav")} volume={0.48} loop />
+      <Audio src={staticFile("audio/jumping-cat-wind.wav")} volume={frame < 540 ? 0.48 : interpolate(frame, [540,599],[0.48,0.3],clamp)} loop />
       <svg viewBox="0 0 1920 1080" width="100%" height="100%" style={{ position: "absolute" }}>
         <defs>
           <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#d6e7e1"/><stop offset=".68" stopColor="#f1e4c8"/></linearGradient>
@@ -77,7 +77,7 @@ export const JumpingCat = () => {
         <g><path d={`M 0 910 Q 200 ${880+breeze} 410 913 T 820 900 T 1220 914 T 1600 899 T 1920 912 L 1920 1080 L 0 1080Z`} fill="#789967"/></g>
         {Array.from({length:38},(_,i)=><GrassBlade key={i} index={i}/>)}
       </svg>
-      <svg viewBox="0 0 1920 1080" width="100%" height="100%" style={{ position: "absolute" }}>
+      <svg viewBox="0 0 1920 1080" width="100%" height="100%" style={{ position: "absolute", opacity:endFade }}>
         <Cat frame={frame}/>
       </svg>
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 92, background: "linear-gradient(0deg,rgba(59,87,53,.22),transparent)" }} />
