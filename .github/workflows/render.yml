@@ -182,10 +182,13 @@ jobs:
           elif [[ -n "$PROJECT_PATH" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
-          elif [[ "$COMPOSITION_ID" == "MadridTrip" || "$COMPOSITION_ID" == "LighthouseRepairFilm" ]]; then
-            # Keep one WebGL canvas below Chromium's context limit. GitHub-hosted
-            # Linux runners have no GPU, so use Remotion's software ANGLE renderer.
-            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
+          elif [[ "$COMPOSITION_ID" == "MadridTrip" ]]; then
+            # Keep one WebGL canvas below Chromium's per-runner context limit.
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle"
+          elif [[ "$COMPOSITION_ID" == "LighthouseRepairFilm" && -n "$PROJECT_PATH" ]]; then
+            # SVG/Remotion composition: no WebGL context needed on headless GitHub runners.
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
           else
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
           fi
