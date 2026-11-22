@@ -1,4 +1,5 @@
 import { ThreeCanvas } from "@remotion/three";
+import { DoubleSide } from "three";
 import type { FC } from "react";
 import {
   AbsoluteFill,
@@ -137,13 +138,13 @@ const Crystal: FC<{ frame: number }> = ({ frame }) => {
 const Cave: FC<{ frame: number }> = ({ frame }) => {
   const light = smooth(frame, [456, 584]);
   return (
-    <group>
+    <>
       <color attach="background" args={["#070a17"]} />
       <fog attach="fog" args={["#0a1020", 6, 22]} />
       <ambientLight intensity={0.3 + light * 0.34} />
       <mesh position={[0, 0, -3.9]} scale={[1.4, 0.9, 1]}>
         <sphereGeometry args={[6.2, 24, 18]} />
-        <meshStandardMaterial color="#241c31" roughness={1} side={2} />
+        <meshStandardMaterial color="#241c31" roughness={1} side={DoubleSide} />
       </mesh>
       {/* Cave floor */}
       <mesh position={[0, -1.55, -2]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -201,7 +202,7 @@ const Cave: FC<{ frame: number }> = ({ frame }) => {
       })}
       <pointLight position={[-3, 1, -4]} color="#845bd1" intensity={13} distance={12} />
       <pointLight position={[3, -0.4, -5]} color="#d47a50" intensity={10} distance={10} />
-    </group>
+  </>
   );
 };
 
@@ -274,46 +275,10 @@ const PlanetScene: FC<{ frame: number }> = ({ frame }) => {
   );
 };
 
-const DarkCaveScene: FC<{ frame: number }> = ({ frame }) => (
-  <>
-    <color attach="background" args={["#090b18"]} />
-    <fog attach="fog" args={["#090b18", 6, 25]} />
-    <ambientLight intensity={0.24} />
-    <mesh position={[0, 0, -3.8]} scale={[1.1, 0.85, 1]}>
-      <sphereGeometry args={[6.1, 24, 18]} />
-      <meshStandardMaterial color="#21192d" side={2} roughness={1} />
-    </mesh>
-    <mesh position={[0, -1.65, -2]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[20, 28]} />
-      <meshStandardMaterial color="#2a2032" roughness={1} />
-    </mesh>
-    {Array.from({ length: 30 }, (_, i) => {
-      const x = -6 + i * 0.42;
-      const h = 1 + (i % 7) * 0.22;
-      return (
-        <mesh key={i} position={[x, 2.15 - h / 2, -5 - (i % 5)} }>
-          <coneGeometry args={[0.34, h, 5]} />
-          <meshStandardMaterial color="#3a3041" roughness={1} flatShading />
-        </mesh>
-      );
-    })}
-    {Array.from({ length: 22 }, (_, i) => {
-      const x = -4.7 + i * 0.45;
-      return (
-        <mesh key={i} position={[x, -1.12, -3 - (i % 7)} }>
-          <dodecahedronGeometry args={[0.38 + (i % 3) * 0.12, 0]} />
-          <meshStandardMaterial color="#45364a" roughness={1} flatShading />
-        </mesh>
-      );
-    })}
-    <pointLight position={[0, 1, -5]} color="#3abed5" intensity={6 + smooth(frame, [300, 390]) * 16} distance={10} />
-  </>
-);
-
 export const TinyAstronautCrystalCave: FC = () => {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
-  const cave = smooth(frame, [285, 375]);
+  const cave = smooth(frame, [270, 390]);
   const reveal = smooth(frame, [390, 495]);
   const awaken = smooth(frame, [490, 580]);
   const camera = {
@@ -321,7 +286,7 @@ export const TinyAstronautCrystalCave: FC = () => {
     y: interpolate(frame, [0, 90, 210, 300, 390, 480, 600], [2.8, 1.5, 2.1, 1.4, 1.0, 0.7, 0.8], { ...clamp, easing: Easing.inOut(Easing.cubic) }),
     z: interpolate(frame, [0, 90, 210, 300, 390, 480, 600], [11, 8.6, 9.5, 8.4, 7.6, 6.5, 7.0], clamp),
   };
-  const cameraYaw = -Math.atan2(camera.x, camera.z);
+  const cameraYaw = Math.atan2(camera.x, camera.z);
   const cameraPitch = -Math.atan2(camera.y, Math.hypot(camera.x, camera.z));
   const vignette = 0.36 + reveal * 0.15 - awaken * 0.18;
   return (
@@ -332,8 +297,7 @@ export const TinyAstronautCrystalCave: FC = () => {
         camera={{ position: [camera.x, camera.y, camera.z], rotation: [cameraPitch, cameraYaw, 0], fov: 43 }}
         style={{ width: "100%", height: "100%" }}
       >
-        {frame < 300 ? <PlanetScene frame={frame} /> : <DarkCaveScene frame={frame} />}
-        {frame >= 300 ? <Cave frame={frame} /> : null}
+        {frame < 300 ? <PlanetScene frame={frame} /> : <Cave frame={frame} />}
         {frame >= 270 && frame < 430 ? (
           <group position={[-1.4 + cave * 1.6, -0.52, -0.4]} rotation={[0, 0.3, 0]}>
             <Astronaut frame={frame} scale={0.7} />
