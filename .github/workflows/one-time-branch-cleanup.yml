@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   cleanup:
-    if: ${{ github.event.head_commit.message == 'chore: clean remote branches' }}
+    if: ${{ contains(github.event.head_commit.message, 'clean remote branches') }}
     runs-on: ubuntu-latest
     steps:
       - name: Keep main and delete all other remote branches
@@ -35,6 +35,6 @@ jobs:
             ref="${branch//\//%2F}"
             gh api --silent --method DELETE "repos/$repo/git/refs/heads/$ref"
             echo "Deleted $branch"
-            ((deleted+=1))
+            deleted=$((deleted + 1))
           done
           echo "Preserved main; deleted $deleted other branches."
