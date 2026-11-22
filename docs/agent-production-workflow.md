@@ -76,3 +76,11 @@ The repository does not yet contain an automatic prompt-to-project model, automa
 - Source assets intentionally and preserve rights/provenance.
 - Local assets and deterministic renders are the default.
 - A successful render is a candidate, not an accepted deliverable.
+
+
+## Mandatory shot-differentiation gate (new)
+
+Before build and before render, every production must follow `agent/skills/shot-differentiation/SKILL.md`. For each shot, the assistant must describe the visible subject, composition/framing, visual event, camera event, transition, and what changes from the previous shot. Adjacent-shot differences must be describable without mentioning text. A single reused scene/camera animation with title changes is explicitly rejected.
+
+
+During implementation, maintain a shot-to-code audit in the project's production notes: source files/component, actual implemented visual event, and checkpoints where the change is visible. Storyboard promises are not evidence of implementation. During final QA, inspect actual MP4 frames at boundaries and regular intervals against the audit. If scene/layout/camera/subject repetition with text-only variation is detected, classify it as a major failure and block delivery. Fix during build or iterate from evidence; do not spend renders discovering missing creative implementation.
