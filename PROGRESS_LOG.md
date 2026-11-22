@@ -665,3 +665,12 @@ Append one entry per meaningful development session:
 - Identified `@types/three` under the video engine's runtime dependencies, unlike the other `@types/*` packages already under development dependencies.
 - Moved only `@types/three` to `devDependencies`; retained `three` and all version pins unchanged.
 - No runtime dependency, render path or production asset changed. Await the full CI job before merge.
+
+
+## 2026-11-22 — Type dependency cleanup PR #128 merged
+
+- Merged [PR #128](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/128) as `6ea141c189d6406bb9648cd0dd45652c4ec5d702`.
+- Moved `@types/three` from `packages/video-engine/package.json` dependencies to devDependencies, consistent with other `@types/*` packages in the workspace.
+- Retained `three` as a runtime dependency; all dependency version pins remain unchanged.
+- PR CI #45019205207 and post-merge main CI #45019314801 passed.
+- No rendering workflow, composition, asset or render-request file changed.
