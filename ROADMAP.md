@@ -298,3 +298,11 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 - [ ] Perform complete branch ancestry/PR protection analysis and prune safely deletable merged branches when branch-delete capability is available.
 - [ ] Analyze source-level unused exports/dead code with a complete import/dynamic-load graph and test evidence.
 - [ ] Consider CI modularization only if it preserves all validation gates and demonstrates a measurable benefit.
+
+
+## Source-level cleanup — 2026-11-22
+
+- [x] Identify and consolidate the duplicated Retry-After/backoff calculation used by NASA and Wikimedia Commons downloaders while preserving each provider's policy.
+- [ ] Continue a full import/export and dynamic-reference audit before proposing any dead-code removal.
+- [ ] Establish a committed npm lockfile and reproducible install workflow before dependency-pruning work.
+- [ ] Review cross-provider HTTP/download code for further safe shared abstractions only where tests can prove behavior preservation.
