@@ -1,0 +1,31 @@
+name: Stormlight SVG asset previews
+
+on:
+  push:
+    branches: ["feat/stormlight-keeper"]
+    paths:
+      - "projects/stormlight-keeper/assets/*.svg"
+      - "scripts/preview-stormlight-svgs.mjs"
+      - "package.json"
+      - "package-lock.json"
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run qa:svg-previews
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stormlight-svg-previews
+          path: review-output/svg-previews/
+          retention-days: 7
