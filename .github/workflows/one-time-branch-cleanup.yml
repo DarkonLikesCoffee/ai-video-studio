@@ -1,4 +1,5 @@
 name: One-time remote branch cleanup
+# Temporary repository housekeeping; remove this workflow after it runs.
 
 on:
   push:
