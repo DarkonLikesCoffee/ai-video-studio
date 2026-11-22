@@ -4,6 +4,10 @@
 
 Judge the actual rendered video as an editor, cinematographer, motion designer and audience member. Passing CI is necessary but insufficient.
 
+## Pre-animation asset inspection
+
+Before assets are placed into a scene, follow `agent/skills/asset-visual-review/SKILL.md`. Inspect rendered PNG preview pages for standalone image/SVG files; source code and asset-evidence metadata are not visual proof. Record actual findings and fix major defects before scene implementation. This stage does not replace the separate final-video inspection below.
+
 ## Technical inspection
 
 - Confirm MP4 exists and can be decoded from beginning to end.

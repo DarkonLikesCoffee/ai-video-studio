@@ -69,6 +69,14 @@ jobs:
           name: storyboard-planning-previews
           path: review-output/*.html
           retention-days: 7
+      - name: Render a real SVG asset-review preview
+        run: npm run assets:visual-review -- projects/examples/three-scene-story --output-dir review-output/asset-visual-review
+      - name: Upload asset visual-review preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-visual-review-preview
+          path: review-output/asset-visual-review/*
+          retention-days: 7
       - name: Generate storyboard critic report on launch-film example
         run: npm run storyboard:critic -- projects/examples/production-plan.json review-output/launch-film-critique.md
       - name: Run storyboard risk report on launch-film example

@@ -50,6 +50,15 @@ For narrated explainers and short-form videos, follow [the Narrated Video Produc
 
 The repository includes an optional Kokoro ONNX narration adapter on the GitHub Actions render worker for Spanish and US English. It derives word timings from the generated speech alignment; arbitrary uploaded recordings still need a separate alignment workflow. Paid provider calls require explicit user consent. Local assets must live under the project's `assets/` folder. Local references are checked for path traversal and file existence before rendering. Remote sources must use public HTTPS URLs, without embedded credentials, and must not point to localhost or private network addresses. Remote audio hosts must also allow cross-origin access; local project assets are more reliable for repeatable renders.
 
+### Pre-animation visual asset review
+
+Before placing locally generated or sourced SVG/raster artwork into a scene, render preview contact sheets of the actual assets:
+
+    npm run assets:visual-review -- projects/<slug>
+    npm run assets:visual-review -- projects/<slug> --output-dir /tmp/tree-asset-review --page-size 12
+
+The command recursively previews standalone .svg, .png, .jpg, .jpeg, .webp and .avif files under the project's assets/ directory using an isolated Remotion still composition. It writes PNG pages, an HTML index and a JSON manifest. Open every PNG and inspect the actual appearance before using the assets; fix weak artwork and repeat the preview. The manifest deliberately remains pending-visual-inspection: rendering a preview is not an AI quality check or approval. The command does not inspect inline JSX/SVG, 3D models, animation or the final video.
+
 ### Open-license visual asset discovery
 
 The asset producer can search Openverse without an API key and prepare reviewed still-image assets for local use:

@@ -22,12 +22,13 @@ Do not claim autonomous behavior for a prompt, checklist, script handoff or dete
 3. **Composition selection** — choose one whole-video Remotion composition using the verified catalogue in `scripts/director-compositions.ts`. Record it in the production plan's `renderStrategy`, including renderer, registered/to-be-built status, rationale, required capabilities and fallback. This is distinct from per-shot visual methods.
 4. **Storyboard** — plan every shot with purpose, concrete subject/action and visual progression, production method, duration, composition, camera/motion, transitions, text rationale and sound.
 5. **Per-shot method selection** — choose from verified methods (footage, generated media, 2D, motion graphics, diagrams, typography, 3D, simulation or hybrid). The method is chosen to serve each shot, not applied uniformly.
-6. **Asset production** — generate or source the required footage, images, illustrations, 3D elements, voice and sound; record provenance. For supported Spanish/US English narration, a Kokoro ONNX adapter can generate speech and phoneme-derived word timings on the render worker. Before build, run `npm run director:asset-evidence -- <production-plan.json> [asset-manifest.json] [report.json]` to connect criterion→shot mappings to manifest assignments and local/provenance/rights checks. Review incomplete mappings and missing files; the render workflow enforces `--strict` when a production plan and manifest exist and includes the report in its artifact. This report does not semantically verify assets or criteria.
-7. **Build** — translate the approved plan into a valid `VideoProject` (`projects/<slug>/scene.json`) and local assets.
-8. **Render** — submit a unique `render-request.json` and wait for the selected provider.
-9. **Visual QA** — inspect the actual MP4, not only CI status; review a contact sheet, keyframes, motion, pacing, audio and technical metadata. Specifically check for slideshow-like repeated layouts, shots without meaningful action/progression, and generic/unmotivated effects.
-10. **Iterate** — fix the highest-impact issues, rerender only the target project, and repeat until it passes.
-11. **Deliver** — provide the MP4/artifact, a concise change log and known limitations.
+6. **Asset production** — generate or source the required footage, images, illustrations, 3D elements, voice and sound; record provenance. For supported Spanish/US English narration, a Kokoro ONNX adapter can generate speech and phoneme-derived word timings on the render worker. Run `npm run director:asset-evidence -- <production-plan.json> [asset-manifest.json] [report.json]` to connect criterion→shot mappings to manifest assignments and local/provenance/rights checks. Review incomplete mappings and missing files; the render workflow enforces `--strict` when a production plan and manifest exist and includes its report in its artifact. This report does not semantically verify assets or criteria.
+7. **Pre-animation visual asset review** — run `npm run assets:visual-review -- projects/<slug>`, open every rendered PNG page and inspect the actual artwork. Correct weak silhouettes, proportions, composition, style, transparency or rendering defects; regenerate and inspect again. Record findings in `production/asset-visual-review.md`. The CLI only renders previews; the assistant supplies visual judgment.
+8. **Build** — translate the approved plan into a valid `VideoProject` (`projects/<slug>/scene.json`) and local assets.
+9. **Render** — submit a unique `render-request.json` and wait for the selected provider.
+10. **Visual QA** — inspect the actual MP4, not only CI status; review a contact sheet, keyframes, motion, pacing, audio and technical metadata. Specifically check for slideshow-like repeated layouts, shots without meaningful action/progression, and generic/unmotivated effects.
+11. **Iterate** — fix the highest-impact issues, rerender only the target project, and repeat until it passes.
+12. **Deliver** — provide the MP4/artifact, a concise change log and known limitations.
 
 ## Pre-production storyboard review
 
@@ -60,6 +61,7 @@ Use these skill files as focused playbooks. Apply all relevant skills; do not tr
 - `skills/creative-director/SKILL.md`
 - `skills/storyboard/SKILL.md`
 - `skills/asset-producer/SKILL.md`
+- `skills/asset-visual-review/SKILL.md` — mandatory rendered-preview inspection of standalone SVG/image assets before scene implementation.
 - `skills/remotion-producer/SKILL`
 - `skills/audio-designer/SKILL.md`
 - `skills/visual-qa/SKILL.md`

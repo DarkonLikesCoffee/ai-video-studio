@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "render": "remotion render src/index.ts DemoVideo render-output/demo.mp4",
-    "render:custom": "remotion render src/index.ts"
+    "render:custom": "remotion render src/index.ts",
+    "render:asset-review": "remotion still src/asset-review-entry.tsx AssetReview"
   },
   "dependencies": {
     "@react-three/fiber": "^9.3.0",

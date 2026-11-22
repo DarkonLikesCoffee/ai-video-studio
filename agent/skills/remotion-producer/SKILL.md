@@ -12,6 +12,7 @@ Translate the approved storyboard and asset manifest into a valid, deterministic
 - If strategy availability is `to-be-built`, implement and register the custom composition and update the capability catalogue before requesting a render.
 - Confirm dimensions, FPS and total frame budget.
 - Confirm every local media path is under the project's `assets/` folder and exists.
+- Before implementing scenes, follow `agent/skills/asset-visual-review/SKILL.md`: render standalone local image/SVG assets with `npm run assets:visual-review -- projects/<slug>`, inspect every preview PNG, correct weak assets and record the actual findings. Do not claim visual approval from the generated manifest alone.
 - Confirm all scene, media, graphics, subtitle, particle and audio limits.
 - Run `npm run typecheck`, `npm test`, and `npm run validate:project -- <project>/scene.json`.
 
