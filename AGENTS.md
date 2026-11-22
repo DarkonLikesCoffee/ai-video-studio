@@ -1,6 +1,6 @@
 # Instructions for AI agents working in this repository
 
-Before acting, read `START_HERE.md`, then `PROJECT_STATE.md`, `ROADMAP.md`, `PROGRESS_LOG.md`, and `README.md`. Follow the mandatory reading order in `START_HERE.md`.
+Before acting, read `START_HERE.md` and follow its task-specific context-loading path. Do not read large status/history documents or the entire README by default; load only the current snapshot and sections relevant to the task.
 
 ## Mission
 
