@@ -658,3 +658,10 @@ Append one entry per meaningful development session:
 - Wikimedia Commons and NASA keep their separate delay bounds and existing exported wrapper functions. Request loops, timeouts, retry counts, headers, cancellation and URL allow-lists were unchanged.
 - Added four direct unit tests. PR CI #45018775059 passed; post-merge main CI #45018877315 passed.
 - Refreshed the verified current snapshot and roadmap. No production render was needed for this internal retry utility refactor.
+
+
+## 2026-11-22 — Type-only dependency reclassified
+
+- Identified `@types/three` under the video engine's runtime dependencies, unlike the other `@types/*` packages already under development dependencies.
+- Moved only `@types/three` to `devDependencies`; retained `three` and all version pins unchanged.
+- No runtime dependency, render path or production asset changed. Await the full CI job before merge.

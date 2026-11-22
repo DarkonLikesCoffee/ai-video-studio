@@ -308,3 +308,10 @@ The largest gap is not basic rendering. It is the **production intelligence and 
 - [ ] Continue a full import/export and dynamic-reference audit before proposing any dead-code removal.
 - [ ] Establish a committed npm lockfile and reproducible install workflow before dependency-pruning work.
 - [ ] Review cross-provider HTTP/download code for further safe shared abstractions only where tests can prove behavior preservation.
+
+
+## Dependency metadata cleanup — 2026-11-22
+
+- [x] Move the type-only `@types/three` package to `devDependencies`; preserve the `three` runtime dependency.
+- [ ] Generate and commit a reproducible npm lockfile before performing dependency removal or version upgrades.
+- [ ] Compare all declared dependencies against actual imports and build/runtime workflows before pruning any package.

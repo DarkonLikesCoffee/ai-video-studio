@@ -35,3 +35,12 @@ Their policies are not identical and remain distinct:
 - Existing Commons and NASA retry tests exercise their public wrapper functions.
 - New tests exercise the common helper and verify both provider policies.
 - GitHub Actions CI must pass on this PR before merge. This connector-only session does not run a local install, test suite or build.
+
+
+## Package metadata follow-up — PR pending
+
+- Moved `@types/three` from `dependencies` to `devDependencies` in `packages/video-engine/package.json`.
+- The package provides TypeScript declarations only; the runtime package `three` remains in `dependencies`.
+- The other `@types/*` packages in the workspace were already classified as development dependencies.
+- This changes dependency classification only; no package version was changed and no rendering/runtime dependency was removed.
+- CI will verify workspace installation, type checking, tests and build on the PR.
