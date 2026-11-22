@@ -1,7 +1,7 @@
 {
   "provider": "github-actions",
   "compositionId": "JumpingCat",
-  "outputName": "jumping-cat-meadow-v2",
-  "requestId": "jumping-cat-20261122-02",
-  "candidateSha": "d2d63f19420105e2d093e403b1a6544f689c86c6"
+  "outputName": "jumping-cat-meadow-final",
+  "requestId": "jumping-cat-20261122-03",
+  "candidateSha": "1dbb99d89d9a9b794228cf2e588905860b172dbf"
 }
