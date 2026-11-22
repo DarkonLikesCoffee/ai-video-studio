@@ -1,5 +1,28 @@
 # AI Video Studio — Project State
 
+## Current verified snapshot — 2026-11-22
+
+- **Main:** `12d037f9d0382c302d069e9aa9104a2a8d2b2c77` (PR #123 merge).
+- **CI:** post-merge main run [#45013735955](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45013735955) passed. PR #123 validation [#45013634377](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45013634377) also passed.
+- **Latest merged work:** PR #123 strengthens the Creative Director handoff by requiring distinct creative territories, an evolving visual grammar and distinct visual events per shot. It changes planning prompts/guidance/tests; it does not add autonomous LLM execution or prove render quality.
+- **PR #121:** merged as `8475fef02486878d2096cf34e07deda672456b02`; explicit renderer/composition selection and render-strategy validation are on main.
+- **Open PRs:** [#122 ORBITAL BLOOM](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/122), [#119 The Last Signal](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/119), [#118 sports car 3D](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/118), [#117 render-gate documentation](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/117), [#114 Last Signal subtitle overlap](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/114), [#113 Solar System](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/113), and [#110 Madrid–New York–Paris render retry](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/110). Their head branches are active and must not be treated as stale.
+- **Render caution:** the latest ORBITAL BLOOM retry visible in Actions, run [#44933442761](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44933442761), failed. PR #122 is still open; do not describe that video as accepted.
+- **Repository inventory:** 232 tracked tree entries and 144 remote branches were observed (100 on the first API page and 44 on the second). The seven open-PR branches are protected from cleanup. No branches were deleted in this pass.
+- **Large asset retained:** `projects/valorant-immortal-decision-making/assets/valorant-gameplay-selected.zip` is 10,530,125 bytes and is explicitly extracted by the render workflow. It is required by the current VALORANT workflow; do not delete it until the project is migrated to a verified external/LFS asset source.
+- **Workflow control files retained:** `render-request.json` triggers video rendering and must be changed only through the frozen-candidate request protocol. `circleci-status-request.json` triggers the CircleCI status workflow. Neither is disposable configuration.
+- **Current product boundary:** the engine has several registered compositions and a Kokoro ONNX narration adapter. The Creative Director remains a model-neutral handoff plus human/external-model execution; it is not a built-in autonomous production agent.
+
+Older entries below are dated history. Their phrases such as “pending”, “in progress” or “current branch” describe the state at the time they were written, not today's live repository state.
+
+## 2026-11-22 — Creative Director storytelling handoff strengthened (PR #123 merged)
+
+- PR #123 merged as `12d037f9d0382c302d069e9aa9104a2a8d2b2c77`.
+- The model-neutral storyboard handoff now requires comparison of distinct creative territories, an evolving visual grammar, and shot-level visual events that do not merely swap text, colors or backgrounds.
+- Updated the Creative Director skill and production workflow guidance; added prompt-contract regression tests.
+- PR CI [#45013634377](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45013634377) and post-merge main CI [#45013735955](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45013735955) completed successfully, including tests, typecheck, validation and Studio build.
+- This was a planning/documentation/test change. No video render was requested, and it does not make the Director autonomous.
+
 ## 2026-11-21 — Explicit Director composition selection (PR #121; CI and representative render passed)
 
 - Started clean development branch `feat/director-composition-selection-final` from the tested Director implementation. The PR excludes the temporary render request; the smoke render was run from a separate branch.
@@ -16,14 +39,14 @@
 - Retrieved and inspected artifact #14712604149 (`director-composition-selection-sora-verified`). MP4: 1920×1080, 30fps, 360 frames/12.0s H.264; AAC stereo 48kHz, 12.1s container duration. Media QA passed with zero silence/frozen/black intervals, A/V duration drift 0.10s, start offset 0s, loudness -15.8 LUFS and true peak -7.9 dBFS.
 - Visual inspection of a 1-second-per-frame contact sheet confirmed four distinct asset/shot designs, but also showed the repeated editorial title/eyebrow layout and relatively restrained within-scene movement of the legacy ProjectVideo renderer. This render verifies the selection and render path; it does not prove cinematic creative quality or that the broader Director now chooses custom compositions well.
 - Audio was measured by Media QA but was not listened to in this inspection.
-- The earlier failed smoke request stopped at the strict asset-evidence gate because SORA lacked `acceptanceCoverage`; no MP4 was produced by that attempt. The corrected, separate smoke request succeeded. Superseded PR #120 is closed; PR #121 is the active clean PR.
+- The earlier failed smoke request stopped at the strict asset-evidence gate because SORA lacked `acceptanceCoverage`; no MP4 was produced by that attempt. The corrected, separate smoke request succeeded. Superseded PR #120 is closed; PR #121 later merged as `8475fef02486878d2096cf34e07deda672456b02`.
 
 
-**Last verified:** 2026-11-21  
+**Historical snapshot recorded:** 2026-11-21 (superseded by the current snapshot above).  
 **Repository:** `DarkonLikesCoffee/ai-video-studio`  
 **Default branch:** `main`  
-**Last verified main commit:** `c148c3002f8364926ad7a71e870ea41411aa5c56` (includes the render-candidate freeze gate from PR #115). PR #116 is also marked merged; recheck the live main ref before relying on its merge SHA.  
-**Current development branch:** `feat/director-composition-selection-final` — clean PR #121; CI and the representative SORA render passed. PR merge is the next integration action.
+**Main commit recorded in that historical snapshot:** `c148c3002f8364926ad7a71e870ea41411aa5c56`.  
+**Development branch recorded in that historical snapshot:** `feat/director-composition-selection-final` — PR #121 was still open at that time; it has since merged.
 
 PR #105 added the strict production asset-evidence gate and merged as `3f3dd846e59a02c0d0f9101ced794ee87357d2e3`. Its exact-head CI #44719701055 passed 233 tests with 0 skipped. Render v6 (#44719959584, artifact #14622220762) proved the gate reports `ready` for the benchmark: 6/6 acceptance criteria linked, 18 assets, and zero unresolved refs, missing files, unsafe paths, rights/provenance gaps or issues.
 

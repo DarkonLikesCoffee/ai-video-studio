@@ -23,8 +23,9 @@ Repository: https://github.com/DarkonLikesCoffee/ai-video-studio
 3. `PROGRESS_LOG.md` — dated history, important decisions, failures, and the latest handoff.
 4. `AGENTS.md` — operating rules for any AI working in this repository.
 5. `README.md` — actual engine architecture, project schema, commands, workflows, asset rules.
-6. `agent/README.md` and `docs/agent-production-workflow.md` — production process and existing agent playbooks.
-7. Relevant skill files under `agent/skills/` and the implementation/tests for the subsystem you intend to change.
+6. `docs/README.md` — documentation map and source-of-truth rules.
+7. `agent/README.md` and `docs/agent-production-workflow.md` — production process and existing agent playbooks.
+8. Relevant skill files under `agent/skills/` and the implementation/tests for the subsystem you intend to change.
 
 Do not rely on this handoff alone when the live repository can be inspected. Verify branch, latest commit, open PRs, workflow runs, render artifacts and current files. These can change after this document was written.
 

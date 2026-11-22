@@ -1,6 +1,6 @@
 # AI Video Studio
 
-Prompt-driven video production system. GitHub stores projects and source code; ChatGPT prepares project files and render requests; GitHub Actions or CircleCI executes the same Remotion engine. No separate web application is required for the prompt-driven workflow.
+Prompt-driven video production system. GitHub stores projects and source code; ChatGPT prepares project files and render requests; GitHub Actions or CircleCI executes the same Remotion engine. No separate web application is required for the prompt-driven workflow. Start with [START_HERE.md](START_HERE.md) when resuming work; see [the documentation index](docs/README.md) for the source-of-truth map.
 
 ## Engine capabilities
 
@@ -9,6 +9,7 @@ Remotion compositions include:
 - `DemoVideo`: the original fixed M1 pipeline demonstration.
 - `ProjectVideo`: a data-driven composition that reads a project JSON file and renders consecutive scenes.
 - `ThreeDShowcase` and `CinematicAdBenchmark`: bespoke 3D/motion-design benchmarks.
+- `MadridTrip` and `MadridNewYorkParis`: custom geographic/travel compositions.
 - `NarratedSkyExplainer`: a custom 3D composition with Kokoro narration, aligned captions and music; it can also composite reviewed Wikimedia Commons footage as full-bleed B-roll with an animated 3D scientific inset.
 
 A `ProjectVideo` project can define:
@@ -616,7 +617,7 @@ A project may also specify `audioMastering` with `integratedLufs`, `truePeakDb` 
 
 The new AETHER showcase exercises EQ, compression, algorithmic reverb, panning, sidechain ducking and final loudness mastering in CI. Its ducking key is a muted deterministic test signal so the demo can verify sidechain behaviour without pretending it contains recorded speech.
 
-This is still a lightweight DSP chain, not a full DAW or mastering suite. Text-to-speech, voice generation, convolution reverb, multiband dynamics, advanced noise reduction and automatic speech transcription are future work. A `voiceover` track currently means importing an existing recording.
+This is still a lightweight DSP chain, not a full DAW or mastering suite. Optional Kokoro ONNX text-to-speech and generated word alignment are available through the GitHub Actions narration adapter described below; this is not a general-purpose provider system. General hosted voice-provider integrations, forced alignment for arbitrary imported recordings, convolution reverb, multiband dynamics, advanced noise reduction and automatic speech transcription remain future work. A `voiceover` track still refers to an imported recording; the Kokoro adapter adds generated narration explicitly through a render request.
 
 
 
@@ -726,7 +727,7 @@ A push that changes only this file starts a short GitHub Actions status check. I
 
 - `ProjectVideo` supports up to eight simultaneous image/video layers per scene, with normalized geometry, rotation, opacity, z-order, and independent visibility windows.
 - Audio DSP uses local FFmpeg binaries. Tracks that need EQ, compression, reverb, panning or sidechain processing must use local assets; remote audio can still be used for unprocessed playback.
-- Video looping and shader-based effects are not implemented in the data-driven `ProjectVideo` schema. Bespoke 3D work requires a custom Remotion composition. The repository now defines an agent production workflow and validates pre-production plans, but it does not host an autonomous LLM agent or an automatic asset-generation service. Timed subtitle overlays are supported, but automatic transcription and text-to-speech are not implemented. SVG path morphing is supported for compatible absolute M/L/C/Q/Z path topologies. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. Audio synthesis, text-to-speech, convolution reverb and multiband processing are future work.
+- Video looping and shader-based effects are not implemented in the data-driven `ProjectVideo` schema. Bespoke 3D work requires a custom Remotion composition. The repository now defines an agent production workflow and validates pre-production plans, but it does not host an autonomous LLM agent or an automatic asset-generation service. Timed subtitle overlays and optional Kokoro ONNX text-to-speech are supported; automatic speech transcription and forced alignment for arbitrary imported recordings are not implemented. SVG path morphing is supported for compatible absolute M/L/C/Q/Z path topologies. The current vector system supports rectangles, ellipses, paths, text, deterministic particle fields and 2D scene transitions; it is not a full 3D or node-based VFX suite. General audio synthesis, hosted voice-provider integrations, convolution reverb and multiband processing remain future work.
 - Remote assets require the render worker to access their public HTTPS URLs. Localhost and private network addresses are rejected.
 - CircleCI rendering requires the one-time CircleCI connection and the three GitHub repository secrets above.
 - Artifact links are served by the selected provider and may require an authenticated session.
