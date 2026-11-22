@@ -31,7 +31,8 @@ export const AssetReview = ({
   totalPages,
   assets,
 }: AssetReviewProps) => {
-  const rows = Math.max(1, Math.ceil(assets.length / 4));
+  const columns = assets.length <= 1 ? 1 : assets.length <= 4 ? 2 : assets.length <= 9 ? 3 : 4;
+  const rows = Math.max(1, Math.ceil(assets.length / columns));
 
   return (
     <AbsoluteFill
@@ -72,7 +73,7 @@ export const AssetReview = ({
           flex: 1,
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+          gridTemplateColumns: "repeat(" + columns + ", minmax(0, 1fr))",
           gridTemplateRows: "repeat(" + rows + ", minmax(0, 1fr))",
           gap: 14,
           paddingTop: 16,
