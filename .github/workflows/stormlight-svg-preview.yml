@@ -22,7 +22,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
       - run: npm run qa:svg-previews
       - uses: actions/upload-artifact@v4
         with:
