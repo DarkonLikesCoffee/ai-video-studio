@@ -37,10 +37,17 @@ Their policies are not identical and remain distinct:
 - GitHub Actions CI must pass on this PR before merge. This connector-only session does not run a local install, test suite or build.
 
 
-## Package metadata follow-up — PR pending
 
 - Moved `@types/three` from `dependencies` to `devDependencies` in `packages/video-engine/package.json`.
 - The package provides TypeScript declarations only; the runtime package `three` remains in `dependencies`.
 - The other `@types/*` packages in the workspace were already classified as development dependencies.
 - This changes dependency classification only; no package version was changed and no rendering/runtime dependency was removed.
 - CI will verify workspace installation, type checking, tests and build on the PR.
+
+
+## Package metadata follow-up — PR #128 merged
+
+- Merged PR #128 as `6ea141c189d6406bb9648cd0dd45652c4ec5d702`.
+- Moved the type-only `@types/three` package from `dependencies` to `devDependencies` in `packages/video-engine/package.json`. The `three` runtime package and all version pins are unchanged.
+- PR CI #45019205207 and post-merge main CI #45019314801 passed.
+- The repository still has no tracked npm lockfile. Dependency removal/version upgrades remain deferred until a real npm-generated lockfile and reproducible clean install can be verified.
