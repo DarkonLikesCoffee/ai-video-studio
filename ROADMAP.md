@@ -2,15 +2,15 @@
 
 ## Current verified snapshot — 2026-11-22
 
-The live implementation and open-work status are recorded in [PROJECT_STATE.md](PROJECT_STATE.md). The latest main commit is `d4a2182cb2dc9a34f525ec203af9a24a07740a62`; cleanup PRs #124–#129 and #131 are merged. Post-merge main CI [#45021169591](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45021169591) passed.
+The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is at `ce1dc23c1f80d1191272fc516fb517fa6428409c`; post-merge CI [#45035430951](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45035430951) passed. There are no open pull requests.
 
-PR #131 added the npm-generated root `package-lock.json` (lockfile v3; 403 package/workspace entries), switched GitHub Actions CI/render and CircleCI rendering to `npm ci`, and documented dependency updates. PR CI #45021066792 and post-merge main CI #45021169591 passed with the committed lockfile.
+PR #133 fixed the GitHub Actions FFmpeg setup failure by replacing the third-party download action in CI and GitHub Actions rendering with a command check and Ubuntu package fallback. PR CI #45034977395 and post-merge main CI #45035118531 passed; 259 Node tests passed with 0 failures and 0 skips. The render workflow's setup was updated but no video render was requested.
 
-PR #126 consolidated Retry-After/backoff calculation for Wikimedia Commons and NASA while preserving their provider-specific delay policies. PR #128 moved the type-only `@types/three` package to devDependencies while retaining `three` at runtime. Both changes passed PR and post-merge CI.
+PR #134 made the shared assistant entry point model-neutral and task-specific. It clarifies that `agent/skills/` is the cross-assistant playbook library and that the active assistant—not an embedded repository LLM—makes creative decisions. Claude-specific integration notes now accurately describe the optional Kokoro ONNX narration adapter. PR CI #45035261813 and post-merge main CI #45035430951 passed; 259 Node tests passed with 0 failures and 0 skips.
 
-PR #123 improved the Creative Director's model-neutral handoff; it does **not** add an LLM integration or complete the autonomous Director. PR #121's explicit composition selection and render-strategy checks are merged. The highest-value remaining product work is still to turn strong plans into genuinely varied, well-edited videos and inspect/repair the actual output.
+These are workflow/documentation and CI reliability improvements, not new creative-production capabilities. The highest-value product work remains a real prompt-to-video benchmark, followed by targeted improvements to reusable visual production and evidence-based critique/iteration. Do not mark autonomous directing or semantic video QA complete until verified on actual outputs.
 
-This roadmap describes the intended product, not current implementation. Update checkboxes only after code and evidence demonstrate the capability. Keep it aligned with the verified project state and actual renders.
+This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
 
 ## North-star outcome
 
