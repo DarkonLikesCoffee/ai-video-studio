@@ -2,13 +2,14 @@
 
 ## Current verified snapshot — 2026-11-22
 
-- **Main:** `21783b093029cb6c9ae688db4be33c415563f458` (PR #126 merge).
-- **Main CI:** post-merge run [#45018877315](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018877315) passed.
-- **Recent cleanup:** PR #124 completed the first documentation pass; PR #125 added the documentation index and follow-up audit; PR #126 extracted the shared retry-delay calculation. All three cleanup PRs are merged.
-- **PR #126 verification:** PR CI [#45018775059](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018775059) passed; post-merge main CI #45018877315 also passed. The NASA and Wikimedia Commons wrappers preserve their original retry policies.
-- **Other open PRs:** [#122 ORBITAL BLOOM](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/122), [#119 The Last Signal](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/119), [#118 sports car 3D](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/118), [#117 render-gate documentation](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/117), [#114 subtitle overlap](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/114), [#113 Solar System](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/113), and [#110 Madrid render retry](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/110). Their branches remain protected.
+- **Main:** `6ea141c189d6406bb9648cd0dd45652c4ec5d702` (PR #128 merge).
+- **Main CI:** post-merge run [#45019314801](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45019314801) passed.
+- **Recent cleanup:** PR #124 completed the first documentation pass; PR #125 added the docs index and follow-up audit; PR #126 consolidated the shared retry-delay algorithm; PR #127 refreshed the verified repository handoff; PR #128 moved the type-only `@types/three` package to development dependencies. All are merged.
+- **PR #126 verification:** PR CI [#45018775059](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45018775059) and post-merge main CI #45018877315 passed.
+- **PR #128 verification:** PR CI [#45019205207](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45019205207) and post-merge main CI #45019314801 passed. The `three` runtime dependency and all package versions were unchanged.
+- **Other open PRs:** [#122 ORBITAL BLOOM](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/122), [#119 The Last Signal](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/119), [#118 sports car 3D](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/118), [#117 render-gate documentation](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/117), [#114 subtitle overlap](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/114), [#113 Solar System](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/113), and [#110 Madrid render retry](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/110). These seven branches remain protected.
 - **Render caution:** the latest ORBITAL BLOOM retry visible in Actions, run [#44933442761](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/44933442761), failed. PR #122 remains open; do not describe that video as accepted.
-- **Repository inventory:** the complete recursive tree contains 190 tracked files (the API response was not truncated). The earlier branch count of 144 was a dated observation; it has not been re-enumerated in this pass.
+- **Repository inventory:** the complete recursive tree at this main commit contains 190 tracked files (API response not truncated). The earlier 144-branch count is a dated observation and has not been re-enumerated.
 - **Large asset retained:** `projects/valorant-immortal-decision-making/assets/valorant-gameplay-selected.zip` is 10,530,125 bytes and is explicitly extracted by the render workflow. It remains required until an alternative asset source is implemented and verified.
 - **Workflow control files retained:** `render-request.json` triggers video rendering and must be changed only through the frozen-candidate request protocol. `circleci-status-request.json` triggers the CircleCI status workflow. Neither is disposable.
 - **Product boundary:** the engine has registered Remotion compositions and a Kokoro ONNX narration adapter. The Creative Director remains a model-neutral handoff plus external model/human execution; it is not a built-in autonomous production agent.
@@ -336,7 +337,7 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - No code, dependency, workflow, asset, or branch deletion was attempted. Local tests/build/render were not run in this connector-only session; PR CI is required.
 
 
-## 2026-11-22 — Source-code cleanup: shared HTTP retry-delay helper (PR pending)
+## 2026-11-22 — Source-code cleanup: shared HTTP retry-delay helper (PR #126 merged)
 
 - Created branch `chore/source-code-cleanup-2026-11-22` from post-PR #125 main commit `12983e7bd7c9c1ab186f0c64e8c149a5e74cc3c4`.
 - Audited the complete recursive tree (186 tracked files) and traced candidate utility modules to their production imports and tests.
@@ -344,11 +345,11 @@ GitHub Actions renders are being extended to generate a 5-second contact sheet a
 - Extracted the pure calculation to `scripts/retry-delay.mjs`; kept both public wrappers and provider-specific delay policies intact.
 - Added focused tests for numeric/date Retry-After handling, caps, backoff and invalid values.
 - Confirmed the inspected core utility modules and EiffelTower component are referenced; no dead code was removed.
-- CI is required on the PR; no local tests/build/render were run in this connector-only session.
+- PR CI #45018775059 and post-merge main CI #45018877315 passed. No production render was required for this internal helper refactor.
 
 
-## 2026-11-22 — Type dependency metadata cleanup (PR pending)
+## 2026-11-22 — Type dependency metadata cleanup (PR #128 merged)
 
 - Moved `@types/three` from runtime dependencies to development dependencies in `packages/video-engine/package.json`, consistent with the other `@types/*` packages.
 - The `three` runtime dependency and all versions remain unchanged.
-- CI must verify workspace install, type-check, test suite and Studio build before merge.
+- PR CI #45019205207 and post-merge main CI #45019314801 passed. No package versions or runtime dependencies changed.
