@@ -2,6 +2,19 @@
 
 This directory defines the operating procedure for an AI agent producing complete videos with this repository. It is an orchestration layer, not a replacement renderer or an autonomous model runtime.
 
+
+## Model-neutral responsibility boundary
+
+This workflow is intended for any assistant that can read and work with the repository; it does not depend on ChatGPT, Claude or a particular model provider.
+
+- The assistant in the current conversation is the director and production decision-maker. It interprets the brief, chooses the visual approach, authors the storyboard, builds scenes and reviews the result.
+- This repository does not contain an embedded general-purpose LLM director. The `director:*` and `storyboard:*` commands create structured handoffs, reports, validators or revision artifacts; they do not call an LLM or make creative judgments on their own.
+- The rendering engine executes deterministic projects. It does not independently invent the story, source every asset, understand the finished video or autonomously repair weak scenes.
+- `agent/skills/` is the canonical shared playbook library for all assistants. The vendored `.claude/skills/` files are optional Claude Code integration, not a dependency for other assistants.
+- Upstream skill examples and provider names do not mean their CLIs, API keys or paid services are configured here. Follow this repository's implementation and integration notes, and obtain explicit consent before any paid service.
+
+Do not claim autonomous behavior for a prompt, checklist, script handoff or deterministic validator. Be clear about which decisions the current assistant made and which checks the repository actually executed.
+
 ## Production pipeline
 
 1. **Brief** — extract objective, audience, platform, duration, format, constraints and success criteria.
