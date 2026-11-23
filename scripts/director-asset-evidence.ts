@@ -133,6 +133,7 @@ export const buildAssetEvidenceReport = async (
   if (planErrors.length) throw new Error("Production plan invalid:\\n" + planErrors.map((error) => "- " + error).join("\\n"));
   if (!isRecord(manifestValue) || !Array.isArray(manifestValue.assets)) throw new Error("Asset manifest must contain an assets array.");
   const projectRoot = path.resolve(options.projectRoot);
+  const requireVisualReview = planValue.assetVisualReviewRequired === true;
   const shotsInput = planValue.shots.filter(isRecord);
   const shotIds = shotsInput.map((shot) => asText(shot.id)).filter((id): id is string => id !== null);
   const knownShots = new Set(shotIds);
@@ -182,11 +183,13 @@ export const buildAssetEvidenceReport = async (
     else if (local.status === "empty") addIssue({ code: "ASSET_FILE_EMPTY", severity: "warning", message: `Asset "${reference}" exists but is empty.`, assetRef: reference });
     if (provenanceStatus === "missing") addIssue({ code: "ASSET_PROVENANCE_MISSING", severity: "warning", message: `Asset "${reference}" has no source/provenance note or URL.`, assetRef: reference });
     if (rightsStatus === "missing") addIssue({ code: "ASSET_RIGHTS_MISSING", severity: "warning", message: `Asset "${reference}" has no license or explicit rights basis and note.`, assetRef: reference });
-    if (previewLocal.status === "not-local") addIssue({ code: "ASSET_PREVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no declared preview file.`, assetRef: reference });
-    else if (previewLocal.status !== "present") addIssue({ code: "ASSET_PREVIEW_UNAVAILABLE", severity: "warning", message: `Asset "${reference}" preview is ${previewLocal.status}.`, assetRef: reference });
-    if (visualReviewStatus === "missing") addIssue({ code: "ASSET_VISUAL_REVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no complete visual-review approval.`, assetRef: reference });
-    else if (visualReviewStatus === "pending") addIssue({ code: "ASSET_VISUAL_REVIEW_PENDING", severity: "warning", message: `Asset "${reference}" visual review is pending.`, assetRef: reference });
-    else if (visualReviewStatus === "rejected") addIssue({ code: "ASSET_VISUAL_REVIEW_REJECTED", severity: "warning", message: `Asset "${reference}" was rejected during visual review.`, assetRef: reference });
+    if (requireVisualReview) {
+      if (previewLocal.status === "not-local") addIssue({ code: "ASSET_PREVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no declared preview file.`, assetRef: reference });
+      else if (previewLocal.status !== "present") addIssue({ code: "ASSET_PREVIEW_UNAVAILABLE", severity: "warning", message: `Asset "${reference}" preview is ${previewLocal.status}.`, assetRef: reference });
+      if (visualReviewStatus === "missing") addIssue({ code: "ASSET_VISUAL_REVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no complete visual-review approval.`, assetRef: reference });
+      else if (visualReviewStatus === "pending") addIssue({ code: "ASSET_VISUAL_REVIEW_PENDING", severity: "warning", message: `Asset "${reference}" visual review is pending.`, assetRef: reference });
+      else if (visualReviewStatus === "rejected") addIssue({ code: "ASSET_VISUAL_REVIEW_REJECTED", severity: "warning", message: `Asset "${reference}" was rejected during visual review.`, assetRef: reference });
+    }
     assets.push({
       id: asText(value.id) ?? reference,
       reference,
