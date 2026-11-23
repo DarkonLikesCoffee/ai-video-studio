@@ -54,7 +54,7 @@ jobs:
             PROJECT_DIR="$(dirname "$(dirname "$PRODUCTION_PLAN_PATH")")"
           fi
           STATE_PATH="$PROJECT_DIR/production/production-state.json"
-          if [[ -f "$STATE_PATH" ]]; then
+          if [[ -e "$STATE_PATH" || -L "$STATE_PATH" ]]; then
             PROJECT_ID="$(basename "$PROJECT_DIR")"
             npm run validate:state -- "$STATE_PATH" "$PROJECT_ID" --require-evidence --verify-evidence-files --project-root "$PROJECT_DIR" --require-stage frozen
             echo "Production state accepted: $PROJECT_ID is frozen with verifiable stage evidence." | tee -a "$GITHUB_STEP_SUMMARY"
