@@ -9,29 +9,29 @@ const move = (frame: number, from: number, to: number, start: number, end: numbe
 type BirdProps = { x: number; y: number; scale?: number; rotation?: number; flap: number; color?: string; opacity?: number };
 
 const Bird = ({ x, y, scale = 1, rotation = 0, flap, color = "#172D35", opacity = 1 }: BirdProps) => (
-  <g transform={`translate(${x} ${y}) rotate(${rotation}) scale(${scale})`} opacity={opacity}>
+  <g transform={"translate(" + x + " " + y + ") rotate(" + rotation + ") scale(" + scale + ")"} opacity={opacity}>
     <path d="M-28 4 Q-74 -2 -109 19 Q-84 23 -57 16 Q-88 37 -114 35 Q-69 44 -30 20Z" fill={color}/>
     <path d="M-45 0 C-28 -23 12 -24 39 -9 C54 -1 62 7 78 4 L102 -4 L86 11 C68 30 26 31 -11 17 C-28 12 -39 8 -45 0Z" fill={color}/>
     <path d="M42 -7 Q71 -21 92 -12 L111 -5 L91 1 Q67 4 49 5Z" fill={color}/>
-    <path d="M101 -5 L124 -9 L108 2Z" fill="#D89A52"/>
+    <g transform={"rotate(" + (10 + flap * 38) + " -16 -2")}>
     <circle cx="78" cy="-11" r="3.1" fill="#F4E8D1"/><circle cx="79" cy="-11" r="1.35" fill="#14242B"/>
     <g transform={`rotate(${10 + flap * 38} -16 -2)`}>
       <path d="M-20 0 Q-16 -65 -56 -136 Q-49 -75 -39 -35 Q-66 -99 -97 -119 Q-75 -65 -48 -27 Q-88 -75 -125 -83 Q-94 -42 -50 -12 Q-79 -29 -112 -31 Q-69 2 -20 12Z" fill="#29434A"/>
-      <path d="M-34 -20 Q-64 -84 -93 -104 M-37 -16 Q-82 -61 -112 -68 M-34 -12 Q-81 -34 -104 -34" fill="none" stroke="#78918E" strokeWidth="2.2" opacity=".45"/>
+    <g transform={"rotate(" + (-12 - flap * 48) + " -15 1")}>
     </g>
     <g transform={`rotate(${-12 - flap * 48} -15 1)`}>
       <path d="M-20 2 Q-13 -62 8 -132 Q8 -74 0 -33 Q18 -94 46 -121 Q35 -65 8 -24 Q45 -70 82 -79 Q56 -32 10 -7 Q48 -24 78 -22 Q35 13 -20 14Z" fill={color}/>
       <path d="M-1 -22 Q22 -80 37 -108 M1 -16 Q42 -56 70 -65 M2 -10 Q47 -28 67 -27" fill="none" stroke="#8DA19A" strokeWidth="2.4" opacity=".42"/>
     </g>
   </g>
-);
+  <g transform={"translate(" + x + " " + y + ") scale(" + s + ")"} opacity={opacity} fill="#FFF8EA">
 
 const Cloud = ({x,y,s=1,opacity=.38}:{x:number;y:number;s?:number;opacity?:number}) => (
   <g transform={`translate(${x} ${y}) scale(${s})`} opacity={opacity} fill="#FFF8EA">
     <ellipse cx="0" cy="12" rx="88" ry="20"/><ellipse cx="-39" cy="3" rx="40" ry="26"/>
     <ellipse cx="8" cy="-12" rx="53" ry="38"/><ellipse cx="53" cy="3" rx="42" ry="27"/>
   </g>
-);
+  <g transform={"translate(" + x + " " + y + ") scale(" + s + ")"}>
 
 const Pine = ({x,y,s=1,tone="#314F4D"}:{x:number;y:number;s?:number;tone?:string}) => (
   <g transform={`translate(${x} ${y}) scale(${s})`}>
@@ -41,7 +41,7 @@ const Pine = ({x,y,s=1,tone="#314F4D"}:{x:number;y:number;s?:number;tone?:string
   </g>
 );
 
-const DistantBirds = ({frame}:{frame:number}) => (
+      return <path key={i} d={"M" + (x-15) + " " + y + " Q" + x + " " + (y-12) + " " + (x+15) + " " + y}/>
   <g fill="none" stroke="#344A48" strokeWidth="4.5" strokeLinecap="round" opacity=".55">
     {Array.from({length:6},(_,i)=>{
       const dx=(frame*(.12+i*.012)+i*83)%250;
@@ -68,7 +68,7 @@ const OpeningShot = ({frame}:{frame:number}) => {
       <path d="M0 840 Q410 745 770 815 T1440 780 T1920 760 L1920 1080 L0 1080Z" fill="url(#openCliff)"/>
       <g opacity=".5"><Cloud x={350-frame*.35} y={360} s={1.1}/><Cloud x={1050-frame*.2} y={420} s={.8}/></g>
       <g transform={`translate(0 ${branchSway})`}>
-        <path d="M-70 930 Q300 830 550 875 Q780 920 1030 820 Q1150 774 1260 790" fill="none" stroke="#53483B" strokeWidth="43" strokeLinecap="round"/>
+      <g transform={"translate(0 " + branchSway + ")}>
         <path d="M460 877 Q565 770 610 650 M835 884 Q905 800 958 745" fill="none" stroke="#584D40" strokeWidth="20" strokeLinecap="round"/>
         <Pine x={330} y={1040} s={.88} tone="#2C4D48"/><Pine x={590} y={1035} s={.64} tone="#496B5A"/>
       </g>
