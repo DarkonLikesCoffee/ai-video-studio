@@ -1,6 +1,5 @@
 # Repository documentation
 
-| [Production state](production-state.md) | Versioned stage/evidence handoff schema and validator for resumable agent-led video work. |
 
 Use this page to find the right document before adding another status or handoff file.
 
@@ -28,6 +27,7 @@ The current snapshot at the top of PROJECT_STATE.md takes precedence over older 
 
 - [agent/README.md](../agent/README.md) — agent roles, skills and operating model.
 - [docs/agent-production-workflow.md](agent-production-workflow.md) — end-to-end brief-to-delivery workflow and render freeze protocol.
+- [production-state.md](production-state.md) — versioned stage/evidence handoff schema and validator for resumable agent-led video work.
 - [agent/skills/](../agent/skills/) — focused playbooks for creative direction, storyboard, assets, narration, audio and QA.
 - [agent/EXTERNAL_SKILLS.md](../agent/EXTERNAL_SKILLS.md) — reviewed upstream skill references and license notes.
 - [.claude/skills/video-engine/](../.claude/skills/video-engine/) — vendored video-engine skill and repository integration references.
