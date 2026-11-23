@@ -1,17 +1,37 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateVisualReviewReport } from "../scripts/visual-review-validate";
+import { validatePlaybackSession, validateVisualReviewReport } from "../scripts/visual-review-validate";
 
 const base = () => ({
   schemaVersion: 2,
   status: "approved",
-  artifact: { videoSha256: "a".repeat(64) },
+  artifact: { videoSha256: "a".repeat(64), name: "demo", durationSeconds: 10 },
   inspection: {
-    method: "full-video",
+    method: "tracked-full-playback",
     fullVideoWatched: true,
-    timestampsReviewedSeconds: [0, 5, 10],
+    timestampsReviewedSeconds: [0, 2.5, 5, 7.5, 10],
     reviewer: "reviewer",
-    reviewedAt: "2026-11-23T12:00:00Z",
+    reviewedAt: "2026-11-23T12:00:10Z",
+    playbackSession: {
+      schemaVersion: 1,
+      kind: "visual-review-playback-session",
+      sessionId: "session-001",
+      mediaName: "demo.mp4",
+      mediaSizeBytes: 123456,
+      mediaSha256: "a".repeat(64),
+      durationSeconds: 10,
+      startedAt: "2026-11-23T12:00:00Z",
+      completedAt: "2026-11-23T12:00:10Z",
+      elapsedWallSeconds: 10,
+      playedRangesSeconds: [[0, 10]],
+      checkpointsSeconds: [0, 2.5, 5, 7.5, 10],
+      playbackRate: 1,
+      endedEventObserved: true,
+      pageVisibleThroughout: true,
+      seekAttempts: 0,
+      complete: true,
+      invalidReason: null,
+    },
   },
   findings: [],
   corrections: [],
@@ -147,4 +167,51 @@ test("invalid hash and duplicate finding ids are rejected", () => {
   const errors = validateVisualReviewReport(r).errors;
   assert.ok(errors.some(error => error.includes("SHA-256")));
   assert.ok(errors.some(error => error.includes("Duplicate finding id")));
+});
+
+
+test("approval cannot be enabled by the fullVideoWatched checkbox alone", () => {
+  const r = base();
+  r.inspection.playbackSession = null;
+  const errors = validateVisualReviewReport(r).errors;
+  assert.ok(errors.some(error => error.includes("tracked full-playback session")));
+});
+
+test("playback evidence must match the exact current MP4 hash and duration", () => {
+  const r = base();
+  r.inspection.playbackSession.mediaSha256 = "f".repeat(64);
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("current artifact video SHA-256")));
+  r.inspection.playbackSession.mediaSha256 = "a".repeat(64);
+  r.inspection.playbackSession.durationSeconds = 9;
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("durationSeconds must match")));
+});
+
+test("playback approval rejects sessions without the ended event, with seeks, hidden tab or non-normal speed", () => {
+  const mutations = [
+    (s: any) => { s.endedEventObserved = false; },
+    (s: any) => { s.seekAttempts = 1; },
+    (s: any) => { s.pageVisibleThroughout = false; },
+    (s: any) => { s.playbackRate = 1.25; },
+  ];
+  for (const mutate of mutations) {
+    const r = base();
+    mutate(r.inspection.playbackSession);
+    assert.ok(validateVisualReviewReport(r).errors.length > 0);
+  }
+});
+
+test("playback approval requires continuous near-complete coverage and checkpoints", () => {
+  const r = base();
+  r.inspection.playbackSession.playedRangesSeconds = [[0, 4], [5, 10]];
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("gap larger than")));
+  r.inspection.playbackSession.playedRangesSeconds = [[0, 9]];
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("does not reach the end")));
+  r.inspection.playbackSession.playedRangesSeconds = [[0, 10]];
+  r.inspection.playbackSession.checkpointsSeconds = [0, 5, 10];
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("25% playback checkpoint")));
+});
+
+test("playback session validation accepts a complete session tied to the current artifact", () => {
+  const r = base();
+  assert.deepEqual(validatePlaybackSession(r.inspection.playbackSession, r.artifact), []);
 });
