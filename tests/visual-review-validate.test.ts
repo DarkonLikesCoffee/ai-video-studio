@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { validatePlaybackSession, validateVisualReviewReport } from "../scripts/visual-review-validate";
 
 const base = () => ({
-  schemaVersion: 2,
+  schemaVersion: 3,
   status: "approved",
   artifact: { videoSha256: "a".repeat(64), name: "demo", durationSeconds: 10 },
   inspection: {
@@ -22,12 +22,13 @@ const base = () => ({
       durationSeconds: 10,
       startedAt: "2026-11-23T12:00:00Z",
       completedAt: "2026-11-23T12:00:10Z",
-      elapsedWallSeconds: 10,
+      elapsedPlaybackSeconds: 10,
       playedRangesSeconds: [[0, 10]],
       checkpointsSeconds: [0, 2.5, 5, 7.5, 10],
       playbackRate: 1,
       endedEventObserved: true,
       pageVisibleThroughout: true,
+      reviewWindowFocusedThroughout: true,
       seekAttempts: 0,
       complete: true,
       invalidReason: null,
@@ -191,6 +192,7 @@ test("playback approval rejects sessions without the ended event, with seeks, hi
     (s: any) => { s.endedEventObserved = false; },
     (s: any) => { s.seekAttempts = 1; },
     (s: any) => { s.pageVisibleThroughout = false; },
+    (s: any) => { s.reviewWindowFocusedThroughout = false; },
     (s: any) => { s.playbackRate = 1.25; },
   ];
   for (const mutate of mutations) {
@@ -214,4 +216,20 @@ test("playback approval requires continuous near-complete coverage and checkpoin
 test("playback session validation accepts a complete session tied to the current artifact", () => {
   const r = base();
   assert.deepEqual(validatePlaybackSession(r.inspection.playbackSession, r.artifact), []);
+});
+
+
+test("approval metadata must refer to the imported playback session", () => {
+  const r = base();
+  r.inspection.reviewedAt = "2026-11-23T12:00:11Z";
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("reviewedAt must match")));
+  r.inspection.reviewedAt = "2026-11-23T12:00:10Z";
+  r.inspection.timestampsReviewedSeconds = [0, 5, 10];
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("must match the playback session checkpoints")));
+});
+
+test("schema version 3 requires a real render duration", () => {
+  const r = base();
+  delete r.artifact.durationSeconds;
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("artifact.durationSeconds")));
 });
