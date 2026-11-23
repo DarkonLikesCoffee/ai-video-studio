@@ -177,7 +177,7 @@ export const appendVisualReviewIteration = (
     }
   }
 
-  const existingIterations = Array.isArray(previousReport.renderIterations)
+  const existingIterations = Array.isArray(previousReport.renderIterations) && previousReport.renderIterations.length > 0
     ? previousReport.renderIterations.filter(isRecord)
     : [createLegacyIteration(previousReport, previousArtifact.videoSha256)];
   const nextIteration = createRenderIteration(
