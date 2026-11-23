@@ -145,6 +145,7 @@ test("rejects unsafe or mismatched production plan paths", () => {
     "../production-plan.json",
     "projects/custom-film/production/other.json",
     "projects/custom-film/production/production-plan.json/../../secret.json",
+    42,
   ]) {
     const result = validateRenderRequest({
       provider: "github-actions",
