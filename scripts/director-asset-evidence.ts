@@ -347,10 +347,10 @@ const collectCompositionReferences = async (
 const normalizeUsagePath = (value: string): string =>
   value.replace(/\\/g, "/").replace(/^\.\//, "");
 
-const usageMatchesAsset = (_reference: SourceReference, _asset: RecordValue, localPath: string | null): boolean => {
+const usageMatchesAsset = (reference: SourceReference, localPath: string | null): boolean => {
   // Compare the canonical project-relative path; preserve folders and case.
   if (!localPath) return false;
-  return normalizeUsagePath(_reference.value) === normalizeUsagePath(localPath);
+  return normalizeUsagePath(reference.value) === normalizeUsagePath(localPath);
 };
 
 const describeProvenance = (asset: RecordValue) => asText(asset.provenance) ?? asText(asset.sourcePage) ?? asText(asset.sourceUrl) ?? asText(asset.creator) ?? asText(asset.attribution);
@@ -397,7 +397,7 @@ export const buildAssetEvidenceReport = async (
     const validReusePolicy = declaredReusePolicy === null || reusePolicies.includes(declaredReusePolicy as ReusePolicy);
     if (!validReusePolicy) addIssue({ code: "ASSET_REUSE_POLICY_INVALID", severity: "error", message: `Asset "${reference}" reusePolicy must be required, optional or reference-only.`, assetRef: reference });
     const reusePolicy = getReusePolicy(value);
-    const usageMatches = reusePolicy === "reference-only" ? [] : compositionReferences.references.filter((sourceReference) => usageMatchesAsset(sourceReference, value, local.path));
+    const usageMatches = reusePolicy === "reference-only" ? [] : compositionReferences.references.filter((sourceReference) => usageMatchesAsset(sourceReference, local.path));
     const usageStatus: AssetUsageStatus = reusePolicy === "reference-only"
       ? "not-required"
       : !compositionReferences.available
