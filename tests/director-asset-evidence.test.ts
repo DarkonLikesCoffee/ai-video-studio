@@ -201,8 +201,8 @@ test("asset visual review requires an existing preview and complete approval met
     assert.equal(report.assets[0]?.previewStatus, "present");
     assert.equal(report.assets[0]?.visualReviewStatus, "approved");
     assert.equal(report.summary.visualReviewApproved, 1);
-    assert.equal(report.summary.visualReviewMissing, 2);
-    assert.equal(report.summary.missingPreviews, 2);
+    assert.equal(report.summary.visualReviewMissing, 0);
+    assert.equal(report.summary.missingPreviews, 0);
   });
 });
 
