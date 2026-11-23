@@ -66,7 +66,7 @@ The visual-review report is the durable review record. When a render is rejected
 5. Inspect the new MP4. Re-verify every correction against this exact artifact hash; do not carry verification forward from an older render. Add `verification.videoSha256`, reviewer, review timestamp and timestamps checked, set `verified: true` and `status: "verified"`, then mark the finding resolved when all its corrections have been verified.
 6. Run `npm run qa:visual-review-validate -- <report.json>`. Approval still requires full-video inspection and the acceptance gate above.
 
-A subsequent render reopens previously resolved findings for re-checking and moves older correction verification into `verificationHistory`. This is intentional regression protection. Schema-version-1 reports can be used as the first, legacy iteration; all new reports use schema version 2.
+A subsequent render reopens previously resolved findings for re-checking and moves older correction verification into `verificationHistory`. This is intentional regression protection. Schema-version-1 reports can be used as the first, legacy iteration after their corrections are upgraded with stable IDs, target paths, applied status and commit SHAs; all new reports use schema version 2.
 
 Example correction:
 
