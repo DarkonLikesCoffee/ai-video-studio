@@ -8,7 +8,7 @@ const isProjectPath = (value) =>
   /^projects\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.json$/.test(value);
 
 const isProductionPlanPath = (value) =>
-  /^projects\\/[A-Za-z0-9_-]+(?:\\/[A-Za-z0-9_-]+)*\\/production\\/production-plan\\.json$/.test(value);
+  /^projects\[A-Za-z0-9_-]+(?:\[A-Za-z0-9_-]+)*\production\production-plan\.json$/.test(value);
 
 export const matchesCompositionMetadata = (project, compositionId) =>
   isRecord(project) && isRecord(project.composition) &&
