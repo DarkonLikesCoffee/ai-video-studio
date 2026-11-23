@@ -207,7 +207,7 @@ test("final delivery rejects a video whose bytes changed after provenance and re
   const f = await makeFixture();
   t.after(() => rm(f.root, { recursive: true, force: true }));
   await writeFile(f.videoPath, "different-mp4-payload-for-gate-test");
-  await assert.rejects(() => validateFinalDeliveryBundle(f.options), /does not match the downloaded file/);
+  await assert.rejects(() => validateFinalDeliveryBundle(f.options), /downloaded MP4 hash/);
 });
 
 test("final delivery rejects failed media QA even when the report is present", async t => {
