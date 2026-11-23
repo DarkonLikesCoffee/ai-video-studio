@@ -28,13 +28,15 @@ const report = (videoSha: string, candidate = "c", source = "d", requestId = "re
 
 test("report starts pending and binds the actual render to candidate and workflow provenance", () => {
   const value = report("a");
-  assert.equal(value.schemaVersion, 2);
+  assert.equal(value.schemaVersion, 3);
   assert.equal(value.status, "pending-review");
   assert.equal(value.inspection.method, "not-yet-inspected");
   assert.equal(value.inspection.fullVideoWatched, false);
   assert.equal(value.decision.approved, false);
   assert.deepEqual(value.contactSheet.sampleTimestampsSeconds, [0, 5]);
   assert.equal(value.artifact.videoSha256, "a".repeat(64));
+  assert.equal(value.artifact.durationSeconds, 8);
+  assert.equal(value.inspection.playbackSession, null);
   assert.equal(value.renderIterations.length, 1);
   assert.equal(value.renderIterations[0].candidateSha, "c".repeat(40));
   assert.equal(value.renderIterations[0].sourceCommit, "d".repeat(40));

@@ -66,7 +66,7 @@ The visual-review report is the durable review record. When a render is rejected
 5. Inspect the new MP4. Re-verify every correction against this exact artifact hash; do not carry verification forward from an older render. Add `verification.videoSha256`, reviewer, review timestamp and timestamps checked, set `verified: true` and `status: "verified"`, then mark the finding resolved when all its corrections have been verified.
 6. Run `npm run qa:visual-review-validate -- <report.json>`. Approval still requires full-video inspection and the acceptance gate above.
 
-A subsequent render reopens previously resolved findings for re-checking and moves older correction verification into `verificationHistory`. This is intentional regression protection. Schema-version-1 reports can be used as the first, legacy iteration after their corrections are upgraded with stable IDs, target paths, applied status and commit SHAs; all new reports use schema version 2.
+A subsequent render reopens previously resolved findings for re-checking and moves older correction verification into `verificationHistory`. This is intentional regression protection. Schema-version-1 reports can be used as the first, legacy iteration after their corrections are upgraded with stable IDs, target paths, applied status and commit SHAs; all new reports use schema version 3.
 
 Example correction:
 
@@ -92,3 +92,17 @@ After inspecting the new MP4, verification must refer to its current `artifact.v
   "timestampsReviewedSeconds": [12.4, 18.2]
 }
 ```
+
+
+## Tracked full-video playback
+
+Before approving a new render, use `tools/visual-review-player.html` with the exact MP4 downloaded from the render artifact:
+
+1. Select the matching `<output-name>.mp4` and wait for its SHA-256 and duration to load.
+2. Play from the beginning through the native `ended` event at 1× speed. Pausing/resuming is allowed. Do not seek, hide the tab or move focus away from the review window.
+3. Export `visual-review-session.json` only after the player confirms continuous coverage and the five start/quarter/half/three-quarter/end checkpoints.
+4. Import the session using `npm run qa:visual-review-session -- --report <report.json> --session <session.json> --reviewer <name>`.
+
+The importer binds the session to the report's current MP4 SHA-256 and duration, then sets the inspection method and timestamps. It does not approve the video. Complete the substantive creative review, record findings and correction verification, explicitly set the final decision, and run `npm run qa:visual-review-validate -- <report.json>`.
+
+The playback JSON is editable telemetry, not a signed or identity-verified attestation. Never describe it as cryptographic proof that a particular person watched the video. It establishes consistency with a full normal-speed playback session as recorded by the local player; visual-quality judgment remains a human responsibility.

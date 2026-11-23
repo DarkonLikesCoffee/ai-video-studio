@@ -865,6 +865,31 @@ Defaults: one thumbnail every 5 seconds, 4 columns, 320 px width. Requires FFmpe
 GitHub Actions renders now also generate a contact sheet and a versioned JSON evidence report automatically after media QA. Both files are uploaded alongside the MP4 and media-QA report, making sparse visual review available for every GitHub Actions render without a manual command. The contact sheet samples at 5-second intervals by default; it is not a substitute for watching the full video.
 
 
+### Full-video playback evidence
+
+A contact sheet is useful for spotting visual patterns, but it does not prove that the actual MP4 was watched. New visual-review reports use schema version 3 and record the render duration. Approval requires a playback session tied to the current MP4 SHA-256.
+
+1. Download the MP4 from the render artifact. Open `tools/visual-review-player.html` locally in a current Chrome or Edge browser and select the MP4. The selected file must be named `<output-name>.mp4`, matching the report.
+2. Start the review and let playback reach the end at normal 1× speed. Pausing and resuming is allowed; seeking, hiding the tab or switching focus away from the review window invalidates the session. The player checks played ranges and five playback checkpoints before enabling the JSON export.
+3. Save `visual-review-session.json` and import it into the matching report:
+
+```bash
+npm run qa:visual-review-session -- \
+  --report render-output/review/<output-name>.visual-review.json \
+  --session visual-review-session.json \
+  --reviewer "Reviewer"
+```
+
+4. Add findings and corrections, make the creative decision, then run the validator:
+
+```bash
+npm run qa:visual-review-validate -- render-output/review/<output-name>.visual-review.json
+```
+
+Importing playback evidence does not approve creative quality. The report remains pending until the reviewer records findings, verifies corrections and explicitly makes the decision. The validator checks the session's MP4 hash, duration, playback coverage, checkpoints, end event, normal playback rate, and visibility/focus flags.
+
+The player works locally and does not upload the MP4. It hashes the complete selected file in browser memory, so very large videos require enough available RAM. The JSON is editable and is not cryptographically signed: it is consistency-checked playback telemetry, not proof of reviewer identity or tamper-proof attestation.
+
 ## Narrative beat review
 
 Production plans may optionally label shots with `narrativeBeat`: `hook`, `setup`, `context`, `development`, `escalation`, `reveal`, `payoff`, `cta`, `transition` or `pause`. These labels are explicit author/director choices; the system does not infer story roles from prose.
