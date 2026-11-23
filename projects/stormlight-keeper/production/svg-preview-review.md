@@ -13,4 +13,4 @@
 | beacon-beam.svg | Soft transparent gradient and clear directional shape |
 | distant-vessel.svg | Legible small boat silhouette at final wide distance |
 
-All SVG files must be rendered individually and visually checked before animation. The contact sheet is a review artifact; the final custom 3D composition builds the lighthouse, robot and environment procedurally.
+All SVG files are rendered individually and visually checked before animation. The previews are design references: the final 2D Remotion composition recreates the selected visual grammar as animated inline SVG groups and paths rather than importing these files as static image layers.
