@@ -6,10 +6,10 @@ parameters:
     default: false
   project_path:
     type: string
-    default: projects/demo/scene.json
+    default: ""
   composition_id:
     type: string
-    default: DemoVideo
+    default: JumpingCat
   narration_path:
     type: string
     default: ""
