@@ -12,10 +12,10 @@ export type CompositionCapability = {
   limitations: string[];
 };
 
-// This is the model-facing catalogue of compositions actually registered by
-// packages/video-engine/src/root.tsx on the current branch. Add every new
-// production composition here before the Director can select it. Tests verify
-// that each catalogue entry is registered; unlisted IDs are not selectable.
+// The shared JSON catalogue is consumed by both the Director and render
+// preflight. Add every new production composition there and register its
+// component in RemotionRoot before it can be selected. CI and render preflight
+// require the two ID sets to match exactly.
 export const COMPOSITION_REGISTRY = compositionRegistry as readonly CompositionCapability[];
 
 export const getCompositionCapability = (id: string): CompositionCapability | undefined =>
