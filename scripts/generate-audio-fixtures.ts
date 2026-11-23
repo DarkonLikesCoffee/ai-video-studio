@@ -276,4 +276,30 @@ await writeMonoWav(resolve(stormlightDirectory, "stormlight-atmosphere.wav"), st
 });
 
 
-console.log("Generated legacy samples, original Aether, PULSE, SORA, Madrid travel, and Stormlight Keeper audio fixtures.");
+const jumpingCatDirectory = resolve("packages/video-engine/public/audio");
+const windDuration = 20;
+await writeMonoWav(resolve(jumpingCatDirectory, "jumping-cat-wind.wav"), windDuration, (time) => {
+  const slow = Math.sin(2 * Math.PI * 0.17 * time) * 0.09 +
+    Math.sin(2 * Math.PI * 0.31 * time + 0.8) * 0.06 +
+    Math.sin(2 * Math.PI * 0.071 * time + 1.4) * 0.045;
+  const gust = 0.78 + 0.22 * Math.sin(2 * Math.PI * 0.055 * time + 0.4);
+  // Inharmonic, softly weighted mid/high components create an airy wind texture
+  // rather than relying on near-infrasonic oscillators that are hard to hear.
+  const air = (
+    Math.sin(2 * Math.PI * 173.3 * time) * 0.04 +
+    Math.sin(2 * Math.PI * 227.7 * time + 0.4) * 0.04 +
+    Math.sin(2 * Math.PI * 311.9 * time + 1.1) * 0.04 +
+    Math.sin(2 * Math.PI * 419.3 * time + 0.7) * 0.04 +
+    Math.sin(2 * Math.PI * 563.1 * time + 1.7) * 0.04 +
+    Math.sin(2 * Math.PI * 719.7 * time + 0.2) * 0.04 +
+    Math.sin(2 * Math.PI * 887.9 * time + 2.1) * 0.04 +
+    Math.sin(2 * Math.PI * 1093.1 * time + 0.9) * 0.04 +
+    Math.sin(2 * Math.PI * 1379.3 * time + 1.4) * 0.04 +
+    Math.sin(2 * Math.PI * 1697.1 * time + 0.6) * 0.04 +
+    Math.sin(2 * Math.PI * 2011.7 * time + 2.2) * 0.04 +
+    Math.sin(2 * Math.PI * 2393.9 * time + 1.8) * 0.04
+  );
+  return (slow + air) * gust * 0.72;
+});
+
+console.log("Generated legacy samples, original Aether, PULSE, SORA, Madrid travel, Stormlight Keeper and Jumping Cat audio fixtures.");
