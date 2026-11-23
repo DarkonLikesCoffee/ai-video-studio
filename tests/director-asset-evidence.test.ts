@@ -715,7 +715,7 @@ test("custom composition imported media files count as required asset usage", as
     ""
   ].join("\n"));
   await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
-    'import hero from "../../../../projects/custom-film/assets/one.svg";',
+    'import hero from "../../../../projects/custom-film/assets/one.svg?url";',
     'import { Img } from "remotion";',
     'export const TestFilm = () => <Img src={hero} />;',
     ""
