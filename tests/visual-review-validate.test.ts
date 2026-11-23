@@ -1,0 +1,10 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { validateVisualReviewReport } from "../scripts/visual-review-validate";
+const base=()=>({status:"approved",artifact:{videoSha256:"a".repeat(64)},inspection:{method:"full-video",fullVideoWatched:true,timestampsReviewedSeconds:[0,5,10],reviewer:"reviewer",reviewedAt:"2026-11-23T12:00:00Z"},findings:[],corrections:[],decision:{approved:true,rationale:"Reviewed the full render; no blocking issues."}});
+test("pending reports validate without implying approval",()=>{const r=base();r.status="pending-review";r.decision.approved=false;const v=validateVisualReviewReport(r);assert.deepEqual(v.errors,[]);assert.equal(v.pending,true);assert.equal(v.approved,false);});
+test("approval requires full-video inspection",()=>{const r=base();r.inspection.fullVideoWatched=false;assert.ok(validateVisualReviewReport(r).errors.some(e=>e.includes("fullVideoWatched=true")));});
+test("approval rejects unresolved blockers and open major findings",()=>{const r=base();r.findings=[{id:"F1",severity:"blocker",status:"open"},{id:"F2",severity:"major",status:"open"}];const v=validateVisualReviewReport(r);assert.ok(v.errors.some(e=>e.includes("blocker")));assert.ok(v.errors.some(e=>e.includes("major")));});
+test("approval requires correction verification and valid finding references",()=>{const r=base();r.findings=[{id:"F1",severity:"minor",status:"resolved"}];r.corrections=[{findingId:"missing",description:"Fix",verified:false}];const v=validateVisualReviewReport(r);assert.ok(v.errors.some(e=>e.includes("existing findingId")));assert.ok(v.errors.some(e=>e.includes("unverified corrections")));});
+test("valid approval passes",()=>assert.deepEqual(validateVisualReviewReport(base()).errors,[]));
+test("invalid hash and duplicate finding ids are rejected",()=>{const r=base();r.artifact.videoSha256="bad";r.findings=[{id:"F",severity:"minor",status:"open"},{id:"F",severity:"minor",status:"open"}];const v=validateVisualReviewReport(r);assert.ok(v.errors.some(e=>e.includes("SHA-256")));assert.ok(v.errors.some(e=>e.includes("Duplicate finding id")));});
