@@ -174,3 +174,53 @@ test("whitespace-only shot and asset references are ignored", async () => {
     assert.equal(report.summary.unknownManifestShotIds, 0);
   });
 });
+
+
+test("asset visual review requires an existing preview and complete approval metadata", async () => {
+  await withProject(async (root) => {
+    await mkdir(path.join(root, "previews"), { recursive: true });
+    await writeFile(path.join(root, "previews", "one.svg"), "<svg/>");
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "original artwork",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork.",
+        previewPath: "previews/one.svg",
+        visualReview: {
+          status: "approved",
+          reviewer: "Test reviewer",
+          reviewedAt: "2026-01-01T00:00:00.000Z",
+          notes: "Inspected silhouette, proportions, rendering and clipping; no defects found."
+        }
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.previewStatus, "present");
+    assert.equal(report.assets[0]?.visualReviewStatus, "approved");
+    assert.equal(report.summary.visualReviewApproved, 1);
+    assert.equal(report.summary.visualReviewMissing, 2);
+    assert.equal(report.summary.missingPreviews, 2);
+  });
+});
+
+test("missing, pending, rejected, unsafe and unavailable previews are reported without claiming approval", async () => {
+  await withProject(async (root) => {
+    const manifest = {
+      assets: [
+        { file: "one.svg", type: "art", shotIds: ["shot-one"], provenance: "Test", license: "Original", visualReview: { status: "pending" } },
+        { file: "two.svg", type: "art", shotIds: ["shot-two"], provenance: "Test", license: "Original", previewPath: "../outside.svg", visualReview: { status: "approved", reviewer: "R", reviewedAt: "2026-01-01T00:00:00Z", notes: "Reviewed." } },
+        { file: "missing.svg", type: "art", shotIds: ["shot-three"], provenance: "Test", license: "Original", visualReview: { status: "rejected", reviewer: "R", reviewedAt: "2026-01-01T00:00:00Z", notes: "Malformed preview." } }
+      ]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.visualReviewStatus, "pending");
+    assert.equal(report.assets[1]?.previewStatus, "unsafe");
+    assert.equal(report.assets[1]?.visualReviewStatus, "missing");
+    assert.equal(report.assets[2]?.visualReviewStatus, "rejected");
+    assert.ok(report.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_PENDING"));
+    assert.ok(report.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_REJECTED"));
+    assert.ok(report.issues.some(issue => issue.code === "ASSET_PREVIEW_UNAVAILABLE"));
+  });
+});
