@@ -242,24 +242,26 @@ test("schema version 3 requires a real render duration", () => {
 
 test("approval requires an explicit, honest audio review status", () => {
   const r = base();
-  delete (r.inspection as Record<string, unknown>).audioReview;
+  const inspection = r.inspection as unknown as Record<string, unknown>;
+  delete inspection.audioReview;
   assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("explicit audio review status")));
 
-  r.inspection.audioReview = { status: "not-listened" };
+  inspection.audioReview = { status: "not-listened" };
   assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("needs a reason")));
 
-  r.inspection.audioReview = { status: "not-listened", reason: "Audio playback was unavailable in this review environment." };
+  inspection.audioReview = { status: "not-listened", reason: "Audio playback was unavailable in this review environment." };
   assert.deepEqual(validateVisualReviewReport(r).errors, []);
 });
 
 test("a listened audio review must match the visual reviewer and include its own timestamp and rationale", () => {
   const r = base();
-  r.inspection.audioReview.reviewer = "different-reviewer";
+  const audioReview = r.inspection.audioReview as unknown as Record<string, unknown>;
+  audioReview.reviewer = "different-reviewer";
   assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("must match the visual inspection reviewer")));
-  r.inspection.audioReview.reviewer = "reviewer";
-  r.inspection.audioReview.reviewedAt = "not-a-date";
+  audioReview.reviewer = "reviewer";
+  audioReview.reviewedAt = "not-a-date";
   assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("valid reviewedAt")));
-  r.inspection.audioReview.reviewedAt = "2026-11-23T12:00:20Z";
-  r.inspection.audioReview.rationale = " ";
+  audioReview.reviewedAt = "2026-11-23T12:00:20Z";
+  audioReview.rationale = " ";
   assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("short rationale")));
 });
