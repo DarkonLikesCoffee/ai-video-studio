@@ -41,6 +41,12 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         run: npm ci --no-audit --no-fund
 
+      - name: Validate prior visual-review report
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.visual_review_history_path != ''
+        env:
+          VISUAL_REVIEW_HISTORY_PATH: ${{ steps.request.outputs.visual_review_history_path }}
+        run: npm run qa:visual-review-validate -- "$VISUAL_REVIEW_HISTORY_PATH"
+
       - name: Validate linked production plan
         if: steps.request.outputs.provider == 'github-actions'
         env:
