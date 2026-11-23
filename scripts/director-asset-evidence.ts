@@ -434,7 +434,7 @@ const collectCompositionReferences = async (
       const collected = collectProjectVideoAssetReferences(scene, "scene.json");
       return { available: true, source: "scene.json", referencesByModule: new Map(), reachableModules: new Set(), ...collected };
     } catch {
-      return { available: false, source: "scene.json", references: [], projectVideoScenes: null, reason: "The selected ProjectVideo scene.json could not be read." };
+      return { available: false, source: "scene.json", references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The selected ProjectVideo scene.json could not be read." };
     }
   }
 
