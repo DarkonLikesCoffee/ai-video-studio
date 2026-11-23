@@ -41,7 +41,8 @@
     "render:provenance": "tsx scripts/render-provenance.ts",
     "validate:state": "tsx scripts/production-state.ts",
     "qa:svg-previews": "node scripts/preview-stormlight-svgs.mjs",
-    "qa:visual-review-report": "tsx scripts/visual-review-report.ts"
+    "qa:visual-review-report": "tsx scripts/visual-review-report.ts",
+    "qa:visual-review-validate": "tsx scripts/visual-review-validate.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.6",
