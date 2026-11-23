@@ -726,3 +726,21 @@ Append one entry per meaningful development session:
 - Added `agent/skills/shot-differentiation/SKILL.md`: mandatory shot cards, adjacent-shot contrast, minimum meaningful variety, implementation-to-source audit, pre-render rejection checklist and post-render failure rule.
 - Linked the new contract from Remotion Producer, Visual QA, `docs/agent-production-workflow.md`, `START_HERE.md` and `AGENTS.md`. Future assistants are instructed to stop before rendering if adjacent shots are not visually distinguishable without text; final MP4 repetition is a major failure.
 - Limit: this change is an explicit process gate, not automated semantic frame-difference detection. CI passing does not prove the video has creative variety. The actual MP4 must still be inspected.
+
+
+## 2026-11-23 — Machine-readable production state merged (PR #143)
+
+- Merged [PR #143](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/143) as `c09a4db22b323ca7acc6373c8635fc9a33e29e21`.
+- Added an optional `production/production-state.json` contract with 11 ordered stages, project identity, timestamp and stage-keyed evidence references; added a structural validator, six tests and usage documentation.
+- The first CI attempt found an `exactOptionalPropertyTypes` error when the CLI passed `expectedProjectId: undefined`. The CLI was corrected to omit the optional property. Final exact-head CI [#45159548730](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45159548730) passed TypeScript, full tests, the state-validator test step, project/storyboard validations and the Studio build. Post-merge main CI [#45160123155](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45160123155) passed.
+- The validator remains opt-in. It checks the shape and presence of evidence references but does not prove that files exist, assets were visually inspected, or a final MP4 was watched. No existing project was migrated and no render request was changed.
+
+## 2026-11-23 — Composition identity preflight (PR #144 in progress)
+
+- Opened draft [PR #144](https://github.com/DarkonLikesCoffee/ai-video-studio/pull/144) on `fix/composition-identity-gate`.
+- Moved the capability catalogue to `schemas/composition-registry.json`, shared by the Director's TypeScript logic and the dependency-free render preflight.
+- Strengthened preflight to require exact, unique ID parity between RemotionRoot and the catalogue; reject unknown and reference/test-only composition IDs; validate renderer, availability, rationale, capabilities and fallback; and require render-request identity to match the plan's selectable registry entry.
+- Added optional `productionPlanPath` for custom compositions without a separate props file, plus regression tests for paths, catalogue parity, test-only selections, renderer mismatches and a new composition that must be registered in both places.
+- Updated the workflow guide and documentation index. No render request was edited and no production render was triggered.
+- Latest branch head at this entry: `0fcb3e1be005f8857f538f9f8f8c30d0d1044944`. GitHub Actions CI for that exact head is running; do not treat the slice as complete until it passes.
+
