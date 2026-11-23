@@ -443,6 +443,12 @@ export const buildAssetEvidenceReport = async (
       let hasUnverifiableShotUsage = false;
       if (!assignedShotIds.length) {
         hasUnverifiableShotUsage = true;
+        addIssue({
+          code: "ASSET_SHOT_USAGE_UNVERIFIABLE",
+          severity: "error",
+          message: `Required asset "${reference}" has no valid shot assignment, so its per-shot use cannot be verified.`,
+          assetRef: reference,
+        });
       }
       for (const shotId of assignedShotIds) {
         const sceneEvidence = compositionReferences.projectVideoScenes.find((scene) => scene.sceneId === shotId);
