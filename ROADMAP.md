@@ -2,7 +2,7 @@
 
 ## Current verified snapshot — 2026-11-23
 
-The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is `b17722dc9293291cdeeceffd5b509220b0871c95` (PR #159 merge). Its PR CI [#45244287864](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244287864) passed all 56 steps; post-merge main CI [#45244858295](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244858295) is running.
+The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is `b17722dc9293291cdeeceffd5b509220b0871c95` (PR #159 merge). Its PR CI [#45244287864](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244287864) passed all 56 steps; post-merge main CI [#45244858295](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244858295) passed all 57 workflow steps.
 
 The current production foundation includes PR #144 composition identity, PR #150 audio QA modes, PRs #151–152 structured visual-review reporting/validation, PR #154 2D/3D render-path separation, PR #155 hash-bound full-video playback evidence, and PR #156 the final delivery gate. PR #158 adds visual-asset preview/approval evidence with audio exempt from visual review. PR #159 adds explicit asset reuse policy and a strict static source/data check for required asset paths.
 
