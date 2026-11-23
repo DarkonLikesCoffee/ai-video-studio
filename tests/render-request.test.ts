@@ -164,3 +164,36 @@ test("rejects unsafe or mismatched production plan paths", () => {
   });
   assert.ok(mismatchedProject.errors.includes("productionPlanPath must belong to the same project directory as projectPath."));
 });
+
+
+test("accepts a visual review history file inside the selected project", () => {
+  const result = validateRenderRequest({
+    ...validProjectRequest,
+    visualReviewHistoryPath: "projects/demo/production/visual-review.json",
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.request?.visualReviewHistoryPath, "projects/demo/production/visual-review.json");
+});
+
+test("rejects visual review history paths outside or mismatched with the selected project", () => {
+  for (const visualReviewHistoryPath of [
+    "../visual-review.json",
+    "projects/demo/production/other.json",
+    "projects/other/production/visual-review.json",
+  ]) {
+    const result = validateRenderRequest({
+      ...validProjectRequest,
+      visualReviewHistoryPath,
+    });
+    assert.ok(result.errors.some((error) => error.startsWith("visualReviewHistoryPath")), visualReviewHistoryPath);
+  }
+
+  const withoutProject = validateRenderRequest({
+    provider: "github-actions",
+    compositionId: "CinematicAdBenchmark",
+    outputName: "demo",
+    requestId: "review-history-001",
+    visualReviewHistoryPath: "projects/demo/production/visual-review.json",
+  });
+  assert.ok(withoutProject.errors.includes("visualReviewHistoryPath requires projectPath or productionPlanPath to identify its project."));
+});
