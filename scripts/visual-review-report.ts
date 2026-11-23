@@ -157,7 +157,9 @@ export const appendVisualReviewIteration = (
     throw new Error("The rejected report has no open findings to correct; resolve or accept findings before another iteration.");
   }
 
-  const candidateSha = currentReport.renderIterations[0].candidateSha;
+  const currentIteration = currentReport.renderIterations[0];
+  if (!currentIteration) throw new Error("The new render has no iteration provenance.");
+  const candidateSha = currentIteration.candidateSha;
   const correctionIds: string[] = [];
   for (const finding of openFindings) {
     const applied = corrections.filter(correction =>
@@ -183,12 +185,12 @@ export const appendVisualReviewIteration = (
   const nextIteration = createRenderIteration(
     currentArtifact.videoSha256,
     {
-      candidateSha: currentReport.renderIterations[0].candidateSha,
-      sourceCommit: currentReport.renderIterations[0].sourceCommit,
-      requestId: currentReport.renderIterations[0].requestId,
-      workflowRunId: currentReport.renderIterations[0].workflowRunId,
-      runUrl: currentReport.renderIterations[0].runUrl,
-      renderedAt: currentReport.renderIterations[0].renderedAt,
+      candidateSha: currentIteration.candidateSha,
+      sourceCommit: currentIteration.sourceCommit,
+      requestId: currentIteration.requestId,
+      workflowRunId: currentIteration.workflowRunId,
+      runUrl: currentIteration.runUrl,
+      renderedAt: currentIteration.renderedAt,
     },
     existingIterations.length + 1,
     previousArtifact.videoSha256,
@@ -274,7 +276,9 @@ const main = async () => {
     )
     : currentReport;
   await writeFile(reportPath, JSON.stringify(report, null, 2) + "\n", "utf8");
-  const iteration = report.renderIterations[report.renderIterations.length - 1].iteration;
+  const latestIteration = report.renderIterations.at(-1);
+  if (!latestIteration) throw new Error("The generated visual review report has no render iteration.");
+  const iteration = latestIteration.iteration;
   const summary = `Visual review: PENDING — render iteration ${iteration}; inspect the actual MP4, then complete ${outputName}.visual-review.json. Contact sheet is sampling evidence only; it does not approve motion or audio.`;
   console.log(summary);
   if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary + "\n");
