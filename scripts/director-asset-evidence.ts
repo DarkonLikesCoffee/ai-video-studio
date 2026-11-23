@@ -465,6 +465,32 @@ const usageMatchesAsset = (reference: SourceReference, localPath: string | null)
   if (!localPath) return false;
   return normalizeUsagePath(reference.value) === normalizeUsagePath(localPath);
 };
+type ShotComponentMapping = { schemaVersion: 1; shots: Array<{ shotId: string; modules: string[] }> };
+const readShotComponentMapping = (manifest: RecordValue): { mapping: ShotComponentMapping | null; error: string | null } => {
+  const raw = manifest.shotComponents;
+  if (raw === undefined) return { mapping: null, error: null };
+  if (!isRecord(raw) || raw.schemaVersion !== 1 || !Array.isArray(raw.shots)) {
+    return { mapping: null, error: "shotComponents must contain schemaVersion 1 and a shots array." };
+  }
+  const seen = new Set<string>();
+  const shots: ShotComponentMapping["shots"] = [];
+  for (const [index, entry] of raw.shots.entries()) {
+    if (!isRecord(entry) || typeof entry.shotId !== "string" || !entry.shotId.trim() ||
+        !Array.isArray(entry.modules) || entry.modules.length === 0 ||
+        entry.modules.some((module) => typeof module !== "string" || !module.trim())) {
+      return { mapping: null, error: `shotComponents.shots[${index}] must contain a shotId and one or more module paths.` };
+    }
+    const shotId = entry.shotId.trim();
+    if (seen.has(shotId)) return { mapping: null, error: `shotComponents contains duplicate shotId "${shotId}".` };
+    seen.add(shotId);
+    const modules = (entry.modules as string[]).map((module) => module.replace(/\\\\/g, "/").replace(/^\\.\\//, ""));
+    if (modules.some((module) => module.startsWith("/") || module.split("/").includes(".."))) {
+      return { mapping: null, error: `shotComponents for "${shotId}" contains an unsafe module path.` };
+    }
+    shots.push({ shotId, modules });
+  }
+  return { mapping: { schemaVersion: 1, shots }, error: null };
+};
 
 const describeProvenance = (asset: RecordValue) => asText(asset.provenance) ?? asText(asset.sourcePage) ?? asText(asset.sourceUrl) ?? asText(asset.creator) ?? asText(asset.attribution);
 const describeRights = (asset: RecordValue) => asText(asset.license) ?? (asText(asset.rightsBasis) && asText(asset.rightsNote) ? `${asset.rightsBasis}: ${asset.rightsNote}` : null);
@@ -494,6 +520,26 @@ export const buildAssetEvidenceReport = async (
   const addIssue = (issue: Issue) => issues.push(issue);
   const assets: AssetEvidence[] = [];
   const unknownShotIds = new Set<string>();
+  const customRemotion = isRecord(planValue.renderStrategy) && planValue.renderStrategy.renderer === "custom-remotion";
+  const shotComponentContract = readShotComponentMapping(manifestValue);
+  const componentModulesByShot = new Map<string, string[]>();
+  if (shotComponentContract.error) {
+    addIssue({ code: "CUSTOM_SHOT_COMPONENT_MAPPING_INVALID", severity: "error", message: shotComponentContract.error });
+  }
+  if (customRemotion && shotComponentContract.mapping && !shotComponentContract.error) {
+    for (const mapping of shotComponentContract.mapping.shots) {
+      if (!knownShots.has(mapping.shotId)) {
+        addIssue({ code: "CUSTOM_SHOT_COMPONENT_UNKNOWN_SHOT", severity: "error", shotId: mapping.shotId, message: `shotComponents maps unknown production-plan shot "${mapping.shotId}".` });
+      } else {
+        componentModulesByShot.set(mapping.shotId, mapping.modules);
+      }
+    }
+    for (const shotId of shotIds) {
+      if (!componentModulesByShot.has(shotId)) {
+        addIssue({ code: "CUSTOM_SHOT_COMPONENT_MAPPING_MISSING", severity: "error", shotId, message: `Custom Remotion shot "${shotId}" has no shotComponents module mapping.` });
+      }
+    }
+  }
   if (manifestValue.assets.length === 0) addIssue({ code: "ASSET_MANIFEST_EMPTY", severity: "warning", message: "Asset manifest contains no assets." });
 
   for (const [index, value] of manifestValue.assets.entries()) {
