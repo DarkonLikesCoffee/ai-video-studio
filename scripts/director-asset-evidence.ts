@@ -345,16 +345,12 @@ const collectCompositionReferences = async (
 };
 
 const normalizeUsagePath = (value: string): string =>
-  value.replace(/\\/g, "/").replace(/^\.\//, "").replace(/^assets\//, "");
+  value.replace(/\\/g, "/").replace(/^\.\//, "");
 
-const usageMatchesAsset = (reference: SourceReference, asset: RecordValue, localPath: string | null): boolean => {
-  // Preserve case: asset paths can be case-sensitive on Linux and in CI.
-  const referenceValue = normalizeUsagePath(reference.value);
-  if (!referenceValue) return false;
-  const candidates = [localPath, asText(asset.path), asText(asset.file)]
-    .filter((value): value is string => value !== null)
-    .map(normalizeUsagePath);
-  return candidates.some((candidate) => candidate === referenceValue);
+const usageMatchesAsset = (_reference: SourceReference, _asset: RecordValue, localPath: string | null): boolean => {
+  // Compare the canonical project-relative path; preserve folders and case.
+  if (!localPath) return false;
+  return normalizeUsagePath(_reference.value) === normalizeUsagePath(localPath);
 };
 
 const describeProvenance = (asset: RecordValue) => asText(asset.provenance) ?? asText(asset.sourcePage) ?? asText(asset.sourceUrl) ?? asText(asset.creator) ?? asText(asset.attribution);
