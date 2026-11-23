@@ -66,14 +66,14 @@ const OpeningShot = ({frame}:{frame:number}) => {
       <path d="M0 610 Q300 460 520 570 T1030 520 T1530 565 T1920 490 L1920 1080 L0 1080Z" fill="#9AA99A"/>
       <path d="M0 725 Q360 590 710 690 T1350 670 T1920 620 L1920 1080 L0 1080Z" fill="#778E7C"/>
       <path d="M0 840 Q410 745 770 815 T1440 780 T1920 760 L1920 1080 L0 1080Z" fill="url(#openCliff)"/>
-      <g opacity=".5"><Cloud x={350-frame*.35} y={360} s={1.1}/><Cloud x={1050-frame*.2} y={420} s={.8}/></g>
+      <g opacity=".5"><Cloud x={350-frame*.35} y={360} scale={1.1}/><Cloud x={1050-frame*.2} y={420} scale={.8}/></g>
       <g transform={`translate(0 ${branchSway})`}>
       <g transform={"translate(0 " + branchSway + ")}>
         <path d="M460 877 Q565 770 610 650 M835 884 Q905 800 958 745" fill="none" stroke="#584D40" strokeWidth="20" strokeLinecap="round"/>
-        <Pine x={330} y={1040} s={.88} tone="#2C4D48"/><Pine x={590} y={1035} s={.64} tone="#496B5A"/>
+        <Pine x={330} y={1040} scale={.88} tone="#2C4D48"/><Pine x={590} y={1035} scale={.64} tone="#496B5A"/>
       </g>
-      <Bird x={760} y={830} s={1.5} flap={Math.sin(frame/5.8)*1.1} color="#263C3C"/>
-      {launch>0&&<Bird x={move(frame,1290,1820,70,150)} y={move(frame,585,180,70,150)} s={1.35-launch*.25} rotation={-22-launch*8} flap={Math.sin(frame/5.6)} color="#20383B" opacity={launch}/>}
+      <Bird x={760} y={830} scale={1.5} flap={Math.sin(frame/5.8)*1.1} color="#263C3C"/>
+      {launch>0&&<Bird x={move(frame,1290,1820,70,150)} y={move(frame,585,180,70,150)} scale={1.35-launch*.25} rotation={-22-launch*8} flap={Math.sin(frame/5.6)} color="#20383B" opacity={launch}/>}
     </svg>
   </AbsoluteFill>;
 };
@@ -89,14 +89,14 @@ const ValleyShot = ({frame}:{frame:number}) => {
         <linearGradient id="river" x2="0" y2="1"><stop stopColor="#B4D5D0" stopOpacity=".95"/><stop offset="1" stopColor="#7BA7A1" stopOpacity=".2"/></linearGradient>
       </defs>
       <rect width={W} height={H} fill="url(#valleySky)"/><circle cx="1540" cy="245" r="110" fill="#FFF0CF" opacity=".72"/>
-      <Cloud x={350+cloudX*.25} y={250} s={1.15} opacity={.52}/><Cloud x={1200+cloudX*.18} y={330} s={.78} opacity={.5}/>
+      <Cloud x={350+cloudX*.25} y={250} scale={1.15} opacity={.52}/><Cloud x={1200+cloudX*.18} y={330} scale={.78} opacity={.5}/>
       <path d="M0 570 L170 430 320 520 540 300 730 560 980 360 1190 540 1400 325 1600 540 1800 390 1920 510 V1080 H0Z" fill="#81999A"/>
       <path d="M0 670 L180 550 360 650 580 425 780 700 1000 510 1220 700 1420 470 1640 700 1840 535 1920 605 V1080 H0Z" fill="#607B76"/>
       <path d="M0 780 Q310 670 620 810 T1200 760 T1920 750 V1080 H0Z" fill="url(#valleyGround)"/>
       <path d="M0 820 Q270 740 500 835 Q740 950 970 835 Q1220 710 1440 815 Q1690 920 1920 795" fill="none" stroke="url(#river)" strokeWidth="65" opacity=".62"/>
       {Array.from({length:8},(_,i)=><path key={i} d={`M${i*270-300} 960 q130 -110 260 -15`} fill="none" stroke="#A5B991" strokeWidth="12" opacity=".35"/>)}
-      <Bird x={x} y={y} s={1.12} rotation={-4+Math.sin(t/20)*3} flap={flap} color="#20383B"/>
-      <g opacity=".28"><Bird x={x-150} y={y+60} s={.24} flap={-flap} color="#F0E9D6"/><Bird x={x-235} y={y+10} s={.18} flap={flap*.8} color="#F0E9D6"/></g>
+      <Bird x={x} y={y} scale={1.12} rotation={-4+Math.sin(t/20)*3} flap={flap} color="#20383B"/>
+      <g opacity=".28"><Bird x={x-150} y={y+60} scale={.24} flap={-flap} color="#F0E9D6"/><Bird x={x-235} y={y+10} scale={.18} flap={flap*.8} color="#F0E9D6"/></g>
     </svg>
   </AbsoluteFill>;
 };
@@ -115,9 +115,9 @@ const ClosePassShot = ({frame}:{frame:number}) => {
       <path d="M0 520 Q220 420 410 520 T790 485 T1200 520 T1600 470 T1920 500 V1080 H0Z" fill="#71867A"/>
       <path d="M0 700 Q310 580 550 730 T1050 680 T1530 710 T1920 650 V1080 H0Z" fill="#3F5E55"/>
       <path d="M0 860 Q260 770 510 860 T1080 830 T1560 850 T1920 780 V1080 H0Z" fill="#263F3B"/>
-      <g opacity=".72"><Pine x={120} y={920} s={1.5}/><Pine x={430} y={980} s={1.1} tone="#405F50"/><Pine x={1640} y={1010} s={1.7}/><Pine x={1830} y={970} s={1.22}/></g>
-      <Cloud x={1300-t*.9} y={390} s={1.35} opacity={.35}/>
-      <Bird x={x} y={y} s={s} rotation={-7+Math.sin(t/14)*7} flap={flap} color="#172F35"/>
+      <g opacity=".72"><Pine x={120} y={920} scale={1.5}/><Pine x={430} y={980} scale={1.1} tone="#405F50"/><Pine x={1640} y={1010} scale={1.7}/><Pine x={1830} y={970} scale={1.22}/></g>
+      <Cloud x={1300-t*.9} y={390} scale={1.35} opacity={.35}/>
+      <Bird x={x} y={y} scale={s} rotation={-7+Math.sin(t/14)*7} flap={flap} color="#172F35"/>
     </svg>
   </AbsoluteFill>;
 };
@@ -138,9 +138,9 @@ const HorizonShot = ({frame}:{frame:number}) => {
       <path d="M0 720 L230 580 430 695 650 525 900 735 1110 585 1300 720 1540 535 1790 700 1920 640 V1080 H0Z" fill="#6D7470" opacity=".55"/>
       <path d="M0 830 Q320 720 600 820 T1150 810 T1650 780 T1920 810 V1080 H0Z" fill="url(#finalLand)"/>
       <path d="M0 930 Q360 875 660 910 T1340 895 T1920 920 V1080 H0Z" fill="#14272D"/>
-      <g opacity=".26"><Cloud x={360-t*.35} y={450}/><Cloud x={1050-t*.45} y={500} s={.7}/></g>
+      <g opacity=".26"><Cloud x={360-t*.35} y={450}/><Cloud x={1050-t*.45} y={500} scale={.7}/></g>
       <DistantBirds frame={t}/>
-      <g opacity={opacity}><Bird x={x} y={y} s={s} rotation={-5} flap={flap} color="#142A31"/></g>
+      <g opacity={opacity}><Bird x={x} y={y} scale={s} rotation={-5} flap={flap} color="#142A31"/></g>
       <path d="M0 1022 Q450 980 890 1018 T1920 1000 V1080 H0Z" fill="#0F2026" opacity=".45"/>
     </svg>
   </AbsoluteFill>;
