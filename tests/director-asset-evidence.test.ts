@@ -242,3 +242,54 @@ test("visual-review issues are opt-in for backwards compatibility and enforced w
     assert.ok(requiredReport.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_MISSING"));
   });
 });
+
+ 
+test("audio assets are excluded from the visual preview and approval gate", async () => {
+  await withProject(async (root) => {
+    await mkdir(path.join(root, "previews"), { recursive: true });
+    await mkdir(path.join(root, "assets", "audio"), { recursive: true });
+    await writeFile(path.join(root, "previews", "one.svg"), "<svg/>");
+    await writeFile(path.join(root, "assets", "audio", "score.wav"), "RIFF-audio-fixture");
+
+    const plan = makePlan();
+    plan.assetVisualReviewRequired = true;
+    const manifest = {
+      assets: [
+        {
+          file: "one.svg",
+          type: "image/svg+xml",
+          shotIds: ["shot-one"],
+          provenance: "Created for this test.",
+          license: "Original project artwork.",
+          previewPath: "previews/one.svg",
+          visualReview: {
+            status: "approved",
+            reviewer: "Test reviewer",
+            reviewedAt: "2026-01-01T00:00:00.000Z",
+            notes: "Inspected the image preview; no defects found."
+          }
+        },
+        {
+          file: "assets/audio/score.wav",
+          type: "audio/wav",
+          shotIds: ["all"],
+          provenance: "Original score for this test.",
+          license: "Original generated audio."
+        }
+      ]
+    };
+
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
+    const audio = report.assets.find((asset) => asset.reference === "assets/audio/score.wav");
+    assert.ok(audio);
+    assert.equal(audio.visualReviewApplicable, false);
+    assert.equal(audio.previewStatus, "not-required");
+    assert.equal(audio.visualReviewStatus, "not-required");
+    assert.equal(report.summary.visualReviewApproved, 1);
+    assert.equal(report.summary.visualReviewNotRequired, 1);
+    assert.equal(report.summary.visualReviewMissing, 0);
+    assert.equal(report.summary.missingPreviews, 0);
+    assert.equal(report.issues.some((issue) => issue.code === "ASSET_PREVIEW_MISSING" && issue.assetRef === audio.reference), false);
+    assert.equal(report.issues.some((issue) => issue.code === "ASSET_VISUAL_REVIEW_MISSING" && issue.assetRef === audio.reference), false);
+  });
+});
