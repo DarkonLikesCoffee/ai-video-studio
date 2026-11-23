@@ -94,7 +94,7 @@ const run = async () => {
   const rawRequest = JSON.parse(await readFile(requestPath, "utf8"));
   const requestValidation = validateRenderRequest(rawRequest);
   if (requestValidation.errors.length || !requestValidation.request) {
-    throw new Error(requestValidation.errors.join("\\n"));
+    throw new Error(requestValidation.errors.join("\n"));
   }
   const request = requestValidation.request;
   const rootSource = await readFile(rootPath, "utf8");
@@ -115,7 +115,7 @@ const run = async () => {
   }
 
   const errors = validateRenderStrategyAgainstRequest({ request, plan, registeredCompositionIds });
-  if (errors.length) throw new Error(errors.join("\\n"));
+  if (errors.length) throw new Error(errors.join("\n"));
   if (plan) {
     console.log(`Accepted Director strategy: ${plan.renderStrategy.renderer} / ${plan.renderStrategy.compositionId} (registered and selectable).`);
   } else {
