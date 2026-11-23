@@ -78,9 +78,9 @@
       "file": "assets/audio/transition-whoosh.wav",
       "type": "audio/wav",
       "shotIds": [
+        "morning",
         "riverside",
-        "park",
-        "sunset"
+        "park"
       ],
       "sourceType": "reused-project-generated-original",
       "source": "Original transition effect reused from projects/showcase-motion/assets/audio/transition-whoosh.wav and copied into the project at render time.",
