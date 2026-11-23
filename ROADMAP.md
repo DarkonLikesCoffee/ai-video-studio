@@ -6,7 +6,7 @@ The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md
 
 The current production foundation is on main: PR #144 composition identity, PR #150 audio QA modes, PRs #151–152 structured visual-review reporting/validation, PR #154 2D/3D render-path separation and PR #155 hash-bound full-video playback evidence.
 
-PR #156 adds the final delivery gate on `feat/final-delivery-gate` at `b01649ec0c14759d7926879ad651ef908a1b4e17`. Exact-head push CI [#45228924930](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228924930) and PR CI [#45228940745](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228940745) passed 331 tests with 0 failures and 0 skips. It remains open and unmerged. No final-delivery workflow has been dispatched against a real approved render.
+PR #156 adds the final delivery gate on `feat/final-delivery-gate`. Exact-head push CI [#45228924930](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228924930) and PR CI [#45228940745](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228940745) passed 331 tests with 0 failures and 0 skips. It remains open and unmerged. No final-delivery workflow has been dispatched against a real approved render.
 
 Only PR #156 was open at the time of this snapshot. This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
 
