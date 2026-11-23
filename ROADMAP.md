@@ -2,15 +2,13 @@
 
 ## Current verified snapshot — 2026-11-23
 
-The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is at `c09a4db22b323ca7acc6373c8635fc9a33e29e21`; post-merge main CI [#45160123155](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45160123155) passed.
+The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is `bd5f2066de7aad81262191580ec117c9ed9eb714`; post-merge main CI [#45224183986](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45224183986) passed.
 
-PR #143 merged the first machine-readable production-state handoff: a versioned stage record, project identity, stage evidence references, a structural validator and six regression tests. It is opt-in and does not yet verify evidence file contents, prove visual inspection or block rendering when absent.
+The current production foundation is on main: PR #144 composition identity, PR #150 audio QA modes, PRs #151–152 structured visual-review reporting/validation, PR #154 2D/3D render-path separation and PR #155 hash-bound full-video playback evidence.
 
-PR #144 is a draft follow-up on `fix/composition-identity-gate`. It strengthens composition enforcement so RemotionRoot and the shared capability catalogue must match exactly, rejects test-only/unselectable compositions, validates the complete plan/request identity and supports an explicit production plan path for custom compositions. Its latest CI is pending; this roadmap must not count the change as complete until the exact PR head passes.
+PR #156 adds the final delivery gate on `feat/final-delivery-gate` at `884832a83278f8b3e581993738f01330dd4b5a`. Exact-head push CI [#45228924930](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228924930) and PR CI [#45228940745](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228940745) passed 331 tests with 0 failures and 0 skips. It remains open and unmerged. No final-delivery workflow has been dispatched against a real approved render.
 
-The other open video-production branches (#137, #138, #139, #141 and #142) remain independent. Keep their composition/render work isolated and avoid changing `render-request.json` except through the frozen-candidate protocol.
-
-This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
+Only PR #156 was open at the time of this snapshot. This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
 
 ## North-star outcome
 
