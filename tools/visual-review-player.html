@@ -97,9 +97,9 @@
     if (!Number.isFinite(video.duration) || video.duration <= 0) return;
     const ratio = Math.min(1, Math.max(0, video.currentTime / video.duration));
     const bucket = ratio >= 1 ? 4 : Math.floor(ratio * 4);
-    if (bucket > lastCheckpoint) {
-      lastCheckpoint = bucket;
-      checkpointTimes.push(bucket === 0 ? 0 : video.duration * bucket / 4);
+    for (let next = lastCheckpoint + 1; next <= bucket; next += 1) {
+      lastCheckpoint = next;
+      checkpointTimes.push(next === 0 ? 0 : video.duration * next / 4);
     }
   };
   const invalidate = (reason) => {
