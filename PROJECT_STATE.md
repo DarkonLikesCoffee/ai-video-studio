@@ -2,7 +2,7 @@
 
 ## Current verified snapshot — 2026-11-23
 
-- **Main:** `b17722dc9293291cdeeceffd5b509220b0871c95` (PR #159 merge). Post-merge main CI [#45244858295](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244858295) is running; the PR's exact-head CI [#45244287864](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244287864) passed all 56 steps.
+- **Main:** `b17722dc9293291cdeeceffd5b509220b0871c95` (PR #159 merge). Post-merge main CI [#45244858295](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244858295) passed all 57 workflow steps; the PR's exact-head CI [#45244287864](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244287864) passed all 56 steps.
 - **Production-state handoff:** PR #143 added `scripts/production-state.ts`, six regression tests and `docs/production-state.md`. It defines 11 ordered stages from `brief` through `delivered`, binds the record to a project ID and accepts stage-keyed evidence references. It remains opt-in; the validator checks structure and reference presence, not file content or creative quality.
 - **Composition identity:** PR #144 is merged. `schemas/composition-registry.json` is the shared composition catalogue; render preflight enforces unique ID parity with RemotionRoot, selectability, composition/renderer metadata and plan/request agreement.
 - **Audio and visual QA:** PR #150 added explicit audio QA modes. PR #151 added structured per-render visual-review reports; PR #152 validates findings, corrections, approval conditions and exact-artifact review evidence. PR #158 adds per-visual-asset preview and approval evidence; audio assets are correctly exempt from visual review.
