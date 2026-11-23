@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, symlink, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { validateFinalDeliveryBundle, type FinalDeliveryOptions } from "../scripts/validate-final-delivery";
@@ -243,4 +243,14 @@ test("final delivery rejects unsafe report paths before reading review content",
     () => validateFinalDeliveryBundle({ ...f.options, reviewReportPath: "../visual-review.json" }),
     /safe repository-relative path/,
   );
+});
+
+test("final delivery rejects symlinked artifact paths before writing over another file", async t => {
+  const f = await makeFixture();
+  t.after(() => rm(f.root, { recursive: true, force: true }));
+  const reviewArtifact = join(f.artifactDir, "review", "demo.visual-review.json");
+  await unlink(reviewArtifact);
+  await symlink("../demo.mp4", reviewArtifact);
+  await assert.rejects(() => validateFinalDeliveryBundle(f.options), /cannot be symbolic links/);
+  assert.equal(await readFile(f.videoPath, "utf8"), "synthetic-mp4-payload-for-gate-test");
 });
