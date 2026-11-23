@@ -376,7 +376,7 @@ test("required custom-composition assets are found through local source imports"
   await mkdir(engineScenes, { recursive: true });
   await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
   await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"),
-    'import { Composition } from "remotion";\\nimport { TestFilm } from "./scenes/TestFilm";\\nexport const Root = () => <Composition id="TestFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;\\n');
+    'import { Composition } from "remotion";\\nimport { TestFilm } from "./scenes/TestFilm";\\nexport const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;\\n');
   await writeFile(path.join(engineScenes, "TestFilm.tsx"),
     'import { getHeroAsset } from "./asset-helper";\\nexport const TestFilm = () => getHeroAsset();\\n');
   await writeFile(path.join(engineScenes, "asset-helper.ts"),
@@ -384,7 +384,7 @@ test("required custom-composition assets are found through local source imports"
   try {
     const plan = makePlan();
     plan.renderStrategy.renderer = "custom-remotion";
-    plan.renderStrategy.compositionId = "TestFilm";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
     const manifest = {
       assets: [{
         file: "one.svg",
@@ -419,5 +419,27 @@ test("invalid reusePolicy is reported as an error", async () => {
     };
     const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
     assert.ok(report.issues.some((issue) => issue.code === "ASSET_REUSE_POLICY_INVALID" && issue.severity === "error"));
+  });
+});
+
+
+test("a same-basename reference from a different folder does not satisfy required asset usage", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ mediaLayers: [{ src: "assets/alternate/one.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED"));
   });
 });
