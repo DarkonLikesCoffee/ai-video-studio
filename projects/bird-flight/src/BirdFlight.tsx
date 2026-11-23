@@ -80,8 +80,14 @@ const OpeningShot = ({frame}:{frame:number}) => {
         <Pine x={330} y={1040} scale={.88} tone="#2C4D48"/>
         <Pine x={590} y={1035} scale={.64} tone="#496B5A"/>
       </g>
-      <Bird x={760} y={830} scale={1.5} flap={Math.sin(frame/5.8)*1.1} color="#263C3C"/>
-      {launch>0&&<Bird x={move(frame,1290,1820,70,150)} y={move(frame,585,180,70,150)} scale={1.35-launch*.25} rotation={-22-launch*8} flap={Math.sin(frame/5.6)} color="#20383B" opacity={launch}/>}
+      <Bird
+        x={move(frame, 760, 1480, 0, 118)}
+        y={move(frame, 830, 270, 0, 118)}
+        scale={1.5 - move(frame, 0, .42, 0, 118)}
+        rotation={-4 - move(frame, 0, 18, 66, 118)}
+        flap={Math.sin(frame / 5.6) * (1 - move(frame, 0, .7, 105, 145))}
+        color="#263C3C"
+      />
     </svg>
   </AbsoluteFill>;
 };
@@ -110,8 +116,8 @@ const ValleyShot = ({frame}:{frame:number}) => {
 };
 
 const ClosePassShot = ({frame}:{frame:number}) => {
-  const t=frame-330, x=move(t,-360,2260,0,180), y=520+Math.sin(t/13)*36-move(t,0,120,0,120);
-  const s=move(t,.7,2.5,0,95)+move(t,2.5,.58,95,180);
+  const t=frame-330, x=move(t,-220,2100,0,180), y=520+Math.sin(t/13)*30-move(t,0,80,0,120);
+  const s=move(t,.62,1.05,0,95)+move(t,1.05,.48,95,180);
   const flap=Math.sin(t/4.4), sunX=move(t,200,1450,0,180);
   return <AbsoluteFill style={{backgroundColor:"#D7C6A7"}}>
     <svg viewBox="0 0 1920 1080" width="100%" height="100%">
