@@ -205,6 +205,20 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 9. Prefer a small, working vertical slice over large architecture rewrites or speculative multi-agent complexity.
 10. Do not spend money on paid services or APIs without explicit user approval.
 
+
+## P9 — Approved final delivery
+
+**Goal:** A successful render is a review package, not a delivered video. Publish a final package only after a reviewer has accepted the exact rendered MP4 and its provenance/QA evidence is consistent.
+
+- [x] Add a separate manual release workflow that accepts one render run, output name and committed approval report; verify the selected run completed successfully in the Render video workflow.
+- [x] Validate schema-v3 visual approval, tracked full playback, exact render run/request/source commit and MP4 SHA-256; compare MP4 size/duration/metadata against Media QA.
+- [x] Verify contact-sheet evidence, asset-evidence status and every file hash recorded by the render-provenance manifest.
+- [x] Require an explicit audio-review status: listened with reviewer/time/rationale, not-listened with a reason, or not-applicable only when the MP4 has no audio stream.
+- [x] Produce a `.delivery.json` receipt and a separate final package with 30-day retention; retain the original render review package for the approval window.
+- [ ] Merge PR #156 after exact-head CI passes. Then exercise the manual workflow with a real approved render and verify the resulting final artifact end-to-end.
+
+**Current boundary:** PR #156's implementation and 331-test CI are verified on its branch, but it is not yet on `main`. CI fixtures prove the validator's consistency checks; they do not constitute a real-world release or creative review. Playback telemetry is not cryptographic identity proof, and reviewer-provided audio listening/creative acceptance cannot be independently established by the gate.
+
 ## Release gate for every video-producing milestone
 
 Do not mark a milestone complete until:
