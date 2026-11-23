@@ -95,6 +95,13 @@ export const buildVisualReviewReport = ({
       reviewer: null,
       reviewedAt: null,
       playbackSession: null,
+      audioReview: {
+        status: "not-reviewed",
+        reviewer: null,
+        reviewedAt: null,
+        rationale: null,
+        reason: null,
+      },
     },
     findings: [],
     corrections: [],
