@@ -291,6 +291,7 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         env:
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+          VISUAL_REVIEW_HISTORY_PATH: ${{ steps.request.outputs.visual_review_history_path }}
         run: npm run qa:visual-review-report
 
       - name: Write footage attribution credits
