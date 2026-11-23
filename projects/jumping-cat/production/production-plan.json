@@ -54,7 +54,8 @@
       "engineApproach": "custom-remotion",
       "visualMethod": "Original 2D vector illustration.",
       "action": "The cat notices something, lowers its body and prepares to jump.",
-      "visualProgression": "Start: relaxed standing cat. Development: tail sways, ears perk, body lowers. End: poised crouch."
+      "visualProgression": "Start: relaxed standing cat. Development: tail sways, ears perk, body lowers. End: poised crouch.",
+      "transition": "Continuous movement; the cat's crouch leads directly into the launch."
     },
     {
       "id": "first-leap",
@@ -69,7 +70,8 @@
       "engineApproach": "custom-remotion",
       "visualMethod": "Frame-driven 2D character animation.",
       "action": "Cat launches, rises, floats briefly and drops toward the grass.",
-      "visualProgression": "Start: crouch. Development: quick launch, peak hangtime and falling arc. End: paws almost reach the ground."
+      "visualProgression": "Start: crouch. Development: quick launch, peak hangtime and falling arc. End: paws almost reach the ground.",
+      "transition": "Stay with the same uninterrupted jump through descent into ground contact."
     },
     {
       "id": "soft-landing",
@@ -84,7 +86,8 @@
       "engineApproach": "custom-remotion",
       "visualMethod": "Expressive 2D character animation.",
       "action": "Cat lands with soft squash, stretches back up and prepares a second jump.",
-      "visualProgression": "Start: descending. Development: contact squash and rebound. End: ready stance."
+      "visualProgression": "Start: descending. Development: contact squash and rebound. End: ready stance.",
+      "transition": "A light timing beat carries the rebound into a smaller second leap."
     },
     {
       "id": "playful-repeat",
@@ -99,7 +102,8 @@
       "engineApproach": "custom-remotion",
       "visualMethod": "Original 2D animation in the dedicated composition.",
       "action": "A smaller leap resolves into a relaxed seated cat.",
-      "visualProgression": "Start: poised to jump. Development: shorter arc and landing. End: calm seated pose."
+      "visualProgression": "Start: poised to jump. Development: shorter arc and landing. End: calm seated pose.",
+      "transition": "Settle the final landing into a held seated pose, then gently fade out."
     }
   ],
   "assetManifestPath": "projects/jumping-cat/production/asset-manifest.json",
