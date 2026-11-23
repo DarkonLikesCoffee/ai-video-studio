@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
+import { copyFile, lstat, mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { basename, isAbsolute, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { validateVisualReviewReport } from "./visual-review-validate";
@@ -81,6 +81,9 @@ const resolveFileInside = async (root: string, path: string): Promise<string> =>
   }
   const candidate = resolve(root, path);
   if (!within(root, candidate)) throw new Error("Artifact path escapes its directory: " + path);
+  const linkDetails = await lstat(candidate);
+  if (linkDetails.isSymbolicLink()) throw new Error("Artifact files cannot be symbolic links: " + path);
+  if (!linkDetails.isFile()) throw new Error("Artifact path is not a regular file: " + path);
   const actual = await realpath(candidate);
   if (!within(root, actual)) throw new Error("Artifact symlink escapes its directory: " + path);
   const details = await stat(actual);
