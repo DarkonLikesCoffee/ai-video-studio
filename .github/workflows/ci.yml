@@ -68,6 +68,10 @@ jobs:
         run: npm run validate:plan -- projects/tiny-astronaut-crystal-cave/production/production-plan.json
       - name: Run Tiny Astronaut storyboard QA
         run: npm run storyboard:qa -- projects/tiny-astronaut-crystal-cave/production/production-plan.json
+      - name: Validate Golden Hour production plan
+        run: npm run validate:plan -- projects/golden-hour-dog-walk/production/production-plan.json
+      - name: Run Golden Hour storyboard QA
+        run: npm run storyboard:qa -- projects/golden-hour-dog-walk/production/production-plan.json
       - name: Run Stormlight Keeper storyboard QA
         run: npm run storyboard:qa -- projects/stormlight-keeper/production/production-plan.json
       - name: Test machine-readable production state validator
@@ -109,6 +113,33 @@ jobs:
         run: npm run validate:plan -- projects/valorant-immortal-decision-making/production/production-plan.json
       - name: Generate original audio fixtures
         run: npm run assets:audio
+      - name: Stage Golden Hour audio fixtures for validation
+        run: |
+          PROJECT_DIR="projects/golden-hour-dog-walk"
+          mkdir -p "$PROJECT_DIR/assets/audio"
+          cp projects/sora/assets/audio/score.wav "$PROJECT_DIR/assets/audio/score.wav"
+          cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
+          test -s "$PROJECT_DIR/assets/audio/score.wav"
+          test -s "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
+      - name: Validate Golden Hour ProjectVideo source
+        run: npm run validate:project -- projects/golden-hour-dog-walk/scene.json
+      - name: Prepare Golden Hour audio mix
+        run: npm run audio:prepare -- projects/golden-hour-dog-walk/scene.json
+      - name: Enforce Golden Hour local asset evidence
+        run: |
+          mkdir -p review-output
+          REPORT_PATH="review-output/golden-hour.asset-evidence.json"
+          npm run director:asset-evidence -- projects/golden-hour-dog-walk/production/production-plan.json projects/golden-hour-dog-walk/production/asset-manifest.json "$REPORT_PATH"
+          node - "$REPORT_PATH" <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+          console.log(JSON.stringify({ summary: report.summary, issues: report.issues }, null, 2));
+          const hasWarningsOrErrors = report.issues.some((issue) => issue.severity === "warning" || issue.severity === "error");
+          if (hasWarningsOrErrors || report.summary.status === "criteria-unavailable" || report.summary.status === "no-assets") {
+            console.error("Golden Hour production asset evidence is not strict-ready.");
+            process.exit(1);
+          }
+          NODE
       - name: Verify Stormlight Keeper audio fixtures
         run: |
           test -s projects/stormlight-keeper/assets/audio/stormlight-score.wav

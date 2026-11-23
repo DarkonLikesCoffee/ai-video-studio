@@ -89,6 +89,15 @@ jobs:
       - name: Generate original audio fixtures
         if: steps.request.outputs.provider == 'github-actions'
         run: npm run assets:audio
+      - name: Stage original score and transition audio for Golden Hour
+        if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.project_path == 'projects/golden-hour-dog-walk/scene.json'
+        env:
+          PROJECT_PATH: ${{ steps.request.outputs.project_path }}
+        run: |
+          PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+          mkdir -p "$PROJECT_DIR/assets/audio"
+          cp projects/sora/assets/audio/score.wav "$PROJECT_DIR/assets/audio/score.wav"
+          cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
 
       - name: Download approved NASA SVS footage
         if: steps.request.outputs.provider == 'github-actions' && (steps.request.outputs.composition_id == 'NarratedSkyExplainer' || (steps.request.outputs.composition_id == 'ProjectVideo' && steps.request.outputs.narration_path != ''))
