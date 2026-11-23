@@ -12,7 +12,7 @@ Remotion compositions include:
 - `CinematicAdBenchmark`, `MadridTrip`, `MadridNewYorkParis` and `NarratedSkyExplainer`: hybrid compositions that combine Three.js/WebGL with 2D, SVG or video layers.
 - `DemoVideo`: the original fixed M1 pipeline demonstration; reference/test-only, not selectable for production.
 
-The shared `schemas/composition-registry.json` declares each composition's `renderMode`: `2d`, `3d` or `hybrid`. Render preflight validates that metadata and both GitHub Actions and CircleCI use it to select the render path. Pure 2D compositions do not request a WebGL context; 3D and hybrid compositions use the software WebGL backend. This avoids applying 3D rendering flags to SVG-only scenes and keeps the two providers aligned.
+The shared `schemas/composition-registry.json` declares each composition's `renderMode`: `2d`, `3d` or `hybrid`. A title, label or post-effect over a Three.js scene does not by itself make that scene hybrid; hybrid means that substantial 2D/SVG/video and 3D/WebGL content both drive the visual storytelling. Render preflight validates that metadata and both GitHub Actions and CircleCI use it to select the render path. Pure 2D compositions do not request a WebGL context; 3D and hybrid compositions use the software WebGL backend. This avoids applying 3D rendering flags to SVG-only scenes and keeps the two providers aligned.
 
 A `ProjectVideo` project can define:
 - 1–20 scenes of type `title`, `content`, or `outro`.
