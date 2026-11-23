@@ -29,6 +29,10 @@ test("composition catalogue entries are all registered in RemotionRoot", () => {
 test("resolves the conventional plan beside a project's scene file", () => {
   assert.equal(resolveProductionPlanPath(request), "projects/demo/production/production-plan.json");
   assert.equal(resolveProductionPlanPath({ compositionId: "MadridTrip" }), undefined);
+  assert.equal(
+    resolveProductionPlanPath({ productionPlanPath: "projects/custom-film/production/production-plan.json" }),
+    "projects/custom-film/production/production-plan.json",
+  );
 });
 
 test("accepts an explicitly selected registered composition matching the render request", () => {
