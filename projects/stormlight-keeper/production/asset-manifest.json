@@ -207,7 +207,8 @@
       "provenance": "Original score synthesized for The Stormlight Keeper by this repository's audio fixture generator.",
       "license": "Original project audio; no third-party material.",
       "creator": "AI Video Studio",
-      "usageRole": "rendered-audio"
+      "usageRole": "rendered-audio",
+      "reusePolicy": "required"
     },
     {
       "id": "stormlight-atmosphere",
@@ -220,7 +221,8 @@
       "provenance": "Original storm ambience synthesized for The Stormlight Keeper by this repository's audio fixture generator.",
       "license": "Original project audio; no third-party material.",
       "creator": "AI Video Studio",
-      "usageRole": "rendered-audio"
+      "usageRole": "rendered-audio",
+      "reusePolicy": "required"
     }
   ],
   "project": "The Stormlight Keeper"
