@@ -2,13 +2,13 @@
 
 ## Current verified snapshot — 2026-11-23
 
-The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is `87d794b1f08306e9e585f6e784e85136d8e3cbef`; post-merge main CI [#45230712726](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230712726) passed.
+The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is `b17722dc9293291cdeeceffd5b509220b0871c95` (PR #159 merge). Its PR CI [#45244287864](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244287864) passed all 56 steps; post-merge main CI [#45244858295](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45244858295) passed all 57 workflow steps.
 
-The current production foundation is on main: PR #144 composition identity, PR #150 audio QA modes, PRs #151–152 structured visual-review reporting/validation, PR #154 2D/3D render-path separation and PR #155 hash-bound full-video playback evidence.
+The current production foundation includes PR #144 composition identity, PR #150 audio QA modes, PRs #151–152 structured visual-review reporting/validation, PR #154 2D/3D render-path separation, PR #155 hash-bound full-video playback evidence, and PR #156 the final delivery gate. PR #158 adds visual-asset preview/approval evidence with audio exempt from visual review. PR #159 adds explicit asset reuse policy and a strict static source/data check for required asset paths.
 
-PR #156 merged the final delivery gate as `87d794b1f08306e9e585f6e784e85136d8e3cbef`. Exact-head push CI [#45230032176](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230032176) and PR CI [#45230048779](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230048779) passed 331 tests with 0 failures and 0 skips; post-merge main CI [#45230712726](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230712726) passed. The manual release path is implemented on main but has not yet been exercised against a real approved render.
+The asset-evidence gates now check provenance/rights, local file safety, visual preview/approval, and whether assets marked required are referenced by the selected composition. Static source references do not prove semantic relevance or visible use in rendered pixels. The manual final-delivery workflow has not yet been exercised against a real approved render.
 
-Only PR #156 was open at the time of this snapshot. This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
+This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
 
 ## North-star outcome
 
@@ -114,12 +114,12 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 - [x] Connect acceptance-criterion → shot mappings to asset-manifest entries and local build evidence. PR #105 merged the strict pre-render asset-evidence gate, report upload/provenance and corrected VALORANT benchmark shot/rights mapping. The report verifies links and metadata, not semantic suitability.
 
 - [ ] Unify discovery of still images and moving footage, including Openverse, Wikimedia Commons, NASA where relevant, and user-provided assets.
-- [ ] Build an asset review/selection manifest with source URL, creator, license, restrictions, attribution, media type, dimensions/duration, codec and hash.
+- [ ] Build a complete asset review/selection manifest with source URL, creator, license, restrictions, attribution, media type, dimensions/duration, codec and hash. **Partial implementation:** PR #158 adds local visual preview/approval evidence (audio is exempt from visual review); PR #159 adds explicit reuse policies and exact source-reference checks. Full media metadata/hash coverage and semantic/visual proof remain open.
 - [ ] Add provider adapters for generated still/video media only after comparing quality, rights, latency, reliability, controllability and cost.
 - [ ] Support user-provided image, video, audio and 3D assets with clear import/validation rules.
 - [ ] Handle missing or unsuitable footage honestly; do not disguise diagrams or stills as real footage.
 - [ ] Add visual consistency controls for recurring subjects, locations, palettes and art direction where selected providers support them.
-- [ ] Keep asset selection connected to shot intent and approved creative direction; avoid sourcing media solely to fill a scene.
+- [ ] Keep asset selection connected to shot intent and approved creative direction; avoid sourcing media solely to fill a scene. **Partial implementation:** criterion→shot→asset evidence plus `reusePolicy` and exact source-reference checks detect required assets omitted from the selected composition; they do not prove semantic relevance or visible use in rendered pixels.
 
 **Exit criteria:** The system satisfies a mixed shot list with reviewed real footage, generated assets and user assets, with complete provenance and no silent substitutions.
 
