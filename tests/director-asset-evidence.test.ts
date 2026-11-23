@@ -298,7 +298,7 @@ test("audio assets are excluded from the visual preview and approval gate", asyn
 test("required ProjectVideo assets must be referenced by the selected scene data", async () => {
   await withProject(async (root) => {
     await writeFile(path.join(root, "scene.json"), JSON.stringify({
-      scenes: [{ mediaLayers: [{ src: "assets/one.svg" }] }],
+      scenes: [{ id: "shot-one", mediaLayers: [{ src: "assets/one.svg" }] }],
       audioTracks: []
     }));
     const plan = makePlan();
@@ -316,9 +316,13 @@ test("required ProjectVideo assets must be referenced by the selected scene data
     assert.equal(report.assets[0]?.reusePolicy, "required");
     assert.equal(report.assets[0]?.usageStatus, "referenced");
     assert.deepEqual(report.assets[0]?.usageEvidence, ["scene.json: assets/one.svg"]);
+    assert.equal(report.assets[0]?.shotUsageStatus, "verified");
+    assert.deepEqual(report.assets[0]?.shotUsageEvidence, ["shot-one: scene.json: assets/one.svg"]);
     assert.equal(report.summary.requiredAssetCount, 1);
     assert.equal(report.summary.requiredAssetsReferenced, 1);
     assert.equal(report.summary.requiredAssetsNotReferenced, 0);
+    assert.equal(report.summary.requiredAssetsVerifiedInAssignedShots, 1);
+    assert.equal(report.summary.requiredAssetsMissingFromAssignedShots, 0);
     assert.equal(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED"), false);
   });
 });
@@ -326,7 +330,7 @@ test("required ProjectVideo assets must be referenced by the selected scene data
 test("required assets absent from the composition are blocking evidence errors", async () => {
   await withProject(async (root) => {
     await writeFile(path.join(root, "scene.json"), JSON.stringify({
-      scenes: [{ mediaLayers: [{ src: "assets/two.svg" }] }]
+      scenes: [{ id: "shot-one", mediaLayers: [{ src: "assets/two.svg" }] }]
     }));
     const plan = makePlan();
     const manifest = {
@@ -407,6 +411,7 @@ test("required custom-composition assets are found through local source imports"
     };
     const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
     assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.equal(report.assets[0]?.shotUsageStatus, "not-audited");
     assert.ok(report.assets[0]?.usageEvidence.some((entry) => entry.endsWith("asset-helper.ts: assets/one.svg")));
     assert.equal(report.summary.requiredAssetsReferenced, 1);
   } finally {
@@ -436,7 +441,7 @@ test("invalid reusePolicy is reported as an error", async () => {
 test("a same-basename reference from a different folder does not satisfy required asset usage", async () => {
   await withProject(async (root) => {
     await writeFile(path.join(root, "scene.json"), JSON.stringify({
-      scenes: [{ mediaLayers: [{ src: "assets/alternate/one.svg" }] }]
+      scenes: [{ id: "shot-one", mediaLayers: [{ src: "assets/alternate/one.svg" }] }]
     }));
     const manifest = {
       assets: [{
@@ -457,7 +462,7 @@ test("a same-basename reference from a different folder does not satisfy require
 test("required asset usage respects case-sensitive paths", async () => {
   await withProject(async (root) => {
     await writeFile(path.join(root, "scene.json"), JSON.stringify({
-      scenes: [{ mediaLayers: [{ src: "assets/One.svg" }] }]
+      scenes: [{ id: "shot-one", mediaLayers: [{ src: "assets/One.svg" }] }]
     }));
     const manifest = {
       assets: [{
@@ -480,7 +485,7 @@ test("ProjectVideo usage ignores filenames mentioned outside rendered media sour
   await withProject(async (root) => {
     await writeFile(path.join(root, "scene.json"), JSON.stringify({
       title: "Design reference: assets/one.svg",
-      scenes: [{ title: "Mentioned in copy only: assets/one.svg", mediaLayers: [] }],
+      scenes: [{ id: "shot-one", title: "Mentioned in copy only: assets/one.svg", mediaLayers: [] }],
       audioTracks: []
     }));
     const manifest = {
@@ -503,7 +508,7 @@ test("ProjectVideo usage ignores filenames mentioned outside rendered media sour
 test("required asset usage must match the complete project-relative path", async () => {
   await withProject(async (root) => {
     await writeFile(path.join(root, "scene.json"), JSON.stringify({
-      scenes: [{ mediaLayers: [{ src: "one.svg" }] }]
+      scenes: [{ id: "shot-one", mediaLayers: [{ src: "one.svg" }] }]
     }));
     const manifest = {
       assets: [{
@@ -519,5 +524,136 @@ test("required asset usage must match the complete project-relative path", async
     assert.equal(report.assets[0]?.path, "assets/one.svg");
     assert.equal(report.assets[0]?.usageStatus, "not-referenced");
     assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+  });
+});
+
+test("required ProjectVideo asset must be referenced in its assigned scene, not another scene", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [
+        { id: "shot-one", mediaLayers: [{ src: "assets/two.svg" }] },
+        { id: "shot-two", mediaLayers: [{ src: "assets/one.svg" }] }
+      ]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.equal(report.assets[0]?.shotUsageStatus, "missing");
+    assert.deepEqual(report.assets[0]?.shotUsageEvidence, []);
+    assert.equal(report.summary.requiredAssetsReferenced, 1);
+    assert.equal(report.summary.requiredAssetsMissingFromAssignedShots, 1);
+    assert.ok(report.issues.some((issue) =>
+      issue.code === "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT" &&
+      issue.severity === "error" &&
+      issue.shotId === "shot-one"
+    ));
+    assert.equal(report.summary.status, "invalid");
+  });
+});
+
+test("required ProjectVideo asset assigned to all shots must appear in every assigned scene", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [
+        { id: "shot-one", mediaLayers: [{ src: "assets/one.svg" }] },
+        { id: "shot-two", mediaLayers: [{ src: "assets/two.svg" }] },
+        { id: "shot-three", mediaLayers: [] }
+      ]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["all"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.shotUsageStatus, "missing");
+    assert.equal(report.summary.requiredAssetsMissingFromAssignedShots, 1);
+    assert.equal(report.issues.filter((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT").length, 2);
+  });
+});
+
+test("required ProjectVideo asset is unverifiable when its assigned shot has no matching scene ID", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ id: "some-other-scene", mediaLayers: [{ src: "assets/one.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.equal(report.assets[0]?.shotUsageStatus, "unverifiable");
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_SHOT_USAGE_UNVERIFIABLE" && issue.shotId === "shot-one"));
+    assert.equal(report.summary.status, "invalid");
+  });
+});
+
+test("required audio assets are checked globally and are excluded from per-shot placement", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "assets", "score.wav"), "audio");
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ id: "shot-one", mediaLayers: [] }],
+      audioTracks: [{ id: "score", role: "music", src: "assets/score.wav" }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "assets/score.wav",
+        type: "audio/wav",
+        reusePolicy: "required",
+        shotIds: ["all"],
+        provenance: "Original generated score.",
+        license: "Original project audio."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.deepEqual(report.assets[0]?.usageEvidence, ["scene.json: assets/score.wav"]);
+    assert.equal(report.assets[0]?.shotUsageStatus, "not-required");
+    assert.equal(report.summary.requiredAssetsReferenced, 1);
+    assert.equal(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT"), false);
+  });
+});
+
+test("required ProjectVideo visual asset without shot assignments is blocking", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ id: "shot-one", mediaLayers: [{ src: "assets/one.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.equal(report.assets[0]?.shotUsageStatus, "unverifiable");
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_SHOT_USAGE_UNVERIFIABLE" && issue.severity === "error"));
+    assert.equal(report.summary.requiredAssetsShotUsageUnverifiable, 1);
+    assert.equal(report.summary.status, "invalid");
   });
 });

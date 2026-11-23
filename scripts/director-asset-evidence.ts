@@ -12,6 +12,7 @@ type PreviewStatus = LocalStatus | "not-required";
 type VisualReviewStatus = "approved" | "pending" | "rejected" | "missing" | "not-required";
 type ReusePolicy = "required" | "optional" | "reference-only";
 type AssetUsageStatus = "referenced" | "not-referenced" | "not-required" | "unverifiable";
+type ShotUsageStatus = "verified" | "missing" | "unverifiable" | "not-audited" | "not-required";
 type AssetEvidence = {
   id: string;
   reference: string;
@@ -31,6 +32,8 @@ type AssetEvidence = {
   reusePolicy: ReusePolicy;
   usageStatus: AssetUsageStatus;
   usageEvidence: string[];
+  shotUsageStatus: ShotUsageStatus;
+  shotUsageEvidence: string[];
   visualReview: { reviewer: string | null; reviewedAt: string | null; notes: string | null };
 };
 type ShotEvidence = {
@@ -84,6 +87,10 @@ export type AssetEvidenceReport = {
     requiredAssetsReferenced: number;
     requiredAssetsNotReferenced: number;
     requiredAssetsUnverifiable: number;
+    requiredAssetsVerifiedInAssignedShots: number;
+    requiredAssetsMissingFromAssignedShots: number;
+    requiredAssetsShotUsageUnverifiable: number;
+    requiredAssetsShotUsageNotAudited: number;
   };
   shots: ShotEvidence[];
   assets: AssetEvidence[];
@@ -145,7 +152,14 @@ const getReusePolicy = (asset: RecordValue): ReusePolicy => {
 };
 
 type SourceReference = { value: string; sourceFile: string };
-type CompositionReferences = { available: boolean; source: string | null; references: SourceReference[]; reason?: string };
+type ProjectVideoSceneReferences = { sceneId: string; references: SourceReference[] };
+type CompositionReferences = {
+  available: boolean;
+  source: string | null;
+  references: SourceReference[];
+  projectVideoScenes: ProjectVideoSceneReferences[] | null;
+  reason?: string;
+};
 
 const sourceExtensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts", ".json"];
 const isAuditableSource = (filePath: string): boolean => sourceExtensions.includes(path.extname(filePath).toLowerCase());
@@ -164,27 +178,37 @@ const addJsonStrings = (value: unknown, sourceFile: string, references: SourceRe
   }
 };
 
-const collectProjectVideoAssetReferences = (value: unknown, sourceFile: string): SourceReference[] => {
-  if (!isRecord(value)) return [];
+const collectProjectVideoAssetReferences = (
+  value: unknown,
+  sourceFile: string,
+): { references: SourceReference[]; projectVideoScenes: ProjectVideoSceneReferences[] } => {
+  if (!isRecord(value)) return { references: [], projectVideoScenes: [] };
   const references: SourceReference[] = [];
-  const addSource = (entry: unknown) => {
+  const projectVideoScenes: ProjectVideoSceneReferences[] = [];
+  const addSource = (entry: unknown, target?: SourceReference[]) => {
     if (isRecord(entry) && typeof entry.src === "string") {
-      references.push({ value: entry.src, sourceFile });
+      const reference = { value: entry.src, sourceFile };
+      references.push(reference);
+      target?.push(reference);
     }
   };
   if (Array.isArray(value.scenes)) {
     for (const scene of value.scenes) {
       if (!isRecord(scene)) continue;
+      const sceneReferences: SourceReference[] = [];
       const mediaItems = Array.isArray(scene.mediaLayers)
         ? scene.mediaLayers
         : scene.media ? [scene.media] : [];
-      for (const media of mediaItems) addSource(media);
+      for (const media of mediaItems) addSource(media, sceneReferences);
+      const sceneId = asText(scene.id);
+      if (sceneId) projectVideoScenes.push({ sceneId, references: sceneReferences });
     }
   }
+  // Audio tracks are global in ProjectVideo and therefore do not map to individual shots.
   if (Array.isArray(value.audioTracks)) {
     for (const track of value.audioTracks) addSource(track);
   }
-  return references;
+  return { references, projectVideoScenes };
 };
 
 const resolveLocalModule = async (specifier: string, containingFile: string, repositoryRoot: string): Promise<string | null> => {
@@ -312,16 +336,16 @@ const collectCompositionReferences = async (
   const strategy = isRecord(plan.renderStrategy) ? plan.renderStrategy : {};
   const renderer = asText(strategy.renderer);
   const compositionId = asText(strategy.compositionId);
-  if (!renderer || !compositionId) return { available: false, source: null, references: [], reason: "The production plan has no valid render strategy." };
+  if (!renderer || !compositionId) return { available: false, source: null, references: [], projectVideoScenes: null, reason: "The production plan has no valid render strategy." };
 
   if (renderer === "project-video" && compositionId === "ProjectVideo") {
     const scenePath = path.join(projectRoot, "scene.json");
     try {
       const scene = JSON.parse(await readFile(scenePath, "utf8")) as unknown;
-      const references = collectProjectVideoAssetReferences(scene, "scene.json");
-      return { available: true, source: "scene.json", references };
+      const collected = collectProjectVideoAssetReferences(scene, "scene.json");
+      return { available: true, source: "scene.json", ...collected };
     } catch {
-      return { available: false, source: "scene.json", references: [], reason: "The selected ProjectVideo scene.json could not be read." };
+      return { available: false, source: "scene.json", references: [], projectVideoScenes: null, reason: "The selected ProjectVideo scene.json could not be read." };
     }
   }
 
@@ -330,18 +354,18 @@ const collectCompositionReferences = async (
   try {
     rootSource = await readFile(rootPath, "utf8");
   } catch {
-    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], reason: "The Remotion composition registry source could not be read." };
+    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], projectVideoScenes: null, reason: "The Remotion composition registry source could not be read." };
   }
   const moduleSpecifier = findCompositionModule(rootSource, compositionId);
   if (!moduleSpecifier) {
-    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], reason: "The selected composition could not be mapped to its imported component in RemotionRoot." };
+    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], projectVideoScenes: null, reason: "The selected composition could not be mapped to its imported component in RemotionRoot." };
   }
   const componentFile = await resolveLocalModule(moduleSpecifier, rootPath, repositoryRoot);
   if (!componentFile) {
-    return { available: false, source: moduleSpecifier, references: [], reason: "The selected composition component source could not be resolved." };
+    return { available: false, source: moduleSpecifier, references: [], projectVideoScenes: null, reason: "The selected composition component source could not be resolved." };
   }
   const references = await collectImportedSourceReferences(componentFile, repositoryRoot);
-  return { available: true, source: path.relative(repositoryRoot, componentFile), references };
+  return { available: true, source: path.relative(repositoryRoot, componentFile), references, projectVideoScenes: null };
 };
 
 const normalizeUsagePath = (value: string): string =>
@@ -396,6 +420,7 @@ export const buildAssetEvidenceReport = async (
     const declaredReusePolicy = asText(value.reusePolicy);
     const validReusePolicy = declaredReusePolicy === null || reusePolicies.includes(declaredReusePolicy as ReusePolicy);
     if (!validReusePolicy) addIssue({ code: "ASSET_REUSE_POLICY_INVALID", severity: "error", message: `Asset "${reference}" reusePolicy must be required, optional or reference-only.`, assetRef: reference });
+    const assetShotIds = Array.isArray(value.shotIds) ? value.shotIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0).map((id) => id.trim()) : [];
     const reusePolicy = getReusePolicy(value);
     const usageMatches = reusePolicy === "reference-only" ? [] : compositionReferences.references.filter((sourceReference) => usageMatchesAsset(sourceReference, local.path));
     const usageStatus: AssetUsageStatus = reusePolicy === "reference-only"
@@ -404,6 +429,60 @@ export const buildAssetEvidenceReport = async (
         ? "unverifiable"
         : usageMatches.length > 0 ? "referenced" : "not-referenced";
     const usageEvidence = [...new Set(usageMatches.map((match) => `${match.sourceFile}: ${match.value}`))];
+    let shotUsageStatus: ShotUsageStatus = reusePolicy !== "required" || !visualReviewApplicable
+      ? "not-required"
+      : compositionReferences.projectVideoScenes === null
+        ? "not-audited"
+        : "unverifiable";
+    const shotUsageEvidence: string[] = [];
+    if (reusePolicy === "required" && visualReviewApplicable && compositionReferences.projectVideoScenes !== null) {
+      const assignedShotIds = assetShotIds.includes("all")
+        ? shotIds
+        : assetShotIds.filter((shotId) => shotId !== "all" && knownShots.has(shotId));
+      let hasMissingShotUsage = false;
+      let hasUnverifiableShotUsage = false;
+      if (!assignedShotIds.length) {
+        hasUnverifiableShotUsage = true;
+        addIssue({
+          code: "ASSET_SHOT_USAGE_UNVERIFIABLE",
+          severity: "error",
+          message: `Required asset "${reference}" has no valid shot assignment, so its per-shot use cannot be verified.`,
+          assetRef: reference,
+        });
+      }
+      for (const shotId of assignedShotIds) {
+        const sceneEvidence = compositionReferences.projectVideoScenes.find((scene) => scene.sceneId === shotId);
+        if (!sceneEvidence) {
+          hasUnverifiableShotUsage = true;
+          addIssue({
+            code: "ASSET_SHOT_USAGE_UNVERIFIABLE",
+            severity: "error",
+            message: `Required asset "${reference}" is assigned to shot "${shotId}", but no ProjectVideo scene with that ID exists.`,
+            shotId,
+            assetRef: reference,
+          });
+          continue;
+        }
+        const sceneMatch = sceneEvidence.references.find((sourceReference) => usageMatchesAsset(sourceReference, local.path));
+        if (!sceneMatch) {
+          hasMissingShotUsage = true;
+          addIssue({
+            code: "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT",
+            severity: "error",
+            message: `Required asset "${reference}" is not referenced by the ProjectVideo scene for assigned shot "${shotId}".`,
+            shotId,
+            assetRef: reference,
+          });
+        } else {
+          shotUsageEvidence.push(`${shotId}: ${sceneMatch.sourceFile}: ${sceneMatch.value}`);
+        }
+      }
+      shotUsageStatus = hasMissingShotUsage
+        ? "missing"
+        : hasUnverifiableShotUsage
+          ? "unverifiable"
+          : "verified";
+    }
     const previewRaw = asText(value.previewPath) ?? asText(value.preview);
     const previewLocal: { path: string | null; status: PreviewStatus } = !visualReviewApplicable
       ? { path: null, status: "not-required" }
@@ -427,7 +506,6 @@ export const buildAssetEvidenceReport = async (
         : "missing";
     const provenanceStatus = hasProvenance(value) ? "documented" : "missing";
     const rightsStatus = hasRights(value) ? "documented" : "missing";
-    const assetShotIds = Array.isArray(value.shotIds) ? value.shotIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0).map((id) => id.trim()) : [];
     if (!assetShotIds.length) addIssue({ code: "ASSET_SHOT_IDS_MISSING", severity: "warning", message: `Asset "${reference}" has no valid shotIds.`, assetRef: reference });
     for (const shotId of assetShotIds) {
       if (shotId !== "all" && !knownShots.has(shotId)) {
@@ -470,6 +548,8 @@ export const buildAssetEvidenceReport = async (
       reusePolicy,
       usageStatus,
       usageEvidence,
+      shotUsageStatus,
+      shotUsageEvidence,
     });
   }
 
@@ -529,6 +609,10 @@ export const buildAssetEvidenceReport = async (
   const requiredAssetsReferenced = assets.filter((asset) => asset.reusePolicy === "required" && asset.usageStatus === "referenced").length;
   const requiredAssetsNotReferenced = assets.filter((asset) => asset.reusePolicy === "required" && asset.usageStatus === "not-referenced").length;
   const requiredAssetsUnverifiable = assets.filter((asset) => asset.reusePolicy === "required" && asset.usageStatus === "unverifiable").length;
+  const requiredAssetsVerifiedInAssignedShots = assets.filter((asset) => asset.reusePolicy === "required" && asset.shotUsageStatus === "verified").length;
+  const requiredAssetsMissingFromAssignedShots = assets.filter((asset) => asset.reusePolicy === "required" && asset.shotUsageStatus === "missing").length;
+  const requiredAssetsShotUsageUnverifiable = assets.filter((asset) => asset.reusePolicy === "required" && asset.shotUsageStatus === "unverifiable").length;
+  const requiredAssetsShotUsageNotAudited = assets.filter((asset) => asset.reusePolicy === "required" && asset.shotUsageStatus === "not-audited").length;
   const assetsNotLocal = assets.filter((asset) => asset.localStatus === "not-local").length;
   const emptyFiles = assets.filter((asset) => asset.localStatus === "empty").length;
   const unsafePaths = assets.filter((asset) => asset.localStatus === "unsafe").length;
@@ -578,6 +662,10 @@ export const buildAssetEvidenceReport = async (
       requiredAssetsReferenced,
       requiredAssetsNotReferenced,
       requiredAssetsUnverifiable,
+      requiredAssetsVerifiedInAssignedShots,
+      requiredAssetsMissingFromAssignedShots,
+      requiredAssetsShotUsageUnverifiable,
+      requiredAssetsShotUsageNotAudited,
     },
     shots,
     assets,
