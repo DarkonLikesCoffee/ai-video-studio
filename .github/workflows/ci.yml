@@ -58,6 +58,8 @@ jobs:
         run: npm test
       - name: Validate example production plan
         run: npm run validate:plan -- projects/examples/production-plan.json
+      - name: Test machine-readable production state validator
+        run: npm test -- --test-name-pattern "production state|production stages"
       - name: Generate storyboard planning previews
         run: |
           mkdir -p review-output
