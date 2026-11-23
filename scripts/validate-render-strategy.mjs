@@ -1,4 +1,4 @@
-import { access, readFile } from "node:fs/promises";
+import { access, appendFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import compositionRegistry from "../schemas/composition-registry.json" with { type: "json" };
@@ -47,8 +47,13 @@ export const validateRenderStrategyAgainstRequest = ({
   const selected = catalogue.find((entry) => entry.id === requestedId);
   if (!selected) {
     errors.push(`compositionId "${requestedId}" is not present in the production composition catalogue.`);
-  } else if (!selected.selectable) {
-    errors.push(`compositionId "${requestedId}" is registered for reference/testing only and cannot be used for production rendering.`);
+  } else {
+    if (!selected.selectable) {
+      errors.push(`compositionId "${requestedId}" is registered for reference/testing only and cannot be used for production rendering.`);
+    }
+    if (!["2d", "3d", "hybrid"].includes(selected.renderMode)) {
+      errors.push(`compositionId "${requestedId}" must declare renderMode as 2d, 3d, or hybrid in the production catalogue.`);
+    }
   }
 
   if (plan === undefined || plan === null) return errors;
@@ -131,10 +136,17 @@ const run = async () => {
 
   const errors = validateRenderStrategyAgainstRequest({ request, plan, registeredCompositionIds });
   if (errors.length) throw new Error(errors.join("\n"));
+  const selected = compositionRegistry.find((entry) => entry.id === request.compositionId);
+  if (!selected || !["2d", "3d", "hybrid"].includes(selected.renderMode)) {
+    throw new Error(`Composition ${request.compositionId} has no supported renderMode.`);
+  }
+  if (process.env.GITHUB_OUTPUT) {
+    await appendFile(process.env.GITHUB_OUTPUT, `render_mode=${selected.renderMode}\n`);
+  }
   if (plan) {
-    console.log(`Accepted Director strategy: ${plan.renderStrategy.renderer} / ${plan.renderStrategy.compositionId} (registered and selectable).`);
+    console.log(`Accepted Director strategy: ${plan.renderStrategy.renderer} / ${plan.renderStrategy.compositionId} (${selected.renderMode}, registered and selectable).`);
   } else {
-    console.log(`Accepted registered, selectable composition ${request.compositionId}; no linked production plan was supplied.`);
+    console.log(`Accepted registered, selectable ${selected.renderMode} composition ${request.compositionId}; no linked production plan was supplied.`);
   }
 };
 
