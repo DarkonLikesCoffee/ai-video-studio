@@ -76,7 +76,7 @@ Then run:
 npm run qa:visual-review-validate -- render-output/review/<output-name>.visual-review.json
 ```
 
-A report can only be approved after full-video inspection, a reviewer and timestamps are recorded, no blocker or open major findings remain, and all corrections are verified against the current MP4.
+A report can only be approved after full-video inspection, a reviewer and timestamps are recorded, no blocker or open major findings remain, and all corrections are verified against the current MP4. Approval must also record `inspection.audioReview` as `listened` (with reviewer, time and rationale), `not-listened` (with a reason), or `not-applicable` (with a reason, only for a video without an audio stream). The [final delivery gate](final-delivery.md) checks this declaration against the actual Media QA report.
 
 ## Legacy report compatibility
 

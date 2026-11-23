@@ -64,7 +64,7 @@ The visual-review report is the durable review record. When a render is rejected
 3. Commit the reviewed report in the same project at `production/visual-review.json`. Set `visualReviewHistoryPath` in the next `render-request.json` to that file. The path must belong to the selected project.
 4. The render workflow appends a new iteration only when the MP4 hash changes and every open finding has an applied correction included in the candidate. A failed check means the iteration must not be recorded.
 5. Inspect the new MP4. Re-verify every correction against this exact artifact hash; do not carry verification forward from an older render. Add `verification.videoSha256`, reviewer, review timestamp and timestamps checked, set `verified: true` and `status: "verified"`, then mark the finding resolved when all its corrections have been verified.
-6. Run `npm run qa:visual-review-validate -- <report.json>`. Approval still requires full-video inspection and the acceptance gate above.
+6. Record `inspection.audioReview`: use `listened` with reviewer, timestamp and rationale when audio was heard; use `not-listened` with a reason when it was not; use `not-applicable` only when the MP4 has no audio stream. Run `npm run qa:visual-review-validate -- <report.json>`. Approval still requires full-video inspection and the acceptance gate above.
 
 A subsequent render reopens previously resolved findings for re-checking and moves older correction verification into `verificationHistory`. This is intentional regression protection. Schema-version-1 reports can be used as the first, legacy iteration after their corrections are upgraded with stable IDs, target paths, applied status and commit SHAs; all new reports use schema version 3.
 

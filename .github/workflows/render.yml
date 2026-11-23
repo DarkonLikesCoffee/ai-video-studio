@@ -332,7 +332,7 @@ jobs:
             render-output/${{ steps.request.outputs.output_name }}.asset-evidence.json
             render-output/${{ steps.request.outputs.output_name }}.provenance.json
           if-no-files-found: error
-          retention-days: 3
+          retention-days: 30
 
       - name: Write render artifact summary
         if: steps.request.outputs.provider == 'github-actions'

@@ -343,6 +343,25 @@ export const validateVisualReviewReport = (report: unknown) => {
     if (!inspection || !isTimestampList(inspection.timestampsReviewedSeconds)) {
       errors.push("Approval requires reviewed timestamps.");
     }
+    const audioReview = isRecord(inspection?.audioReview) ? inspection.audioReview : undefined;
+    const audioStatus = audioReview?.status;
+    if (audioStatus !== "listened" && audioStatus !== "not-listened" && audioStatus !== "not-applicable") {
+      errors.push("Approval requires an explicit audio review status: listened, not-listened, or not-applicable.");
+    } else if (audioStatus === "listened") {
+      if (typeof audioReview?.reviewer !== "string" || !audioReview.reviewer.trim()) {
+        errors.push("A listened audio review needs a reviewer.");
+      } else if (inspection?.reviewer !== audioReview.reviewer) {
+        errors.push("Audio review reviewer must match the visual inspection reviewer.");
+      }
+      if (!isDate(audioReview?.reviewedAt)) {
+        errors.push("A listened audio review needs a valid reviewedAt timestamp.");
+      }
+      if (typeof audioReview?.rationale !== "string" || !audioReview.rationale.trim()) {
+        errors.push("A listened audio review needs a short rationale.");
+      }
+    } else if (typeof audioReview?.reason !== "string" || !audioReview.reason.trim()) {
+      errors.push("An audio review marked not-listened or not-applicable needs a reason.");
+    }
     if (findings.some(finding => finding.severity === "blocker" && finding.status !== "resolved")) {
       errors.push("Approval is blocked by unresolved blocker findings.");
     }
