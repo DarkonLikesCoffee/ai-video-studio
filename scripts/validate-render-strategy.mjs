@@ -24,8 +24,23 @@ export const validateRenderStrategyAgainstRequest = ({
 }) => {
   const errors = [];
   const requestedId = request.compositionId;
+  const registeredSet = new Set(registeredCompositionIds);
+  const catalogueIds = catalogue.map((entry) => entry.id);
+  const catalogueSet = new Set(catalogueIds);
 
-  if (!registeredCompositionIds.includes(requestedId)) {
+  if (registeredSet.size !== registeredCompositionIds.length) {
+    errors.push("RemotionRoot contains duplicate composition IDs.");
+  }
+  if (catalogueSet.size !== catalogueIds.length) {
+    errors.push("The production composition catalogue contains duplicate IDs.");
+  }
+  if (registeredSet.size !== catalogueSet.size ||
+      [...registeredSet].some((id) => !catalogueSet.has(id)) ||
+      [...catalogueSet].some((id) => !registeredSet.has(id))) {
+    errors.push("RemotionRoot and the production composition catalogue must contain exactly the same composition IDs.");
+  }
+
+  if (!registeredSet.has(requestedId)) {
     errors.push(`compositionId "${requestedId}" is not registered in packages/video-engine/src/root.tsx.`);
   }
 
