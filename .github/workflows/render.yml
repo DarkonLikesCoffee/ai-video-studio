@@ -42,6 +42,26 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         run: npm ci --no-audit --no-fund
 
+      - name: Enforce frozen production state when a project opts in
+        if: steps.request.outputs.provider == 'github-actions' && (steps.request.outputs.project_path != '' || steps.request.outputs.production_plan_path != '')
+        env:
+          PROJECT_PATH: ${{ steps.request.outputs.project_path }}
+          PRODUCTION_PLAN_PATH: ${{ steps.request.outputs.production_plan_path }}
+        run: |
+          if [[ -n "$PROJECT_PATH" ]]; then
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+          else
+            PROJECT_DIR="$(dirname "$(dirname "$PRODUCTION_PLAN_PATH")")"
+          fi
+          STATE_PATH="$PROJECT_DIR/production/production-state.json"
+          if [[ -f "$STATE_PATH" ]]; then
+            PROJECT_ID="$(basename "$PROJECT_DIR")"
+            npm run validate:state -- "$STATE_PATH" "$PROJECT_ID" --require-evidence --verify-evidence-files --project-root "$PROJECT_DIR" --require-stage frozen
+            echo "Production state accepted: $PROJECT_ID is frozen with verifiable stage evidence." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No production-state.json found for $PROJECT_DIR; continuing in legacy compatibility mode." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Validate prior visual-review report
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.visual_review_history_path != ''
         env:
