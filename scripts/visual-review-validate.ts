@@ -60,53 +60,26 @@ export const validateVisualReviewReport = (report: unknown) => {
     if (typeof c.description !== "string" || !c.description.trim()) errors.push("Each correction needs a description.");
     if (typeof c.verified !== "boolean") errors.push("Each correction needs verified boolean.");
     if (version === 2) {
-      if (typeof c.id !== "string" || !c.id.trim()) errors.push("Each schemaVersion 2 correction needs a non-empty id.");
-      else if (correctionIds.has(c.id)) errors.push(`Duplicate correction id: ${c.id}`);
-      else correctionIds.add(c.id);
-      if (!Array.isArray(c.targetPaths) || c.targetPaths.length === 0 || !c.targetPaths.every(isSafeRepoPath)) {
-        errors.push(`Correction ${String(c.id)} needs one or more safe repository-relative targetPaths.`);
-      }
-      if (!["planned", "applied", "verified"].includes(String(c.status))) {
-        errors.push(`Correction ${String(c.id)} status must be planned, applied, or verified.`);
-      }
-      if ((c.status === "applied" || c.status === "verified") && !isCommitSha(c.appliedInCommit)) {
-        errors.push(`Correction ${String(c.id)} needs a full appliedInCommit SHA.`);
-      }
-      if (c.verified === true) {
-        if (c.status !== "verified") errors.push(`Verified correction ${String(c.id)} must have status verified.`);
-        if (!isRecord(c.verification)) errors.push(`Verified correction ${String(c.id)} needs verification evidence.`);
-        else {
-          if (!isSha256(c.verification.videoSha256) || !isRecord(r.artifact) || c.verification.videoSha256 !== r.artifact.videoSha256) {
-            errors.push(`Correction ${String(c.id)} verification must match the current artifact video hash.`);
-          }
-          if (typeof c.verification.reviewer !== "string" || !c.verification.reviewer.trim()) {
-            errors.push(`Correction ${String(c.id)} verification needs a reviewer.`);
-          }
-          if (!isDate(c.verification.reviewedAt)) errors.push(`Correction ${String(c.id)} verification needs a valid reviewedAt timestamp.`);
-          if (!isTimestampList(c.verification.timestampsReviewedSeconds)) {
-            errors.push(`Correction ${String(c.id)} verification needs non-negative reviewed timestamps.`);
-          }
-        }
-      }
-    }
-  }
-
-  if (version === 2) {
     if (!Array.isArray(r.renderIterations) || r.renderIterations.length === 0) {
       errors.push("schemaVersion 2 reports need a non-empty renderIterations history.");
     } else {
       const hashes = new Set<string>();
       const iterations = r.renderIterations.filter(isRecord);
-      for (let index = 0; index < iterations.length; index++) {
-        const item = iterations[index];
+      if (iterations.length !== r.renderIterations.length) {
+        errors.push("Every render iteration must be a JSON object.");
+      }
+      for (const [index, item] of iterations.entries()) {
         if (item.iteration !== index + 1) errors.push("renderIterations must use sequential iteration numbers starting at 1.");
         if (!isSha256(item.videoSha256)) errors.push(`Render iteration ${index + 1} needs a valid videoSha256.`);
         else if (hashes.has(item.videoSha256)) errors.push("renderIterations cannot contain duplicate video hashes.");
         else hashes.add(item.videoSha256);
         if (index === 0) {
           if (item.previousVideoSha256 !== null) errors.push("The first render iteration must have previousVideoSha256=null.");
-        } else if (item.previousVideoSha256 !== iterations[index - 1].videoSha256) {
-          errors.push(`Render iteration ${index + 1} must reference the preceding video hash.`);
+        } else {
+          const previous = iterations[index - 1];
+          if (!previous || item.previousVideoSha256 !== previous.videoSha256) {
+            errors.push(`Render iteration ${index + 1} must reference the preceding video hash.`);
+          }
         }
         if (item.legacy !== true && !isCommitSha(item.candidateSha)) errors.push(`Render iteration ${index + 1} needs a full candidateSha.`);
         if (item.legacy !== true && !isCommitSha(item.sourceCommit)) errors.push(`Render iteration ${index + 1} needs a full sourceCommit.`);
@@ -121,7 +94,7 @@ export const validateVisualReviewReport = (report: unknown) => {
           }
         }
       }
-      const last = iterations[iterations.length - 1];
+      const last = iterations.at(-1);
       if (isRecord(r.artifact) && last && last.videoSha256 !== r.artifact.videoSha256) {
         errors.push("artifact.videoSha256 must match the latest render iteration.");
       }
