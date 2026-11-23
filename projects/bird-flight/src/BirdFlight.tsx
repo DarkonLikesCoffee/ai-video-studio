@@ -12,8 +12,8 @@ type BirdProps = {
 };
 
 const Bird = ({ x, y, scale = 1, rotation = 0, flap, color = "#172D35", opacity = 1 }: BirdProps) => (
-  <g transform={\`translate(\${x} \${y}) rotate(\${rotation}) scale(\${scale})\`} opacity={opacity}>
-    <g transform={\`rotate(\${10 + flap * 38} -16 -2)\`}>
+  <g transform={`translate(${x} ${y}) rotate(${rotation}) scale(${scale})`} opacity={opacity}>
+    <g transform={`rotate(${10 + flap * 38} -16 -2)`}>
       <path d="M-20 0 Q-16 -65 -56 -136 Q-49 -75 -39 -35 Q-66 -99 -97 -119 Q-75 -65 -48 -27 Q-88 -75 -125 -83 Q-94 -42 -50 -12 Q-79 -29 -112 -31 Q-69 2 -20 12Z" fill="#29434A"/>
       <path d="M-34 -20 Q-64 -84 -93 -104 M-37 -16 Q-82 -61 -112 -68 M-34 -12 Q-81 -34 -104 -34" fill="none" stroke="#78918E" strokeWidth="2.2" opacity=".45"/>
     </g>
@@ -23,7 +23,7 @@ const Bird = ({ x, y, scale = 1, rotation = 0, flap, color = "#172D35", opacity 
     <path d="M101 -5 L124 -9 L108 2Z" fill="#D89A52"/>
     <circle cx="78" cy="-11" r="3.1" fill="#F4E8D1"/>
     <circle cx="79" cy="-11" r="1.35" fill="#14242B"/>
-    <g transform={\`rotate(\${-12 - flap * 48} -15 1)\`}>
+    <g transform={`rotate(${-12 - flap * 48} -15 1)`}>
       <path d="M-20 2 Q-13 -62 8 -132 Q8 -74 0 -33 Q18 -94 46 -121 Q35 -65 8 -24 Q45 -70 82 -79 Q56 -32 10 -7 Q48 -24 78 -22 Q35 13 -20 14Z" fill={color}/>
       <path d="M-1 -22 Q22 -80 37 -108 M1 -16 Q42 -56 70 -65 M2 -10 Q47 -28 67 -27" fill="none" stroke="#8DA19A" strokeWidth="2.4" opacity=".42"/>
     </g>
@@ -31,7 +31,7 @@ const Bird = ({ x, y, scale = 1, rotation = 0, flap, color = "#172D35", opacity 
 );
 
 const Cloud = ({ x, y, scale = 1, opacity = .38 }: { x: number; y: number; scale?: number; opacity?: number }) => (
-  <g transform={\`translate(\${x} \${y}) scale(\${scale})\`} opacity={opacity} fill="#FFF8EA">
+  <g transform={`translate(${x} ${y}) scale(${scale})`} opacity={opacity} fill="#FFF8EA">
     <ellipse cx="0" cy="12" rx="88" ry="20"/>
     <ellipse cx="-39" cy="3" rx="40" ry="26"/>
     <ellipse cx="8" cy="-12" rx="53" ry="38"/>
@@ -40,7 +40,7 @@ const Cloud = ({ x, y, scale = 1, opacity = .38 }: { x: number; y: number; scale
 );
 
 const Pine = ({ x, y, scale = 1, tone = "#314F4D" }: { x: number; y: number; scale?: number; tone?: string }) => (
-  <g transform={\`translate(\${x} \${y}) scale(\${scale})\`}>
+  <g transform={`translate(${x} ${y}) scale(${scale})`}>
     <path d="M0 0 V-250" stroke="#4D4638" strokeWidth="16"/>
     <path d="M0 -252 L-86 -118 -39 -132 -107 -43 106 -43 37 -132 84 -118Z" fill={tone}/>
     <path d="M0 -208 L-72 -94 -28 -105 -88 -34 90 -34 30 -105 71 -94Z" fill="#52705D" opacity=".72"/>
@@ -53,7 +53,7 @@ const DistantBirds = ({ frame }: { frame: number }) => (
       const dx = (frame * (.12 + i * .012) + i * 83) % 250;
       const x = 1230 + i * 48 + dx;
       const y = 330 + Math.sin(frame / 17 + i) * 12 + i * 19;
-      return <path key={i} d={\`M\${x - 15} \${y} Q\${x} \${y - 12} \${x + 15} \${y}\`} />;
+      return <path key={i} d={`M${x - 15} ${y} Q${x} ${y - 12} ${x + 15} ${y}`} />;
     })}
   </g>
 );
