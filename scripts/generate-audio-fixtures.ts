@@ -231,4 +231,49 @@ await writeMonoWav(resolve(madridTravelDirectory, "madrid-travel-score.wav"), ma
   return (pad + airy) * pulse * envelope * 0.52;
 });
 
-console.log("Generated legacy samples, original Aether, PULSE, SORA, and Madrid travel audio fixtures.");
+const stormlightDirectory = resolve("projects/stormlight-keeper/assets/audio");
+const stormlightDuration = 24;
+const stormlightChords = [
+  [73.42, 110, 146.83, 185],
+  [82.41, 123.47, 164.81, 207.65],
+  [65.41, 98, 130.81, 164.81],
+  [87.31, 130.81, 174.61, 220],
+];
+await writeMonoWav(resolve(stormlightDirectory, "stormlight-score.wav"), stormlightDuration, (time) => {
+  const fadeIn = Math.min(1, time / 2.0);
+  const fadeOut = Math.min(1, (stormlightDuration - time) / 2.5);
+  const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+  const chord = stormlightChords[Math.min(3, Math.floor(time / 6))]!;
+  const pad = chord.reduce((sum, frequency, index) =>
+    sum + Math.sin(2 * Math.PI * frequency * time + Math.sin(time * 0.18 + index) * 0.05) * (0.14 - index * 0.016), 0
+  );
+  const lowDrone = Math.sin(2 * Math.PI * 38 * time + Math.sin(time * 0.2) * 0.1) * 0.055;
+  const pulse = 0.88 + 0.12 * Math.sin(2 * Math.PI * 0.09 * time);
+  const swell = Math.sin(2 * Math.PI * 220 * time) * (time > 15 ? 0.035 : 0.012);
+  return (pad + lowDrone + swell) * envelope * pulse * 0.62;
+});
+await writeMonoWav(resolve(stormlightDirectory, "stormlight-atmosphere.wav"), stormlightDuration, (time) => {
+  const wind = Math.sin(time * 1731.1) * 0.29 +
+    Math.sin(time * 2137.7) * 0.2 +
+    Math.sin(time * 2981.3) * 0.18 +
+    Math.sin(time * 3877.9) * 0.1;
+  const gust = 0.24 + 0.76 * Math.pow(0.5 + 0.5 * Math.sin(2 * Math.PI * 0.11 * time + 0.7), 2);
+  const surf = Math.sin(2 * Math.PI * (43 + 7 * Math.sin(time * 0.26)) * time) * 0.18;
+  const thunderTimes = [3.9, 7.4, 11.4, 13.3, 18.2];
+  const thunder = thunderTimes.reduce((sum, at) => {
+    const t = time - at;
+    if (t < 0 || t > 1.8) return sum;
+    return sum + Math.sin(2 * Math.PI * (48 - 12 * t) * t) * Math.exp(-t * 2.9) * 0.42;
+  }, 0);
+  const metalTimes = [6.5, 8.2, 12.2, 13.8, 15.2, 16.1];
+  const metal = metalTimes.reduce((sum, at, i) => {
+    const t = time - at;
+    if (t < 0 || t > 0.5) return sum;
+    const tick = Math.sin(2 * Math.PI * (680 + i * 93) * t) * Math.exp(-t * 16);
+    return sum + tick * 0.12;
+  }, 0);
+  return (wind * gust + surf + thunder + metal) * 0.25;
+});
+
+
+console.log("Generated legacy samples, original Aether, PULSE, SORA, Madrid travel, and Stormlight Keeper audio fixtures.");
