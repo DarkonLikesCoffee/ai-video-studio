@@ -38,7 +38,8 @@
     "director:production-plan": "tsx scripts/director-production-plan.ts",
     "director:asset-evidence": "tsx scripts/director-asset-evidence.ts",
     "qa:contact-sheet": "tsx scripts/qa-contact-sheet.ts",
-    "render:provenance": "tsx scripts/render-provenance.ts"
+    "render:provenance": "tsx scripts/render-provenance.ts",
+    "validate:state": "tsx scripts/production-state.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.6",
