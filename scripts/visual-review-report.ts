@@ -22,9 +22,9 @@ const main = async () => {
   const video = await readFile(videoPath);
   const sheetReport = JSON.parse(await readFile(sheetReportPath, "utf8"));
   const report = buildVisualReviewReport({ outputName, videoPath: `${outputName}.mp4`, contactSheetPath: `review/${outputName}.contact-sheet.jpg`, contactSheetReportPath: `review/${outputName}.contact-sheet.json`, videoSha256: sha256Buffer(video), contactSheetReport: sheetReport });
-  await writeFile(reportPath, JSON.stringify(report, null, 2) + "\\n", "utf8");
+  await writeFile(reportPath, JSON.stringify(report, null, 2) + "\n", "utf8");
   const summary = `Visual review: PENDING — inspect the actual MP4, then complete ${outputName}.visual-review.json. Contact sheet is sampling evidence only; it does not approve motion or audio.`;
   console.log(summary);
-  if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary + "\\n");
+  if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary + "\n");
 };
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exitCode = 1; });
