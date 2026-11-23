@@ -1,5 +1,5 @@
 import { lstat, readFile, realpath, stat, writeFile } from "node:fs/promises";
-import { isAbsolute, relative, resolve } from "node:path";
+import { isAbsolute, relative, resolve, sep } from "node:path";
 
 export const PRODUCTION_STAGES = [
   "brief",
@@ -28,6 +28,7 @@ export type ProductionState = {
 export type StateValidationOptions = {
   expectedProjectId?: string;
   requireEvidence?: boolean;
+  requiredStage?: ProductionStage;
 };
 
 export type EvidenceFileValidationOptions = StateValidationOptions & {
@@ -124,6 +125,9 @@ export const validateProductionState = (
   if (typeof value.stage !== "string" || !PRODUCTION_STAGES.includes(value.stage as ProductionStage)) {
     errors.push(`stage must be one of: ${PRODUCTION_STAGES.join(", ")}.`);
   }
+  if (options.requiredStage && value.stage !== options.requiredStage) {
+    errors.push(`stage must be exactly "${options.requiredStage}" for this operation; received "${String(value.stage)}".`);
+  }
   if (typeof value.updatedAt !== "string" || !Number.isFinite(Date.parse(value.updatedAt))) {
     errors.push("updatedAt must be a valid ISO-compatible timestamp.");
   }
@@ -162,23 +166,40 @@ const run = async (): Promise<void> => {
   const requireEvidence = process.argv.includes("--require-evidence");
   const verifyEvidenceFiles = process.argv.includes("--verify-evidence-files");
   const projectRootFlag = process.argv.indexOf("--project-root");
+  const requiredStageFlag = process.argv.indexOf("--require-stage");
+  const requiredStageValue = requiredStageFlag >= 0 ? process.argv[requiredStageFlag + 1] : undefined;
+  const requiredStage = requiredStageValue && PRODUCTION_STAGES.includes(requiredStageValue as ProductionStage)
+    ? requiredStageValue as ProductionStage
+    : undefined;
+  const requiredStageErrors = requiredStageFlag >= 0 && !requiredStage
+    ? [`--require-stage must be one of: ${PRODUCTION_STAGES.join(", ")}.`]
+    : [];
   const repositoryRoot = process.cwd();
   const projectRoot = projectRootFlag >= 0 ? process.argv[projectRootFlag + 1] : undefined;
   if (!path) {
-    process.stderr.write("Usage: tsx scripts/production-state.ts <production-state.json> [expected-project-id] [--require-evidence] [--verify-evidence-files --project-root <project-dir>]\n");
+    process.stderr.write("Usage: tsx scripts/production-state.ts <production-state.json> [expected-project-id] [--require-evidence] [--verify-evidence-files --project-root <project-dir>] [--require-stage <stage>]\n");
     process.exitCode = 2;
     return;
   }
   try {
+    if (verifyEvidenceFiles && projectRoot) {
+      const stateReference = relative(resolve(projectRoot), resolve(path)).split(sep).join("/");
+      await resolveProductionEvidenceFile(projectRoot, stateReference);
+    }
     const value: unknown = JSON.parse(await readFile(resolve(path), "utf8"));
-    const errors = verifyEvidenceFiles
-      ? projectRoot
-        ? await validateProductionEvidenceFiles(value, { ...(expectedProjectId === undefined ? {} : { expectedProjectId }), requireEvidence, repositoryRoot, projectRoot })
-        : ["--verify-evidence-files requires --project-root <project-dir>."]
-      : validateProductionState(value, {
-          ...(expectedProjectId === undefined ? {} : { expectedProjectId }),
-          requireEvidence,
-        });
+    const stateOptions: StateValidationOptions = {
+      ...(expectedProjectId === undefined ? {} : { expectedProjectId }),
+      requireEvidence,
+      ...(requiredStage ? { requiredStage } : {}),
+    };
+    const errors = [
+      ...requiredStageErrors,
+      ...(verifyEvidenceFiles
+        ? projectRoot
+          ? await validateProductionEvidenceFiles(value, { ...stateOptions, repositoryRoot, projectRoot })
+          : ["--verify-evidence-files requires --project-root <project-dir>."]
+        : validateProductionState(value, stateOptions)),
+    ];
     if (errors.length) {
       process.stderr.write(errors.map((error) => `- ${error}`).join("\n") + "\n");
       process.exitCode = 1;

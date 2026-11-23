@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { PRODUCTION_STAGES, validateProductionEvidenceFiles, validateProductionState } from "../scripts/production-state";
+import { PRODUCTION_STAGES, resolveProductionEvidenceFile, validateProductionEvidenceFiles, validateProductionState } from "../scripts/production-state";
 
 const valid = {
   schemaVersion: 1,
@@ -169,6 +169,11 @@ test("strict production-state validation rejects symlinks and project roots outs
       requireEvidence: true
     });
     assert.ok(errors.some(error => error.includes("symbolic links")));
+    await symlink(path.join(outsideRoot, "brief.md"), path.join(projectRoot, "production", "production-state.json"));
+    await assert.rejects(
+      resolveProductionEvidenceFile(projectRoot, "production/production-state.json"),
+      /symbolic links/,
+    );
     const outsideProjectErrors = await validateProductionEvidenceFiles(state, {
       repositoryRoot: projectRoot,
       projectRoot: outsideRoot,
@@ -182,4 +187,65 @@ test("strict production-state validation rejects symlinks and project roots outs
 
 test("legacy production-state validation remains reference-presence-only unless strict file checking is requested", () => {
   assert.deepEqual(validateProductionState(valid, { requireEvidence: true }), []);
+});
+
+
+test("render preflight can require the exact frozen stage", () => {
+  const frozen = {
+    ...valid,
+    stage: "frozen",
+    evidence: {
+      ...valid.evidence,
+      build: ["production/build-report.json"],
+      "render-ready": ["production/render-ready.json"],
+      frozen: ["production/frozen-candidate.json"],
+    },
+  };
+  assert.deepEqual(validateProductionState(frozen, {
+    requireEvidence: true,
+    requiredStage: "frozen",
+  }), []);
+
+  const notFrozen = validateProductionState(valid, {
+    requireEvidence: true,
+    requiredStage: "frozen",
+  });
+  assert.ok(notFrozen.some((error) => error.includes('stage must be exactly "frozen"')));
+});
+
+test("strict frozen-stage validation requires and resolves evidence through the frozen candidate", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "production-state-frozen-"));
+  const projectRoot = path.join(root, "projects", "lighthouse-repair");
+  const productionRoot = path.join(projectRoot, "production");
+  await mkdir(productionRoot, { recursive: true });
+  const evidence = {
+    brief: "creative-brief.md",
+    direction: "creative-direction.md",
+    storyboard: "production-plan.json",
+    assets: "asset-manifest.json",
+    build: "build-report.json",
+    "render-ready": "render-ready.json",
+    frozen: "frozen-candidate.json",
+  };
+  for (const file of Object.values(evidence)) {
+    await writeFile(path.join(productionRoot, file), `evidence: ${file}\n`);
+  }
+  try {
+    const state = {
+      ...valid,
+      stage: "frozen",
+      evidence: Object.fromEntries(
+        Object.entries(evidence).map(([stage, file]) => [stage, [`production/${file}`]]),
+      ),
+    };
+    assert.deepEqual(await validateProductionEvidenceFiles(state, {
+      repositoryRoot: root,
+      projectRoot,
+      expectedProjectId: "lighthouse-repair",
+      requireEvidence: true,
+      requiredStage: "frozen",
+    }), []);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });

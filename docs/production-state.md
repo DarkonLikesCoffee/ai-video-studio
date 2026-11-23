@@ -21,7 +21,7 @@ Each new agent-led video project may keep a `production/production-state.json` f
 
 Stages are ordered: `brief`, `direction`, `storyboard`, `assets`, `build`, `render-ready`, `frozen`, `rendered`, `qa`, `accepted`, `delivered`.
 
-Evidence references are repository-relative artifact paths or stable external evidence identifiers. This first version validates structure and presence only; it does not verify the referenced file contents or prove that a human/model inspected them. Do not treat a reference as proof of visual approval.
+Evidence references may be repository-relative artifact paths or stable external evidence identifiers for handoff records. For strict render preflight, every reference must be a project-relative file path that resolves to an existing non-empty regular file. Neither a file reference nor file existence proves that a human/model inspected the contents; do not treat it as proof of visual approval.
 
 ## Validation
 
@@ -37,9 +37,20 @@ The second form requires evidence for every stage up to and including the declar
 For projects that want to verify the evidence files themselves, run:
 
 ```bash
-npx tsx scripts/production-state.ts projects/<slug>/production/production-state.json <slug> --require-evidence --verify-evidence-files --project-root projects/<slug>
+npx tsx scripts/production-state.ts projects/<slug>/production/production-state.json <slug> --require-evidence --verify-evidence-files --project-root projects/<slug> --require-stage frozen
 ```
+
+Use `--require-stage frozen` for a render candidate. It requires the stage to be exactly `frozen`, not merely a later or earlier stage.
 
 Strict file verification resolves each evidence reference relative to the project root and requires a non-empty regular file. It rejects absolute paths, traversal segments, directories, symbolic links and paths that escape the project. The supplied project root must itself be inside the repository root. References are still not proof that the contents are correct, current, reviewed or creatively approved.
 
-This validator remains opt-in for projects adopting the state file. Existing projects without a state file remain compatible. The render workflow does not yet require this file; render-gate integration is a separate follow-up after migration rules and evidence semantics are agreed.
+## Render preflight enforcement
+
+Both the GitHub Actions render workflow and the direct CircleCI render job automatically look for `production/production-state.json` inside the selected project directory.
+
+- **When the file exists:** render preflight requires `stage: "frozen"`, requires evidence for every stage from `brief` through `frozen`, checks that every evidence reference resolves to a non-empty regular file within the project, and requires `projectId` to match the project directory slug. A state at `assets`, `render-ready`, `rendered` or another stage is not accepted for a new render request.
+- **When the file is absent:** the workflow logs that the project is using legacy compatibility mode and continues through the existing render gates. This keeps existing projects operational while state files are migrated.
+- **For new agent-led projects:** create the state file and bring it to `frozen` before submitting a render request. Include it in the frozen candidate commit; do not change `render-request.json` as part of the candidate commit.
+- After the render, review and delivery lifecycle, update the state through `rendered`, `qa`, `accepted` and `delivered` with the appropriate evidence. The render gate does not advance the state automatically.
+
+This gate proves stage/evidence structure and file existence only. It does not establish that evidence contents are truthful, current, reviewed or creatively approved; the separate visual/audio QA and final-delivery gates remain required. A missing state file is a deliberate migration compatibility path, not evidence that production readiness has been verified.

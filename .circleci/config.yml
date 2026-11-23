@@ -107,6 +107,17 @@ jobs:
             fs.writeFileSync("/tmp/circleci-render-request.json", JSON.stringify(request, null, 2));
             NODE
             node scripts/validate-render-strategy.mjs /tmp/circleci-render-request.json packages/video-engine/src/root.tsx
+            if [[ -n "$PROJECT_PATH" ]]; then
+              PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+              STATE_PATH="$PROJECT_DIR/production/production-state.json"
+              if [[ -e "$STATE_PATH" || -L "$STATE_PATH" ]]; then
+                PROJECT_ID="$(basename "$PROJECT_DIR")"
+                npm run validate:state -- "$STATE_PATH" "$PROJECT_ID" --require-evidence --verify-evidence-files --project-root "$PROJECT_DIR" --require-stage frozen
+                echo "Production state accepted: $PROJECT_ID is frozen with verifiable stage evidence."
+              else
+                echo "No production-state.json found for $PROJECT_DIR; continuing in legacy compatibility mode."
+              fi
+            fi
       - when:
           condition:
             not:
