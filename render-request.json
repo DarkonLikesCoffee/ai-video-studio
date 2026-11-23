@@ -2,7 +2,7 @@
   "provider": "github-actions",
   "compositionId": "ProjectVideo",
   "outputName": "voyager-1-interstellar",
-  "requestId": "voyager-1-interstellar-20261123-02",
+  "requestId": "voyager-1-interstellar-20261123-03",
   "projectPath": "projects/voyager-1-interstellar/scene.json",
-  "candidateSha": "36e1ac5d07df44e9596505fa76dc4256fe1d7c1e"
+  "candidateSha": "7e28cfdab5b137c26dc6af9f484859431453e39"
 }
