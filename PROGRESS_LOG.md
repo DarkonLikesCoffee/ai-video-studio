@@ -784,3 +784,6 @@ Append one entry per meaningful development session:
 - Inspected prior render run [#45045569904](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45045569904): the MP4 was 20.10 s, 1920×1080/30 fps with AAC stereo. The old QA failed only on silence intervals of 2.83 s at 11.97 s and 4.09 s at 16.01 s. PR #146 now keeps silence findings informational; this does not imply the audio has been listened to or creatively accepted.
 - Deliberately did not carry over the old branch's `render-request.json` edit. This migration does not trigger or claim a new production render. The next render, if requested, must use a new frozen candidate and a separate request-only commit.
 - Latest migration head at this entry: workflows have been updated on `feat/golden-hour-mainline-v2`; exact-head CI and pull request are pending.
+
+
+- **Golden Hour visual review:** sampled the previous MP4 at 1 fps (20 frames). The four environments are distinguishable and the man/dog motifs are visually consistent, but the people/dog are embedded in static SVG plates; motion comes mainly from camera transforms, particle systems and scene transitions. The plan now describes this accurately. No full video playback or audio listening was performed; creative acceptance remains pending.
