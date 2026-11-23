@@ -294,3 +294,17 @@ test("production plan requires an explicit registered or to-be-built composition
   };
   assert.ok(validateProductionPlan(invalid).some((error) => error.includes("not registered")));
 });
+
+test("assetVisualReviewRequired is optional for legacy plans and must be boolean when set", () => {
+  const legacy = structuredClone(example);
+  delete legacy.assetVisualReviewRequired;
+  assert.deepEqual(validateProductionPlan(legacy).filter(error => error.includes("assetVisualReviewRequired")), []);
+
+  const enabled = structuredClone(example);
+  enabled.assetVisualReviewRequired = true;
+  assert.deepEqual(validateProductionPlan(enabled).filter(error => error.includes("assetVisualReviewRequired")), []);
+
+  const invalid = structuredClone(example);
+  invalid.assetVisualReviewRequired = "required";
+  assert.ok(validateProductionPlan(invalid).some(error => error.includes("assetVisualReviewRequired must be a boolean")));
+});
