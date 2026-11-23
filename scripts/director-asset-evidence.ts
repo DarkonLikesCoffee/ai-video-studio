@@ -19,6 +19,10 @@ type AssetEvidence = {
   rightsStatus: "documented" | "missing";
   provenance: string | null;
   rights: string | null;
+  previewPath: string | null;
+  previewStatus: LocalStatus;
+  visualReviewStatus: "approved" | "pending" | "rejected" | "missing";
+  visualReview: { reviewer: string | null; reviewedAt: string | null; notes: string | null };
 };
 type ShotEvidence = {
   shotId: string;
@@ -61,6 +65,11 @@ export type AssetEvidenceReport = {
     missingRights: number;
     unresolvedPlannedAssetRefs: number;
     unknownManifestShotIds: number;
+    visualReviewApproved: number;
+    visualReviewPending: number;
+    visualReviewRejected: number;
+    visualReviewMissing: number;
+    missingPreviews: number;
   };
   shots: ShotEvidence[];
   assets: AssetEvidence[];
@@ -142,6 +151,21 @@ export const buildAssetEvidenceReport = async (
     const aliases = getAliases(value);
     if (!asText(value.type)) addIssue({ code: "ASSET_TYPE_MISSING", severity: "warning", message: `Asset "${reference}" has no type.`, assetRef: reference });
     const local = await resolveLocalPath(value, projectRoot);
+    const previewRaw = asText(value.previewPath) ?? asText(value.preview);
+    const previewLocal = previewRaw ? await resolveLocalPath({ path: previewRaw }, projectRoot) : { path: null, status: "not-local" as LocalStatus };
+    const reviewRaw = isRecord(value.visualReview) ? value.visualReview : {};
+    const reviewStatus = ["approved", "pending", "rejected"].includes(String(reviewRaw.status))
+      ? reviewRaw.status as "approved" | "pending" | "rejected"
+      : "missing";
+    const reviewer = asText(reviewRaw.reviewer);
+    const reviewedAt = asText(reviewRaw.reviewedAt);
+    const reviewNotes = asText(reviewRaw.notes);
+    const reviewMetadataValid = Boolean(reviewer && reviewedAt && Number.isFinite(Date.parse(reviewedAt)) && reviewNotes);
+    const visualReviewStatus = reviewStatus === "approved" && reviewMetadataValid && previewLocal.status === "present"
+      ? "approved"
+      : reviewStatus === "rejected" ? "rejected"
+      : reviewStatus === "pending" ? "pending"
+      : "missing";
     const provenanceStatus = hasProvenance(value) ? "documented" : "missing";
     const rightsStatus = hasRights(value) ? "documented" : "missing";
     const assetShotIds = Array.isArray(value.shotIds) ? value.shotIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0).map((id) => id.trim()) : [];
@@ -158,6 +182,11 @@ export const buildAssetEvidenceReport = async (
     else if (local.status === "empty") addIssue({ code: "ASSET_FILE_EMPTY", severity: "warning", message: `Asset "${reference}" exists but is empty.`, assetRef: reference });
     if (provenanceStatus === "missing") addIssue({ code: "ASSET_PROVENANCE_MISSING", severity: "warning", message: `Asset "${reference}" has no source/provenance note or URL.`, assetRef: reference });
     if (rightsStatus === "missing") addIssue({ code: "ASSET_RIGHTS_MISSING", severity: "warning", message: `Asset "${reference}" has no license or explicit rights basis and note.`, assetRef: reference });
+    if (previewLocal.status === "not-local") addIssue({ code: "ASSET_PREVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no declared preview file.`, assetRef: reference });
+    else if (previewLocal.status !== "present") addIssue({ code: "ASSET_PREVIEW_UNAVAILABLE", severity: "warning", message: `Asset "${reference}" preview is ${previewLocal.status}.`, assetRef: reference });
+    if (visualReviewStatus === "missing") addIssue({ code: "ASSET_VISUAL_REVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no complete visual-review approval.`, assetRef: reference });
+    else if (visualReviewStatus === "pending") addIssue({ code: "ASSET_VISUAL_REVIEW_PENDING", severity: "warning", message: `Asset "${reference}" visual review is pending.`, assetRef: reference });
+    else if (visualReviewStatus === "rejected") addIssue({ code: "ASSET_VISUAL_REVIEW_REJECTED", severity: "warning", message: `Asset "${reference}" was rejected during visual review.`, assetRef: reference });
     assets.push({
       id: asText(value.id) ?? reference,
       reference,
@@ -170,6 +199,10 @@ export const buildAssetEvidenceReport = async (
       rightsStatus,
       provenance: describeProvenance(value),
       rights: describeRights(value),
+      previewPath: previewLocal.path,
+      previewStatus: previewLocal.status,
+      visualReviewStatus,
+      visualReview: { reviewer, reviewedAt, notes: reviewNotes },
     });
   }
 
@@ -219,6 +252,11 @@ export const buildAssetEvidenceReport = async (
   }
 
   const missingFiles = assets.filter((asset) => asset.localStatus === "missing").length;
+  const visualReviewApproved = assets.filter((asset) => asset.visualReviewStatus === "approved").length;
+  const visualReviewPending = assets.filter((asset) => asset.visualReviewStatus === "pending").length;
+  const visualReviewRejected = assets.filter((asset) => asset.visualReviewStatus === "rejected").length;
+  const visualReviewMissing = assets.filter((asset) => asset.visualReviewStatus === "missing").length;
+  const missingPreviews = assets.filter((asset) => asset.previewStatus !== "present").length;
   const assetsNotLocal = assets.filter((asset) => asset.localStatus === "not-local").length;
   const emptyFiles = assets.filter((asset) => asset.localStatus === "empty").length;
   const unsafePaths = assets.filter((asset) => asset.localStatus === "unsafe").length;
@@ -258,6 +296,11 @@ export const buildAssetEvidenceReport = async (
       missingRights,
       unresolvedPlannedAssetRefs,
       unknownManifestShotIds: unknownShotIds.size,
+      visualReviewApproved,
+      visualReviewPending,
+      visualReviewRejected,
+      visualReviewMissing,
+      missingPreviews,
     },
     shots,
     assets,
