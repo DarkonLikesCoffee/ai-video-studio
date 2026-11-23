@@ -21,7 +21,7 @@ Each new agent-led video project may keep a `production/production-state.json` f
 
 Stages are ordered: `brief`, `direction`, `storyboard`, `assets`, `build`, `render-ready`, `frozen`, `rendered`, `qa`, `accepted`, `delivered`.
 
-Evidence references are repository-relative artifact paths or stable external evidence identifiers. This first version validates structure and presence only; it does not verify the referenced file contents or prove that a human/model inspected them. Do not treat a reference as proof of visual approval.
+Evidence references may be repository-relative artifact paths or stable external evidence identifiers for handoff records. For strict render preflight, every reference must be a project-relative file path that resolves to an existing non-empty regular file. Neither a file reference nor file existence proves that a human/model inspected the contents; do not treat it as proof of visual approval.
 
 ## Validation
 
