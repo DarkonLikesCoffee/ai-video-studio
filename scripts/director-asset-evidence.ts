@@ -157,6 +157,8 @@ type CompositionReferences = {
   available: boolean;
   source: string | null;
   references: SourceReference[];
+  referencesByModule: Map<string, SourceReference[]>;
+  reachableModules: Set<string>;
   projectVideoScenes: ProjectVideoSceneReferences[] | null;
   reason?: string;
 };
@@ -295,16 +297,11 @@ const collectImportedSourceReferences = async (
   entryFile: string,
   repositoryRoot: string,
   projectRoot: string,
-): Promise<SourceReference[]> => {
+): Promise<{ references: SourceReference[]; referencesByModule: Map<string, SourceReference[]>; reachableModules: Set<string> }> => {
   const references: SourceReference[] = [];
+  const referencesByModule = new Map<string, SourceReference[]>();
+  const reachableModules = new Set<string>();
   const visited = new Set<string>();
-  const addModuleRelativeAsset = (specifier: string, sourceAbsolute: string, sourceRelative: string): void => {
-    const cleanSpecifier = specifier.split(/[?#]/, 1)[0] ?? specifier;
-    const value = cleanSpecifier.startsWith(".") || path.isAbsolute(cleanSpecifier)
-      ? path.relative(projectRoot, path.resolve(path.dirname(sourceAbsolute), cleanSpecifier)).split(path.sep).join("/")
-      : cleanSpecifier;
-    references.push({ value, sourceFile: sourceRelative });
-  };
   const visitFile = async (filePath: string): Promise<void> => {
     const absolute = path.resolve(filePath);
     if (!isWithin(repositoryRoot, absolute) || visited.has(absolute) || !isAuditableSource(absolute)) return;
@@ -315,16 +312,19 @@ const collectImportedSourceReferences = async (
     } catch {
       return;
     }
-    const relativeSource = path.relative(repositoryRoot, absolute);
+    const relativeSource = path.relative(repositoryRoot, absolute).split(path.sep).join("/");
+    reachableModules.add(relativeSource);
+    const moduleReferences: SourceReference[] = [];
     if (path.extname(absolute).toLowerCase() === ".json") {
       try {
-        collectJsonAssetReferences(JSON.parse(contents) as unknown, relativeSource, references);
+        collectJsonAssetReferences(JSON.parse(contents) as unknown, relativeSource, moduleReferences);
       } catch {
-        // Invalid JSON will be reported by the project validators; it cannot prove asset use here.
+        // Invalid JSON cannot prove asset use.
       }
+      references.push(...moduleReferences);
+      referencesByModule.set(relativeSource, moduleReferences);
       return;
     }
-
     const ext = path.extname(absolute).toLowerCase();
     const kind = ext === ".tsx" ? ts.ScriptKind.TSX
       : ext === ".jsx" ? ts.ScriptKind.JSX
@@ -335,7 +335,6 @@ const collectImportedSourceReferences = async (
     const staticFileAliases = new Set<string>();
     const staticFileNamespaces = new Set<string>();
     const constants = new Map<string, string>();
-
     for (const statement of sourceFile.statements) {
       if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || statement.moduleSpecifier.text !== "remotion") continue;
       const bindings = statement.importClause?.namedBindings;
@@ -347,7 +346,6 @@ const collectImportedSourceReferences = async (
         }
       }
     }
-
     const gatherConstants = (node: ts.Node): void => {
       if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
         const value = resolveStaticString(node.initializer, constants);
@@ -356,28 +354,30 @@ const collectImportedSourceReferences = async (
       ts.forEachChild(node, gatherConstants);
     };
     gatherConstants(sourceFile);
-
     const recordStaticFileCall = (node: ts.CallExpression): void => {
       const expression = node.expression;
       const isNamedStaticFile = ts.isIdentifier(expression) && staticFileAliases.has(expression.text);
       const isNamespaceStaticFile = ts.isPropertyAccessExpression(expression) &&
-        expression.name.text === "staticFile" &&
-        ts.isIdentifier(expression.expression) &&
+        expression.name.text === "staticFile" && ts.isIdentifier(expression.expression) &&
         staticFileNamespaces.has(expression.expression.text);
       if (!isNamedStaticFile && !isNamespaceStaticFile) return;
       const value = resolveStaticString(node.arguments[0], constants);
-      if (value !== null) references.push({ value, sourceFile: relativeSource });
+      if (value !== null) moduleReferences.push({ value, sourceFile: relativeSource });
     };
-
+    const addModuleRelativeAsset = (specifier: string): void => {
+      const cleanSpecifier = specifier.split(/[?#]/, 1)[0] ?? specifier;
+      const value = cleanSpecifier.startsWith(".") || path.isAbsolute(cleanSpecifier)
+        ? path.relative(projectRoot, path.resolve(path.dirname(absolute), cleanSpecifier)).split(path.sep).join("/")
+        : cleanSpecifier;
+      moduleReferences.push({ value, sourceFile: relativeSource });
+    };
     const visitNode = (node: ts.Node): void => {
       if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
         const specifier = node.moduleSpecifier.text;
-        if (isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier, absolute, relativeSource);
+        if (isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier);
         else imports.push(specifier);
       }
-      if (ts.isExportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
-        imports.push(node.moduleSpecifier.text);
-      }
+      if (ts.isExportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) imports.push(node.moduleSpecifier.text);
       if (ts.isCallExpression(node)) {
         recordStaticFileCall(node);
         const firstArgument = node.arguments[0];
@@ -386,14 +386,14 @@ const collectImportedSourceReferences = async (
           const isDynamicImport = node.expression.kind === ts.SyntaxKind.ImportKeyword;
           if (isRequire || isDynamicImport) {
             const specifier = firstArgument.text;
-            if (isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier, absolute, relativeSource);
+            if (isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier);
             else imports.push(specifier);
           }
         }
       }
       if (ts.isNewExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "URL") {
         const specifier = resolveStaticString(node.arguments?.[0], constants);
-        if (specifier && isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier, absolute, relativeSource);
+        if (specifier && isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier);
       }
       if (ts.isJsxAttribute(node) && (node.name.getText(sourceFile) === "src" || node.name.getText(sourceFile) === "poster")) {
         const initializer = node.initializer;
@@ -402,19 +402,20 @@ const collectImportedSourceReferences = async (
           : initializer && ts.isJsxExpression(initializer)
             ? resolveStaticString(initializer.expression, constants)
             : null;
-        if (value !== null) references.push({ value, sourceFile: relativeSource });
+        if (value !== null) moduleReferences.push({ value, sourceFile: relativeSource });
       }
       ts.forEachChild(node, visitNode);
     };
     visitNode(sourceFile);
+    references.push(...moduleReferences);
+    referencesByModule.set(relativeSource, moduleReferences);
     for (const specifier of imports) {
       const resolved = await resolveLocalModule(specifier, absolute, repositoryRoot);
       if (resolved) await visitFile(resolved);
     }
   };
-
   await visitFile(entryFile);
-  return references;
+  return { references, referencesByModule, reachableModules };
 };
 const collectCompositionReferences = async (
   plan: RecordValue,
@@ -424,16 +425,16 @@ const collectCompositionReferences = async (
   const strategy = isRecord(plan.renderStrategy) ? plan.renderStrategy : {};
   const renderer = asText(strategy.renderer);
   const compositionId = asText(strategy.compositionId);
-  if (!renderer || !compositionId) return { available: false, source: null, references: [], projectVideoScenes: null, reason: "The production plan has no valid render strategy." };
+  if (!renderer || !compositionId) return { available: false, source: null, references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The production plan has no valid render strategy." };
 
   if (renderer === "project-video" && compositionId === "ProjectVideo") {
     const scenePath = path.join(projectRoot, "scene.json");
     try {
       const scene = JSON.parse(await readFile(scenePath, "utf8")) as unknown;
       const collected = collectProjectVideoAssetReferences(scene, "scene.json");
-      return { available: true, source: "scene.json", ...collected };
+      return { available: true, source: "scene.json", referencesByModule: new Map(), reachableModules: new Set(), ...collected };
     } catch {
-      return { available: false, source: "scene.json", references: [], projectVideoScenes: null, reason: "The selected ProjectVideo scene.json could not be read." };
+      return { available: false, source: "scene.json", references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The selected ProjectVideo scene.json could not be read." };
     }
   }
 
@@ -442,18 +443,18 @@ const collectCompositionReferences = async (
   try {
     rootSource = await readFile(rootPath, "utf8");
   } catch {
-    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], projectVideoScenes: null, reason: "The Remotion composition registry source could not be read." };
+    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The Remotion composition registry source could not be read." };
   }
   const moduleSpecifier = findCompositionModule(rootSource, compositionId);
   if (!moduleSpecifier) {
-    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], projectVideoScenes: null, reason: "The selected composition could not be mapped to its imported component in RemotionRoot." };
+    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The selected composition could not be mapped to its imported component in RemotionRoot." };
   }
   const componentFile = await resolveLocalModule(moduleSpecifier, rootPath, repositoryRoot);
   if (!componentFile) {
-    return { available: false, source: moduleSpecifier, references: [], projectVideoScenes: null, reason: "The selected composition component source could not be resolved." };
+    return { available: false, source: moduleSpecifier, references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The selected composition component source could not be resolved." };
   }
-  const references = await collectImportedSourceReferences(componentFile, repositoryRoot, projectRoot);
-  return { available: true, source: path.relative(repositoryRoot, componentFile), references, projectVideoScenes: null };
+  const collected = await collectImportedSourceReferences(componentFile, repositoryRoot, projectRoot);
+  return { available: true, source: path.relative(repositoryRoot, componentFile), ...collected, projectVideoScenes: null };
 };
 
 const normalizeUsagePath = (value: string): string =>
@@ -463,6 +464,38 @@ const usageMatchesAsset = (reference: SourceReference, localPath: string | null)
   // Compare the canonical project-relative path; preserve folders and case.
   if (!localPath) return false;
   return normalizeUsagePath(reference.value) === normalizeUsagePath(localPath);
+};
+type ShotComponentMapping = { schemaVersion: 1; shots: Array<{ shotId: string; modules: string[] }> };
+const readShotComponentMapping = (manifest: RecordValue): { mapping: ShotComponentMapping | null; error: string | null } => {
+  const raw = manifest.shotComponents;
+  if (raw === undefined) return { mapping: null, error: null };
+  if (!isRecord(raw) || raw.schemaVersion !== 1 || !Array.isArray(raw.shots)) {
+    return { mapping: null, error: "shotComponents must contain schemaVersion 1 and a shots array." };
+  }
+  const seen = new Set<string>();
+  const shots: ShotComponentMapping["shots"] = [];
+  for (const [index, entry] of raw.shots.entries()) {
+    if (!isRecord(entry) || typeof entry.shotId !== "string" || !entry.shotId.trim() ||
+        !Array.isArray(entry.modules) || entry.modules.length === 0 ||
+        entry.modules.some((module) => typeof module !== "string" || !module.trim())) {
+      return { mapping: null, error: `shotComponents.shots[${index}] must contain a shotId and one or more module paths.` };
+    }
+    const shotId = entry.shotId.trim();
+    if (seen.has(shotId)) return { mapping: null, error: `shotComponents contains duplicate shotId "${shotId}".` };
+    seen.add(shotId);
+    const modules = (entry.modules as string[]).map((module) => {
+      const normalized = module.trim().replace(/\\/g, "/").replace(/^\.\//, "");
+      return path.posix.normalize(normalized);
+    });
+    if (modules.some((module) => module === "." || module.startsWith("/") || module.split("/").includes("..") || module.startsWith("../"))) {
+      return { mapping: null, error: `shotComponents for "${shotId}" contains an unsafe module path.` };
+    }
+    if (new Set(modules).size !== modules.length) {
+      return { mapping: null, error: `shotComponents for "${shotId}" contains duplicate module paths.` };
+    }
+    shots.push({ shotId, modules });
+  }
+  return { mapping: { schemaVersion: 1, shots }, error: null };
 };
 
 const describeProvenance = (asset: RecordValue) => asText(asset.provenance) ?? asText(asset.sourcePage) ?? asText(asset.sourceUrl) ?? asText(asset.creator) ?? asText(asset.attribution);
@@ -493,6 +526,26 @@ export const buildAssetEvidenceReport = async (
   const addIssue = (issue: Issue) => issues.push(issue);
   const assets: AssetEvidence[] = [];
   const unknownShotIds = new Set<string>();
+  const customRemotion = isRecord(planValue.renderStrategy) && planValue.renderStrategy.renderer === "custom-remotion";
+  const shotComponentContract = readShotComponentMapping(manifestValue);
+  const componentModulesByShot = new Map<string, string[]>();
+  if (shotComponentContract.error) {
+    addIssue({ code: "CUSTOM_SHOT_COMPONENT_MAPPING_INVALID", severity: "error", message: shotComponentContract.error });
+  }
+  if (customRemotion && shotComponentContract.mapping && !shotComponentContract.error) {
+    for (const mapping of shotComponentContract.mapping.shots) {
+      if (!knownShots.has(mapping.shotId)) {
+        addIssue({ code: "CUSTOM_SHOT_COMPONENT_UNKNOWN_SHOT", severity: "error", shotId: mapping.shotId, message: `shotComponents maps unknown production-plan shot "${mapping.shotId}".` });
+      } else {
+        componentModulesByShot.set(mapping.shotId, mapping.modules);
+      }
+    }
+    for (const shotId of shotIds) {
+      if (!componentModulesByShot.has(shotId)) {
+        addIssue({ code: "CUSTOM_SHOT_COMPONENT_MAPPING_MISSING", severity: "error", shotId, message: `Custom Remotion shot "${shotId}" has no shotComponents module mapping.` });
+      }
+    }
+  }
   if (manifestValue.assets.length === 0) addIssue({ code: "ASSET_MANIFEST_EMPTY", severity: "warning", message: "Asset manifest contains no assets." });
 
   for (const [index, value] of manifestValue.assets.entries()) {
@@ -519,16 +572,32 @@ export const buildAssetEvidenceReport = async (
     const usageEvidence = [...new Set(usageMatches.map((match) => `${match.sourceFile}: ${match.value}`))];
     let shotUsageStatus: ShotUsageStatus = reusePolicy !== "required" || !visualReviewApplicable
       ? "not-required"
-      : compositionReferences.projectVideoScenes === null
-        ? "not-audited"
-        : "unverifiable";
+      : compositionReferences.projectVideoScenes !== null
+        ? "unverifiable"
+        : !customRemotion
+          ? "not-audited"
+          : shotComponentContract.error
+            ? "unverifiable"
+            : shotComponentContract.mapping
+              ? "unverifiable"
+              : "not-audited";
     const shotUsageEvidence: string[] = [];
-    if (reusePolicy === "required" && visualReviewApplicable && compositionReferences.projectVideoScenes !== null) {
+    if (reusePolicy === "required" && visualReviewApplicable &&
+        (compositionReferences.projectVideoScenes !== null || (customRemotion && shotComponentContract.mapping && !shotComponentContract.error))) {
       const assignedShotIds = assetShotIds.includes("all")
         ? shotIds
         : assetShotIds.filter((shotId) => shotId !== "all" && knownShots.has(shotId));
       let hasMissingShotUsage = false;
       let hasUnverifiableShotUsage = false;
+      if (customRemotion && (shotComponentContract.error || !shotComponentContract.mapping)) {
+        hasUnverifiableShotUsage = true;
+        addIssue({
+          code: "CUSTOM_SHOT_COMPONENT_MAPPING_UNVERIFIABLE",
+          severity: "error",
+          message: shotComponentContract.error ?? `Required custom Remotion asset "${reference}" cannot be checked per shot because the manifest has no shotComponents mapping.`,
+          assetRef: reference,
+        });
+      }
       if (!assignedShotIds.length) {
         hasUnverifiableShotUsage = true;
         addIssue({
@@ -539,30 +608,56 @@ export const buildAssetEvidenceReport = async (
         });
       }
       for (const shotId of assignedShotIds) {
-        const sceneEvidence = compositionReferences.projectVideoScenes.find((scene) => scene.sceneId === shotId);
-        if (!sceneEvidence) {
-          hasUnverifiableShotUsage = true;
-          addIssue({
-            code: "ASSET_SHOT_USAGE_UNVERIFIABLE",
-            severity: "error",
-            message: `Required asset "${reference}" is assigned to shot "${shotId}", but no ProjectVideo scene with that ID exists.`,
-            shotId,
-            assetRef: reference,
-          });
-          continue;
+        let candidateReferences: SourceReference[] = [];
+        let scope = "ProjectVideo scene";
+        if (compositionReferences.projectVideoScenes !== null) {
+          const sceneEvidence = compositionReferences.projectVideoScenes.find((scene) => scene.sceneId === shotId);
+          if (!sceneEvidence) {
+            hasUnverifiableShotUsage = true;
+            addIssue({
+              code: "ASSET_SHOT_USAGE_UNVERIFIABLE",
+              severity: "error",
+              message: `Required asset "${reference}" is assigned to shot "${shotId}", but no ProjectVideo scene with that ID exists.`,
+              shotId,
+              assetRef: reference,
+            });
+            continue;
+          }
+          candidateReferences = sceneEvidence.references;
+        } else {
+          scope = "custom Remotion mapped module";
+          const modules = componentModulesByShot.get(shotId) ?? [];
+          const normalizedModules = modules.map((module) => path.posix.normalize(module));
+          const unreachable = normalizedModules.filter((module) => !compositionReferences.reachableModules.has(module));
+          if (!modules.length || unreachable.length) {
+            hasUnverifiableShotUsage = true;
+            addIssue({
+              code: "CUSTOM_SHOT_COMPONENT_MODULE_UNREACHABLE",
+              severity: "error",
+              message: unreachable.length
+                ? `Mapped module(s) for custom Remotion shot "${shotId}" are not reachable from the selected composition: ${unreachable.join(", ")}.`
+                : `Custom Remotion shot "${shotId}" has no mapped reachable module.`,
+              shotId,
+              assetRef: reference,
+            });
+            continue;
+          }
+          candidateReferences = normalizedModules.flatMap((module) => compositionReferences.referencesByModule.get(module) ?? []);
         }
-        const sceneMatch = sceneEvidence.references.find((sourceReference) => usageMatchesAsset(sourceReference, local.path));
-        if (!sceneMatch) {
+        const match = candidateReferences.find((sourceReference) => usageMatchesAsset(sourceReference, local.path));
+        if (!match) {
           hasMissingShotUsage = true;
           addIssue({
-            code: "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT",
+            code: compositionReferences.projectVideoScenes !== null
+              ? "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT"
+              : "CUSTOM_ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT",
             severity: "error",
-            message: `Required asset "${reference}" is not referenced by the ProjectVideo scene for assigned shot "${shotId}".`,
+            message: `Required asset "${reference}" is not referenced by the ${scope} mapped to assigned shot "${shotId}".`,
             shotId,
             assetRef: reference,
           });
         } else {
-          shotUsageEvidence.push(`${shotId}: ${sceneMatch.sourceFile}: ${sceneMatch.value}`);
+          shotUsageEvidence.push(`${shotId}: ${match.sourceFile}: ${match.value}`);
         }
       }
       shotUsageStatus = hasMissingShotUsage

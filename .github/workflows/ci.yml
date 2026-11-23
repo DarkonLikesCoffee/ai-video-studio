@@ -179,6 +179,39 @@ jobs:
           }
           console.log("Stormlight Keeper: both required audio assets are referenced by LighthouseRepairFilm.");
           NODE
+
+      - name: Enforce Stormlight Keeper custom shot mapping
+        run: |
+          mkdir -p review-output
+          REPORT_PATH="review-output/stormlight-keeper.asset-evidence.json"
+          npm run director:asset-evidence -- projects/stormlight-keeper/production/production-plan.json projects/stormlight-keeper/production/asset-manifest.json "$REPORT_PATH" --strict
+          node - "$REPORT_PATH" <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+          const summary = report.summary;
+          const shotStatuses = report.shots.map((shot) => ({
+            shotId: shot.shotId,
+            requiredAudioAssets: shot.manifestAssets.filter((asset) => asset.visualReviewApplicable === false).map((asset) => asset.id),
+          }));
+          if (
+            summary.requiredAssetCount !== 2 ||
+            summary.requiredAssetsReferenced !== 2 ||
+            summary.requiredAssetsNotReferenced !== 0 ||
+            summary.requiredAssetsUnverifiable !== 0 ||
+            summary.requiredAssetsShotUsageNotAudited !== 0 ||
+            report.assets.some((asset) => asset.visualReviewApplicable === false && asset.shotUsageStatus !== "not-required") ||
+            report.issues.some((issue) => issue.severity === "error")
+          ) {
+            console.error("Stormlight Keeper custom shot mapping or global audio evidence failed.");
+            console.error(JSON.stringify({ summary, issues: report.issues, shotStatuses }, null, 2));
+            process.exit(1);
+          }
+          const expectedShots = ["storm-headland", "door-and-machine", "climb-and-discover", "repair-macro", "beacon-ignition", "coast-relief"];
+          if (report.shots.length !== expectedShots.length || !expectedShots.every((shotId) => report.shots.some((shot) => shot.shotId === shotId))) {
+            throw new Error("Stormlight shot map does not cover the production plan.");
+          }
+          console.log("Stormlight Keeper: all six production shots map to the reachable LighthouseRepairFilm module; required score and ambience remain global audio evidence.");
+          NODE
       - name: Stage VALORANT audio fixtures for validation
         run: |
           PROJECT_DIR="projects/valorant-immortal-decision-making"

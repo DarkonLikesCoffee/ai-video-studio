@@ -225,5 +225,46 @@
       "reusePolicy": "required"
     }
   ],
-  "project": "The Stormlight Keeper"
+  "project": "The Stormlight Keeper",
+  "shotComponents": {
+    "schemaVersion": 1,
+    "shots": [
+      {
+        "shotId": "storm-headland",
+        "modules": [
+          "packages/video-engine/src/scenes/LighthouseRepairFilm.tsx"
+        ]
+      },
+      {
+        "shotId": "door-and-machine",
+        "modules": [
+          "packages/video-engine/src/scenes/LighthouseRepairFilm.tsx"
+        ]
+      },
+      {
+        "shotId": "climb-and-discover",
+        "modules": [
+          "packages/video-engine/src/scenes/LighthouseRepairFilm.tsx"
+        ]
+      },
+      {
+        "shotId": "repair-macro",
+        "modules": [
+          "packages/video-engine/src/scenes/LighthouseRepairFilm.tsx"
+        ]
+      },
+      {
+        "shotId": "beacon-ignition",
+        "modules": [
+          "packages/video-engine/src/scenes/LighthouseRepairFilm.tsx"
+        ]
+      },
+      {
+        "shotId": "coast-relief",
+        "modules": [
+          "packages/video-engine/src/scenes/LighthouseRepairFilm.tsx"
+        ]
+      }
+    ]
+  }
 }
