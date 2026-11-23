@@ -73,6 +73,7 @@
   let elapsedBeforePause = 0;
   let seekAttempts = 0;
   let hiddenObserved = false;
+  let windowBlurObserved = false;
   let endedObserved = false;
   let running = false;
   let lastCheckpoint = -1;
@@ -90,7 +91,7 @@
     }
     return result;
   };
-  const elapsedWallSeconds = () =>
+  const elapsedPlaybackSeconds = () =>
     elapsedBeforePause + (running ? (performance.now() - startClock) / 1000 : 0);
   const checkpoint = () => {
     if (!Number.isFinite(video.duration) || video.duration <= 0) return;
@@ -144,6 +145,7 @@
     elapsedBeforePause = 0;
     seekAttempts = 0;
     hiddenObserved = document.hidden;
+    windowBlurObserved = false;
     endedObserved = false;
     running = false;
     lastCheckpoint = -1;
@@ -224,14 +226,15 @@
       durationSeconds: video.duration,
       startedAt,
       completedAt: isoNow(),
-      elapsedWallSeconds: elapsedWallSeconds(),
+      elapsedPlaybackSeconds: elapsedPlaybackSeconds(),
       playedRangesSeconds: ranges(),
       checkpointsSeconds: checkpointTimes,
       playbackRate: video.playbackRate,
       endedEventObserved: true,
       pageVisibleThroughout: !hiddenObserved,
+      reviewWindowFocusedThroughout: !windowBlurObserved,
       seekAttempts,
-      complete: !sessionInvalidReason && !hiddenObserved && seekAttempts === 0 &&
+      complete: !sessionInvalidReason && !hiddenObserved && !windowBlurObserved && seekAttempts === 0 &&
         video.playbackRate === 1 && hasCompleteCoverage(ranges(), video.duration) &&
         checkpointTimes.length >= 5,
       invalidReason: sessionInvalidReason || null
@@ -301,7 +304,7 @@
   });
   window.addEventListener("blur", () => {
     if (startedAt && !endedObserved) {
-      hiddenObserved = true;
+      windowBlurObserved = true;
       video.pause();
       running = false;
       invalidate("The review window lost focus.");
