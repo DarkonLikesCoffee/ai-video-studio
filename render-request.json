@@ -2,7 +2,7 @@
   "provider": "github-actions",
   "compositionId": "BirdFlight",
   "outputName": "bird-flight",
-  "requestId": "bird-flight-20261123-01",
+  "requestId": "bird-flight-20261123-02",
   "projectPath": "projects/bird-flight/scene.json",
-  "candidateSha": "5ba6ed4243e5beacaf92606c88dea72c985b7ba5"
+  "candidateSha": "c2cd8fb1ebebe6b6e7a57a75f58055f2bfcc9c30"
 }
