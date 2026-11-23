@@ -192,7 +192,7 @@ export const validateVisualReviewReport = (report: unknown) => {
       errors.push("Each correction needs verified boolean.");
     }
 
-    if (version === 2) {
+    if (version >= 2) {
       if (typeof correction.id !== "string" || !correction.id.trim()) {
         errors.push("Each schemaVersion 2 correction needs a non-empty id.");
       } else if (correctionIds.has(correction.id)) {
@@ -242,7 +242,7 @@ export const validateVisualReviewReport = (report: unknown) => {
     }
   }
 
-  if (version === 2) {
+  if (version >= 2) {
     if (!Array.isArray(report.renderIterations) || report.renderIterations.length === 0) {
       errors.push("schemaVersion 2 reports need a non-empty renderIterations history.");
     } else {
