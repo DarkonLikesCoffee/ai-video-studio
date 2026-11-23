@@ -1,6 +1,9 @@
 import { spawn } from "node:child_process";
 
+export type AudioMode = "required" | "optional" | "silent";
+
 export type MediaQaOptions = {
+  audioMode?: AudioMode;
   ffmpegPath?: string;
   ffprobePath?: string;
   silenceNoiseDb?: number;
@@ -36,6 +39,7 @@ export type MediaStream = {
 
 export type MediaQaReport = {
   schemaVersion: 1;
+  audioMode: AudioMode;
   file: string;
   passed: boolean;
   thresholds: {
@@ -193,6 +197,7 @@ export const buildMediaQaReport = (
   options: MediaQaOptions = {},
 ): MediaQaReport => {
   const config = { ...defaults, ...options };
+  const audioMode = options.audioMode ?? "optional";
   const streams = probe.streams ?? [];
   const format = probe.format ?? {};
   const durationSeconds = Number(format.duration ?? 0);
@@ -227,7 +232,17 @@ export const buildMediaQaReport = (
     findings.push({ severity: "error", code: "missing-video-stream", message: "The MP4 contains no video stream." });
   }
   if (!audioStream) {
-    findings.push({ severity: "warning", code: "missing-audio-stream", message: "The MP4 contains no audio stream; silent video is allowed." });
+    findings.push({
+      severity: audioMode === "required" ? "error" : "warning",
+      code: "missing-audio-stream",
+      message: audioMode === "required"
+        ? "Audio is required by the project configuration, but the MP4 contains no audio stream."
+        : audioMode === "silent"
+          ? "No audio stream is present, as expected for a silent project."
+          : "The project allows audio to be absent, and the MP4 contains no audio stream.",
+    });
+  } else if (audioMode === "silent") {
+    findings.push({ severity: "warning", code: "unexpected-audio-stream", message: "The project is configured as silent, but the MP4 contains an audio stream." });
   }
   for (const interval of silenceIntervals) {
     const excessive = interval.durationSeconds > config.maxSilenceDurationSeconds;
@@ -319,6 +334,7 @@ export const buildMediaQaReport = (
 
   return {
     schemaVersion: 1,
+    audioMode,
     file,
     passed: !findings.some(finding => finding.severity === "error"),
     thresholds: {
@@ -374,7 +390,8 @@ export const inspectMedia = async (
     "-v", "error", "-show_streams", "-show_format", "-of", "json", file,
   ]);
   const probe = JSON.parse(probeRaw) as { streams?: MediaStream[]; format?: Record<string, string | number> };
-  const hasAudio = (probe.streams ?? []).some(stream => stream.codec_type === "audio");
+  const audioMode = options.audioMode ?? "optional";
+  const hasAudio = audioMode !== "silent" && (probe.streams ?? []).some(stream => stream.codec_type === "audio");
   const hasVideo = (probe.streams ?? []).some(stream => stream.codec_type === "video");
 
   const audioLog = hasAudio ? await run(config.ffmpegPath, [
@@ -388,5 +405,5 @@ export const inspectMedia = async (
     "-an", "-f", "null", "-",
   ]) : "";
 
-  return buildMediaQaReport(file, probe, audioLog, videoLog, options);
+  return buildMediaQaReport(file, probe, audioLog, videoLog, { ...options, audioMode });
 };
