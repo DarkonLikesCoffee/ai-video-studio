@@ -323,6 +323,7 @@ jobs:
             render-output/${{ steps.request.outputs.output_name }}.qa.json
             render-output/review/${{ steps.request.outputs.output_name }}.contact-sheet.jpg
             render-output/review/${{ steps.request.outputs.output_name }}.contact-sheet.json
+            render-output/review/${{ steps.request.outputs.output_name }}.visual-review.json
             render-output/${{ steps.request.outputs.output_name }}.asset-evidence.json
             render-output/${{ steps.request.outputs.output_name }}.provenance.json
           if-no-files-found: error
