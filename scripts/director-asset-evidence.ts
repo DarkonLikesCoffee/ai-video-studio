@@ -185,11 +185,11 @@ const collectProjectVideoAssetReferences = (
   if (!isRecord(value)) return { references: [], projectVideoScenes: [] };
   const references: SourceReference[] = [];
   const projectVideoScenes: ProjectVideoSceneReferences[] = [];
-  const addSource = (entry: unknown, target: SourceReference[]) => {
+  const addSource = (entry: unknown, target?: SourceReference[]) => {
     if (isRecord(entry) && typeof entry.src === "string") {
       const reference = { value: entry.src, sourceFile };
       references.push(reference);
-      target.push(reference);
+      target?.push(reference);
     }
   };
   if (Array.isArray(value.scenes)) {
@@ -206,7 +206,7 @@ const collectProjectVideoAssetReferences = (
   }
   // Audio tracks are global in ProjectVideo and therefore do not map to individual shots.
   if (Array.isArray(value.audioTracks)) {
-    for (const track of value.audioTracks) addSource(track, references);
+    for (const track of value.audioTracks) addSource(track);
   }
   return { references, projectVideoScenes };
 };
