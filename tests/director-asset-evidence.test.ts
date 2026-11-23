@@ -786,3 +786,131 @@ test("custom composition JSON imports contribute only src and poster asset field
     await rm(root, { recursive: true, force: true });
   }
 });
+
+
+test("custom Remotion shot-component mapping verifies required assets in each assigned module", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-shot-map-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const scenesRoot = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(path.join(scenesRoot, "shots"), { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(projectRoot, "assets", "two.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "TestFilm.tsx"), [
+    'import { ShotOne } from "./shots/ShotOne";',
+    'import { ShotTwo } from "./shots/ShotTwo";',
+    'export const TestFilm = () => <><ShotOne/><ShotTwo/></>;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "shots", "ShotOne.tsx"), [
+    'import { staticFile } from "remotion";',
+    'export const ShotOne = () => <img src={staticFile("assets/one.svg")}/>;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "shots", "ShotTwo.tsx"), [
+    'import { staticFile } from "remotion";',
+    'export const ShotTwo = () => <img src={staticFile("assets/two.svg")}/>;',
+    ""
+  ].join("\\n"));
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      shotComponents: { schemaVersion: 1, shots: [
+        { shotId: "shot-one", modules: ["packages/video-engine/src/scenes/shots/ShotOne.tsx"] },
+        { shotId: "shot-two", modules: ["packages/video-engine/src/scenes/shots/ShotTwo.tsx"] },
+        { shotId: "shot-three", modules: ["packages/video-engine/src/scenes/TestFilm.tsx"] }
+      ] },
+      assets: [
+        { file: "one.svg", type: "image/svg+xml", reusePolicy: "required", shotIds: ["shot-one"], provenance: "Test", license: "Original" },
+        { file: "two.svg", type: "image/svg+xml", reusePolicy: "required", shotIds: ["shot-two"], provenance: "Test", license: "Original" }
+      ]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.shotUsageStatus, "verified");
+    assert.equal(report.assets[1]?.shotUsageStatus, "verified");
+    assert.deepEqual(report.assets[0]?.shotUsageEvidence, ["shot-one: packages/video-engine/src/scenes/shots/ShotOne.tsx: assets/one.svg"]);
+    assert.equal(report.summary.requiredAssetsVerifiedInAssignedShots, 2);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("custom Remotion asset used only in a different mapped shot fails assigned-shot verification", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-shot-wrong-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const scenesRoot = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(path.join(scenesRoot, "shots"), { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "TestFilm.tsx"), 'import { ShotOne } from "./shots/ShotOne"; export const TestFilm = () => <ShotOne/>;');
+  await writeFile(path.join(scenesRoot, "shots", "ShotOne.tsx"), 'import { staticFile } from "remotion"; export const ShotOne = () => <img src={staticFile("assets/one.svg")}/>;');
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      shotComponents: { schemaVersion: 1, shots: [
+        { shotId: "shot-one", modules: ["packages/video-engine/src/scenes/shots/ShotOne.tsx"] },
+        { shotId: "shot-two", modules: ["packages/video-engine/src/scenes/TestFilm.tsx"] },
+        { shotId: "shot-three", modules: ["packages/video-engine/src/scenes/TestFilm.tsx"] }
+      ] },
+      assets: [{ file: "one.svg", type: "image/svg+xml", reusePolicy: "required", shotIds: ["shot-two"], provenance: "Test", license: "Original" }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.equal(report.assets[0]?.shotUsageStatus, "missing");
+    assert.ok(report.issues.some((issue) => issue.code === "CUSTOM_ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT" && issue.shotId === "shot-two"));
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("custom Remotion mapping rejects unknown shot IDs and unreachable modules", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-shot-invalid-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const scenesRoot = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(scenesRoot, { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "TestFilm.tsx"), 'import { staticFile } from "remotion"; export const TestFilm = () => <img src={staticFile("assets/one.svg")}/>;');
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      shotComponents: { schemaVersion: 1, shots: [
+        { shotId: "ghost-shot", modules: ["packages/video-engine/src/scenes/TestFilm.tsx"] },
+        { shotId: "shot-one", modules: ["packages/video-engine/src/scenes/not-reachable.tsx"] },
+        { shotId: "shot-two", modules: ["packages/video-engine/src/scenes/TestFilm.tsx"] },
+        { shotId: "shot-three", modules: ["packages/video-engine/src/scenes/TestFilm.tsx"] }
+      ] },
+      assets: [{ file: "one.svg", type: "image/svg+xml", reusePolicy: "required", shotIds: ["shot-one"], provenance: "Test", license: "Original" }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.ok(report.issues.some((issue) => issue.code === "CUSTOM_SHOT_COMPONENT_UNKNOWN_SHOT" && issue.shotId === "ghost-shot"));
+    assert.ok(report.issues.some((issue) => issue.code === "CUSTOM_SHOT_COMPONENT_MODULE_UNREACHABLE" && issue.shotId === "shot-one"));
+    assert.equal(report.assets[0]?.shotUsageStatus, "unverifiable");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
