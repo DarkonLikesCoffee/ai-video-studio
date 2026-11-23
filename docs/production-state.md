@@ -34,4 +34,12 @@ npx tsx scripts/production-state.ts projects/<slug>/production/production-state.
 
 The second form requires evidence for every stage up to and including the declared stage. For a handoff at `assets`, for example, brief, direction, storyboard and assets must all have evidence references.
 
-This validator is opt-in for projects adopting the state file. Existing projects without a state file remain compatible. The render workflow does not yet require this file; render-gate integration is a separate follow-up after migration rules and evidence semantics are agreed.
+For projects that want to verify the evidence files themselves, run:
+
+```bash
+npx tsx scripts/production-state.ts projects/<slug>/production/production-state.json <slug> --require-evidence --verify-evidence-files --project-root projects/<slug>
+```
+
+Strict file verification resolves each evidence reference relative to the project root and requires a non-empty regular file. It rejects absolute paths, traversal segments, directories, symbolic links and paths that escape the project. The supplied project root must itself be inside the repository root. References are still not proof that the contents are correct, current, reviewed or creatively approved.
+
+This validator remains opt-in for projects adopting the state file. Existing projects without a state file remain compatible. The render workflow does not yet require this file; render-gate integration is a separate follow-up after migration rules and evidence semantics are agreed.

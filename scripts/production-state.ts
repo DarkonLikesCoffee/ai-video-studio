@@ -1,5 +1,5 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { lstat, readFile, realpath, stat, writeFile } from "node:fs/promises";
+import { isAbsolute, relative, resolve } from "node:path";
 
 export const PRODUCTION_STAGES = [
   "brief",
@@ -30,8 +30,83 @@ export type StateValidationOptions = {
   requireEvidence?: boolean;
 };
 
+export type EvidenceFileValidationOptions = StateValidationOptions & {
+  repositoryRoot: string;
+  projectRoot: string;
+};
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+const isWithin = (root: string, target: string): boolean => {
+  const path = relative(root, target);
+  return path === "" || (!path.startsWith("..") && !isAbsolute(path));
+};
+
+/**
+ * Resolve an evidence reference to a regular file contained in the project.
+ * Absolute paths, traversal, empty segments, symlinks and directories are rejected.
+ */
+export const resolveProductionEvidenceFile = async (
+  projectRootInput: string,
+  reference: string,
+): Promise<string> => {
+  const projectRoot = await realpath(resolve(projectRootInput));
+  if (!reference.trim() || reference.includes("\\") || reference.startsWith("/") ||
+      reference.split("/").some((part) => !part || part === "." || part === "..")) {
+    throw new Error(`Evidence reference is not a safe project-relative path: "${reference}".`);
+  }
+  const candidate = resolve(projectRoot, reference);
+  if (!isWithin(projectRoot, candidate)) {
+    throw new Error(`Evidence reference escapes the project root: "${reference}".`);
+  }
+  const details = await lstat(candidate);
+  if (details.isSymbolicLink()) {
+    throw new Error(`Evidence references cannot be symbolic links: "${reference}".`);
+  }
+  if (!details.isFile()) {
+    throw new Error(`Evidence reference is not a regular file: "${reference}".`);
+  }
+  const actual = await realpath(candidate);
+  if (!isWithin(projectRoot, actual)) {
+    throw new Error(`Evidence reference resolves outside the project root: "${reference}".`);
+  }
+  const actualDetails = await stat(actual);
+  if (!actualDetails.isFile() || actualDetails.size <= 0) {
+    throw new Error(`Evidence file is missing, empty or not a regular file: "${reference}".`);
+  }
+  return actual;
+};
+
+export const validateProductionEvidenceFiles = async (
+  value: unknown,
+  options: EvidenceFileValidationOptions,
+): Promise<string[]> => {
+  const errors = validateProductionState(value, options);
+  if (!isRecord(value) || !isRecord(value.evidence)) return errors;
+  let projectRoot: string;
+  try {
+    projectRoot = await realpath(resolve(options.projectRoot));
+    const repositoryRoot = await realpath(resolve(options.repositoryRoot));
+    if (!isWithin(repositoryRoot, projectRoot)) {
+      return [...errors, "projectRoot must be contained within repositoryRoot."];
+    }
+  } catch (error) {
+    return [...errors, `Could not resolve project/repository root: ${error instanceof Error ? error.message : String(error)}`];
+  }
+  for (const [stage, references] of Object.entries(value.evidence)) {
+    if (!PRODUCTION_STAGES.includes(stage as ProductionStage) || !Array.isArray(references)) continue;
+    for (const reference of references) {
+      if (typeof reference !== "string" || !reference.trim()) continue;
+      try {
+        await resolveProductionEvidenceFile(projectRoot, reference);
+      } catch (error) {
+        errors.push(`evidence.${stage} reference "${reference}": ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  }
+  return errors;
+};
 
 export const validateProductionState = (
   value: unknown,
@@ -85,17 +160,25 @@ const run = async (): Promise<void> => {
   const path = process.argv[2];
   const expectedProjectId = process.argv[3];
   const requireEvidence = process.argv.includes("--require-evidence");
+  const verifyEvidenceFiles = process.argv.includes("--verify-evidence-files");
+  const projectRootFlag = process.argv.indexOf("--project-root");
+  const repositoryRoot = process.cwd();
+  const projectRoot = projectRootFlag >= 0 ? process.argv[projectRootFlag + 1] : undefined;
   if (!path) {
-    process.stderr.write("Usage: tsx scripts/production-state.ts <production-state.json> [expected-project-id] [--require-evidence]\n");
+    process.stderr.write("Usage: tsx scripts/production-state.ts <production-state.json> [expected-project-id] [--require-evidence] [--verify-evidence-files --project-root <project-dir>]\n");
     process.exitCode = 2;
     return;
   }
   try {
     const value: unknown = JSON.parse(await readFile(resolve(path), "utf8"));
-    const errors = validateProductionState(value, {
-      ...(expectedProjectId === undefined ? {} : { expectedProjectId }),
-      requireEvidence,
-    });
+    const errors = verifyEvidenceFiles
+      ? projectRoot
+        ? await validateProductionEvidenceFiles(value, { ...(expectedProjectId === undefined ? {} : { expectedProjectId }), requireEvidence, repositoryRoot, projectRoot })
+        : ["--verify-evidence-files requires --project-root <project-dir>."]
+      : validateProductionState(value, {
+          ...(expectedProjectId === undefined ? {} : { expectedProjectId }),
+          requireEvidence,
+        });
     if (errors.length) {
       process.stderr.write(errors.map((error) => `- ${error}`).join("\n") + "\n");
       process.exitCode = 1;
