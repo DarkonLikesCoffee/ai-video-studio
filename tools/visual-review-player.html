@@ -104,6 +104,8 @@
   };
   const invalidate = (reason) => {
     if (!sessionInvalidReason) sessionInvalidReason = reason;
+    video.pause();
+    running = false;
     playButton.disabled = true;
     resumeButton.disabled = true;
     setStatus("Session invalid: " + sessionInvalidReason + " Reload the MP4 and start again.");
@@ -195,6 +197,9 @@
     metadata.textContent = "File: " + (file?.name ?? "") + " · " +
       file?.size.toLocaleString() + " bytes · " +
       video.duration.toFixed(3) + " seconds";
+    if (metadataLoaded && mediaSha256 && !hashing) {
+      setStatus("Ready. Start the full review from the beginning.");
+    }
     updateProgress();
   });
   video.addEventListener("timeupdate", updateProgress);
