@@ -111,9 +111,8 @@ test("correction render rejects a duplicate MP4 hash", () => {
 });
 
 test("legacy review reports are retained as the first linked iteration", () => {
-  const previous = report("a");
-  previous.schemaVersion = 1;
-  delete previous.renderIterations;
+  const original = report("a");
+  const previous = { ...original, schemaVersion: 1, renderIterations: undefined };
   previous.status = "rejected";
   previous.decision = { approved: false, rationale: "Fix needed." };
   previous.findings = [{ id: "F1", severity: "minor", status: "open" }];
@@ -132,3 +131,31 @@ test("sha256 helper produces deterministic digest", () =>
     sha256Buffer(Buffer.from("test")),
     "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
   ));
+
+
+test("old correction verification is archived and must be repeated for the new render", () => {
+  const previous = report("a");
+  previous.status = "rejected";
+  previous.decision = { approved: false, rationale: "Recheck after another change." };
+  previous.findings = [{ id: "F1", severity: "major", status: "open" }];
+  previous.corrections = [{
+    id: "C1",
+    findingId: "F1",
+    description: "Rebuild the scene.",
+    targetPaths: ["projects/demo/src/Scene.tsx"],
+    status: "verified",
+    appliedInCommit: "e".repeat(40),
+    verified: true,
+    verification: {
+      videoSha256: "a".repeat(64),
+      reviewer: "reviewer",
+      reviewedAt: "2026-11-23T12:00:00Z",
+      timestampsReviewedSeconds: [4.2],
+    },
+  }];
+  const next = appendVisualReviewIteration(previous, report("b"), () => true);
+  assert.equal(next.corrections[0].verified, false);
+  assert.equal(next.corrections[0].status, "applied");
+  assert.equal(next.corrections[0].verificationHistory.length, 1);
+  assert.equal(next.corrections[0].verificationHistory[0].videoSha256, "a".repeat(64));
+});
