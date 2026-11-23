@@ -21,8 +21,8 @@ The command writes a sidecar `video.qa.json` unless a report path is supplied.
 ## Real-media integration tests
 
 - `tests/media-qa-ffmpeg.integration.test.ts` generates a moving-pattern MP4 with delayed audio and checks the actual `inspectMedia` pipeline for an A/V start-offset error without conflating it with duration drift.
-- `tests/media-qa-silence.integration.test.ts` generates real MP4 fixtures with moderate and excessive silence and verifies warning/failure severity, interval measurement and clean A/V timing.
-- `tests/media-qa-video-intervals.integration.test.ts` generates real MP4s with frozen or black middle segments and verifies warning/pass versus excessive/error behavior, while checking unrelated silence and A/V timing measurements remain clean.
+- `tests/media-qa-silence.integration.test.ts` generates real MP4 fixtures with moderate and excessive silence and verifies informational severity, interval measurement and clean A/V timing.
+- `tests/media-qa-video-intervals.integration.test.ts` generates real MP4s with frozen or black middle segments and verifies freeze findings remain informational regardless of duration, while black-video thresholds and unrelated A/V timing measurements remain unchanged.
 - These tests are part of `npm test`. They skip locally if FFmpeg/FFprobe are unavailable. CI sets `MEDIA_QA_INTEGRATION_REQUIRED=1` for the test step; in required mode the test helper disables skips and throws a clear error if either binary is missing. This prevents a green run from silently omitting the real-media suite.
 
 ## Render provenance
@@ -32,9 +32,9 @@ The command writes a sidecar `video.qa.json` unless a report path is supplied.
 - The production asset-evidence report is also hashed and summarized (status, criteria/asset counts and issue counters); its full JSON remains in the artifact. The post-upload workflow summary supplies the artifact ID, URL and upload digest. The manifest cannot include its own artifact ID because that ID exists only after upload.
 
 ## Interpretation
-- Missing audio/video stream or invalid duration is a hard failure.
+- Missing video stream or invalid duration is a hard failure. Missing audio is informational; silent videos are valid.
 - Audio/video duration differences above 0.5 seconds and start offsets above 0.5 seconds are hard failures by default.
-- Silence, freeze and black intervals are warnings or errors according to their duration thresholds; intentional pauses, fades and black transitions may be valid. Compare each timestamp with the production plan and actual rendered media.
+- Silence and frozen footage are informational findings only and never invalidate a render, regardless of duration. Black intervals retain their existing severity thresholds.
 - The report does not understand story, asset relevance, shot variety, captions, narration correctness or whether silence is intentional.
 - Measurements are not a substitute for listening or watching the video.
 - Never mark a video creatively accepted from this report alone.
