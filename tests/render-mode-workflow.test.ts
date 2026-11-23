@@ -20,9 +20,18 @@ test("CircleCI runs the same composition preflight and consumes its resolved ren
   assert.ok(circleCiWorkflow.includes('"--gl=swangle"'));
 });
 
-test("both providers use the explicit 2D branch instead of composition-name exceptions", () => {
-  assert.ok(githubWorkflow.includes('elif [[ "$RENDER_MODE" == "2d" ]]'));
-  assert.ok(circleCiWorkflow.includes('elif [[ "$RENDER_MODE" == "2d" ]]'));
-  assert.ok(!githubWorkflow.includes('COMPOSITION_ID" == "LighthouseRepairFilm'));
-  assert.ok(!githubWorkflow.includes('COMPOSITION_ID" == "MadridTrip"'));
+test("both render commands use the explicit 2D branch instead of composition-name exceptions", () => {
+  const renderStart = githubWorkflow.indexOf("      - name: Render MP4 with GitHub Actions");
+  const renderEnd = githubWorkflow.indexOf("\\n      - name: Master final ProjectVideo audio", renderStart);
+  const githubRenderStep = githubWorkflow.slice(renderStart, renderEnd);
+  const circleRenderStart = circleCiWorkflow.indexOf("          name: Render MP4");
+  const circleRenderEnd = circleCiWorkflow.indexOf("\\n      - run:\\n          name: Master final audio", circleRenderStart);
+  const circleRenderStep = circleCiWorkflow.slice(circleRenderStart, circleRenderEnd);
+
+  assert.ok(githubRenderStep.includes('elif [[ "$RENDER_MODE" == "2d" ]]'));
+  assert.ok(circleRenderStep.includes('elif [[ "$RENDER_MODE" == "2d" ]]'));
+  assert.ok(!githubRenderStep.includes("LighthouseRepairFilm"));
+  assert.ok(!githubRenderStep.includes("MadridTrip"));
+  assert.ok(!circleRenderStep.includes("LighthouseRepairFilm"));
+  assert.ok(!circleRenderStep.includes("MadridTrip"));
 });
