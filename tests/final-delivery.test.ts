@@ -151,6 +151,12 @@ const makeFixture = async () => {
   };
   const reviewReportPath = "projects/demo/production/visual-review.json";
   await writeJson(join(repositoryRoot, reviewReportPath), report);
+  const renderReviewReport = {
+    ...report,
+    status: "pending-review",
+    decision: { approved: false, rationale: "Awaiting external creative review." },
+  };
+  await writeJson(join(artifactDir, "review", "demo.visual-review.json"), renderReviewReport);
 
   const options: FinalDeliveryOptions = {
     artifactDir,
