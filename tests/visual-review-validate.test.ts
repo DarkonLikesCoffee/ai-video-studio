@@ -33,6 +33,12 @@ const base = () => ({
       complete: true,
       invalidReason: null,
     },
+    audioReview: {
+      status: "listened",
+      reviewer: "reviewer",
+      reviewedAt: "2026-11-23T12:00:20Z",
+      rationale: "Listened to the full audio track.",
+    },
   },
   findings: [],
   corrections: [],
@@ -232,4 +238,28 @@ test("schema version 3 requires a real render duration", () => {
   const r = base();
   delete r.artifact.durationSeconds;
   assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("artifact.durationSeconds")));
+});
+
+test("approval requires an explicit, honest audio review status", () => {
+  const r = base();
+  delete (r.inspection as Record<string, unknown>).audioReview;
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("explicit audio review status")));
+
+  r.inspection.audioReview = { status: "not-listened" };
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("needs a reason")));
+
+  r.inspection.audioReview = { status: "not-listened", reason: "Audio playback was unavailable in this review environment." };
+  assert.deepEqual(validateVisualReviewReport(r).errors, []);
+});
+
+test("a listened audio review must match the visual reviewer and include its own timestamp and rationale", () => {
+  const r = base();
+  r.inspection.audioReview.reviewer = "different-reviewer";
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("must match the visual inspection reviewer")));
+  r.inspection.audioReview.reviewer = "reviewer";
+  r.inspection.audioReview.reviewedAt = "not-a-date";
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("valid reviewedAt")));
+  r.inspection.audioReview.reviewedAt = "2026-11-23T12:00:20Z";
+  r.inspection.audioReview.rationale = " ";
+  assert.ok(validateVisualReviewReport(r).errors.some(error => error.includes("short rationale")));
 });
