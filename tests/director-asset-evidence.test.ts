@@ -8,6 +8,7 @@ import { buildAssetEvidenceReport } from "../scripts/director-asset-evidence";
 const criteria = ["Criterion one", "Criterion two", "Criterion three"];
 const makePlan = () => ({
   schemaVersion: 1,
+  assetVisualReviewRequired: false,
   id: "asset-evidence-test",
   title: "Asset Evidence Test",
   delivery: { durationSeconds: 3, width: 1920, height: 1080, fps: 30, format: "mp4" },
