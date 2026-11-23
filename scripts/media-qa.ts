@@ -99,6 +99,7 @@ export type MediaQaReport = {
 };
 
 const defaults: Required<MediaQaOptions> = {
+  audioMode: "optional",
   ffmpegPath: process.env.FFMPEG_PATH || "ffmpeg",
   ffprobePath: process.env.FFPROBE_PATH || "ffprobe",
   silenceNoiseDb: -50,
