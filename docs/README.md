@@ -1,5 +1,7 @@
 # Repository documentation
 
+| [Production state](production-state.md) | Versioned stage/evidence handoff schema and validator for resumable agent-led video work. |
+
 Use this page to find the right document before adding another status or handoff file.
 
 ## Start here
