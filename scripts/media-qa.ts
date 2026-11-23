@@ -80,7 +80,7 @@ export type MediaQaReport = {
     durationSeconds?: number;
   };
   findings: Array<{
-    severity: "error" | "warning";
+    severity: "error" | "warning" | "info";
     code: string;
     message: string;
     startSeconds?: number;
@@ -233,7 +233,7 @@ export const buildMediaQaReport = (
   }
   if (!audioStream) {
     findings.push({
-      severity: audioMode === "required" ? "error" : "warning",
+      severity: audioMode === "required" ? "error" : "info",
       code: "missing-audio-stream",
       message: audioMode === "required"
         ? "Audio is required by the project configuration, but the MP4 contains no audio stream."
