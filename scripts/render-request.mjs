@@ -138,6 +138,25 @@ const run = async () => {
     }
   }
 
+  if (request.visualReviewHistoryPath) {
+    if (request.provider !== "github-actions") {
+      throw new Error("visualReviewHistoryPath is currently supported only by the GitHub Actions render workflow.");
+    }
+    let previousReview;
+    try {
+      previousReview = JSON.parse(await readFile(request.visualReviewHistoryPath, "utf8"));
+    } catch (error) {
+      throw new Error(`Could not read visual review history ${request.visualReviewHistoryPath}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if (!isRecord(previousReview) || previousReview.status !== "rejected" ||
+        !isRecord(previousReview.decision) || previousReview.decision.approved !== false) {
+      throw new Error("visualReviewHistoryPath must reference a rejected visual review report.");
+    }
+    if (!isRecord(previousReview.artifact) || previousReview.artifact.name !== request.outputName) {
+      throw new Error("visual review history artifact.name must match the new render outputName.");
+    }
+  }
+
   if (request.narrationPath) {
     let narration;
     try {
