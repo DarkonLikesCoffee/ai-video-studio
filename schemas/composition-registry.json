@@ -12,6 +12,20 @@
     ]
   },
   {
+    "id": "JumpingCat",
+    "renderer": "custom-remotion",
+    "selectable": true,
+    "purpose": "Original 2D animated cat short with expressive squash-and-stretch jumping and a quiet outdoor ambience.",
+    "strengths": [
+      "Dedicated 2D illustration and character animation",
+      "Continuous custom wind ambience",
+      "No text or reusable editorial template"
+    ],
+    "limitations": [
+      "Purpose-built for a single playful jumping-cat scene."
+    ]
+  },
+  {
     "id": "ProjectVideo",
     "renderer": "project-video",
     "selectable": true,
