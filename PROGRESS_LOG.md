@@ -802,3 +802,13 @@ Append one entry per meaningful development session:
 - Merged PR #156 as `87d794b1f08306e9e585f6e784e85136d8e3cbef`. Post-merge main CI [#45230712726](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230712726) passed.
 - The manual workflow has not been dispatched because no new real approved render was part of this infrastructure change. Do not claim the final delivery path has been exercised with an actual production video until that end-to-end run is performed.
 - No render request was modified and no production render was triggered by PR #156.
+
+
+## 2026-11-23 — Custom Remotion asset-reference audit merged (PR #163)
+
+- PR #163, **Tighten custom Remotion asset usage evidence**, merged into `main` as `f51ff459b1df2445b75cd140ce93e350ea37532f` (squash merge).
+- Exact PR-head CI run [#45250261362](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45250261362) completed successfully: 52 workflow steps passed on commit `3493da553d7bbdcb182ca0d99286813b74575534`.
+- The audit recognizes statically resolvable Remotion `staticFile()` references (named/namespace imports and local constants), imported media files, static `new URL()` media references, and JSX/JSON `src`/ `poster` values in the selected component's reachable local import graph.
+- Arbitrary string literals used only as title/copy/labels no longer count as proof of required asset usage. Regression tests cover string-copy false positives, imported media files and JSON media fields.
+- Scope remains limited: this is source/data-reference evidence, not proof that an asset is visible or semantically appropriate in rendered pixels. Custom Remotion shot-to-shot asset placement remains unaudited until a shot-to-component mapping contract exists.
+- No production video render was triggered.
