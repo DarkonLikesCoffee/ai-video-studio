@@ -293,3 +293,231 @@ test("audio assets are excluded from the visual preview and approval gate", asyn
     assert.equal(report.issues.some((issue) => issue.code === "ASSET_VISUAL_REVIEW_MISSING" && issue.assetRef === audio.reference), false);
   });
 });
+
+
+test("required ProjectVideo assets must be referenced by the selected scene data", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ mediaLayers: [{ src: "assets/one.svg" }] }],
+      audioTracks: []
+    }));
+    const plan = makePlan();
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.reusePolicy, "required");
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.deepEqual(report.assets[0]?.usageEvidence, ["scene.json: assets/one.svg"]);
+    assert.equal(report.summary.requiredAssetCount, 1);
+    assert.equal(report.summary.requiredAssetsReferenced, 1);
+    assert.equal(report.summary.requiredAssetsNotReferenced, 0);
+    assert.equal(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED"), false);
+  });
+});
+
+test("required assets absent from the composition are blocking evidence errors", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ mediaLayers: [{ src: "assets/two.svg" }] }]
+    }));
+    const plan = makePlan();
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.equal(report.summary.requiredAssetsNotReferenced, 1);
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+    assert.equal(report.summary.status, "invalid");
+  });
+});
+
+test("reference-only design studies do not need to appear in the runtime composition", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({ scenes: [] }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        usageRole: "design-reference",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.reusePolicy, "reference-only");
+    assert.equal(report.assets[0]?.usageStatus, "not-required");
+    assert.equal(report.summary.requiredAssetCount, 0);
+    assert.equal(report.issues.some((issue) => issue.code.startsWith("ASSET_REQUIRED_")), false);
+  });
+});
+
+test("required custom-composition assets are found through local source imports", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-usage-source-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const engineScenes = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(engineScenes, { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\n"));
+  await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
+    'import { getHeroAsset } from "./asset-helper";',
+    'export const TestFilm = () => getHeroAsset();',
+    ""
+  ].join("\n"));
+  await writeFile(path.join(engineScenes, "asset-helper.ts"), [
+    'import { staticFile } from "remotion";',
+    'export const getHeroAsset = () => staticFile("assets/one.svg");',
+    ""
+  ].join("\n"));
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.ok(report.assets[0]?.usageEvidence.some((entry) => entry.endsWith("asset-helper.ts: assets/one.svg")));
+    assert.equal(report.summary.requiredAssetsReferenced, 1);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("invalid reusePolicy is reported as an error", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({ scenes: [] }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "must-use-maybe",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REUSE_POLICY_INVALID" && issue.severity === "error"));
+  });
+});
+
+
+test("a same-basename reference from a different folder does not satisfy required asset usage", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ mediaLayers: [{ src: "assets/alternate/one.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED"));
+  });
+});
+
+test("required asset usage respects case-sensitive paths", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ mediaLayers: [{ src: "assets/One.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.equal(report.summary.requiredAssetsNotReferenced, 1);
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+  });
+});
+
+test("ProjectVideo usage ignores filenames mentioned outside rendered media sources", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      title: "Design reference: assets/one.svg",
+      scenes: [{ title: "Mentioned in copy only: assets/one.svg", mediaLayers: [] }],
+      audioTracks: []
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.equal(report.summary.requiredAssetsNotReferenced, 1);
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+  });
+});
+
+test("required asset usage must match the complete project-relative path", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ mediaLayers: [{ src: "one.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.path, "assets/one.svg");
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+  });
+});
