@@ -29,7 +29,8 @@ export const buildStoryboardDirectorPrompt = (brief: RecordValue): string => {
     "- Always give a concrete rationale, required capabilities and an honest fallback. Do not choose based on convenience or because ProjectVideo is the easiest route.",
     "- Make each shot filmable/renderable: describe subject, environment, foreground/background, lighting, composition, action, and what visibly changes over time. Avoid vague adjectives without concrete visual direction.",
     "- Vary shot scale, angle, composition and movement with intent. Avoid repeating the same framing or technique in adjacent shots unless repetition is a deliberate motif.",
-    "- Protect the brief's factual constraints and acceptance criteria. Never invent product facts, sources, footage availability, or asset licenses. Mark unknowns as needs.",
+    "- Protect the brief's factual constraints and acceptance criteria. Never invent product facts, sources, footage availability, or asset licenses. Mark unknowns as needs.
+- Set `assetVisualReviewRequired: true` for every new production plan. Assets need local preview files and explicit visual-review approval before strict asset evidence passes. Do not fabricate review metadata or approve assets you have not actually inspected.",
     "- Sound is editorial: give each shot a purposeful sound cue/ambience/music change or intentional silence; avoid generic whooshes.",
     "- Respect runtime exactly. Use contiguous shot timing with no gaps/overlaps, start at 0, and end at delivery.durationSeconds. Every boundary must be frame-aligned for the supplied fps.",
     "",
