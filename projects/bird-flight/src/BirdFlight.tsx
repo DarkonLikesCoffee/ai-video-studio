@@ -122,15 +122,17 @@ const OpeningShot = ({frame}:{frame:number}) => {
   return <AbsoluteFill style={{backgroundColor:"#C7C9B1"}}>
     <svg viewBox="0 0 1920 1080" width="100%" height="100%">
       <defs>
-        <linearGradient id="openSky" x2="0" y2="1"><stop stopColor="#8EA9A7"/><stop offset=".58" stopColor="#E9CDAA"/><stop offset="1" stopColor="#F4D5AF"/></linearGradient>
+        <linearGradient id="openSky" x2="0" y2="1"><stop stopColor="#7795A1"/><stop offset=".26" stopColor="#B9BDB0"/><stop offset=".5" stopColor="#E6B99B"/><stop offset=".72" stopColor="#F3D0A8"/><stop offset="1" stopColor="#E8D8BA"/></linearGradient>
         <radialGradient id="openSun"><stop stopColor="#FFF1C9" stopOpacity=".88"/><stop offset="1" stopColor="#FFF1C9" stopOpacity="0"/></radialGradient>
-        <linearGradient id="openCliff" x2="0" y2="1"><stop stopColor="#66766A"/><stop offset="1" stopColor="#354A45"/></linearGradient>
+        <linearGradient id="openCliff" x2="0" y2="1"><stop stopColor="#687D72"/><stop offset=".42" stopColor="#455E54"/><stop offset="1" stopColor="#263F3B"/></linearGradient>
       </defs>
       <rect width={W} height={H} fill="url(#openSky)"/>
       <circle cx="1510" cy="260" r="360" fill="url(#openSun)"/><circle cx="1510" cy="260" r="77" fill="#FFE8BC" opacity=".7"/>
       <path d="M0 610 C180 505 340 480 500 568 C690 438 850 448 1030 535 C1210 475 1415 460 1580 545 C1740 505 1850 485 1920 500 L1920 1080 L0 1080Z" fill="#9AA99A"/>
       <path d="M0 725 C220 630 470 598 710 690 C920 665 1120 640 1350 670 C1580 660 1770 610 1920 620 L1920 1080 L0 1080Z" fill="#778E7C"/>
       <path d="M0 840 C280 760 530 755 770 815 C1010 830 1210 785 1440 780 C1630 785 1800 750 1920 760 L1920 1080 L0 1080Z" fill="url(#openCliff)"/>
+      <path d="M0 790 C230 760 440 795 650 845 C930 875 1200 820 1510 820 C1720 820 1840 800 1920 790 L1920 870 C1580 910 1270 895 960 900 C670 885 360 875 0 910Z" fill="#AAB6A0" opacity=".13"/>
+      <g opacity=".52"><Pine x={1330} y={1060} scale={.62} tone="#345249"/><Pine x={1510} y={1070} scale={.78} tone="#2F4A43"/><Pine x={1750} y={1055} scale={.7} tone="#304C44"/></g>
       <g opacity=".5"><Cloud x={350-frame*.35} y={360} scale={1.1}/><Cloud x={1050-frame*.2} y={420} scale={.8}/></g>
       <g transform={`translate(0 ${branchSway})`}>
         <path d="M-70 930 Q300 830 550 875 Q780 920 1030 820 Q1150 774 1260 790" fill="none" stroke="#53483B" strokeWidth="43" strokeLinecap="round"/>
@@ -156,14 +158,17 @@ const ValleyShot = ({frame}:{frame:number}) => {
   return <AbsoluteFill style={{backgroundColor:"#A6C6C1"}}>
     <svg viewBox="0 0 1920 1080" width="100%" height="100%">
       <defs>
-        <linearGradient id="valleySky" x2="0" y2="1"><stop stopColor="#80A9B3"/><stop offset=".52" stopColor="#D7D9C4"/><stop offset="1" stopColor="#F0D5AE"/></linearGradient>
-        <linearGradient id="valleyGround" x2="0" y2="1"><stop stopColor="#788E73"/><stop offset="1" stopColor="#344D43"/></linearGradient>
+        <linearGradient id="valleySky" x2="0" y2="1"><stop stopColor="#6D9AA8"/><stop offset=".28" stopColor="#B7C7C2"/><stop offset=".56" stopColor="#E3D7BF"/><stop offset=".8" stopColor="#E7B994"/><stop offset="1" stopColor="#F2D3A8"/></linearGradient>
+        <linearGradient id="valleyGround" x2="0" y2="1"><stop stopColor="#8C9B78"/><stop offset=".38" stopColor="#607B61"/><stop offset=".72" stopColor="#425E4C"/><stop offset="1" stopColor="#263F36"/></linearGradient>
         <linearGradient id="river" x2="0" y2="1"><stop stopColor="#B4D5D0" stopOpacity=".95"/><stop offset="1" stopColor="#7BA7A1" stopOpacity=".2"/></linearGradient>
       </defs>
       <rect width={W} height={H} fill="url(#valleySky)"/><circle cx="1540" cy="245" r="110" fill="#FFF0CF" opacity=".72"/>
       <Cloud x={350+cloudX*.25} y={250} scale={1.15} opacity={.52}/><Cloud x={1200+cloudX*.18} y={330} scale={.78} opacity={.5}/>
       <path d="M0 570 C110 470 175 415 270 495 C390 360 490 275 590 425 C710 330 820 335 930 510 C1060 370 1180 320 1300 500 C1430 375 1540 305 1660 495 C1780 400 1860 430 1920 510 V1080 H0Z" fill="#81999A"/>
       <path d="M0 670 C140 585 250 520 365 650 C500 520 600 405 710 585 C850 500 970 500 1100 675 C1240 530 1360 470 1490 675 C1640 555 1780 525 1920 605 V1080 H0Z" fill="#607B76"/>
+      <path d="M535 426 L586 360 L637 421 L596 402 L581 414 L566 400Z M1380 493 L1450 392 L1515 484 L1470 462 L1448 478 L1428 462Z" fill="#E4E7DF" opacity=".72"/>
+      <path d="M0 760 C260 735 430 755 610 810 S960 850 1210 790 S1670 800 1920 770" fill="none" stroke="#A6B99B" strokeWidth="14" opacity=".14"/>
+      <g opacity=".48">{Array.from({length:12},(_,i)=><Pine key={i} x={i*170-60} y={1070} scale={.42+(i%3)*.12} tone={i%2?"#3A5B4D":"#345348"}/>)}</g>
       <path d="M0 780 Q310 670 620 810 T1200 760 T1920 750 V1080 H0Z" fill="url(#valleyGround)"/>
       <path d="M0 820 Q270 740 500 835 Q740 950 970 835 Q1220 710 1440 815 Q1690 920 1920 795" fill="none" stroke="url(#river)" strokeWidth="65" opacity=".62"/>
       {Array.from({length:8},(_,i)=><path key={i} d={`M${i*270-300} 960 q130 -110 260 -15`} fill="none" stroke="#A5B991" strokeWidth="12" opacity=".35"/>)}
@@ -180,13 +185,15 @@ const ClosePassShot = ({frame}:{frame:number}) => {
   return <AbsoluteFill style={{backgroundColor:"#D7C6A7"}}>
     <svg viewBox="0 0 1920 1080" width="100%" height="100%">
       <defs>
-        <linearGradient id="passSky" x2="0" y2="1"><stop stopColor="#647E86"/><stop offset=".5" stopColor="#B6B7A2"/><stop offset="1" stopColor="#E5B98A"/></linearGradient>
+        <linearGradient id="passSky" x2="0" y2="1"><stop stopColor="#526F80"/><stop offset=".26" stopColor="#82949B"/><stop offset=".52" stopColor="#C3B9A4"/><stop offset=".78" stopColor="#D7A77F"/><stop offset="1" stopColor="#E9C18F"/></linearGradient>
         <radialGradient id="passSun"><stop stopColor="#FFF3D3" stopOpacity=".9"/><stop offset="1" stopColor="#FFF3D3" stopOpacity="0"/></radialGradient>
       </defs>
       <rect width={W} height={H} fill="url(#passSky)"/><circle cx={sunX} cy="255" r="400" fill="url(#passSun)"/>
       <path d="M0 520 C180 435 310 425 410 520 C590 475 700 455 790 485 C960 525 1080 485 1200 520 C1410 470 1510 450 1600 470 C1770 500 1840 475 1920 500 V1080 H0Z" fill="#71867A"/>
       <path d="M0 700 C230 600 370 615 550 730 C750 700 910 650 1050 680 C1280 730 1410 690 1530 710 C1710 690 1840 650 1920 650 V1080 H0Z" fill="#3F5E55"/>
       <path d="M0 860 C220 790 380 790 510 860 C730 840 920 800 1080 830 C1310 860 1420 835 1560 850 C1740 835 1850 795 1920 780 V1080 H0Z" fill="#263F3B"/>
+      <path d="M170 675 C270 646 350 640 440 664 M660 705 C780 675 850 660 940 682 M1270 695 C1390 658 1490 650 1580 680" fill="none" stroke="#B5A08A" strokeWidth="8" opacity=".18"/>
+      <path d="M280 842 C360 810 420 815 490 840 M980 835 C1070 800 1150 805 1220 834 M1560 840 C1650 810 1740 810 1820 830" fill="none" stroke="#A8B79B" strokeWidth="7" opacity=".14"/>
       <g opacity=".72"><Pine x={120} y={920} scale={1.5}/><Pine x={430} y={980} scale={1.1} tone="#405F50"/><Pine x={1640} y={1010} scale={1.7}/><Pine x={1830} y={970} scale={1.22}/></g>
       <Cloud x={1300-t*.9} y={390} scale={1.35} opacity={.35}/>
       <Bird x={x} y={y} scale={s} rotation={-7+Math.sin(t/14)*7} flap={flap} color="#172F35"/>
@@ -201,15 +208,16 @@ const HorizonShot = ({frame}:{frame:number}) => {
   return <AbsoluteFill style={{backgroundColor:"#222F3B"}}>
     <svg viewBox="0 0 1920 1080" width="100%" height="100%">
       <defs>
-        <linearGradient id="finalSky" x2="0" y2="1"><stop stopColor="#293B4D"/><stop offset=".4" stopColor="#A06D65"/><stop offset=".68" stopColor="#E7AF7F"/><stop offset="1" stopColor="#F0D5A8"/></linearGradient>
+        <linearGradient id="finalSky" x2="0" y2="1"><stop stopColor="#25384A"/><stop offset=".24" stopColor="#566274"/><stop offset=".46" stopColor="#986C71"/><stop offset=".68" stopColor="#D48E77"/><stop offset=".86" stopColor="#EFB989"/><stop offset="1" stopColor="#F5D9AC"/></linearGradient>
         <radialGradient id="finalSun"><stop stopColor="#FFF5D9" stopOpacity=".92"/><stop offset=".32" stopColor="#FFDBA1" stopOpacity=".32"/><stop offset="1" stopColor="#FFC58C" stopOpacity="0"/></radialGradient>
-        <linearGradient id="finalLand" x2="0" y2="1"><stop stopColor="#47575A"/><stop offset="1" stopColor="#172B31"/></linearGradient>
+        <linearGradient id="finalLand" x2="0" y2="1"><stop stopColor="#526266"/><stop offset=".45" stopColor="#354A4E"/><stop offset="1" stopColor="#13272D"/></linearGradient>
       </defs>
       <rect width={W} height={H} fill="url(#finalSky)"/><circle cx="1440" cy="570" r="580" fill="url(#finalSun)" opacity={sunPulse}/>
       <circle cx="1440" cy="590" r="112" fill="#FFF0CB" opacity=".58"/>
       <path d="M0 720 C170 620 280 570 430 695 C590 610 690 510 850 700 C1020 610 1140 560 1300 720 C1480 620 1620 540 1790 700 C1850 680 1890 650 1920 640 V1080 H0Z" fill="#6D7470" opacity=".55"/>
       <path d="M0 830 Q320 720 600 820 T1150 810 T1650 780 T1920 810 V1080 H0Z" fill="url(#finalLand)"/>
       <path d="M0 930 Q360 875 660 910 T1340 895 T1920 920 V1080 H0Z" fill="#14272D"/>
+      <path d="M0 988 Q300 960 610 984 T1210 970 T1920 990" fill="none" stroke="#91A2A0" strokeWidth="9" opacity=".12"/>
       <g opacity=".26"><Cloud x={360-t*.35} y={450}/><Cloud x={1050-t*.45} y={500} scale={.7}/></g>
       <DistantBirds frame={t}/>
       <g opacity={opacity}><Bird x={x} y={y} scale={s} rotation={-5} flap={flap} color="#142A31"/></g>
