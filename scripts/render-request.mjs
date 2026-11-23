@@ -74,6 +74,9 @@ export const validateRenderRequest = (value) => {
       (typeof visualReviewHistoryPath !== "string" || !isVisualReviewHistoryPath(visualReviewHistoryPath))) {
     errors.push("visualReviewHistoryPath, when supplied, must point to production/visual-review.json inside projects/.");
   }
+  if (typeof visualReviewHistoryPath === "string" && provider !== "github-actions") {
+    errors.push("visualReviewHistoryPath is currently supported only by the GitHub Actions render workflow.");
+  }
   const selectedProjectDirectory = typeof projectPath === "string"
     ? projectPath.split("/").slice(0, -1).join("/")
     : typeof productionPlanPath === "string"
