@@ -8,6 +8,7 @@ const isRecord = (value) =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
 export const extractRegisteredCompositionIds = (rootSource) =>
+  [...rootSource.matchAll(/<Composition\s+id="([^"]+)"/g)].map((match) => match[1]);
   [...rootSource.matchAll(/<Composition\\s+id="([^"]+)"/g)].map((match) => match[1]);
 
 export const resolveProductionPlanPath = (request) => {
