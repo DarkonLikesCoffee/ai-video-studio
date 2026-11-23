@@ -39,11 +39,11 @@ jobs:
         run: node scripts/validate-render-strategy.mjs render-request.json packages/video-engine/src/root.tsx
 
       - name: Install dependencies
-        if: steps.request.outputs.provider == 'github-actions'
+        if: steps.request.outputs.provider == 'github-actions' || steps.request.outputs.project_path != '' || steps.request.outputs.production_plan_path != ''
         run: npm ci --no-audit --no-fund
 
       - name: Enforce frozen production state when a project opts in
-        if: steps.request.outputs.provider == 'github-actions' && (steps.request.outputs.project_path != '' || steps.request.outputs.production_plan_path != '')
+        if: steps.request.outputs.project_path != '' || steps.request.outputs.production_plan_path != ''
         env:
           PROJECT_PATH: ${{ steps.request.outputs.project_path }}
           PRODUCTION_PLAN_PATH: ${{ steps.request.outputs.production_plan_path }}
