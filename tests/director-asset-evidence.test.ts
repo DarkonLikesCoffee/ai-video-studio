@@ -927,7 +927,7 @@ test("custom Remotion required visual assets without a shotComponents map remain
     'import { TestFilm } from "./scenes/TestFilm";',
     'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   await writeFile(path.join(scenesRoot, "TestFilm.tsx"), 'import { staticFile } from "remotion"; export const TestFilm = () => <img src={staticFile("assets/one.svg")}/>;');
   try {
     const plan = makePlan();
@@ -955,7 +955,7 @@ test("custom Remotion required visual assets with an invalid shot map are blocki
     'import { TestFilm } from "./scenes/TestFilm";',
     'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   await writeFile(path.join(scenesRoot, "TestFilm.tsx"), 'import { staticFile } from "remotion"; export const TestFilm = () => <img src={staticFile("assets/one.svg")}/>;');
   try {
     const plan = makePlan();
@@ -986,13 +986,13 @@ test("custom Remotion required assets can map to multiple modules for each of se
     'import { TestFilm } from "./scenes/TestFilm";',
     'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   await writeFile(path.join(scenesRoot, "TestFilm.tsx"), [
     'import { ShotOne } from "./shots/ShotOne";',
     'import { ShotTwo } from "./shots/ShotTwo";',
     'export const TestFilm = () => <><ShotOne/><ShotTwo/></>;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   await writeFile(path.join(scenesRoot, "shots", "ShotOne.tsx"), 'import { staticFile } from "remotion"; export const ShotOne = () => <img src={staticFile("assets/shared.svg")}/>;');
   await writeFile(path.join(scenesRoot, "shots", "ShotTwo.tsx"), 'import { staticFile } from "remotion"; export const ShotTwo = () => <img src={staticFile("assets/shared.svg")}/>;');
   try {
