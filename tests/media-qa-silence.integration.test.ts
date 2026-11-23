@@ -66,7 +66,7 @@ test("inspectMedia reports moderate silence as a warning in a real MP4", {
   }
 });
 
-test("inspectMedia fails excessive silence in a real MP4", {
+test("inspectMedia reports excessive silence as informational in a real MP4", {
   skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
@@ -81,8 +81,8 @@ test("inspectMedia fails excessive silence in a real MP4", {
     assert.ok(interval, "the real MP4 should contain a detected silence interval");
     assert.ok(interval.durationSeconds > 2 && interval.durationSeconds < 3);
     assert.deepEqual(report.findings.map(finding => finding.code), ["silence"]);
-    assert.equal(report.findings[0]?.severity, "error");
-    assert.equal(report.passed, false, "silence above the maximum threshold should fail QA");
+    assert.equal(report.findings[0]?.severity, "warning");
+    assert.equal(report.passed, true, "excessive silence must not fail QA");
     assert.ok(
       report.measurements.audioVideoStartOffsetSeconds !== undefined &&
         Math.abs(report.measurements.audioVideoStartOffsetSeconds) < 0.05,

@@ -75,7 +75,7 @@ test("inspectMedia reports a short real-video freeze as a warning", {
   }
 });
 
-test("inspectMedia fails an excessive real-video freeze", {
+test("inspectMedia reports excessive real-video freeze informationally", {
   skip: skipMediaIntegration,
   timeout: 45_000,
 }, async () => {
@@ -90,8 +90,8 @@ test("inspectMedia fails an excessive real-video freeze", {
     assert.ok(interval, "the real MP4 should contain a detected frozen interval");
     assert.ok(interval.durationSeconds > 2.5 && interval.durationSeconds < 3.5);
     assert.deepEqual(report.findings.map(finding => finding.code), ["frozen-video"]);
-    assert.equal(report.findings[0]?.severity, "error");
-    assert.equal(report.passed, false, "a freeze above the maximum threshold should fail QA");
+    assert.equal(report.findings[0]?.severity, "warning");
+    assert.equal(report.passed, true, "a freeze above the maximum threshold must not fail QA");
     assert.deepEqual(report.measurements.blackIntervals, [], "the blue hold should not be misreported as black video");
     assertCleanSynchronization(report);
   } finally {

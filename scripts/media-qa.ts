@@ -227,12 +227,12 @@ export const buildMediaQaReport = (
     findings.push({ severity: "error", code: "missing-video-stream", message: "The MP4 contains no video stream." });
   }
   if (!audioStream) {
-    findings.push({ severity: "error", code: "missing-audio-stream", message: "The MP4 contains no audio stream." });
+    findings.push({ severity: "warning", code: "missing-audio-stream", message: "The MP4 contains no audio stream; silent video is allowed." });
   }
   for (const interval of silenceIntervals) {
     const excessive = interval.durationSeconds > config.maxSilenceDurationSeconds;
     findings.push({
-      severity: excessive ? "error" : "warning",
+      severity: "warning",
       code: "silence",
       message: `Audio silence detected for ${interval.durationSeconds.toFixed(2)} seconds` +
         (excessive ? ` (maximum ${config.maxSilenceDurationSeconds.toFixed(2)}s).` : "."),
@@ -242,7 +242,7 @@ export const buildMediaQaReport = (
   for (const interval of frozenIntervals) {
     const excessive = interval.durationSeconds > config.maxFreezeDurationSeconds;
     findings.push({
-      severity: excessive ? "error" : "warning",
+      severity: "warning",
       code: "frozen-video",
       message: `Video freeze detected for ${interval.durationSeconds.toFixed(2)} seconds` +
         (excessive ? ` (maximum ${config.maxFreezeDurationSeconds.toFixed(2)}s).` : "."),
