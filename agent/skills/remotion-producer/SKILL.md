@@ -9,7 +9,7 @@ Translate the approved storyboard and asset manifest into a valid, deterministic
 - Read the current `README.md` and the project types/validator in `packages/video-engine/src/project.ts`.
 - Confirm the production plan's `renderStrategy` matches the requested composition ID and renderer.
 - Check `scripts/director-compositions.ts`, `schemas/composition-registry.json` and `packages/video-engine/src/root.tsx`; do not select a composition marked reference/test-only or one that is not registered.
-- Declare the composition's `renderMode` from its actual implementation: `2d` when it does not require Three.js/WebGL, `3d` when its rendered scene is Three.js/WebGL, and `hybrid` when it combines Three.js/WebGL with SVG, DOM or video layers. GitHub Actions and CircleCI use this registry field to choose the renderer flags; do not add or remove WebGL flags through composition-name exceptions.
+- Declare the composition's `renderMode` from its actual implementation: `2d` when it does not require Three.js/WebGL, `3d` when the primary visual scene is Three.js/WebGL and other layers are only supporting overlays or post-effects, and `hybrid` when substantial 2D/SVG/video and 3D/WebGL elements are both part of the visual storytelling. A title, label, vignette or small UI overlay alone does not make a 3D scene hybrid. GitHub Actions and CircleCI use this registry field to choose the renderer flags; do not add or remove WebGL flags through composition-name exceptions.
 - If strategy availability is `to-be-built`, implement and register the custom composition and update the capability catalogue before requesting a render.
 - Confirm dimensions, FPS and total frame budget.
 - Confirm every local media path is under the project's `assets/` folder and exists.
