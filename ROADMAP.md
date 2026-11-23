@@ -1,14 +1,14 @@
 # AI Video Studio — Roadmap
 
-## Current verified snapshot — 2026-11-22
+## Current verified snapshot — 2026-11-23
 
-The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is at `ce1dc23c1f80d1191272fc516fb517fa6428409c`; post-merge CI [#45035430951](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45035430951) passed. There are no open pull requests.
+The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is at `c09a4db22b323ca7acc6373c8635fc9a33e29e21`; post-merge main CI [#45160123155](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45160123155) passed.
 
-PR #133 fixed the GitHub Actions FFmpeg setup failure by replacing the third-party download action in CI and GitHub Actions rendering with a command check and Ubuntu package fallback. PR CI #45034977395 and post-merge main CI #45035118531 passed; 259 Node tests passed with 0 failures and 0 skips. The render workflow's setup was updated but no video render was requested.
+PR #143 merged the first machine-readable production-state handoff: a versioned stage record, project identity, stage evidence references, a structural validator and six regression tests. It is opt-in and does not yet verify evidence file contents, prove visual inspection or block rendering when absent.
 
-PR #134 made the shared assistant entry point model-neutral and task-specific. It clarifies that `agent/skills/` is the cross-assistant playbook library and that the active assistant—not an embedded repository LLM—makes creative decisions. Claude-specific integration notes now accurately describe the optional Kokoro ONNX narration adapter. PR CI #45035261813 and post-merge main CI #45035430951 passed; 259 Node tests passed with 0 failures and 0 skips.
+PR #144 is a draft follow-up on `fix/composition-identity-gate`. It strengthens composition enforcement so RemotionRoot and the shared capability catalogue must match exactly, rejects test-only/unselectable compositions, validates the complete plan/request identity and supports an explicit production plan path for custom compositions. Its latest CI is pending; this roadmap must not count the change as complete until the exact PR head passes.
 
-These are workflow/documentation and CI reliability improvements, not new creative-production capabilities. The highest-value product work remains a real prompt-to-video benchmark, followed by targeted improvements to reusable visual production and evidence-based critique/iteration. Do not mark autonomous directing or semantic video QA complete until verified on actual outputs.
+The other open video-production branches (#137, #138, #139, #141 and #142) remain independent. Keep their composition/render work isolated and avoid changing `render-request.json` except through the frozen-candidate protocol.
 
 This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
 
@@ -66,6 +66,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 - [ ] Include explicit confidence, assumptions and source fields; do not fabricate facts or claim unsupported capabilities.
 - [ ] Keep model/provider integration swappable; avoid coupling the production schema to one AI vendor.
 - [ ] Support save/resume from project artifacts so another model, agent or conversation can continue without re-planning everything.
+- [x] Add the first optional, versioned `production-state.json` handoff envelope and structural validator (PR #143). This validates project identity, stage ordering labels and evidence-reference structure; it does not verify evidence contents or enforce a render gate, so full save/resume remains unfinished.
 
 **Exit criteria:** An unfamiliar prompt produces a validated creative brief and executable shot plan with meaningful visual variety and a selected production method per shot, without hand-authoring every scene.
 
@@ -101,6 +102,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 - [ ] Support 2D character/rig animation and physical simulation only for projects where those techniques serve the brief.
 - [ ] Make generated/custom Remotion compositions first-class; ProjectVideo remains a useful compatibility renderer, not the creative ceiling.
 - [x] Add a versioned composition-capability registry and require every new production plan to make an explicit whole-video renderer/composition choice. Validate registered versus to-be-built status and enforce agreement between the plan and render request before Remotion runs. The AI decision remains model/agent-led; this is not an embedded autonomous LLM.
+- [ ] Strengthen runtime composition identity enforcement so the shared capability catalogue and RemotionRoot contain exactly the same IDs, only selectable entries can render, and a custom composition without a props JSON can link its production plan explicitly. Draft PR #144 is implementing this; await exact-head CI and merge before checking this item.
 - [ ] Benchmark visual capabilities on several unrelated topics and formats.
 
 **Architecture policy:** Remotion is the current core composition/rendering path. Three.js, Blender, specialized animation tools and other renderers should be integrated selectively behind reusable interfaces. FFmpeg remains a post-processing, audio/video processing and export tool. Evaluate HyperFrames or other engines against concrete requirements before adopting; do not add technology merely because it appears in research.

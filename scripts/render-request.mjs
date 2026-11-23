@@ -7,19 +7,22 @@ const isRecord = (value) =>
 const isProjectPath = (value) =>
   /^projects\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.json$/.test(value);
 
+const isProductionPlanPath = (value) =>
+  /^projects\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\/production\/production-plan\.json$/.test(value);
+
 export const matchesCompositionMetadata = (project, compositionId) =>
   isRecord(project) && isRecord(project.composition) &&
   project.composition.id === compositionId;
 
 /**
  * Validate the request envelope independently of the selected composition.
- * Remotion remains the source of truth for whether compositionId is registered.
+ * The render preflight checks registry membership and production selectability.
  */
 export const validateRenderRequest = (value) => {
   if (!isRecord(value)) return { errors: ["Render request must be a JSON object."] };
 
   const errors = [];
-  const { provider, compositionId, outputName, requestId, projectPath, narrationPath } = value;
+  const { provider, compositionId, outputName, requestId, projectPath, productionPlanPath, narrationPath } = value;
 
   if (provider !== "github-actions" && provider !== "circleci") {
     errors.push("provider must be github-actions or circleci.");
@@ -43,6 +46,16 @@ export const validateRenderRequest = (value) => {
   if (projectPath !== undefined &&
       (typeof projectPath !== "string" || !isProjectPath(projectPath))) {
     errors.push("projectPath, when supplied, must point to a JSON file inside projects/.");
+  }
+
+  if (productionPlanPath !== undefined &&
+      (typeof productionPlanPath !== "string" || !isProductionPlanPath(productionPlanPath))) {
+    errors.push("productionPlanPath, when supplied, must point to production/production-plan.json inside projects/.");
+  }
+
+  if (typeof productionPlanPath === "string" && typeof projectPath === "string" &&
+      productionPlanPath.split("/").slice(0, -2).join("/") !== projectPath.split("/").slice(0, -1).join("/")) {
+    errors.push("productionPlanPath must belong to the same project directory as projectPath.");
   }
 
   if ((compositionId === "ProjectVideo" || compositionId === "NarratedSkyExplainer") &&
@@ -69,6 +82,7 @@ export const validateRenderRequest = (value) => {
       outputName,
       requestId,
       ...(typeof projectPath === "string" ? { projectPath } : {}),
+      ...(typeof productionPlanPath === "string" ? { productionPlanPath } : {}),
       ...(typeof narrationPath === "string" ? { narrationPath } : {}),
     },
   };
@@ -122,6 +136,7 @@ const run = async () => {
     await appendFile(output, [
       `provider=${request.provider}`,
       `project_path=${request.projectPath ?? ""}`,
+      `production_plan_path=${request.productionPlanPath ?? ""}`,
       `narration_path=${request.narrationPath ?? ""}`,
       `composition_id=${request.compositionId}`,
       `output_name=${request.outputName}`,

@@ -127,3 +127,40 @@ test("checks that a project metadata file matches the requested composition", ()
   );
   assert.equal(matchesCompositionMetadata({}, "NarratedSkyExplainer"), false);
 });
+
+test("accepts an explicit production plan path for custom compositions", () => {
+  const result = validateRenderRequest({
+    provider: "github-actions",
+    compositionId: "CinematicAdBenchmark",
+    productionPlanPath: "projects/custom-film/production/production-plan.json",
+    outputName: "custom-film",
+    requestId: "custom-plan-001",
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.request?.productionPlanPath, "projects/custom-film/production/production-plan.json");
+});
+
+test("rejects unsafe or mismatched production plan paths", () => {
+  for (const productionPlanPath of [
+    "../production-plan.json",
+    "projects/custom-film/production/other.json",
+    "projects/custom-film/production/production-plan.json/../../secret.json",
+    42,
+  ]) {
+    const result = validateRenderRequest({
+      provider: "github-actions",
+      compositionId: "CinematicAdBenchmark",
+      productionPlanPath,
+      outputName: "custom-film",
+      requestId: "custom-plan-002",
+    });
+    assert.ok(result.errors.some((error) => error.startsWith("productionPlanPath")), productionPlanPath);
+  }
+
+  const mismatchedProject = validateRenderRequest({
+    ...validProjectRequest,
+    compositionId: "CinematicAdBenchmark",
+    productionPlanPath: "projects/another-project/production/production-plan.json",
+  });
+  assert.ok(mismatchedProject.errors.includes("productionPlanPath must belong to the same project directory as projectPath."));
+});
