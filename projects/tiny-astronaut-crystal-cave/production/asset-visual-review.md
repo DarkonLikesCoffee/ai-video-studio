@@ -37,3 +37,12 @@ This approval is limited to representative still compositions. The final MP4 mus
 - The actual render failed at frame 0 because the custom Remotion render invocation did not select software WebGL on the GPU-less GitHub-hosted runner.
 - The five scene still previews used `--gl=swangle` and rendered successfully. The render workflow is being corrected to use that same flag with concurrency 1 for all custom Remotion compositions.
 - No MP4 was produced; no visual acceptance of a full video is claimed.
+
+
+## Full-motion render audit — request 02 (2026-11-22)
+
+- The MP4 from render run #45059287954 is 20.000 seconds, 1920×1080, 30 fps, H.264. It intentionally contains video only and no audio stream.
+- The run failed in the old Media QA policy on two findings: missing audio stream and a 2.87-second frozen-video interval at approximately 3.0 seconds. The silent output matches the creative brief; after PR #146, missing audio and freeze intervals are informational and no longer invalidate a render. Black-video remains an error.
+- Sampled 1-fps contact-sheet inspection shows the intended landing, exterior exploration, cave approach and crystal reveal. The post-touchdown hold is deliberate; it should not be given artificial animation solely to defeat a freeze detector.
+- A source audit found two overlapping astronaut layers for frames 270–299. The mainline migration now makes the planet, cave-approach and crystal-awakening layers mutually exclusive and adds a frame-by-frame regression test. A corrected MP4 render is still required to verify the fix in motion.
+- The previous still review remains limited to five representative frames; no end-to-end playback or audio listening was performed.
