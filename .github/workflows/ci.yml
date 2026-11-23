@@ -72,14 +72,6 @@ jobs:
         run: npm run validate:plan -- projects/golden-hour-dog-walk/production/production-plan.json
       - name: Run Golden Hour storyboard QA
         run: npm run storyboard:qa -- projects/golden-hour-dog-walk/production/production-plan.json
-      - name: Validate Golden Hour ProjectVideo source
-        run: npm run validate:project -- projects/golden-hour-dog-walk/scene.json
-      - name: Prepare Golden Hour audio mix
-        run: npm run audio:prepare -- projects/golden-hour-dog-walk/scene.json
-      - name: Enforce Golden Hour local asset evidence
-        run: |
-          mkdir -p review-output
-          npm run director:asset-evidence -- projects/golden-hour-dog-walk/production/production-plan.json projects/golden-hour-dog-walk/production/asset-manifest.json review-output/golden-hour.asset-evidence.json --strict
       - name: Run Stormlight Keeper storyboard QA
         run: npm run storyboard:qa -- projects/stormlight-keeper/production/production-plan.json
       - name: Test machine-readable production state validator
@@ -129,6 +121,14 @@ jobs:
           cp projects/showcase-motion/assets/audio/transition-whoosh.wav "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
           test -s "$PROJECT_DIR/assets/audio/score.wav"
           test -s "$PROJECT_DIR/assets/audio/transition-whoosh.wav"
+      - name: Validate Golden Hour ProjectVideo source
+        run: npm run validate:project -- projects/golden-hour-dog-walk/scene.json
+      - name: Prepare Golden Hour audio mix
+        run: npm run audio:prepare -- projects/golden-hour-dog-walk/scene.json
+      - name: Enforce Golden Hour local asset evidence
+        run: |
+          mkdir -p review-output
+          npm run director:asset-evidence -- projects/golden-hour-dog-walk/production/production-plan.json projects/golden-hour-dog-walk/production/asset-manifest.json review-output/golden-hour.asset-evidence.json --strict
       - name: Verify Stormlight Keeper audio fixtures
         run: |
           test -s projects/stormlight-keeper/assets/audio/stormlight-score.wav
