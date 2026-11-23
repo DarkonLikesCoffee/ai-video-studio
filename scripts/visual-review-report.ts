@@ -66,7 +66,7 @@ export const buildVisualReviewReport = ({
     throw new Error("Render context needs a request ID, workflow run ID and valid renderedAt timestamp.");
   }
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     reportType: "visual-review",
     status: "pending-review",
     generatedAt: renderContext.renderedAt,
@@ -74,6 +74,7 @@ export const buildVisualReviewReport = ({
       name: outputName,
       videoPath,
       videoSha256,
+      durationSeconds: contactSheetReport?.durationSeconds ?? null,
       contactSheetPath,
       contactSheetReportPath,
       candidateSha: renderContext.candidateSha,
@@ -89,6 +90,7 @@ export const buildVisualReviewReport = ({
       timestampsReviewedSeconds: [],
       reviewer: null,
       reviewedAt: null,
+      playbackSession: null,
     },
     findings: [],
     corrections: [],
