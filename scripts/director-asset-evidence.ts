@@ -574,9 +574,13 @@ export const buildAssetEvidenceReport = async (
       ? "not-required"
       : compositionReferences.projectVideoScenes !== null
         ? "unverifiable"
-        : customRemotion && shotComponentContract.mapping && !shotComponentContract.error
-          ? "unverifiable"
-          : "not-audited";
+        : !customRemotion
+          ? "not-audited"
+          : shotComponentContract.error
+            ? "unverifiable"
+            : shotComponentContract.mapping
+              ? "unverifiable"
+              : "not-audited";
     const shotUsageEvidence: string[] = [];
     if (reusePolicy === "required" && visualReviewApplicable &&
         (compositionReferences.projectVideoScenes !== null || (customRemotion && shotComponentContract.mapping && !shotComponentContract.error))) {
@@ -585,6 +589,15 @@ export const buildAssetEvidenceReport = async (
         : assetShotIds.filter((shotId) => shotId !== "all" && knownShots.has(shotId));
       let hasMissingShotUsage = false;
       let hasUnverifiableShotUsage = false;
+      if (customRemotion && (shotComponentContract.error || !shotComponentContract.mapping)) {
+        hasUnverifiableShotUsage = true;
+        addIssue({
+          code: "CUSTOM_SHOT_COMPONENT_MAPPING_UNVERIFIABLE",
+          severity: "error",
+          message: shotComponentContract.error ?? `Required custom Remotion asset "${reference}" cannot be checked per shot because the manifest has no shotComponents mapping.`,
+          assetRef: reference,
+        });
+      }
       if (!assignedShotIds.length) {
         hasUnverifiableShotUsage = true;
         addIssue({
