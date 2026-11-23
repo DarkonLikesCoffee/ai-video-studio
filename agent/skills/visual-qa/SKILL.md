@@ -53,3 +53,42 @@ If it fails, report that it failed and iterate. Never equate a green CI check wi
 ## Shot repetition is a major failure
 
 Read `agent/skills/shot-differentiation/SKILL.md` and compare the actual MP4 contact sheet with the storyboard and shot-to-code audit. At every shot boundary, verify a meaningful change in visual subject, framing, scene, depth, action or medium. Repeated background + same object silhouette + same camera path with only copy changes is a major failure. Do not deliver; require targeted rebuild and a new frozen render candidate.
+
+
+## Correction and re-render loop
+
+The visual-review report is the durable review record. When a render is rejected:
+
+1. Keep each finding open until the issue is fixed and rechecked on a later MP4.
+2. Add a correction with a stable ID, the finding ID, a concrete description, repository-relative `targetPaths`, `status: "applied"`, and the full commit SHA in `appliedInCommit`. The correction commit must be an ancestor of the frozen candidate commit used by the next render.
+3. Commit the reviewed report in the same project at `production/visual-review.json`. Set `visualReviewHistoryPath` in the next `render-request.json` to that file. The path must belong to the selected project.
+4. The render workflow appends a new iteration only when the MP4 hash changes and every open finding has an applied correction included in the candidate. A failed check means the iteration must not be recorded.
+5. Inspect the new MP4. Re-verify every correction against this exact artifact hash; do not carry verification forward from an older render. Add `verification.videoSha256`, reviewer, review timestamp and timestamps checked, set `verified: true` and `status: "verified"`, then mark the finding resolved when all its corrections have been verified.
+6. Run `npm run qa:visual-review-validate -- <report.json>`. Approval still requires full-video inspection and the acceptance gate above.
+
+A subsequent render reopens previously resolved findings for re-checking and moves older correction verification into `verificationHistory`. This is intentional regression protection. Schema-version-1 reports can be used as the first, legacy iteration after their corrections are upgraded with stable IDs, target paths, applied status and commit SHAs; all new reports use schema version 2.
+
+Example correction:
+
+```json
+{
+  "id": "C-001",
+  "findingId": "F-001",
+  "description": "Replace the repeated skyline shot with a distinct low-angle tracking shot.",
+  "targetPaths": ["projects/demo/src/Scene.tsx"],
+  "status": "applied",
+  "appliedInCommit": "<40-character correction commit SHA>",
+  "verified": false
+}
+```
+
+After inspecting the new MP4, verification must refer to its current `artifact.videoSha256`:
+
+```json
+{
+  "videoSha256": "<current MP4 SHA-256>",
+  "reviewer": "reviewer",
+  "reviewedAt": "2026-11-23T12:00:00.000Z",
+  "timestampsReviewedSeconds": [12.4, 18.2]
+}
+```
