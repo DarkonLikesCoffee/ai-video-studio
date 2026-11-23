@@ -566,11 +566,14 @@ export const buildAssetEvidenceReport = async (
     const usageEvidence = [...new Set(usageMatches.map((match) => `${match.sourceFile}: ${match.value}`))];
     let shotUsageStatus: ShotUsageStatus = reusePolicy !== "required" || !visualReviewApplicable
       ? "not-required"
-      : compositionReferences.projectVideoScenes === null
-        ? "not-audited"
-        : "unverifiable";
+      : compositionReferences.projectVideoScenes !== null
+        ? "unverifiable"
+        : customRemotion && shotComponentContract.mapping && !shotComponentContract.error
+          ? "unverifiable"
+          : "not-audited";
     const shotUsageEvidence: string[] = [];
-    if (reusePolicy === "required" && visualReviewApplicable && compositionReferences.projectVideoScenes !== null) {
+    if (reusePolicy === "required" && visualReviewApplicable &&
+        (compositionReferences.projectVideoScenes !== null || (customRemotion && shotComponentContract.mapping && !shotComponentContract.error))) {
       const assignedShotIds = assetShotIds.includes("all")
         ? shotIds
         : assetShotIds.filter((shotId) => shotId !== "all" && knownShots.has(shotId));
@@ -586,30 +589,56 @@ export const buildAssetEvidenceReport = async (
         });
       }
       for (const shotId of assignedShotIds) {
-        const sceneEvidence = compositionReferences.projectVideoScenes.find((scene) => scene.sceneId === shotId);
-        if (!sceneEvidence) {
-          hasUnverifiableShotUsage = true;
-          addIssue({
-            code: "ASSET_SHOT_USAGE_UNVERIFIABLE",
-            severity: "error",
-            message: `Required asset "${reference}" is assigned to shot "${shotId}", but no ProjectVideo scene with that ID exists.`,
-            shotId,
-            assetRef: reference,
-          });
-          continue;
+        let candidateReferences: SourceReference[] = [];
+        let scope = "ProjectVideo scene";
+        if (compositionReferences.projectVideoScenes !== null) {
+          const sceneEvidence = compositionReferences.projectVideoScenes.find((scene) => scene.sceneId === shotId);
+          if (!sceneEvidence) {
+            hasUnverifiableShotUsage = true;
+            addIssue({
+              code: "ASSET_SHOT_USAGE_UNVERIFIABLE",
+              severity: "error",
+              message: `Required asset "${reference}" is assigned to shot "${shotId}", but no ProjectVideo scene with that ID exists.`,
+              shotId,
+              assetRef: reference,
+            });
+            continue;
+          }
+          candidateReferences = sceneEvidence.references;
+        } else {
+          scope = "custom Remotion mapped module";
+          const modules = componentModulesByShot.get(shotId) ?? [];
+          const normalizedModules = modules.map((module) => path.posix.normalize(module));
+          const unreachable = normalizedModules.filter((module) => !compositionReferences.reachableModules.has(module));
+          if (!modules.length || unreachable.length) {
+            hasUnverifiableShotUsage = true;
+            addIssue({
+              code: "CUSTOM_SHOT_COMPONENT_MODULE_UNREACHABLE",
+              severity: "error",
+              message: unreachable.length
+                ? `Mapped module(s) for custom Remotion shot "${shotId}" are not reachable from the selected composition: ${unreachable.join(", ")}.`
+                : `Custom Remotion shot "${shotId}" has no mapped reachable module.`,
+              shotId,
+              assetRef: reference,
+            });
+            continue;
+          }
+          candidateReferences = normalizedModules.flatMap((module) => compositionReferences.referencesByModule.get(module) ?? []);
         }
-        const sceneMatch = sceneEvidence.references.find((sourceReference) => usageMatchesAsset(sourceReference, local.path));
-        if (!sceneMatch) {
+        const match = candidateReferences.find((sourceReference) => usageMatchesAsset(sourceReference, local.path));
+        if (!match) {
           hasMissingShotUsage = true;
           addIssue({
-            code: "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT",
+            code: compositionReferences.projectVideoScenes !== null
+              ? "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT"
+              : "CUSTOM_ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT",
             severity: "error",
-            message: `Required asset "${reference}" is not referenced by the ProjectVideo scene for assigned shot "${shotId}".`,
+            message: `Required asset "${reference}" is not referenced by the ${scope} mapped to assigned shot "${shotId}".`,
             shotId,
             assetRef: reference,
           });
         } else {
-          shotUsageEvidence.push(`${shotId}: ${sceneMatch.sourceFile}: ${sceneMatch.value}`);
+          shotUsageEvidence.push(`${shotId}: ${match.sourceFile}: ${match.value}`);
         }
       }
       shotUsageStatus = hasMissingShotUsage
