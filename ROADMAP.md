@@ -2,11 +2,11 @@
 
 ## Current verified snapshot — 2026-11-23
 
-The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is `bd5f2066de7aad81262191580ec117c9ed9eb714`; post-merge main CI [#45224183986](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45224183986) passed.
+The live implementation state is recorded in [PROJECT_STATE.md](PROJECT_STATE.md). Main is `87d794b1f08306e9e585f6e784e85136d8e3cbef`; post-merge main CI [#45230712726](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230712726) passed.
 
 The current production foundation is on main: PR #144 composition identity, PR #150 audio QA modes, PRs #151–152 structured visual-review reporting/validation, PR #154 2D/3D render-path separation and PR #155 hash-bound full-video playback evidence.
 
-PR #156 adds the final delivery gate on `feat/final-delivery-gate`. Exact-head push CI [#45228924930](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228924930) and PR CI [#45228940745](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228940745) passed 331 tests with 0 failures and 0 skips. It remains open and unmerged. No final-delivery workflow has been dispatched against a real approved render.
+PR #156 merged the final delivery gate as `87d794b1f08306e9e585f6e784e85136d8e3cbef`. Exact-head push CI [#45230032176](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230032176) and PR CI [#45230048779](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230048779) passed 331 tests with 0 failures and 0 skips; post-merge main CI [#45230712726](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45230712726) passed. The manual release path is implemented on main but has not yet been exercised against a real approved render.
 
 Only PR #156 was open at the time of this snapshot. This roadmap describes intended work, not current implementation. Update checkboxes only when code and evidence demonstrate the capability.
 
@@ -217,7 +217,7 @@ Visual methods are selectable production capabilities—not mandatory ingredient
 - [x] Produce a `.delivery.json` receipt and a separate final package with 30-day retention; retain the original render review package for the approval window.
 - [ ] Merge PR #156 after exact-head CI passes. Then exercise the manual workflow with a real approved render and verify the resulting final artifact end-to-end.
 
-**Current boundary:** PR #156's implementation and 331-test CI are verified on its branch, but it is not yet on `main`. CI fixtures prove the validator's consistency checks; they do not constitute a real-world release or creative review. Playback telemetry is not cryptographic identity proof, and reviewer-provided audio listening/creative acceptance cannot be independently established by the gate.
+**Current boundary:** the final-delivery implementation is on `main` and its CI fixtures verify package/evidence consistency. The manual release workflow has not been run against a real approved render, so a real-world release is not yet verified. Playback telemetry is not cryptographic identity proof, and reviewer-provided audio listening/creative acceptance cannot be independently established by the gate.
 
 ## Release gate for every video-producing milestone
 
