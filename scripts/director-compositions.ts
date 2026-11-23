@@ -1,11 +1,13 @@
 import compositionRegistry from "../schemas/composition-registry.json" with { type: "json" };
 
 export type RendererKind = "project-video" | "custom-remotion";
+export type RenderMode = "2d" | "3d" | "hybrid";
 export type CompositionAvailability = "registered" | "to-be-built";
 
 export type CompositionCapability = {
   id: string;
   renderer: RendererKind;
+  renderMode: RenderMode;
   selectable: boolean;
   purpose: string;
   strengths: string[];
