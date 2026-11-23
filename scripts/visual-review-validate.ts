@@ -24,6 +24,101 @@ const isSafeRepoPath = (value: unknown): value is string =>
   !value.includes("\\") &&
   value.split("/").every(part => part.length > 0 && part !== "." && part !== "..");
 
+
+export const validatePlaybackSession = (session: unknown, artifact: JsonRecord): string[] => {
+  const errors: string[] = [];
+  if (!isRecord(session)) return ["Approval requires a tracked full-playback session object."];
+  if (session.schemaVersion !== 1 || session.kind !== "visual-review-playback-session") {
+    errors.push("Playback session must use schemaVersion 1 and kind visual-review-playback-session.");
+  }
+  if (typeof session.sessionId !== "string" || !session.sessionId.trim()) {
+    errors.push("Playback session needs a sessionId.");
+  }
+  if (typeof session.mediaName !== "string" || !session.mediaName.trim()) {
+    errors.push("Playback session needs the selected MP4 filename.");
+  } else if (typeof artifact.name === "string" &&
+      session.mediaName.toLowerCase() !== `${artifact.name}.mp4`.toLowerCase()) {
+    errors.push("Playback session mediaName must match the report's output MP4 filename.");
+  }
+  if (typeof session.mediaSizeBytes !== "number" || !Number.isSafeInteger(session.mediaSizeBytes) || session.mediaSizeBytes <= 0) {
+    errors.push("Playback session needs a positive mediaSizeBytes value.");
+  }
+  if (!isSha256(session.mediaSha256) || session.mediaSha256 !== artifact.videoSha256) {
+    errors.push("Playback session mediaSha256 must match the current artifact video SHA-256.");
+  }
+  const duration = artifact.durationSeconds;
+  if (typeof duration !== "number" || !Number.isFinite(duration) || duration <= 0) {
+    errors.push("The report needs a valid artifact.durationSeconds to verify playback coverage.");
+  }
+  if (typeof session.durationSeconds !== "number" || !Number.isFinite(session.durationSeconds) || session.durationSeconds <= 0) {
+    errors.push("Playback session needs a positive durationSeconds value.");
+  } else if (typeof duration === "number" && Math.abs(session.durationSeconds - duration) > 0.25) {
+    errors.push("Playback session durationSeconds must match the current artifact duration.");
+  }
+  if (!isDate(session.startedAt) || !isDate(session.completedAt)) {
+    errors.push("Playback session needs valid startedAt and completedAt timestamps.");
+  } else if (Date.parse(session.completedAt) < Date.parse(session.startedAt)) {
+    errors.push("Playback session completedAt cannot precede startedAt.");
+  }
+  if (typeof session.elapsedWallSeconds !== "number" || !Number.isFinite(session.elapsedWallSeconds) ||
+      typeof duration !== "number" || session.elapsedWallSeconds < duration * 0.98) {
+    errors.push("Playback session elapsedWallSeconds must be at least 98% of the video duration.");
+  }
+  if (session.endedEventObserved !== true) errors.push("Playback session must record the native video ended event.");
+  if (session.complete !== true) errors.push("Playback session must be marked complete by the review player.");
+  if (session.pageVisibleThroughout !== true) errors.push("Playback session is invalid because the review page was hidden.");
+  if (session.seekAttempts !== 0) errors.push("Playback session must have zero seek attempts.");
+  if (session.playbackRate !== 1) errors.push("Playback session must remain at normal 1× playback speed.");
+
+  if (typeof duration === "number" && duration > 0) {
+    const inputRanges = session.playedRangesSeconds;
+    if (!Array.isArray(inputRanges) || inputRanges.length === 0) {
+      errors.push("Playback session must include playedRangesSeconds.");
+    } else {
+      const ranges: Array<[number, number]> = [];
+      for (const range of inputRanges) {
+        if (!Array.isArray(range) || range.length !== 2 ||
+            typeof range[0] !== "number" || typeof range[1] !== "number" ||
+            !Number.isFinite(range[0]) || !Number.isFinite(range[1]) ||
+            range[0] < 0 || range[1] <= range[0] || range[1] > duration + 0.5) {
+          errors.push("Playback session contains an invalid played range.");
+          continue;
+        }
+        ranges.push([range[0], range[1]]);
+      }
+      ranges.sort((a, b) => a[0] - b[0]);
+      if (ranges.length > 0) {
+        if (ranges[0][0] > 0.25) errors.push("Playback coverage must begin at the start of the video.");
+        let end = ranges[0][1];
+        let covered = ranges[0][1] - ranges[0][0];
+        for (let index = 1; index < ranges.length; index += 1) {
+          const [start, nextEnd] = ranges[index];
+          if (start - end > 0.5) errors.push("Playback coverage contains a gap larger than 0.5 seconds.");
+          const addition = Math.max(0, nextEnd - Math.max(start, end));
+          covered += addition;
+          end = Math.max(end, nextEnd);
+        }
+        if (end < duration - 0.25) errors.push("Playback coverage does not reach the end of the video.");
+        if (covered < duration * 0.99) errors.push("Playback coverage must include at least 99% of the video duration.");
+      }
+    }
+
+    const checkpoints = session.checkpointsSeconds;
+    if (!Array.isArray(checkpoints) || !checkpoints.every(value =>
+      typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= duration + 0.25)) {
+      errors.push("Playback session must include valid checkpointsSeconds.");
+    } else {
+      for (const fraction of [0, 0.25, 0.5, 0.75, 1]) {
+        const expected = duration * fraction;
+        if (!checkpoints.some(value => Math.abs(value - expected) <= Math.max(0.5, duration * 0.02))) {
+          errors.push(`Playback session is missing the ${Math.round(fraction * 100)}% playback checkpoint.`);
+        }
+      }
+    }
+  }
+  return errors;
+};
+
 export const validateVisualReviewReport = (report: unknown) => {
   const errors: string[] = [];
   if (!isRecord(report)) {
@@ -31,7 +126,7 @@ export const validateVisualReviewReport = (report: unknown) => {
   }
 
   const version = report.schemaVersion === undefined ? 1 : report.schemaVersion;
-  if (version !== 1 && version !== 2) errors.push("schemaVersion must be 1 or 2.");
+  if (version !== 1 && version !== 2 && version !== 3) errors.push("schemaVersion must be 1, 2 or 3.");
   if (report.status !== "pending-review" && report.status !== "approved" && report.status !== "rejected") {
     errors.push("status must be pending-review, approved, or rejected.");
   }
@@ -39,6 +134,10 @@ export const validateVisualReviewReport = (report: unknown) => {
   const artifact = isRecord(report.artifact) ? report.artifact : undefined;
   if (!artifact || !isSha256(artifact.videoSha256)) {
     errors.push("artifact.videoSha256 must be a valid SHA-256 hash.");
+  }
+  if (version === 3 && (!artifact || typeof artifact.durationSeconds !== "number" ||
+      !Number.isFinite(artifact.durationSeconds) || artifact.durationSeconds <= 0)) {
+    errors.push("schemaVersion 3 requires artifact.durationSeconds greater than zero.");
   }
 
   const inspection = isRecord(report.inspection) ? report.inspection : undefined;
@@ -212,6 +311,11 @@ export const validateVisualReviewReport = (report: unknown) => {
     if (!inspection || inspection.fullVideoWatched !== true) {
       errors.push("Approval requires fullVideoWatched=true; contact sheets alone are insufficient.");
     }
+    if (!inspection || inspection.method !== "tracked-full-playback") {
+      errors.push("Approval requires inspection.method=tracked-full-playback.");
+    }
+    const playbackErrors = validatePlaybackSession(inspection?.playbackSession, artifact ?? {});
+    errors.push(...playbackErrors);
     if (!inspection || typeof inspection.reviewer !== "string" || !inspection.reviewer.trim()) {
       errors.push("Approval requires a reviewer.");
     }
