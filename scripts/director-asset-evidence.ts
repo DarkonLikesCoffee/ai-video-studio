@@ -7,6 +7,8 @@ import { validateProductionPlan } from "./validate-production-plan";
 type RecordValue = Record<string, unknown>;
 type Issue = { code: string; severity: "warning" | "error"; message: string; shotId?: string; criterion?: string; assetRef?: string };
 type LocalStatus = "present" | "missing" | "empty" | "unsafe" | "not-local";
+type PreviewStatus = LocalStatus | "not-required";
+type VisualReviewStatus = "approved" | "pending" | "rejected" | "missing" | "not-required";
 type AssetEvidence = {
   id: string;
   reference: string;
@@ -20,8 +22,9 @@ type AssetEvidence = {
   provenance: string | null;
   rights: string | null;
   previewPath: string | null;
-  previewStatus: LocalStatus;
-  visualReviewStatus: "approved" | "pending" | "rejected" | "missing";
+  previewStatus: PreviewStatus;
+  visualReviewApplicable: boolean;
+  visualReviewStatus: VisualReviewStatus;
   visualReview: { reviewer: string | null; reviewedAt: string | null; notes: string | null };
 };
 type ShotEvidence = {
@@ -65,6 +68,7 @@ export type AssetEvidenceReport = {
     missingRights: number;
     unresolvedPlannedAssetRefs: number;
     unknownManifestShotIds: number;
+    visualReviewNotRequired: number;
     visualReviewApproved: number;
     visualReviewPending: number;
     visualReviewRejected: number;
@@ -115,6 +119,13 @@ const getAliases = (asset: RecordValue): string[] => [...new Set([asset.id, asse
 const getReference = (asset: RecordValue, index: number): string => asText(asset.path) ?? asText(asset.file) ?? asText(asset.id) ?? `asset-${index + 1}`;
 const hasProvenance = (asset: RecordValue) => Boolean(asText(asset.provenance) || asText(asset.sourcePage) || asText(asset.sourceUrl) || asText(asset.creator) || asText(asset.attribution));
 const hasRights = (asset: RecordValue) => Boolean(asText(asset.license) || (asText(asset.rightsBasis) && asText(asset.rightsNote)));
+const isAudioAsset = (asset: RecordValue): boolean => {
+  const declaredType = (asText(asset.type) ?? "").toLowerCase();
+  const assetPath = `${asText(asset.path) ?? ""} ${asText(asset.file) ?? ""}`;
+  return declaredType.startsWith("audio/") ||
+    /\\b(?:audio|sound|music|narration|voice(?:over)?|ambience)\\b/.test(declaredType) ||
+    /\\.(?:aac|aif|aiff|alac|flac|m4a|mid|midi|mp3|oga|ogg|opus|wav|wma)$/i.test(assetPath);
+};
 const describeProvenance = (asset: RecordValue) => asText(asset.provenance) ?? asText(asset.sourcePage) ?? asText(asset.sourceUrl) ?? asText(asset.creator) ?? asText(asset.attribution);
 const describeRights = (asset: RecordValue) => asText(asset.license) ?? (asText(asset.rightsBasis) && asText(asset.rightsNote) ? `${asset.rightsBasis}: ${asset.rightsNote}` : null);
 
@@ -152,8 +163,13 @@ export const buildAssetEvidenceReport = async (
     const aliases = getAliases(value);
     if (!asText(value.type)) addIssue({ code: "ASSET_TYPE_MISSING", severity: "warning", message: `Asset "${reference}" has no type.`, assetRef: reference });
     const local = await resolveLocalPath(value, projectRoot);
+    const visualReviewApplicable = !isAudioAsset(value);
     const previewRaw = asText(value.previewPath) ?? asText(value.preview);
-    const previewLocal = previewRaw ? await resolveLocalPath({ path: previewRaw }, projectRoot) : { path: null, status: "not-local" as LocalStatus };
+    const previewLocal: { path: string | null; status: PreviewStatus } = !visualReviewApplicable
+      ? { path: null, status: "not-required" }
+      : previewRaw
+        ? await resolveLocalPath({ path: previewRaw }, projectRoot)
+        : { path: null, status: "not-local" };
     const reviewRaw = isRecord(value.visualReview) ? value.visualReview : {};
     const reviewStatus = ["approved", "pending", "rejected"].includes(String(reviewRaw.status))
       ? reviewRaw.status as "approved" | "pending" | "rejected"
@@ -162,11 +178,13 @@ export const buildAssetEvidenceReport = async (
     const reviewedAt = asText(reviewRaw.reviewedAt);
     const reviewNotes = asText(reviewRaw.notes);
     const reviewMetadataValid = Boolean(reviewer && reviewedAt && Number.isFinite(Date.parse(reviewedAt)) && reviewNotes);
-    const visualReviewStatus = reviewStatus === "approved" && reviewMetadataValid && previewLocal.status === "present"
-      ? "approved"
-      : reviewStatus === "rejected" ? "rejected"
-      : reviewStatus === "pending" ? "pending"
-      : "missing";
+    const visualReviewStatus: VisualReviewStatus = !visualReviewApplicable
+      ? "not-required"
+      : reviewStatus === "approved" && reviewMetadataValid && previewLocal.status === "present"
+        ? "approved"
+        : reviewStatus === "rejected" ? "rejected"
+        : reviewStatus === "pending" ? "pending"
+        : "missing";
     const provenanceStatus = hasProvenance(value) ? "documented" : "missing";
     const rightsStatus = hasRights(value) ? "documented" : "missing";
     const assetShotIds = Array.isArray(value.shotIds) ? value.shotIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0).map((id) => id.trim()) : [];
@@ -183,7 +201,7 @@ export const buildAssetEvidenceReport = async (
     else if (local.status === "empty") addIssue({ code: "ASSET_FILE_EMPTY", severity: "warning", message: `Asset "${reference}" exists but is empty.`, assetRef: reference });
     if (provenanceStatus === "missing") addIssue({ code: "ASSET_PROVENANCE_MISSING", severity: "warning", message: `Asset "${reference}" has no source/provenance note or URL.`, assetRef: reference });
     if (rightsStatus === "missing") addIssue({ code: "ASSET_RIGHTS_MISSING", severity: "warning", message: `Asset "${reference}" has no license or explicit rights basis and note.`, assetRef: reference });
-    if (requireVisualReview) {
+    if (requireVisualReview && visualReviewApplicable) {
       if (previewLocal.status === "not-local") addIssue({ code: "ASSET_PREVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no declared preview file.`, assetRef: reference });
       else if (previewLocal.status !== "present") addIssue({ code: "ASSET_PREVIEW_UNAVAILABLE", severity: "warning", message: `Asset "${reference}" preview is ${previewLocal.status}.`, assetRef: reference });
       if (visualReviewStatus === "missing") addIssue({ code: "ASSET_VISUAL_REVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no complete visual-review approval.`, assetRef: reference });
@@ -204,6 +222,7 @@ export const buildAssetEvidenceReport = async (
       rights: describeRights(value),
       previewPath: previewLocal.path,
       previewStatus: previewLocal.status,
+      visualReviewApplicable,
       visualReviewStatus,
       visualReview: { reviewer, reviewedAt, notes: reviewNotes },
     });
@@ -255,11 +274,12 @@ export const buildAssetEvidenceReport = async (
   }
 
   const missingFiles = assets.filter((asset) => asset.localStatus === "missing").length;
+  const visualReviewNotRequired = assets.filter((asset) => asset.visualReviewStatus === "not-required").length;
   const visualReviewApproved = assets.filter((asset) => asset.visualReviewStatus === "approved").length;
   const visualReviewPending = assets.filter((asset) => asset.visualReviewStatus === "pending").length;
   const visualReviewRejected = assets.filter((asset) => asset.visualReviewStatus === "rejected").length;
   const visualReviewMissing = assets.filter((asset) => asset.visualReviewStatus === "missing").length;
-  const missingPreviews = assets.filter((asset) => asset.previewStatus !== "present").length;
+  const missingPreviews = assets.filter((asset) => asset.previewStatus !== "present" && asset.previewStatus !== "not-required").length;
   const assetsNotLocal = assets.filter((asset) => asset.localStatus === "not-local").length;
   const emptyFiles = assets.filter((asset) => asset.localStatus === "empty").length;
   const unsafePaths = assets.filter((asset) => asset.localStatus === "unsafe").length;
@@ -299,6 +319,7 @@ export const buildAssetEvidenceReport = async (
       missingRights,
       unresolvedPlannedAssetRefs,
       unknownManifestShotIds: unknownShotIds.size,
+      visualReviewNotRequired,
       visualReviewApproved,
       visualReviewPending,
       visualReviewRejected,
