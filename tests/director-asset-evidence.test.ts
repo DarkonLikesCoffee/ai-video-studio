@@ -475,3 +475,27 @@ test("required asset usage respects case-sensitive paths", async () => {
     assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
   });
 });
+
+test("ProjectVideo usage ignores filenames mentioned outside rendered media sources", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      title: "Design reference: assets/one.svg",
+      scenes: [{ title: "Mentioned in copy only: assets/one.svg", mediaLayers: [] }],
+      audioTracks: []
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.equal(report.summary.requiredAssetsNotReferenced, 1);
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+  });
+});
