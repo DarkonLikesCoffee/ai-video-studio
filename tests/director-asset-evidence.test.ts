@@ -453,3 +453,25 @@ test("a same-basename reference from a different folder does not satisfy require
     assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED"));
   });
 });
+
+test("required asset usage respects case-sensitive paths", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ mediaLayers: [{ src: "assets/One.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.equal(report.summary.requiredAssetsNotReferenced, 1);
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+  });
+});
