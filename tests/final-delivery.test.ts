@@ -62,6 +62,7 @@ const makeFixture = async () => {
     reportType: "render-provenance",
     source: {
       repository: "DarkonLikesCoffee/ai-video-studio",
+      workflow: "Render video",
       commit: sourceCommit,
       workflowRun: { id: workflowRunId },
     },
@@ -253,4 +254,14 @@ test("final delivery rejects symlinked artifact paths before writing over anothe
   await symlink("../demo.mp4", reviewArtifact);
   await assert.rejects(() => validateFinalDeliveryBundle(f.options), /cannot be symbolic links/);
   assert.equal(await readFile(f.videoPath, "utf8"), "synthetic-mp4-payload-for-gate-test");
+});
+
+test("final delivery rejects an artifact not produced by the Render video workflow", async t => {
+  const f = await makeFixture();
+  t.after(() => rm(f.root, { recursive: true, force: true }));
+  const path = join(f.artifactDir, "demo.provenance.json");
+  const provenance = JSON.parse(await readFile(path, "utf8"));
+  provenance.source.workflow = "CI";
+  await writeJson(path, provenance);
+  await assert.rejects(() => validateFinalDeliveryBundle(f.options), /Render video workflow/);
 });
