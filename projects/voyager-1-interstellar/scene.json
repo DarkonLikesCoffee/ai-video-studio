@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "voyager-1-interstellar",
   "title": "Voyager 1 — The Long Goodbye",
-  "description": "Cinematic editorial 2D Voyager 1 journey using custom SVG artwork, layered camera motion and atmospheric animation.",
+  "description": "Cinematic editorial 2D Voyager 1 journey using custom SVG artwork, layered camera motion and atmospheric animation. Render candidate refreshed after validation failures.",
   "composition": {
     "id": "ProjectVideo",
     "width": 1920,
