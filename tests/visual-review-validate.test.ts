@@ -172,7 +172,7 @@ test("invalid hash and duplicate finding ids are rejected", () => {
 
 test("approval cannot be enabled by the fullVideoWatched checkbox alone", () => {
   const r = base();
-  r.inspection.playbackSession = null;
+  (r.inspection as { playbackSession: unknown }).playbackSession = null;
   const errors = validateVisualReviewReport(r).errors;
   assert.ok(errors.some(error => error.includes("tracked full-playback session")));
 });
