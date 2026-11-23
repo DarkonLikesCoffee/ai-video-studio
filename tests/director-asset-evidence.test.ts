@@ -392,7 +392,8 @@ test("required custom-composition assets are found through local source imports"
   ].join("\n"));
   await writeFile(path.join(engineScenes, "asset-helper.ts"), [
     'import { staticFile } from "remotion";',
-    'export const getHeroAsset = () => staticFile("assets/one.svg");',
+    'const heroAssetPath = "assets/one.svg";',
+    'export const getHeroAsset = () => staticFile(heroAssetPath);',
     ""
   ].join("\n"));
   try {
@@ -656,4 +657,131 @@ test("required ProjectVideo visual asset without shot assignments is blocking", 
     assert.equal(report.summary.requiredAssetsShotUsageUnverifiable, 1);
     assert.equal(report.summary.status, "invalid");
   });
+});
+
+test("custom composition string literals used only as copy do not satisfy required asset usage", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-usage-copy-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const engineScenes = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(engineScenes, { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
+    'import { AbsoluteFill } from "remotion";',
+    'const imageLabel = "assets/one.svg";',
+    'export const TestFilm = () => <AbsoluteFill aria-label={imageLabel} />;',
+    ""
+  ].join("\\n"));
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.equal(report.summary.requiredAssetsNotReferenced, 1);
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("custom composition imported media files count as required asset usage", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-usage-import-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const engineScenes = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(engineScenes, { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
+    'import hero from "../../../../projects/custom-film/assets/one.svg";',
+    'import { Img } from "remotion";',
+    'export const TestFilm = () => <Img src={hero} />;',
+    ""
+  ].join("\\n"));
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.ok(report.assets[0]?.usageEvidence.some((entry) => entry.endsWith("TestFilm.tsx: assets/one.svg")));
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("custom composition JSON imports contribute only src and poster asset fields", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-usage-json-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const engineScenes = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(engineScenes, { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(engineScenes, "asset-config.json"), JSON.stringify({
+    label: "assets/one.svg",
+    video: { src: "assets/one.svg" }
+  }));
+  await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
+    'import config from "./asset-config.json";',
+    'export const TestFilm = () => <div title={config.label}>{config.video.src}</div>;',
+    ""
+  ].join("\\n"));
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.deepEqual(report.assets[0]?.usageEvidence, ["packages/video-engine/src/scenes/asset-config.json: assets/one.svg"]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
