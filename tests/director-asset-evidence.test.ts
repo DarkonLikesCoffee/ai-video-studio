@@ -914,3 +914,106 @@ test("custom Remotion mapping rejects unknown shot IDs and unreachable modules",
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("custom Remotion required visual assets without a shotComponents map remain explicitly not-audited", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-shot-legacy-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const scenesRoot = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(scenesRoot, { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "TestFilm.tsx"), 'import { staticFile } from "remotion"; export const TestFilm = () => <img src={staticFile("assets/one.svg")}/>;');
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = { assets: [{ file: "one.svg", type: "image/svg+xml", reusePolicy: "required", shotIds: ["shot-one"], provenance: "Test", license: "Original" }] };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.equal(report.assets[0]?.shotUsageStatus, "not-audited");
+    assert.equal(report.summary.requiredAssetsShotUsageNotAudited, 1);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("custom Remotion required visual assets with an invalid shot map are blocking and unverifiable", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-shot-invalid-map-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const scenesRoot = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(scenesRoot, { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "TestFilm.tsx"), 'import { staticFile } from "remotion"; export const TestFilm = () => <img src={staticFile("assets/one.svg")}/>;');
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      shotComponents: { schemaVersion: 1, shots: [{ shotId: "shot-one", modules: [] }] },
+      assets: [{ file: "one.svg", type: "image/svg+xml", reusePolicy: "required", shotIds: ["shot-one"], provenance: "Test", license: "Original" }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.shotUsageStatus, "unverifiable");
+    assert.ok(report.issues.some((issue) => issue.code === "CUSTOM_SHOT_COMPONENT_MAPPING_INVALID" && issue.severity === "error"));
+    assert.equal(report.summary.status, "invalid");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("custom Remotion required assets can map to multiple modules for each of several assigned shots", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "asset-shot-multi-"));
+  const projectRoot = path.join(root, "projects", "custom-film");
+  const scenesRoot = path.join(root, "packages", "video-engine", "src", "scenes");
+  await mkdir(path.join(projectRoot, "assets"), { recursive: true });
+  await mkdir(path.join(scenesRoot, "shots"), { recursive: true });
+  await writeFile(path.join(projectRoot, "assets", "shared.svg"), "<svg/>");
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "TestFilm.tsx"), [
+    'import { ShotOne } from "./shots/ShotOne";',
+    'import { ShotTwo } from "./shots/ShotTwo";',
+    'export const TestFilm = () => <><ShotOne/><ShotTwo/></>;',
+    ""
+  ].join("\\n"));
+  await writeFile(path.join(scenesRoot, "shots", "ShotOne.tsx"), 'import { staticFile } from "remotion"; export const ShotOne = () => <img src={staticFile("assets/shared.svg")}/>;');
+  await writeFile(path.join(scenesRoot, "shots", "ShotTwo.tsx"), 'import { staticFile } from "remotion"; export const ShotTwo = () => <img src={staticFile("assets/shared.svg")}/>;');
+  try {
+    const plan = makePlan();
+    plan.renderStrategy.renderer = "custom-remotion";
+    plan.renderStrategy.compositionId = "LighthouseRepairFilm";
+    const manifest = {
+      shotComponents: { schemaVersion: 1, shots: [
+        { shotId: "shot-one", modules: ["packages/video-engine/src/scenes/shots/ShotOne.tsx", "packages/video-engine/src/scenes/TestFilm.tsx"] },
+        { shotId: "shot-two", modules: ["packages/video-engine/src/scenes/shots/ShotTwo.tsx"] },
+        { shotId: "shot-three", modules: ["packages/video-engine/src/scenes/TestFilm.tsx"] }
+      ] },
+      assets: [{ file: "shared.svg", type: "image/svg+xml", reusePolicy: "required", shotIds: ["shot-one", "shot-two"], provenance: "Test", license: "Original" }]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot, repositoryRoot: root });
+    assert.equal(report.assets[0]?.shotUsageStatus, "verified");
+    assert.deepEqual(report.assets[0]?.shotUsageEvidence, [
+      "shot-one: packages/video-engine/src/scenes/shots/ShotOne.tsx: assets/shared.svg",
+      "shot-two: packages/video-engine/src/scenes/shots/ShotTwo.tsx: assets/shared.svg"
+    ]);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
