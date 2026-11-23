@@ -1,4 +1,5 @@
 import { ThreeCanvas } from "@remotion/three";
+import { getAstronautLayerVisibility } from "./tinyAstronautPhases";
 import { DoubleSide } from "three";
 import type { FC } from "react";
 import {
@@ -282,7 +283,7 @@ const PlanetScene: FC<{ frame: number }> = ({ frame }) => {
         ))}
       </group>
       {/* Tiny figure traverses the terrain */}
-      {frame >= 90 ? (
+      {getAstronautLayerVisibility(frame).planet ? (
         <group position={[0.7 - walk * 1.5, -0.12, -0.25]} rotation={[0, walk * 0.12, 0]}>
           <Astronaut frame={frame} scale={0.63} />
         </group>
@@ -306,6 +307,7 @@ const PlanetScene: FC<{ frame: number }> = ({ frame }) => {
 export const TinyAstronautCrystalCave: FC = () => {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
+  const astronautVisibility = getAstronautLayerVisibility(frame);
   const cave = smooth(frame, [270, 390]);
   const reveal = smooth(frame, [390, 495]);
   const awaken = smooth(frame, [490, 580]);
@@ -326,12 +328,12 @@ export const TinyAstronautCrystalCave: FC = () => {
         style={{ width: "100%", height: "100%" }}
       >
         {frame < 300 ? <PlanetScene frame={frame} /> : <Cave frame={frame} />}
-        {frame >= 270 && frame < 430 ? (
+        {astronautVisibility.caveApproach ? (
           <group position={[-1.4 + cave * 1.6, 0.08, -0.4]} rotation={[0, 0.3, 0]}>
             <Astronaut frame={frame} scale={0.7} />
           </group>
         ) : null}
-        {frame >= 430 ? (
+        {astronautVisibility.crystalAwakening ? (
           <group position={[1.45 - reveal * 1.0, 0.08, 0.55]} rotation={[0, -0.3, 0]}>
             <Astronaut frame={frame} scale={0.72 + awaken * 0.02} />
           </group>
