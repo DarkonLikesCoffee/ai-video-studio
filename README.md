@@ -46,6 +46,10 @@ npm run assets:nasa-video -- download --selection projects/examples/narrated-exp
 
 The same ISS clip is cut from different source-time offsets for distinct storyboard shots; the wavelength comparison remains an animated 3D scientific visual. The downloader records the actual resolved source URL, NASA item page, creator, license and SHA-256 in the project manifest. Render artifacts include attribution credits. Large video binaries are not committed to Git.
 
+## Final video delivery
+
+A render upload is a review package, not an approved final video. After inspecting the exact MP4, completing tracked playback, recording findings/corrections and explicitly recording the audio-review decision, commit the approved report as `projects/<slug>/production/visual-review.json`. Run the manual [Final video delivery workflow](docs/final-delivery.md) to verify the MP4 hash, render provenance, Media QA, contact-sheet evidence, asset evidence and approval report before publishing the final package.
+
 ## Agent production workflow
 
 For narrated explainers and short-form videos, follow [the Narrated Video Producer skill](agent/skills/narrated-video-producer/SKILL.md). The voice track and its actual word/phrase alignment should drive the edit; footage, motion graphics, captions, music and sound effects are coordinated around that timeline. See [external skill references](agent/EXTERNAL_SKILLS.md) for the official Remotion agent skills and reviewed open-source production workflows.
