@@ -135,22 +135,13 @@ export const validateFinalDeliveryBundle = async (options: FinalDeliveryOptions)
   const assetEvidencePath = await resolveFileInside(root, paths.assetEvidence);
   const provenancePath = await resolveFileInside(root, paths.provenance);
 
-  const results = await Promise.all([
-    readFile(videoPath),
-    readJson(qaPath),
-    readJson(contactSheetReportPath),
-    readJson(assetEvidencePath),
-    readJson(provenancePath),
-    readFile(reviewRealPath, "utf8"),
-    stat(videoPath),
-  ]);
-  const videoBytes = results[0] as Buffer;
-  const qa = results[1] as JsonRecord;
-  const contactSheetReport = results[2] as JsonRecord;
-  const assetEvidence = results[3] as JsonRecord;
-  const provenance = results[4] as JsonRecord;
-  const reviewText = results[5] as string;
-  const videoStat = results[6] as Awaited<ReturnType<typeof stat>>;
+  const videoBytes = await readFile(videoPath);
+  const qa = await readJson(qaPath);
+  const contactSheetReport = await readJson(contactSheetReportPath);
+  const assetEvidence = await readJson(assetEvidencePath);
+  const provenance = await readJson(provenancePath);
+  const reviewText = await readFile(reviewRealPath, "utf8");
+  const videoStat = await stat(videoPath);
   const reviewValue: unknown = JSON.parse(reviewText);
   if (!isRecord(reviewValue)) throw new Error("The committed visual-review report must be a JSON object.");
   const validation = validateVisualReviewReport(reviewValue);
@@ -246,6 +237,9 @@ export const validateFinalDeliveryBundle = async (options: FinalDeliveryOptions)
   }
 
   const audioStatus = reviewAudio.status;
+  const audioReviewer = asText(reviewAudio.reviewer);
+  const audioReviewedAt = asText(reviewAudio.reviewedAt);
+  const assetReason = asText(assetEvidence.reason);
   if (audioStatus !== "listened" && audioStatus !== "not-listened" && audioStatus !== "not-applicable") {
     throw new Error("The approved visual-review report must record an explicit audio review status.");
   }
@@ -270,9 +264,8 @@ export const validateFinalDeliveryBundle = async (options: FinalDeliveryOptions)
     if (!path || recordByPath.has(path)) throw new Error("Render provenance contains a missing or duplicate artifact file path.");
     recordByPath.set(path, record);
     const filePath = await resolveFileInside(root, path);
-    const fileResults = await Promise.all([stat(filePath), readFile(filePath)]);
-    const fileStat = fileResults[0] as Awaited<ReturnType<typeof stat>>;
-    const bytes = fileResults[1] as Buffer;
+    const fileStat = await stat(filePath);
+    const bytes = await readFile(filePath);
     if (record.sizeBytes !== fileStat.size || !isSha256(record.sha256) || record.sha256 !== hashBuffer(bytes)) {
       throw new Error("Artifact file evidence does not match the downloaded file: " + path);
     }
@@ -301,9 +294,8 @@ export const validateFinalDeliveryBundle = async (options: FinalDeliveryOptions)
   const files: Array<{ path: string; sizeBytes: number; sha256: string }> = [];
   for (const path of finalFiles) {
     const fullPath = await resolveFileInside(root, path);
-    const fileResults = await Promise.all([stat(fullPath), readFile(fullPath)]);
-    const fileStat = fileResults[0] as Awaited<ReturnType<typeof stat>>;
-    const bytes = fileResults[1] as Buffer;
+    const fileStat = await stat(fullPath);
+    const bytes = await readFile(fullPath);
     files.push({ path, sizeBytes: fileStat.size, sha256: hashBuffer(bytes) });
   }
 
@@ -333,8 +325,8 @@ export const validateFinalDeliveryBundle = async (options: FinalDeliveryOptions)
       reviewedAt: String(reviewInspection.reviewedAt),
       rationale: String(reviewDecision.rationale),
       audioStatus,
-      ...(asText(reviewAudio.reviewer) ? { audioReviewer: asText(reviewAudio.reviewer) } : {}),
-      ...(asText(reviewAudio.reviewedAt) ? { audioReviewedAt: asText(reviewAudio.reviewedAt) } : {}),
+      ...(audioReviewer ? { audioReviewer } : {}),
+      ...(audioReviewedAt ? { audioReviewedAt } : {}),
       audioNote: String(reviewAudio.rationale ?? reviewAudio.reason ?? ""),
       findingCount: reviewFindings.length,
       openMinorFindings: reviewFindings.filter(finding => finding.severity === "minor" && finding.status === "open").length,
@@ -347,7 +339,7 @@ export const validateFinalDeliveryBundle = async (options: FinalDeliveryOptions)
     },
     assetEvidence: {
       status: String(assetStatus),
-      ...(asText(assetEvidence.reason) ? { reason: asText(assetEvidence.reason) } : {}),
+      ...(assetReason ? { reason: assetReason } : {}),
     },
     files,
     limitations: [
