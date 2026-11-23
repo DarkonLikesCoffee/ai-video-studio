@@ -6,7 +6,7 @@ import {
   resolveProductionPlanPath,
   validateRenderStrategyAgainstRequest,
 } from "../scripts/validate-render-strategy.mjs";
-import { COMPOSITION_REGISTRY } from "../scripts/director-compositions";
+import { COMPOSITION_REGISTRY, renderCompositionRegistryForPrompt } from "../scripts/director-compositions";
 
 const rootSource = await readFile(new URL("../packages/video-engine/src/root.tsx", import.meta.url), "utf8");
 const registered = extractRegisteredCompositionIds(rootSource);
@@ -183,4 +183,12 @@ test("rejects a selected composition with missing or unsupported render mode met
     catalogue: withoutMode,
   });
   assert.ok(errors.some(error => error.includes("must declare renderMode")));
+});
+
+
+test("Director composition prompts include the render mode", () => {
+  const prompt = renderCompositionRegistryForPrompt();
+  assert.ok(prompt.includes("JumpingCat [custom-remotion; 2d; selectable]"));
+  assert.ok(prompt.includes("TinyAstronautCrystalCave [custom-remotion; 3d; selectable]"));
+  assert.ok(prompt.includes("MadridTrip [custom-remotion; hybrid; selectable]"));
 });
