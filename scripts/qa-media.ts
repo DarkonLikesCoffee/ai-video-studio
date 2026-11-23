@@ -9,7 +9,7 @@ if (!input) {
   process.exit(2);
 }
 
-const options = { planPath: undefined as string | undefined, tolerance: 0.75, output: undefined as string | undefined, audioMode: "optional" as "required" | "optional" | "silent" };
+const options = { planPath: undefined as string | undefined, tolerance: 0.75, output: undefined as string | undefined, audioMode: undefined as "required" | "optional" | "silent" | undefined };
 for (let index = 0; index < args.length; index += 1) {
   const arg = args[index]!;
   if (arg === "--plan") {
@@ -42,16 +42,20 @@ try {
   if (options.planPath) {
     const plan = JSON.parse(await readFile(resolve(options.planPath), "utf8")) as {
       delivery?: { durationSeconds?: unknown };
+      audioMode?: unknown;
     };
     const duration = plan?.delivery?.durationSeconds;
     if (typeof duration !== "number" || !Number.isFinite(duration) || duration <= 0) {
       throw new Error("The production plan must define a positive delivery.durationSeconds.");
     }
     expectedDurationSeconds = duration;
+    if (plan.audioMode !== undefined && plan.audioMode !== "required" && plan.audioMode !== "optional" && plan.audioMode !== "silent") {
+      throw new Error("The production plan audioMode must be required, optional, or silent.");
+    }
   }
 
   const report = await inspectMedia(inputPath, {
-    audioMode: options.audioMode,
+    audioMode: options.audioMode ?? "optional",
     ...(expectedDurationSeconds === undefined ? {} : { expectedDurationSeconds }),
     maxExpectedDurationDriftSeconds: options.tolerance,
   });
