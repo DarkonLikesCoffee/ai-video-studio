@@ -194,7 +194,7 @@ export const validateProductionPlan = (value: unknown): string[] => {
 
   if (plan.assetVisualReviewRequired !== undefined && typeof plan.assetVisualReviewRequired !== "boolean") errors.push("assetVisualReviewRequired must be a boolean when provided.");
 
-  errors.push(...validateRenderStrategy(plan.renderStrategy);
+  errors.push(...validateRenderStrategy(plan.renderStrategy));
   errors.push(...validateAcceptanceCoverage(plan));
   return errors;
 };
