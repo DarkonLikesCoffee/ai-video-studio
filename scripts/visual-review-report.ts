@@ -2,7 +2,9 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile, appendFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-export const buildVisualReviewReport = ({ outputName, videoPath, contactSheetPath, contactSheetReportPath, videoSha256, contactSheetReport, generatedAt = new Date().toISOString() }) => ({
+type ContactSheetReport = { durationSeconds?: number; sampleTimestampsSeconds?: number[] };
+type VisualReviewInput = { outputName: string; videoPath: string; contactSheetPath: string; contactSheetReportPath: string; videoSha256: string; contactSheetReport: ContactSheetReport; generatedAt?: string };
+export const buildVisualReviewReport = ({ outputName, videoPath, contactSheetPath, contactSheetReportPath, videoSha256, contactSheetReport, generatedAt = new Date().toISOString() }: VisualReviewInput) => ({
   schemaVersion: 1, reportType: "visual-review", status: "pending-review", generatedAt,
   artifact: { name: outputName, videoPath, videoSha256, contactSheetPath, contactSheetReportPath },
   inspection: { method: "not-yet-inspected", fullVideoWatched: false, timestampsReviewedSeconds: [], reviewer: null, reviewedAt: null },
@@ -10,7 +12,7 @@ export const buildVisualReviewReport = ({ outputName, videoPath, contactSheetPat
   decision: { approved: false, rationale: "Visual inspection has not been completed." },
   contactSheet: { durationSeconds: contactSheetReport?.durationSeconds ?? null, sampleTimestampsSeconds: contactSheetReport?.sampleTimestampsSeconds ?? [] },
 });
-export const sha256Buffer = buffer => createHash("sha256").update(buffer).digest("hex");
+export const sha256Buffer = (buffer: Uint8Array) => createHash("sha256").update(buffer).digest("hex");
 const main = async () => {
   const outputName = process.env.OUTPUT_NAME;
   if (!outputName) throw new Error("OUTPUT_NAME is required.");
