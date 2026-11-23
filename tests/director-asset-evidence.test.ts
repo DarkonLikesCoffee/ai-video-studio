@@ -671,13 +671,13 @@ test("custom composition string literals used only as copy do not satisfy requir
     'import { TestFilm } from "./scenes/TestFilm";',
     'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
     'import { AbsoluteFill } from "remotion";',
     'const imageLabel = "assets/one.svg";',
     'export const TestFilm = () => <AbsoluteFill aria-label={imageLabel} />;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   try {
     const plan = makePlan();
     plan.renderStrategy.renderer = "custom-remotion";
@@ -713,13 +713,13 @@ test("custom composition imported media files count as required asset usage", as
     'import { TestFilm } from "./scenes/TestFilm";',
     'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
     'import hero from "../../../../projects/custom-film/assets/one.svg";',
     'import { Img } from "remotion";',
     'export const TestFilm = () => <Img src={hero} />;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   try {
     const plan = makePlan();
     plan.renderStrategy.renderer = "custom-remotion";
@@ -754,7 +754,7 @@ test("custom composition JSON imports contribute only src and poster asset field
     'import { TestFilm } from "./scenes/TestFilm";',
     'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   await writeFile(path.join(engineScenes, "asset-config.json"), JSON.stringify({
     label: "assets/one.svg",
     video: { src: "assets/one.svg" }
@@ -763,7 +763,7 @@ test("custom composition JSON imports contribute only src and poster asset field
     'import config from "./asset-config.json";',
     'export const TestFilm = () => <div title={config.label}>{config.video.src}</div>;',
     ""
-  ].join("\\n"));
+  ].join("\n"));
   try {
     const plan = makePlan();
     plan.renderStrategy.renderer = "custom-remotion";
