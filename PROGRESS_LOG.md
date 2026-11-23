@@ -841,3 +841,13 @@ Append one entry per meaningful development session:
 - Exact-head CI [#45257516309](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45257516309) passed all 53 workflow steps, including type-check, full tests, project and asset-evidence validation, preview artifact generation and Studio build.
 - Refreshed the project state and roadmap for PR #168's strict production-state evidence-file check, corrected the historical custom Remotion shot-mapping status, and recorded the PR #168 implementation baseline and PR #169 current-main documentation tip.
 - No production video render was triggered.
+
+
+## 2026-11-23 — Frozen production state enforced before render (PR #171)
+
+- PR #171, **Enforce frozen production state before render**, merged into `main` as `2ea5babd4f0d0f041cb0a1b07bfb11450e66a57`.
+- Exact-head GitHub Actions run [#45260582143](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45260582143) completed successfully on `f87b3773eec1496184f3afc819e0a68c156892dc`: all 53 substantive workflow steps passed, including type-check, full tests, production-state regression tests, project/storyboard/asset validators and the Studio build.
+- GitHub Actions preflight checks the production-state ledger for requests carrying either `projectPath` or `productionPlanPath`, regardless of selected provider; this also covers GitHub-dispatched CircleCI requests that only identify a production plan. Direct CircleCI runs run the same strict check.
+- If `production/production-state.json` exists, the stage must be exactly `frozen`; evidence must exist for every stage through `frozen`; the project ID must match the project-directory slug; the state file and all evidence paths must resolve to non-empty regular files inside the project with no symlink/path escape.
+- A genuinely absent state file logs an explicit legacy compatibility message. The gate does not silently accept an invalid path entry and does not automatically advance the state after render.
+- No `render-request.json`, project state file or production asset was changed. No production video render was triggered.
