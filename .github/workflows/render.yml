@@ -41,6 +41,24 @@ jobs:
         if: steps.request.outputs.provider == 'github-actions'
         run: npm ci --no-audit --no-fund
 
+      - name: Validate linked production plan
+        if: steps.request.outputs.provider == 'github-actions'
+        env:
+          PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
+          PRODUCTION_PLAN_PATH: ${{ steps.request.outputs.production_plan_path }}
+        run: |
+          PLAN_PATH="$PRODUCTION_PLAN_PATH"
+          if [[ -z "$PLAN_PATH" && -n "$PROJECT_PATH" ]]; then
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+            PLAN_PATH="$PROJECT_DIR/production/production-plan.json"
+          fi
+          if [[ -n "$PLAN_PATH" && -f "$PLAN_PATH" ]]; then
+            npm run validate:plan -- "$PLAN_PATH"
+          elif [[ -n "$PRODUCTION_PLAN_PATH" ]]; then
+            echo "Explicit production plan was not found: $PLAN_PATH" >&2
+            exit 1
+          fi
+
       - name: Set up Python for optional narration
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.narration_path != ''
         uses: actions/setup-python@v5
@@ -179,19 +197,20 @@ jobs:
           if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_DIR/.render-project.json" "--public-dir=../../$PROJECT_DIR"
-          elif [[ -n "$PROJECT_PATH" ]]; then
-            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
-            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
-          elif [[ "$COMPOSITION_ID" == "MadridTrip" ]]; then
-            # Keep the single WebGL canvas below Chromium's per-runner context limit.
-            # GitHub-hosted Linux runners have no GPU: Remotion recommends swangle.
-            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle"
           elif [[ "$COMPOSITION_ID" == "LighthouseRepairFilm" && -n "$PROJECT_PATH" ]]; then
             # SVG/Remotion composition: no WebGL context needed on headless GitHub runners.
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
+          elif [[ -n "$PROJECT_PATH" ]]; then
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+            # Custom 3D compositions use software WebGL on GPU-less GitHub runners.
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR" "--concurrency=1" "--gl=swangle"
+          elif [[ "$COMPOSITION_ID" == "MadridTrip" ]]; then
+            # Keep the single WebGL canvas below Chromium's per-runner context limit.
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle"
           else
-            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
+            # Custom Three.js scenes use software WebGL on GPU-less GitHub runners.
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle"
           fi
 
       - name: Master final ProjectVideo audio
@@ -238,10 +257,14 @@ jobs:
         env:
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
           PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
+          PRODUCTION_PLAN_PATH: ${{ steps.request.outputs.production_plan_path }}
         run: |
-          PROJECT_DIR="$(dirname "$PROJECT_PATH")"
-          PLAN_PATH="$PROJECT_DIR/production/production-plan.json"
-          if [[ -f "$PLAN_PATH" ]]; then
+          PLAN_PATH="$PRODUCTION_PLAN_PATH"
+          if [[ -z "$PLAN_PATH" && -n "$PROJECT_PATH" ]]; then
+            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
+            PLAN_PATH="$PROJECT_DIR/production/production-plan.json"
+          fi
+          if [[ -n "$PLAN_PATH" && -f "$PLAN_PATH" ]]; then
             npm run qa:media -- "render-output/$OUTPUT_NAME.mp4" --plan "$PLAN_PATH" --duration-tolerance 0.75
           else
             npm run qa:media -- "render-output/$OUTPUT_NAME.mp4"

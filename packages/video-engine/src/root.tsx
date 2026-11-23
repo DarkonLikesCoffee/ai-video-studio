@@ -9,6 +9,7 @@ import { MadridTrip, MADRID_TRIP_DURATION, FPS as MADRID_TRIP_FPS, WIDTH as MADR
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
 import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
 import { LighthouseRepairFilm } from "./scenes/LighthouseRepairFilm";
+import { TinyAstronautCrystalCave } from "./scenes/TinyAstronautCrystalCave";
 import { JumpingCat } from "./scenes/JumpingCat";
 
 // Remotion merges partial --props over defaultProps. Do not leak the example
@@ -23,6 +24,14 @@ export const RemotionRoot = () => (
     <Composition
       id="JumpingCat"
       component={JumpingCat}
+      durationInFrames={600}
+      fps={30}
+      width={1920}
+      height={1080}
+    />
+    <Composition
+      id="TinyAstronautCrystalCave"
+      component={TinyAstronautCrystalCave}
       durationInFrames={600}
       fps={30}
       width={1920}
