@@ -123,7 +123,7 @@ const isAudioAsset = (asset: RecordValue): boolean => {
   const declaredType = (asText(asset.type) ?? "").toLowerCase();
   const assetPath = `${asText(asset.path) ?? ""} ${asText(asset.file) ?? ""}`;
   return declaredType.startsWith("audio/") ||
-    /\b(?:audio|sound|music|narration|voice(?:over)?|ambience)\\b/.test(declaredType) ||
+    /\b(?:audio|sound|music|narration|voice(?:over)?|ambience)\b/.test(declaredType) ||
     /\.(?:aac|aif|aiff|alac|flac|m4a|mid|midi|mp3|oga|ogg|opus|wav|wma)$/i.test(assetPath);
 };
 const describeProvenance = (asset: RecordValue) => asText(asset.provenance) ?? asText(asset.sourcePage) ?? asText(asset.sourceUrl) ?? asText(asset.creator) ?? asText(asset.attribution);
