@@ -15,97 +15,94 @@ const Bird = ({ x, y, scale = 1, rotation = 0, flap, color = "#172D35", opacity 
   <g transform={`translate(${x} ${y}) rotate(${rotation}) scale(${scale})`} opacity={opacity}>
     <defs>
       <linearGradient id="birdBody" x1="0" y1="-1" x2="0" y2="1">
-        <stop offset="0" stopColor="#536D72"/>
-        <stop offset=".48" stopColor="#304B54"/>
-        <stop offset="1" stopColor="#1B343E"/>
+        <stop offset="0" stopColor="#58747A"/><stop offset=".55" stopColor="#334E57"/><stop offset="1" stopColor="#1C343D"/>
       </linearGradient>
       <linearGradient id="birdBreast" x1="0" y1="0" x2="0" y2="1">
-        <stop stopColor="#F2E7D1"/><stop offset="1" stopColor="#C8B99F"/>
+        <stop stopColor="#F3E9D7"/><stop offset="1" stopColor="#C7B79E"/>
       </linearGradient>
       <linearGradient id="birdWing" x1="0" y1="0" x2="1" y2="1">
-        <stop stopColor="#607A7E"/><stop offset=".55" stopColor="#354F58"/><stop offset="1" stopColor="#203A43"/>
+        <stop stopColor="#789093"/><stop offset=".55" stopColor="#3E5962"/><stop offset="1" stopColor="#263F48"/>
       </linearGradient>
       <linearGradient id="birdBeak" x1="0" y1="0" x2="1" y2="1">
-        <stop stopColor="#F2C66C"/><stop offset="1" stopColor="#C67B3D"/>
+        <stop stopColor="#F5D17B"/><stop offset="1" stopColor="#C9803E"/>
       </linearGradient>
     </defs>
-    {/* far wing: broad, rounded flight feathers rather than pointed spikes */}
-    <g transform={`rotate(${-22 - flap * 34} -12 2)`}>
-      <path d="M-15 5 C-39 -20 -65 -52 -87 -91 C-74 -88 -58 -78 -40 -61
-        C-51 -83 -56 -103 -49 -122 C-31 -103 -15 -82 1 -59
-        C12 -81 31 -101 53 -112 C48 -82 31 -53 13 -31
-        C-2 -13 -9 -4 -15 5Z" fill="#182E37" opacity=".94"/>
-      <path d="M-40 -61 C-27 -42 -16 -24 -9 -8 M-49 -122 C-35 -90 -25 -58 -14 -26
-        M53 -112 C35 -83 20 -54 4 -25" fill="none" stroke="#829A98" strokeWidth="2.2" opacity=".34"/>
+    {/* far wing: a rounded, broad shape, kept behind the body */}
+    <g transform={`rotate(${-18 - flap * 30} -8 0)`}>
+      <path d="M-16 5 C-38 -18 -58 -42 -72 -68 C-59 -63 -45 -51 -33 -38
+        C-43 -56 -43 -74 -34 -89 C-20 -72 -7 -51 7 -31
+        C16 -47 31 -64 48 -73 C42 -48 26 -25 8 -10 C-3 -1 -10 4 -16 5Z"
+        fill="#1C333B" opacity=".9"/>
+      <path d="M-34 -89 C-22 -64 -12 -38 -3 -10 M48 -73 C30 -48 14 -27 2 -8"
+        fill="none" stroke="#829B99" strokeWidth="2" opacity=".32"/>
     </g>
-    {/* tail: three softly tapered feathers */}
-    <path d="M-43 5 C-72 1 -105 -8 -137 -26 C-118 -8 -93 8 -60 18Z" fill="#233E47"/>
-    <path d="M-43 10 C-76 18 -110 27 -138 42 C-108 39 -82 32 -54 21Z" fill="#29464E"/>
-    <path d="M-42 -1 C-72 -16 -101 -32 -120 -52 C-103 -28 -82 -10 -55 11Z" fill="#36535A"/>
-    {/* body and shoulder */}
-    <path d="M-56 4 C-43 -20 -17 -31 14 -29 C42 -28 62 -16 75 -5
-      C88 3 101 0 112 -8 L121 -3 L110 8
-      C92 28 63 32 34 24 C4 17 -22 22 -43 17Z" fill="url(#birdBody)"/>
-    {/* pale belly and chest */}
-    <path d="M-22 13 C-4 20 23 26 49 19 C64 14 74 7 81 2
-      C70 20 54 29 35 29 C12 29 -12 22 -22 13Z" fill="url(#birdBreast)" opacity=".92"/>
-    {/* head, cheek and throat */}
-    <path d="M35 -21 C50 -39 78 -40 95 -26 C105 -17 109 -5 105 7
-      C92 18 75 18 61 10 C48 4 39 -6 35 -21Z" fill="url(#birdBody)"/>
-    <path d="M44 -6 C54 8 73 16 92 12 C82 22 62 20 49 10Z" fill="#E0D2B8" opacity=".88"/>
-    {/* hooked but small beak */}
-    <path d="M99 -20 L128 -11 L111 -3 L99 1 L105 -8Z" fill="url(#birdBeak)"/>
-    <path d="M100 -19 L121 -12" stroke="#F9D991" strokeWidth="2" opacity=".5"/>
-    {/* eye with warm iris */}
-    <ellipse cx="82" cy="-23" rx="7.2" ry="7.8" fill="#F2E4C8"/>
-    <circle cx="84" cy="-23" r="4.1" fill="#B97D39"/>
-    <circle cx="85" cy="-23" r="2.3" fill="#15272D"/>
-    <circle cx="86.2" cy="-24.4" r="1" fill="#FFF6E3"/>
-    {/* subtle wing coverts on the body */}
-    <path d="M-34 -4 C-12 -21 14 -22 37 -12 C17 -4 -2 7 -21 11Z" fill="#263F48" opacity=".55"/>
-    <path d="M-14 -10 Q4 -16 24 -12 M-6 -4 Q14 -10 34 -7" fill="none" stroke="#839A94" strokeWidth="2" opacity=".35"/>
-    {/* near wing moves with the flap cycle */}
-    <g transform={`rotate(${18 + flap * 38} -8 2)`}>
-      <path d="M-10 1 C-27 -25 -39 -55 -34 -91
-        C-17 -75 -4 -56 8 -35
-        C5 -62 12 -91 31 -116
-        C34 -82 42 -57 55 -38
-        C66 -62 85 -82 108 -91
-        C98 -59 77 -30 55 -13
-        C34 1 10 8 -10 1Z" fill="url(#birdWing)"/>
-      <path d="M-34 -91 C-21 -62 -10 -34 2 -8 M31 -116 C25 -79 18 -44 10 -10
-        M108 -91 C83 -63 61 -36 28 -8" fill="none" stroke="#9DB0A4" strokeWidth="2.5" opacity=".3"/>
-      <path d="M-8 -1 C14 -13 35 -22 57 -34" fill="none" stroke="#D0D7C7" strokeWidth="3" opacity=".12"/>
+    {/* tail feathers with rounded, tapered tips */}
+    <path d="M-44 3 C-72 0 -93 -10 -117 -24 C-101 -5 -80 10 -58 17Z" fill={color}/>
+    <path d="M-44 8 C-70 16 -92 24 -115 39 C-88 35 -66 27 -52 18Z" fill="#29454D"/>
+    <path d="M-42 -2 C-67 -15 -88 -30 -105 -48 C-90 -27 -71 -10 -53 10Z" fill="#3B5760"/>
+    {/* compact body */}
+    <path d="M-55 3 C-42 -18 -17 -29 11 -28 C37 -28 60 -17 75 -5
+      C87 3 99 1 111 -7 L120 -2 L110 9
+      C92 26 64 31 36 24 C7 18 -20 22 -43 16Z" fill="url(#birdBody)"/>
+    <path d="M-19 13 C1 21 25 26 48 19 C64 14 75 7 82 1
+      C69 21 53 29 35 29 C13 29 -7 22 -19 13Z" fill="url(#birdBreast)"/>
+    {/* head and softly curved throat */}
+    <path d="M34 -20 C49 -38 77 -40 94 -26 C104 -17 109 -5 105 6
+      C93 17 76 17 61 10 C48 4 39 -7 34 -20Z" fill="url(#birdBody)"/>
+    <path d="M43 -4 C54 9 73 16 91 11 C80 22 61 19 49 9Z" fill="#E1D4BD" opacity=".9"/>
+    {/* short beak and eye */}
+    <path d="M98 -20 L127 -11 L111 -4 L100 1 L105 -8Z" fill="url(#birdBeak)"/>
+    <path d="M100 -19 L121 -12" stroke="#F8DEA1" strokeWidth="2" opacity=".45"/>
+    <ellipse cx="81" cy="-23" rx="7.4" ry="8" fill="#F2E5CA"/>
+    <circle cx="83" cy="-23" r="4.2" fill="#B77C3C"/><circle cx="84.2" cy="-23" r="2.2" fill="#16272E"/>
+    <circle cx="85.4" cy="-24.5" r="1" fill="#FFF7E8"/>
+    {/* wing-coverts */}
+    <path d="M-34 -4 C-11 -20 13 -22 37 -12 C17 -4 -2 7 -21 11Z" fill="#273F48" opacity=".46"/>
+    <path d="M-15 -10 Q5 -16 24 -12 M-7 -4 Q13 -10 34 -7" fill="none" stroke="#9AAFA5" strokeWidth="2" opacity=".25"/>
+    {/* near wing with gently scalloped feather ends; flap rotates as one mass */}
+    <g transform={`rotate(${20 + flap * 34} -8 2)`}>
+      <path d="M-10 1 C-28 -17 -46 -38 -54 -61
+        C-42 -58 -30 -47 -20 -35
+        C-29 -53 -31 -70 -22 -84
+        C-9 -68 3 -48 16 -29
+        C22 -45 36 -60 52 -69
+        C49 -44 34 -23 14 -8
+        C2 2 -7 5 -10 1Z" fill="url(#birdWing)"/>
+      <path d="M-54 -61 C-36 -38 -23 -20 -9 -2 M-22 -84 C-10 -58 2 -33 9 -10
+        M52 -69 C34 -43 22 -24 8 -7" fill="none" stroke="#C1C9B8" strokeWidth="2.5" opacity=".26"/>
+      <path d="M-7 -3 C12 -12 30 -24 43 -39" fill="none" stroke="#D9DFD0" strokeWidth="3" opacity=".1"/>
     </g>
-    {/* tiny legs tucked into the flight silhouette */}
+    {/* legs tucked close to the body */}
     <path d="M18 22 L10 31 L4 31 M36 22 L29 31 L23 31" fill="none" stroke="#B77D49" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
   </g>
 );
 const Cloud = ({ x, y, scale = 1, opacity = .38 }: { x: number; y: number; scale?: number; opacity?: number }) => (
-  <g transform={`translate(${x} ${y}) scale(${scale})`} opacity={opacity} fill="#FFF8EA">
-    <ellipse cx="0" cy="12" rx="88" ry="20"/>
-    <ellipse cx="-39" cy="3" rx="40" ry="26"/>
-    <ellipse cx="8" cy="-12" rx="53" ry="38"/>
-    <ellipse cx="53" cy="3" rx="42" ry="27"/>
+  <g transform={`translate(${x} ${y}) scale(${scale})`} opacity={opacity}>
+    <path d="M-82 17 C-104 17 -116 5 -109 -9 C-102 -22 -84 -22 -71 -13
+      C-70 -35 -47 -51 -24 -44 C-8 -66 24 -60 39 -42
+      C65 -48 86 -28 82 -9 C104 -8 119 8 106 20 C96 30 72 29 52 28
+      L-72 28 C-83 28 -88 24 -82 17Z" fill="#FFF8EA"/>
+    <path d="M-68 13 C-54 18 -24 17 5 13 C29 18 54 15 82 12" fill="none" stroke="#D6E0DA" strokeWidth="3" opacity=".3"/>
   </g>
 );
-
 const Pine = ({ x, y, scale = 1, tone = "#314F4D" }: { x: number; y: number; scale?: number; tone?: string }) => (
   <g transform={`translate(${x} ${y}) scale(${scale})`}>
-    <path d="M-4 0 Q-2 -84 2 -236" stroke="#554638" strokeWidth="13" fill="none"/>
-    <path d="M0 -238 C-23 -213 -45 -186 -61 -158 C-43 -164 -28 -166 -16 -162
-      C-43 -145 -63 -118 -81 -91 C-59 -100 -39 -101 -23 -94
-      C-49 -75 -75 -47 -98 -16 L97 -16 C74 -47 49 -75 22 -94
-      C42 -101 61 -100 80 -91 C62 -118 43 -145 18 -162
-      C35 -166 51 -164 68 -158 C48 -186 26 -213 0 -238Z" fill={tone}/>
-    <path d="M0 -195 C-17 -175 -35 -154 -48 -132 C-30 -137 -15 -136 -3 -132
-      C-27 -112 -45 -91 -64 -68 C-43 -75 -26 -75 -12 -68
-      C-33 -47 -54 -27 -73 -3 L73 -3 C53 -27 32 -47 12 -68
-      C29 -75 45 -75 64 -68 C45 -91 26 -112 3 -132
-      C18 -136 34 -137 49 -132 C32 -154 17 -175 0 -195Z" fill="#58765F" opacity=".65"/>
-    <path d="M0 -210 L-44 -151 M0 -170 L-58 -105 M0 -130 L-70 -59 M0 -90 L-81 -20
-      M0 -210 L42 -151 M0 -170 L58 -105 M0 -130 L70 -59 M0 -90 L81 -20"
-      stroke="#9AAF8A" strokeWidth="3" strokeLinecap="round" opacity=".16"/>
+    <path d="M-3 0 Q-1 -92 3 -230" stroke="#514435" strokeWidth="11" fill="none"/>
+    <path d="M0 -230 C-13 -211 -26 -193 -38 -175 C-22 -179 -12 -177 0 -170
+      C-24 -151 -42 -129 -58 -106 C-39 -112 -25 -111 -10 -104
+      C-31 -83 -52 -62 -70 -40 C-49 -46 -30 -45 -13 -36
+      C-30 -20 -46 -8 -58 0 L58 0 C46 -8 30 -20 13 -36
+      C30 -45 49 -46 70 -40 C52 -62 31 -83 10 -104
+      C25 -111 39 -112 58 -106 C42 -129 24 -151 0 -170
+      C12 -177 22 -179 38 -175 C26 -193 13 -211 0 -230Z" fill={tone}/>
+    <path d="M0 -183 C-12 -165 -24 -149 -35 -133 C-20 -137 -10 -136 0 -130
+      C-19 -111 -35 -91 -48 -72 C-30 -76 -18 -75 -5 -67
+      C-22 -48 -38 -30 -52 -10 L52 -10 C38 -30 22 -48 5 -67
+      C18 -75 30 -76 48 -72 C35 -91 19 -111 0 -130
+      C10 -136 20 -137 35 -133 C24 -149 12 -165 0 -183Z" fill="#69856B" opacity=".5"/>
+    <path d="M0 -206 L-28 -166 M0 -170 L-42 -128 M0 -134 L-50 -91 M0 -96 L-58 -51
+      M0 -206 L28 -166 M0 -170 L42 -128 M0 -134 L50 -91 M0 -96 L58 -51"
+      stroke="#A8B895" strokeWidth="3" strokeLinecap="round" opacity=".15"/>
   </g>
 );
 const DistantBirds = ({ frame }: { frame: number }) => (
