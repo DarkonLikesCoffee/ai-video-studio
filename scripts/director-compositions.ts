@@ -1,3 +1,5 @@
+import compositionRegistry from "../schemas/composition-registry.json" with { type: "json" };
+
 export type RendererKind = "project-video" | "custom-remotion";
 export type CompositionAvailability = "registered" | "to-be-built";
 
@@ -14,72 +16,7 @@ export type CompositionCapability = {
 // packages/video-engine/src/root.tsx on the current branch. Add every new
 // production composition here before the Director can select it. Tests verify
 // that each catalogue entry is registered; unlisted IDs are not selectable.
-export const COMPOSITION_REGISTRY: readonly CompositionCapability[] = [
-  {
-    id: "DemoVideo",
-    renderer: "custom-remotion",
-    selectable: false,
-    purpose: "Engine smoke test only.",
-    strengths: ["Verifies the basic Remotion render path."],
-    limitations: ["Not a production creative template."],
-  },
-  {
-    id: "ProjectVideo",
-    renderer: "project-video",
-    selectable: true,
-    purpose: "General-purpose compatibility renderer for structured 2D projects.",
-    strengths: [
-      "Layered local/remote image and video assets",
-      "2D vector graphics, text, SVG path animation and particles",
-      "Keyframed transforms, scene transitions, captions and global audio tracks",
-    ],
-    limitations: [
-      "Uses a recurring scene layout and title/editorial framing",
-      "Does not create arbitrary 3D geometry or a true 3D camera",
-      "Do not choose it merely because it is the easiest or default renderer",
-    ],
-  },
-  {
-    id: "ThreeDShowcase",
-    renderer: "custom-remotion",
-    selectable: false,
-    purpose: "Reference/showcase composition demonstrating a narrow set of 3D techniques.",
-    strengths: ["Provides a reference for basic Three.js integration."],
-    limitations: ["A showcase, not a general-purpose production composition."],
-  },
-  {
-    id: "MadridNewYorkParis",
-    renderer: "custom-remotion",
-    selectable: true,
-    purpose: "Specialized animated city-route travel story.",
-    strengths: ["Animated map routes, location labels and a Three.js Eiffel Tower reveal."],
-    limitations: ["Its story, cities and visual structure are hard-coded; adapt or create a new composition for other itineraries."],
-  },
-  {
-    id: "MadridTrip",
-    renderer: "custom-remotion",
-    selectable: true,
-    purpose: "Specialized Madrid travel/geography composition.",
-    strengths: ["Custom geographic framing and route-oriented visual storytelling."],
-    limitations: ["Not a general-purpose map or travel renderer; inspect its scope before reuse."],
-  },
-  {
-    id: "CinematicAdBenchmark",
-    renderer: "custom-remotion",
-    selectable: true,
-    purpose: "Specialized premium product-ad benchmark built around a 3D speaker product.",
-    strengths: ["Three.js product geometry, moving camera, studio lighting, exploded-view sequence and editorial overlays."],
-    limitations: ["The product model, brand copy, timing and shot structure are hard-coded; do not reuse unchanged for unrelated products."],
-  },
-  {
-    id: "NarratedSkyExplainer",
-    renderer: "custom-remotion",
-    selectable: true,
-    purpose: "Specialized narrated science/space explainer combining 3D scenes and optional footage clips.",
-    strengths: ["Three.js visual sequences, narration, subtitles, music and footage integration."],
-    limitations: ["Its built-in scene language is tailored to the sky/space explainer; unrelated topics may need a new composition."],
-  },
-] as const;
+export const COMPOSITION_REGISTRY = compositionRegistry as readonly CompositionCapability[];
 
 export const getCompositionCapability = (id: string): CompositionCapability | undefined =>
   COMPOSITION_REGISTRY.find((composition) => composition.id === id);
