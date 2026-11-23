@@ -787,3 +787,16 @@ Append one entry per meaningful development session:
 
 
 - **Golden Hour visual review:** sampled the previous MP4 at 1 fps (20 frames). The four environments are distinguishable and the man/dog motifs are visually consistent, but the people/dog are embedded in static SVG plates; motion comes mainly from camera transforms, particle systems and scene transitions. The plan now describes this accurately. No full video playback or audio listening was performed; creative acceptance remains pending.
+
+## 2026-11-23 — Full-video playback evidence merged and final delivery gate in review
+
+- Merged PR #155, `Require hash-bound playback evidence for full-video review`, as `bd5f2066de7aad81262191580ec117c9ed9eb714`. The post-merge main CI [#45224183986](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45224183986) passed.
+- The local player/importer records playback against the selected MP4 hash and measured duration, including continuous played ranges, start/quarter/half/three-quarter/end checkpoints, 1× playback, visibility/focus and the native ended event. The importer does not approve the video. The session JSON remains editable telemetry, not signed evidence of reviewer identity.
+- Opened PR #156, `Gate final video delivery on approved review and exact artifact evidence`, at `884832a83278fbf8b3e581993738f01330dd4b5a`.
+- The PR adds a manual final-delivery workflow. It confirms the selected run is a successful execution of the Render video workflow, downloads the artifact from that exact run, checks the committed schema-v3 approval report, verifies the final MP4 hash against review/provenance, validates technical Media QA and contact-sheet duration, verifies each provenance-listed artifact hash, and accepts only ready or explicitly not-applicable asset evidence.
+- Visual approval now requires an explicit audio decision. `listened` requires reviewer/time/rationale; `not-listened` requires a reason; `not-applicable` is only valid when Media QA shows no audio stream. The final receipt records the declared decision and limitations honestly.
+- The gate writes `<outputName>.delivery.json` and uploads a separate final package only after validation. Render review artifact retention was increased to 30 days to provide an approval window.
+- Exact-head push CI [#45228924930](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228924930) and PR CI [#45228940745](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45228940745) passed: 331 tests, 0 failures, 0 skips, plus typecheck, project/storyboard checks and Studio build.
+- Several early CI runs exposed strict optional-property typing, missing review-report fixtures and a stale error-message expectation; these were fixed. A symlinked-artifact regression test was added to ensure the report-copy step cannot overwrite another artifact file.
+- PR #156 remains open and unmerged. The manual workflow has not been dispatched because no new real approved render was part of this infrastructure change. Do not claim the final delivery path has been exercised with an actual production video until that end-to-end run is performed.
+- No render request was modified and no production render was triggered by PR #156.
