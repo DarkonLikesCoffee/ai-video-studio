@@ -483,9 +483,15 @@ const readShotComponentMapping = (manifest: RecordValue): { mapping: ShotCompone
     const shotId = entry.shotId.trim();
     if (seen.has(shotId)) return { mapping: null, error: `shotComponents contains duplicate shotId "${shotId}".` };
     seen.add(shotId);
-    const modules = (entry.modules as string[]).map((module) => module.replace(/\\\\/g, "/").replace(/^\\.\\//, ""));
-    if (modules.some((module) => module.startsWith("/") || module.split("/").includes(".."))) {
+    const modules = (entry.modules as string[]).map((module) => {
+      const normalized = module.trim().replace(/\\\\/g, "/").replace(/^\\.\\//, "");
+      return path.posix.normalize(normalized);
+    });
+    if (modules.some((module) => module === "." || module.startsWith("/") || module.split("/").includes("..") || module.startsWith("../"))) {
       return { mapping: null, error: `shotComponents for "${shotId}" contains an unsafe module path.` };
+    }
+    if (new Set(modules).size !== modules.length) {
+      return { mapping: null, error: `shotComponents for "${shotId}" contains duplicate module paths.` };
     }
     shots.push({ shotId, modules });
   }
