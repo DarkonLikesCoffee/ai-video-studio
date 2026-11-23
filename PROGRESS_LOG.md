@@ -744,3 +744,14 @@ Append one entry per meaningful development session:
 - Updated the workflow guide and documentation index. No render request was edited and no production render was triggered.
 - Latest branch head at this entry: `0fcb3e1be005f8857f538f9f8f8c30d0d1044944`. GitHub Actions CI for that exact head is running; do not treat the slice as complete until it passes.
 
+
+
+## 2026-11-23 — Stormlight Keeper integrated with current composition registry
+
+- Rebuilt the Stormlight Keeper feature on top of the current main after PR #144 introduced the canonical shared composition catalogue and strict RemotionRoot/catalogue ID parity. Added `LighthouseRepairFilm` to both RemotionRoot and `schemas/composition-registry.json`.
+- Preserved the dedicated Remotion component, ten SVG studies, six-shot production plan, scene metadata, local asset manifest, audio generator and SVG preview workflow. Added CI checks for production-plan validity, storyboard risk, generated audio duration and strict local asset evidence; added the headless custom-render branch and the SVG preview npm script.
+- Deliberately did **not** carry over the feature branch's `render-request.json` or lockfile newline-only edit. Render request 03 already ran on the feature branch; copying that request into main would create an unintended render trigger.
+- Verified render run [#45072523096](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45072523096), request `stormlight-keeper-20261122-svg-render-03`, source `98354d6c1f0b58c6cd138a676cab3007bba45e19`. Artifact #14773409887 passed technical Media QA at 24.000 s, 1920×1080, 30 fps, H.264/AAC stereo; no silence, freeze, black-frame or A/V-sync findings. Strict asset evidence reported 6/6 criteria linked, 12 manifest entries, no missing files, rights/provenance gaps or unresolved references.
+- Inspected the final artifact's 1-fps contact sheet. It shows six distinct visual setups and changes in the robot, door, mechanism, lens and beacon beam. This is sampled inspection only; the full MP4 was not watched end-to-end and the audio was not listened to. The visual language is restrained flat vector illustration, not realistic 3D.
+- Clarified that the ten SVGs are design references, not imported runtime image assets: `LighthouseRepairFilm.tsx` reconstructs the selected artwork as animated inline SVG groups and paths. Their manifest entries now identify `usageRole: design-reference`; the score and atmosphere WAVs are runtime audio. The asset-evidence report checks file presence/metadata/linkage, not source-code usage.
+- No render request was modified and no production render was triggered on main as part of this migration.
