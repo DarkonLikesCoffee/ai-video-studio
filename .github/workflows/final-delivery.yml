@@ -54,6 +54,27 @@ jobs:
             exit 1
           fi
 
+      - name: Verify the selected render run completed successfully
+        env:
+          RENDER_RUN_ID: ${{ inputs.render_run_id }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          run_json="$(curl --fail --silent --show-error \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs/$RENDER_RUN_ID")"
+          jq -e --arg repository "$GITHUB_REPOSITORY" '
+            .repository.full_name == $repository and
+            .path == ".github/workflows/render.yml" and
+            .status == "completed" and
+            .conclusion == "success"
+          ' <<< "$run_json" >/dev/null || {
+            echo "::error::The selected run must be a successful completed Render video workflow in this repository."
+            exit 1
+          }
+
       - name: Download the exact render review artifact
         uses: actions/download-artifact@v4
         with:
