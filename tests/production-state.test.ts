@@ -228,7 +228,7 @@ test("strict frozen-stage validation requires and resolves evidence through the 
     frozen: "frozen-candidate.json",
   };
   for (const file of Object.values(evidence)) {
-    await writeFile(path.join(productionRoot, file), `evidence: ${file}\\n`);
+    await writeFile(path.join(productionRoot, file), `evidence: ${file}\n`);
   }
   try {
     const state = {
