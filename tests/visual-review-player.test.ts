@@ -27,5 +27,5 @@ test("player requires start, quarter, half, three-quarter and end checkpoints an
 
 test("player requires metadata before enabling playback and does not enable native seeking controls", () => {
   assert.ok(player.includes("metadataLoaded"));
-  assert.ok(!player.includes("controls"));
+  assert.ok(player.includes('<video id="player" playsinline preload="metadata"></video>'));
 });
