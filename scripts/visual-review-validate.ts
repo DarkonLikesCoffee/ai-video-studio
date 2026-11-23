@@ -92,12 +92,15 @@ export const validatePlaybackSession = (session: unknown, artifact: JsonRecord):
         ranges.push([range[0], range[1]]);
       }
       ranges.sort((a, b) => a[0] - b[0]);
-      if (ranges.length > 0) {
-        if (ranges[0][0] > 0.25) errors.push("Playback coverage must begin at the start of the video.");
-        let end = ranges[0][1];
-        let covered = ranges[0][1] - ranges[0][0];
+      const firstRange = ranges[0];
+      if (firstRange) {
+        if (firstRange[0] > 0.25) errors.push("Playback coverage must begin at the start of the video.");
+        let end = firstRange[1];
+        let covered = firstRange[1] - firstRange[0];
         for (let index = 1; index < ranges.length; index += 1) {
-          const [start, nextEnd] = ranges[index];
+          const nextRange = ranges[index];
+          if (!nextRange) continue;
+          const [start, nextEnd] = nextRange;
           if (start - end > 0.5) errors.push("Playback coverage contains a gap larger than 0.5 seconds.");
           const addition = Math.max(0, nextEnd - Math.max(start, end));
           covered += addition;
@@ -130,7 +133,9 @@ export const validateVisualReviewReport = (report: unknown) => {
     return { errors: ["Visual review report must be a JSON object."], approved: false, pending: false };
   }
 
-  const version = report.schemaVersion === undefined ? 1 : report.schemaVersion;
+  const version: number = typeof report.schemaVersion === "number"
+    ? report.schemaVersion
+    : report.schemaVersion === undefined ? 1 : 0;
   if (version !== 1 && version !== 2 && version !== 3) errors.push("schemaVersion must be 1, 2 or 3.");
   if (report.status !== "pending-review" && report.status !== "approved" && report.status !== "rejected") {
     errors.push("status must be pending-review, approved, or rejected.");
