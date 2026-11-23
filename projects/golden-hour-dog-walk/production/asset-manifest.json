@@ -14,7 +14,8 @@
       "source": "Original vector scene illustration authored specifically for Golden Hour — A Walk With a Friend.",
       "creator": "AI assistant",
       "license": "Original project artwork created for this production; no third-party material.",
-      "provenance": "Original SVG illustration in this project repository; no external source."
+      "provenance": "Original SVG illustration in this project repository; no external source.",
+      "reusePolicy": "required"
     },
     {
       "id": "02-riverside",
@@ -28,7 +29,8 @@
       "source": "Original vector scene illustration authored specifically for Golden Hour — A Walk With a Friend.",
       "creator": "AI assistant",
       "license": "Original project artwork created for this production; no third-party material.",
-      "provenance": "Original SVG illustration in this project repository; no external source."
+      "provenance": "Original SVG illustration in this project repository; no external source.",
+      "reusePolicy": "required"
     },
     {
       "id": "03-park-detail",
@@ -42,7 +44,8 @@
       "source": "Original vector scene illustration authored specifically for Golden Hour — A Walk With a Friend.",
       "creator": "AI assistant",
       "license": "Original project artwork created for this production; no third-party material.",
-      "provenance": "Original SVG illustration in this project repository; no external source."
+      "provenance": "Original SVG illustration in this project repository; no external source.",
+      "reusePolicy": "required"
     },
     {
       "id": "04-sunset-home",
@@ -56,7 +59,8 @@
       "source": "Original vector scene illustration authored specifically for Golden Hour — A Walk With a Friend.",
       "creator": "AI assistant",
       "license": "Original project artwork created for this production; no third-party material.",
-      "provenance": "Original SVG illustration in this project repository; no external source."
+      "provenance": "Original SVG illustration in this project repository; no external source.",
+      "reusePolicy": "required"
     },
     {
       "id": "golden-hour-score",
@@ -70,7 +74,8 @@
       "source": "Original score fixture reused from projects/sora/assets/audio/score.wav and copied into the project at render time.",
       "creator": "AI Video Studio audio fixture generator",
       "license": "Original project-generated audio; no third-party recording.",
-      "provenance": "Source file: projects/sora/assets/audio/score.wav."
+      "provenance": "Source file: projects/sora/assets/audio/score.wav.",
+      "reusePolicy": "required"
     },
     {
       "id": "golden-hour-transition-whoosh",
@@ -86,7 +91,8 @@
       "source": "Original transition effect reused from projects/showcase-motion/assets/audio/transition-whoosh.wav and copied into the project at render time.",
       "creator": "AI Video Studio audio fixture generator",
       "license": "Original project-generated audio; no third-party recording.",
-      "provenance": "Source file: projects/showcase-motion/assets/audio/transition-whoosh.wav."
+      "provenance": "Source file: projects/showcase-motion/assets/audio/transition-whoosh.wav.",
+      "reusePolicy": "required"
     }
   ]
 }
