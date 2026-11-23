@@ -128,7 +128,7 @@ test("media QA detects frozen video and black intervals", () => {
 test("media QA fails when video or audio stream is missing", () => {
   const report = buildMediaQaReport("silent.mp4", { ...probe, streams: [probe.streams[0]!] }, "", "");
   assert.equal(report.passed, true);
-  assert.ok(report.findings.some(f => f.code === "missing-audio-stream" && f.severity === "warning"));
+  assert.ok(report.findings.some(f => f.code === "missing-audio-stream" && f.severity === "info"));
 });
 
 
@@ -229,4 +229,28 @@ test("media QA enforces planned delivery duration with configurable tolerance", 
   }, "", "", { expectedDurationSeconds: 60, maxExpectedDurationDriftSeconds: 0.75 });
   assert.equal(relaxed.passed, true);
   assert.ok(!relaxed.findings.some((finding) => finding.code === "expected-duration-mismatch"));
+});
+
+
+test("required audio mode blocks missing audio while optional and silent modes do not", () => {
+  const videoOnlyProbe = { ...probe, streams: [probe.streams[0]!] };
+  const required = buildMediaQaReport("required-audio.mp4", videoOnlyProbe, "", "", { audioMode: "required" });
+  assert.equal(required.audioMode, "required");
+  assert.equal(required.passed, false);
+  assert.ok(required.findings.some(f => f.code === "missing-audio-stream" && f.severity === "error"));
+
+  const optional = buildMediaQaReport("optional-audio.mp4", videoOnlyProbe, "", "", { audioMode: "optional" });
+  assert.equal(optional.passed, true);
+  assert.ok(optional.findings.some(f => f.code === "missing-audio-stream" && f.severity === "info"));
+
+  const silent = buildMediaQaReport("silent-audio.mp4", videoOnlyProbe, "[silencedetect] silence_start: 1.0\\n[silencedetect] silence_end: 4.0", "", { audioMode: "silent" });
+  assert.equal(silent.passed, true);
+  assert.deepEqual(silent.measurements.silenceIntervals, []);
+  assert.ok(silent.findings.some(f => f.code === "missing-audio-stream" && f.severity === "info"));
+});
+
+test("silent audio mode warns if an audio stream is present unexpectedly", () => {
+  const report = buildMediaQaReport("unexpected-audio.mp4", probe, "", "", { audioMode: "silent" });
+  assert.equal(report.passed, true);
+  assert.ok(report.findings.some(f => f.code === "unexpected-audio-stream" && f.severity === "warning"));
 });

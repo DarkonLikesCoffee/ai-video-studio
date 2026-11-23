@@ -5,17 +5,23 @@ import { inspectMedia } from "./media-qa";
 const input = process.argv[2];
 const args = process.argv.slice(3);
 if (!input) {
-  process.stderr.write("Usage: npm run qa:media -- <rendered.mp4> [report.json] [--plan production-plan.json] [--duration-tolerance seconds]\n");
+  process.stderr.write("Usage: npm run qa:media -- <rendered.mp4> [report.json] [--plan production-plan.json] [--audio-mode required|optional|silent] [--duration-tolerance seconds]\n");
   process.exit(2);
 }
 
-const options = { planPath: undefined as string | undefined, tolerance: 0.75, output: undefined as string | undefined };
+const options = { planPath: undefined as string | undefined, tolerance: 0.75, output: undefined as string | undefined, audioMode: undefined as "required" | "optional" | "silent" | undefined };
 for (let index = 0; index < args.length; index += 1) {
   const arg = args[index]!;
   if (arg === "--plan") {
     const value = args[++index];
     if (!value) throw new Error("--plan requires a production-plan.json path.");
     options.planPath = value;
+  } else if (arg === "--audio-mode") {
+    const value = args[++index];
+    if (value !== "required" && value !== "optional" && value !== "silent") {
+      throw new Error("--audio-mode must be required, optional, or silent.");
+    }
+    options.audioMode = value;
   } else if (arg === "--duration-tolerance") {
     const value = Number(args[++index]);
     if (!Number.isFinite(value) || value < 0) throw new Error("--duration-tolerance requires a non-negative number.");
@@ -33,18 +39,25 @@ const inputPath = resolve(input);
 const outputPath = resolve(options.output ?? inputPath.replace(/\.mp4$/i, "") + ".qa.json");
 try {
   let expectedDurationSeconds: number | undefined;
+  let planAudioMode: "required" | "optional" | "silent" | undefined;
   if (options.planPath) {
     const plan = JSON.parse(await readFile(resolve(options.planPath), "utf8")) as {
       delivery?: { durationSeconds?: unknown };
+      audioMode?: unknown;
     };
     const duration = plan?.delivery?.durationSeconds;
     if (typeof duration !== "number" || !Number.isFinite(duration) || duration <= 0) {
       throw new Error("The production plan must define a positive delivery.durationSeconds.");
     }
     expectedDurationSeconds = duration;
+    planAudioMode = plan.audioMode as "required" | "optional" | "silent" | undefined;
+    if (plan.audioMode !== undefined && plan.audioMode !== "required" && plan.audioMode !== "optional" && plan.audioMode !== "silent") {
+      throw new Error("The production plan audioMode must be required, optional, or silent.");
+    }
   }
 
   const report = await inspectMedia(inputPath, {
+    audioMode: options.audioMode ?? planAudioMode ?? "optional",
     ...(expectedDurationSeconds === undefined ? {} : { expectedDurationSeconds }),
     maxExpectedDurationDriftSeconds: options.tolerance,
   });
@@ -54,6 +67,7 @@ try {
   if (expectedDurationSeconds !== undefined) {
     process.stdout.write(`Planned duration: ${expectedDurationSeconds.toFixed(2)}s (tolerance ±${options.tolerance.toFixed(2)}s)\n`);
   }
+  process.stdout.write(`Audio mode: ${report.audioMode}\n`);
   process.stdout.write(`Audio: ${report.audio ? `${report.audio.codec}, ${report.audio.sampleRate}Hz, ${report.audio.channels}ch` : "missing"}\n`);
   process.stdout.write(`Findings: ${report.findings.length}\n`);
   for (const finding of report.findings) {
