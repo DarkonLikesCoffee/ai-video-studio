@@ -80,4 +80,4 @@ A report can only be approved after full-video inspection, a reviewer and timest
 
 ## Legacy report compatibility
 
-Schema-version-1 review reports can be used as the history input for a first correction render. The generator preserves that original artifact as a legacy first iteration and appends the new schema-version-2 iteration.
+Schema-version-1 review reports can be used as the history input for a first correction render after each correction has been upgraded with a stable id, targetPaths, applied status and appliedInCommit. The generator preserves that original artifact as a legacy first iteration and appends the new schema-version-2 iteration.
