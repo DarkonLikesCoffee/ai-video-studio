@@ -173,7 +173,7 @@ const run = async (): Promise<void> => {
     const value: unknown = JSON.parse(await readFile(resolve(path), "utf8"));
     const errors = verifyEvidenceFiles
       ? projectRoot
-        ? await validateProductionEvidenceFiles(value, { expectedProjectId, requireEvidence, repositoryRoot, projectRoot })
+        ? await validateProductionEvidenceFiles(value, { ...(expectedProjectId === undefined ? {} : { expectedProjectId }), requireEvidence, repositoryRoot, projectRoot })
         : ["--verify-evidence-files requires --project-root <project-dir>."]
       : validateProductionState(value, {
           ...(expectedProjectId === undefined ? {} : { expectedProjectId }),
