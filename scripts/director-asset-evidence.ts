@@ -323,13 +323,12 @@ const collectCompositionReferences = async (
 };
 
 const usageMatchesAsset = (reference: SourceReference, asset: RecordValue, localPath: string | null): boolean => {
-  const referenceValue = reference.value.replace(/\\/g, "/").replace(/^\.\/+/, "").toLowerCase();
+  const referenceValue = normalizeRef(reference.value);
   if (!referenceValue) return false;
   const candidates = [localPath, asText(asset.path), asText(asset.file)]
     .filter((value): value is string => value !== null)
-    .map((value) => value.replace(/\\/g, "/").replace(/^\.\/+/, "").toLowerCase());
-  return candidates.some((candidate) => candidate === referenceValue ||
-    (path.posix.extname(candidate) !== "" && path.posix.basename(candidate) === path.posix.basename(referenceValue)));
+    .map(normalizeRef);
+  return candidates.some((candidate) => candidate === referenceValue);
 };
 
 const describeProvenance = (asset: RecordValue) => asText(asset.provenance) ?? asText(asset.sourcePage) ?? asText(asset.sourceUrl) ?? asText(asset.creator) ?? asText(asset.attribution);
