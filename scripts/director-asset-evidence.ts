@@ -157,6 +157,8 @@ type CompositionReferences = {
   available: boolean;
   source: string | null;
   references: SourceReference[];
+  referencesByModule: Map<string, SourceReference[]>;
+  reachableModules: Set<string>;
   projectVideoScenes: ProjectVideoSceneReferences[] | null;
   reason?: string;
 };
@@ -295,16 +297,11 @@ const collectImportedSourceReferences = async (
   entryFile: string,
   repositoryRoot: string,
   projectRoot: string,
-): Promise<SourceReference[]> => {
+): Promise<{ references: SourceReference[]; referencesByModule: Map<string, SourceReference[]>; reachableModules: Set<string> }> => {
   const references: SourceReference[] = [];
+  const referencesByModule = new Map<string, SourceReference[]>();
+  const reachableModules = new Set<string>();
   const visited = new Set<string>();
-  const addModuleRelativeAsset = (specifier: string, sourceAbsolute: string, sourceRelative: string): void => {
-    const cleanSpecifier = specifier.split(/[?#]/, 1)[0] ?? specifier;
-    const value = cleanSpecifier.startsWith(".") || path.isAbsolute(cleanSpecifier)
-      ? path.relative(projectRoot, path.resolve(path.dirname(sourceAbsolute), cleanSpecifier)).split(path.sep).join("/")
-      : cleanSpecifier;
-    references.push({ value, sourceFile: sourceRelative });
-  };
   const visitFile = async (filePath: string): Promise<void> => {
     const absolute = path.resolve(filePath);
     if (!isWithin(repositoryRoot, absolute) || visited.has(absolute) || !isAuditableSource(absolute)) return;
@@ -315,16 +312,19 @@ const collectImportedSourceReferences = async (
     } catch {
       return;
     }
-    const relativeSource = path.relative(repositoryRoot, absolute);
+    const relativeSource = path.relative(repositoryRoot, absolute).split(path.sep).join("/");
+    reachableModules.add(relativeSource);
+    const moduleReferences: SourceReference[] = [];
     if (path.extname(absolute).toLowerCase() === ".json") {
       try {
-        collectJsonAssetReferences(JSON.parse(contents) as unknown, relativeSource, references);
+        collectJsonAssetReferences(JSON.parse(contents) as unknown, relativeSource, moduleReferences);
       } catch {
-        // Invalid JSON will be reported by the project validators; it cannot prove asset use here.
+        // Invalid JSON cannot prove asset use.
       }
+      references.push(...moduleReferences);
+      referencesByModule.set(relativeSource, moduleReferences);
       return;
     }
-
     const ext = path.extname(absolute).toLowerCase();
     const kind = ext === ".tsx" ? ts.ScriptKind.TSX
       : ext === ".jsx" ? ts.ScriptKind.JSX
@@ -335,7 +335,6 @@ const collectImportedSourceReferences = async (
     const staticFileAliases = new Set<string>();
     const staticFileNamespaces = new Set<string>();
     const constants = new Map<string, string>();
-
     for (const statement of sourceFile.statements) {
       if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || statement.moduleSpecifier.text !== "remotion") continue;
       const bindings = statement.importClause?.namedBindings;
@@ -347,7 +346,6 @@ const collectImportedSourceReferences = async (
         }
       }
     }
-
     const gatherConstants = (node: ts.Node): void => {
       if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
         const value = resolveStaticString(node.initializer, constants);
@@ -356,28 +354,30 @@ const collectImportedSourceReferences = async (
       ts.forEachChild(node, gatherConstants);
     };
     gatherConstants(sourceFile);
-
     const recordStaticFileCall = (node: ts.CallExpression): void => {
       const expression = node.expression;
       const isNamedStaticFile = ts.isIdentifier(expression) && staticFileAliases.has(expression.text);
       const isNamespaceStaticFile = ts.isPropertyAccessExpression(expression) &&
-        expression.name.text === "staticFile" &&
-        ts.isIdentifier(expression.expression) &&
+        expression.name.text === "staticFile" && ts.isIdentifier(expression.expression) &&
         staticFileNamespaces.has(expression.expression.text);
       if (!isNamedStaticFile && !isNamespaceStaticFile) return;
       const value = resolveStaticString(node.arguments[0], constants);
-      if (value !== null) references.push({ value, sourceFile: relativeSource });
+      if (value !== null) moduleReferences.push({ value, sourceFile: relativeSource });
     };
-
+    const addModuleRelativeAsset = (specifier: string): void => {
+      const cleanSpecifier = specifier.split(/[?#]/, 1)[0] ?? specifier;
+      const value = cleanSpecifier.startsWith(".") || path.isAbsolute(cleanSpecifier)
+        ? path.relative(projectRoot, path.resolve(path.dirname(absolute), cleanSpecifier)).split(path.sep).join("/")
+        : cleanSpecifier;
+      moduleReferences.push({ value, sourceFile: relativeSource });
+    };
     const visitNode = (node: ts.Node): void => {
       if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
         const specifier = node.moduleSpecifier.text;
-        if (isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier, absolute, relativeSource);
+        if (isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier);
         else imports.push(specifier);
       }
-      if (ts.isExportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
-        imports.push(node.moduleSpecifier.text);
-      }
+      if (ts.isExportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) imports.push(node.moduleSpecifier.text);
       if (ts.isCallExpression(node)) {
         recordStaticFileCall(node);
         const firstArgument = node.arguments[0];
@@ -386,14 +386,14 @@ const collectImportedSourceReferences = async (
           const isDynamicImport = node.expression.kind === ts.SyntaxKind.ImportKeyword;
           if (isRequire || isDynamicImport) {
             const specifier = firstArgument.text;
-            if (isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier, absolute, relativeSource);
+            if (isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier);
             else imports.push(specifier);
           }
         }
       }
       if (ts.isNewExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "URL") {
         const specifier = resolveStaticString(node.arguments?.[0], constants);
-        if (specifier && isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier, absolute, relativeSource);
+        if (specifier && isMediaAssetPath(specifier)) addModuleRelativeAsset(specifier);
       }
       if (ts.isJsxAttribute(node) && (node.name.getText(sourceFile) === "src" || node.name.getText(sourceFile) === "poster")) {
         const initializer = node.initializer;
@@ -402,19 +402,20 @@ const collectImportedSourceReferences = async (
           : initializer && ts.isJsxExpression(initializer)
             ? resolveStaticString(initializer.expression, constants)
             : null;
-        if (value !== null) references.push({ value, sourceFile: relativeSource });
+        if (value !== null) moduleReferences.push({ value, sourceFile: relativeSource });
       }
       ts.forEachChild(node, visitNode);
     };
     visitNode(sourceFile);
+    references.push(...moduleReferences);
+    referencesByModule.set(relativeSource, moduleReferences);
     for (const specifier of imports) {
       const resolved = await resolveLocalModule(specifier, absolute, repositoryRoot);
       if (resolved) await visitFile(resolved);
     }
   };
-
   await visitFile(entryFile);
-  return references;
+  return { references, referencesByModule, reachableModules };
 };
 const collectCompositionReferences = async (
   plan: RecordValue,
