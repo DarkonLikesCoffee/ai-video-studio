@@ -8,6 +8,7 @@ import { MadridNewYorkParis } from "./scenes/MadridNewYorkParis";
 import { MadridTrip, MADRID_TRIP_DURATION, FPS as MADRID_TRIP_FPS, WIDTH as MADRID_TRIP_WIDTH, HEIGHT as MADRID_TRIP_HEIGHT } from "./scenes/MadridTrip";
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
 import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
+import { LighthouseRepairFilm } from "./scenes/LighthouseRepairFilm";
 
 // Remotion merges partial --props over defaultProps. Do not leak the example
 // project's soundtrack into projects that intentionally omit audioTracks.
@@ -69,6 +70,14 @@ export const RemotionRoot = () => (
       id="CinematicAdBenchmark"
       component={CinematicAdBenchmark}
       durationInFrames={600}
+      fps={30}
+      width={1920}
+      height={1080}
+    />
+    <Composition
+      id="LighthouseRepairFilm"
+      component={LighthouseRepairFilm}
+      durationInFrames={720}
       fps={30}
       width={1920}
       height={1080}
