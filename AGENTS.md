@@ -45,6 +45,19 @@ Help build AI Video Studio into a prompt-to-finished-video production system. Do
 
 - **Technical freeze gate (enforced by CI):** Push the complete candidate project first. Then make a separate commit that changes only `render-request.json`; include `candidateSha` equal to the exact remote branch tip immediately before that request commit. The render workflow fetches full history and rejects a missing/mismatched SHA, any other file in the triggering push, reused candidate SHAs, and reused request IDs. A new branch push cannot render. If any project files remain unpushed, push them in a normal development commit first, then create the request-only commit.
 
+## Production-state ledger — mandatory for new projects
+
+- Every **new agent-led project** must create `projects/<slug>/production/production-state.json` as part of project bootstrap. Use schema version 1, set `projectId` to the lowercase project-directory slug, initialize `stage` to `brief`, set `updatedAt` to an ISO timestamp, and record a real brief artifact in `evidence.brief`. Create the brief file and state file together; do not wait until render time to add the ledger.
+- After completing each production stage, advance `stage` in order and add project-relative evidence paths for that stage while preserving evidence for all earlier stages. Evidence files must exist, be non-empty regular files inside the project directory, and must not be symlinks. Never add an evidence reference merely because a task was discussed or intended.
+- Before committing a render candidate, set the state to exactly `frozen` and provide evidence for `brief`, `direction`, `storyboard`, `assets`, `build`, `render-ready` and `frozen`. Run:
+  ```bash
+  npm run validate:state -- projects/<slug>/production/production-state.json <slug> --require-evidence --verify-evidence-files --project-root projects/<slug> --require-stage frozen
+  ```
+- Include the frozen state file and its evidence in the candidate commit. Then follow the separate, request-only `render-request.json` commit protocol. Do not put the render request in the candidate commit.
+- Render preflight checks this file when present. If it is absent, existing projects use an explicit legacy compatibility path; **new projects must not omit the file to bypass the gate**.
+- After a render, advance the ledger to `rendered`, then `qa`, `accepted` and `delivered` only when the corresponding artifact/review/delivery evidence exists. The workflow never advances the stage automatically. For a corrected candidate, produce and validate a new frozen candidate; preserve prior render/QA history as separate evidence.
+- The ledger establishes stage and file existence, not the truth of file contents, semantic correctness, creative approval or actual MP4 quality. The visual/audio QA and final-delivery checks remain mandatory.
+
 ## Definition of done
 
 For code changes: relevant tests, typecheck, validation and CI pass; the implementation matches its documentation.
