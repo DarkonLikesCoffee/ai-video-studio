@@ -2,6 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { stat, realpath } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import * as ts from "typescript";
 import { validateProductionPlan } from "./validate-production-plan";
 
 type RecordValue = Record<string, unknown>;
@@ -9,6 +10,8 @@ type Issue = { code: string; severity: "warning" | "error"; message: string; sho
 type LocalStatus = "present" | "missing" | "empty" | "unsafe" | "not-local";
 type PreviewStatus = LocalStatus | "not-required";
 type VisualReviewStatus = "approved" | "pending" | "rejected" | "missing" | "not-required";
+type ReusePolicy = "required" | "optional" | "reference-only";
+type AssetUsageStatus = "referenced" | "not-referenced" | "not-required" | "unverifiable";
 type AssetEvidence = {
   id: string;
   reference: string;
@@ -25,6 +28,9 @@ type AssetEvidence = {
   previewStatus: PreviewStatus;
   visualReviewApplicable: boolean;
   visualReviewStatus: VisualReviewStatus;
+  reusePolicy: ReusePolicy;
+  usageStatus: AssetUsageStatus;
+  usageEvidence: string[];
   visualReview: { reviewer: string | null; reviewedAt: string | null; notes: string | null };
 };
 type ShotEvidence = {
@@ -74,6 +80,10 @@ export type AssetEvidenceReport = {
     visualReviewRejected: number;
     visualReviewMissing: number;
     missingPreviews: number;
+    requiredAssetCount: number;
+    requiredAssetsReferenced: number;
+    requiredAssetsNotReferenced: number;
+    requiredAssetsUnverifiable: number;
   };
   shots: ShotEvidence[];
   assets: AssetEvidence[];
@@ -126,6 +136,199 @@ const isAudioAsset = (asset: RecordValue): boolean => {
     /\b(?:audio|sound|music|narration|voice(?:over)?|ambience)\b/.test(declaredType) ||
     /\.(?:aac|aif|aiff|alac|flac|m4a|mid|midi|mp3|oga|ogg|opus|wav|wma)$/i.test(assetPath);
 };
+
+const reusePolicies = ["required", "optional", "reference-only"] as const;
+const getReusePolicy = (asset: RecordValue): ReusePolicy => {
+  const declared = asText(asset.reusePolicy);
+  if (declared && reusePolicies.includes(declared as ReusePolicy)) return declared as ReusePolicy;
+  return asText(asset.usageRole) === "design-reference" ? "reference-only" : "optional";
+};
+
+type SourceReference = { value: string; sourceFile: string };
+type CompositionReferences = { available: boolean; source: string | null; references: SourceReference[]; reason?: string };
+
+const sourceExtensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts", ".json"];
+const isAuditableSource = (filePath: string): boolean => sourceExtensions.includes(path.extname(filePath).toLowerCase());
+
+const addJsonStrings = (value: unknown, sourceFile: string, references: SourceReference[]): void => {
+  if (typeof value === "string") {
+    references.push({ value, sourceFile });
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value) addJsonStrings(entry, sourceFile, references);
+    return;
+  }
+  if (isRecord(value)) {
+    for (const entry of Object.values(value)) addJsonStrings(entry, sourceFile, references);
+  }
+};
+
+const resolveLocalModule = async (specifier: string, containingFile: string, repositoryRoot: string): Promise<string | null> => {
+  if (!specifier.startsWith(".")) return null;
+  const base = path.resolve(path.dirname(containingFile), specifier);
+  const extension = path.extname(base).toLowerCase();
+  const candidates = extension
+    ? [base]
+    : [
+        base,
+        ...sourceExtensions.map((suffix) => base + suffix),
+        ...sourceExtensions.map((suffix) => path.join(base, "index" + suffix)),
+      ];
+  for (const candidate of candidates) {
+    if (!isWithin(repositoryRoot, candidate)) continue;
+    try {
+      if ((await stat(candidate)).isFile()) return candidate;
+    } catch {
+      // Try the next supported source extension.
+    }
+  }
+  return null;
+};
+
+const findCompositionModule = (rootSource: string, compositionId: string): string | null => {
+  const sourceFile = ts.createSourceFile("root.tsx", rootSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  let componentName: string | null = null;
+  const visit = (node: ts.Node): void => {
+    if (ts.isJsxSelfClosingElement(node) && node.tagName.getText(sourceFile) === "Composition") {
+      const idAttribute = node.attributes.properties.find((attribute): attribute is ts.JsxAttribute =>
+        ts.isJsxAttribute(attribute) && attribute.name.getText(sourceFile) === "id");
+      const idValue = idAttribute && idAttribute.initializer && ts.isStringLiteral(idAttribute.initializer)
+        ? idAttribute.initializer.text
+        : null;
+      const componentAttribute = node.attributes.properties.find((attribute): attribute is ts.JsxAttribute =>
+        ts.isJsxAttribute(attribute) && attribute.name.getText(sourceFile) === "component");
+      const componentExpression = componentAttribute?.initializer && ts.isJsxExpression(componentAttribute.initializer)
+        ? componentAttribute.initializer.expression
+        : null;
+      if (idValue === compositionId && componentExpression && ts.isIdentifier(componentExpression)) {
+        componentName = componentExpression.text;
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  if (!componentName) return null;
+
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || !statement.importClause) continue;
+    const clause = statement.importClause;
+    if (clause.name?.text === componentName) return statement.moduleSpecifier.text;
+    const bindings = clause.namedBindings;
+    if (bindings && ts.isNamedImports(bindings) && bindings.elements.some((element) => element.name.text === componentName)) {
+      return statement.moduleSpecifier.text;
+    }
+  }
+  return null;
+};
+
+const collectImportedSourceReferences = async (
+  entryFile: string,
+  repositoryRoot: string,
+): Promise<SourceReference[]> => {
+  const references: SourceReference[] = [];
+  const visited = new Set<string>();
+  const visitFile = async (filePath: string): Promise<void> => {
+    const absolute = path.resolve(filePath);
+    if (!isWithin(repositoryRoot, absolute) || visited.has(absolute) || !isAuditableSource(absolute)) return;
+    visited.add(absolute);
+    let contents: string;
+    try {
+      contents = await readFile(absolute, "utf8");
+    } catch {
+      return;
+    }
+    if (path.extname(absolute).toLowerCase() === ".json") {
+      try {
+        addJsonStrings(JSON.parse(contents) as unknown, path.relative(repositoryRoot, absolute), references);
+      } catch {
+        // Invalid JSON will be reported by the project validators; it cannot prove asset use here.
+      }
+      return;
+    }
+
+    const ext = path.extname(absolute).toLowerCase();
+    const kind = ext === ".tsx" ? ts.ScriptKind.TSX
+      : ext === ".jsx" ? ts.ScriptKind.JSX
+      : ext === ".js" || ext === ".mjs" || ext === ".cjs" ? ts.ScriptKind.JS
+      : ts.ScriptKind.TS;
+    const sourceFile = ts.createSourceFile(absolute, contents, ts.ScriptTarget.Latest, true, kind);
+    const imports: string[] = [];
+    const visitNode = (node: ts.Node): void => {
+      if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
+        references.push({ value: node.text, sourceFile: path.relative(repositoryRoot, absolute) });
+      }
+      if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) imports.push(node.moduleSpecifier.text);
+      if (ts.isExportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) imports.push(node.moduleSpecifier.text);
+      if (ts.isCallExpression(node) && node.arguments.length > 0 && ts.isStringLiteral(node.arguments[0])) {
+        const isRequire = ts.isIdentifier(node.expression) && node.expression.text === "require";
+        const isDynamicImport = node.expression.kind === ts.SyntaxKind.ImportKeyword;
+        if (isRequire || isDynamicImport) imports.push(node.arguments[0].text);
+      }
+      ts.forEachChild(node, visitNode);
+    };
+    visitNode(sourceFile);
+    for (const specifier of imports) {
+      const resolved = await resolveLocalModule(specifier, absolute, repositoryRoot);
+      if (resolved) await visitFile(resolved);
+    }
+  };
+
+  await visitFile(entryFile);
+  return references;
+};
+
+const collectCompositionReferences = async (
+  plan: RecordValue,
+  projectRoot: string,
+  repositoryRoot: string,
+): Promise<CompositionReferences> => {
+  const strategy = isRecord(plan.renderStrategy) ? plan.renderStrategy : {};
+  const renderer = asText(strategy.renderer);
+  const compositionId = asText(strategy.compositionId);
+  if (!renderer || !compositionId) return { available: false, source: null, references: [], reason: "The production plan has no valid render strategy." };
+
+  if (renderer === "project-video" && compositionId === "ProjectVideo") {
+    const scenePath = path.join(projectRoot, "scene.json");
+    try {
+      const scene = JSON.parse(await readFile(scenePath, "utf8")) as unknown;
+      const references: SourceReference[] = [];
+      addJsonStrings(scene, "scene.json", references);
+      return { available: true, source: "scene.json", references };
+    } catch {
+      return { available: false, source: "scene.json", references: [], reason: "The selected ProjectVideo scene.json could not be read." };
+    }
+  }
+
+  const rootPath = path.join(repositoryRoot, "packages", "video-engine", "src", "root.tsx");
+  let rootSource: string;
+  try {
+    rootSource = await readFile(rootPath, "utf8");
+  } catch {
+    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], reason: "The Remotion composition registry source could not be read." };
+  }
+  const moduleSpecifier = findCompositionModule(rootSource, compositionId);
+  if (!moduleSpecifier) {
+    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], reason: "The selected composition could not be mapped to its imported component in RemotionRoot." };
+  }
+  const componentFile = await resolveLocalModule(moduleSpecifier, rootPath, repositoryRoot);
+  if (!componentFile) {
+    return { available: false, source: moduleSpecifier, references: [], reason: "The selected composition component source could not be resolved." };
+  }
+  const references = await collectImportedSourceReferences(componentFile, repositoryRoot);
+  return { available: true, source: path.relative(repositoryRoot, componentFile), references };
+};
+
+const usageMatchesAsset = (reference: SourceReference, asset: RecordValue, localPath: string | null): boolean => {
+  const referenceValue = reference.value.replace(/\\/g, "/").replace(/^\.\/+/, "").toLowerCase();
+  if (!referenceValue) return false;
+  const candidates = [localPath, asText(asset.path), asText(asset.file)]
+    .filter((value): value is string => value !== null)
+    .map((value) => value.replace(/\\/g, "/").replace(/^\.\/+/, "").toLowerCase());
+  return candidates.some((candidate) => candidate === referenceValue ||
+    (path.posix.extname(candidate) !== "" && path.posix.basename(candidate) === path.posix.basename(referenceValue)));
+};
+
 const describeProvenance = (asset: RecordValue) => asText(asset.provenance) ?? asText(asset.sourcePage) ?? asText(asset.sourceUrl) ?? asText(asset.creator) ?? asText(asset.attribution);
 const describeRights = (asset: RecordValue) => asText(asset.license) ?? (asText(asset.rightsBasis) && asText(asset.rightsNote) ? `${asset.rightsBasis}: ${asset.rightsNote}` : null);
 
@@ -137,7 +340,7 @@ const assetMatchesRef = (asset: AssetEvidence, reference: string): boolean => {
 export const buildAssetEvidenceReport = async (
   planValue: unknown,
   manifestValue: unknown,
-  options: { projectRoot: string; planPath?: string; manifestPath?: string; generatedAt?: string },
+  options: { projectRoot: string; repositoryRoot?: string; planPath?: string; manifestPath?: string; generatedAt?: string },
 ): Promise<AssetEvidenceReport> => {
   if (!isRecord(planValue) || !Array.isArray(planValue.shots)) throw new Error("Production plan must contain a shots array.");
   const planErrors = validateProductionPlan(planValue);
@@ -145,6 +348,8 @@ export const buildAssetEvidenceReport = async (
   if (!isRecord(manifestValue) || !Array.isArray(manifestValue.assets)) throw new Error("Asset manifest must contain an assets array.");
   const projectRoot = path.resolve(options.projectRoot);
   const requireVisualReview = planValue.assetVisualReviewRequired === true;
+  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
+  const compositionReferences = await collectCompositionReferences(planValue, projectRoot, repositoryRoot);
   const shotsInput = planValue.shots.filter(isRecord);
   const shotIds = shotsInput.map((shot) => asText(shot.id)).filter((id): id is string => id !== null);
   const knownShots = new Set(shotIds);
@@ -164,6 +369,17 @@ export const buildAssetEvidenceReport = async (
     if (!asText(value.type)) addIssue({ code: "ASSET_TYPE_MISSING", severity: "warning", message: `Asset "${reference}" has no type.`, assetRef: reference });
     const local = await resolveLocalPath(value, projectRoot);
     const visualReviewApplicable = !isAudioAsset(value);
+    const declaredReusePolicy = asText(value.reusePolicy);
+    const validReusePolicy = declaredReusePolicy === null || reusePolicies.includes(declaredReusePolicy as ReusePolicy);
+    if (!validReusePolicy) addIssue({ code: "ASSET_REUSE_POLICY_INVALID", severity: "error", message: `Asset "${reference}" reusePolicy must be required, optional or reference-only.`, assetRef: reference });
+    const reusePolicy = getReusePolicy(value);
+    const usageMatches = reusePolicy === "reference-only" ? [] : compositionReferences.references.filter((sourceReference) => usageMatchesAsset(sourceReference, value, local.path));
+    const usageStatus: AssetUsageStatus = reusePolicy === "reference-only"
+      ? "not-required"
+      : !compositionReferences.available
+        ? "unverifiable"
+        : usageMatches.length > 0 ? "referenced" : "not-referenced";
+    const usageEvidence = [...new Set(usageMatches.map((match) => `${match.sourceFile}: ${match.value}`))];
     const previewRaw = asText(value.previewPath) ?? asText(value.preview);
     const previewLocal: { path: string | null; status: PreviewStatus } = !visualReviewApplicable
       ? { path: null, status: "not-required" }
@@ -201,6 +417,8 @@ export const buildAssetEvidenceReport = async (
     else if (local.status === "empty") addIssue({ code: "ASSET_FILE_EMPTY", severity: "warning", message: `Asset "${reference}" exists but is empty.`, assetRef: reference });
     if (provenanceStatus === "missing") addIssue({ code: "ASSET_PROVENANCE_MISSING", severity: "warning", message: `Asset "${reference}" has no source/provenance note or URL.`, assetRef: reference });
     if (rightsStatus === "missing") addIssue({ code: "ASSET_RIGHTS_MISSING", severity: "warning", message: `Asset "${reference}" has no license or explicit rights basis and note.`, assetRef: reference });
+    if (reusePolicy === "required" && usageStatus === "not-referenced") addIssue({ code: "ASSET_REQUIRED_NOT_REFERENCED", severity: "error", message: `Required asset "${reference}" is not referenced by the selected composition source.`, assetRef: reference });
+    if (reusePolicy === "required" && usageStatus === "unverifiable") addIssue({ code: "ASSET_USAGE_UNVERIFIABLE", severity: "error", message: `Required asset "${reference}" could not be audited: ${compositionReferences.reason ?? "composition source unavailable"}`, assetRef: reference });
     if (requireVisualReview && visualReviewApplicable) {
       if (previewLocal.status === "not-local") addIssue({ code: "ASSET_PREVIEW_MISSING", severity: "warning", message: `Asset "${reference}" has no declared preview file.`, assetRef: reference });
       else if (previewLocal.status !== "present") addIssue({ code: "ASSET_PREVIEW_UNAVAILABLE", severity: "warning", message: `Asset "${reference}" preview is ${previewLocal.status}.`, assetRef: reference });
@@ -225,6 +443,9 @@ export const buildAssetEvidenceReport = async (
       visualReviewApplicable,
       visualReviewStatus,
       visualReview: { reviewer, reviewedAt, notes: reviewNotes },
+      reusePolicy,
+      usageStatus,
+      usageEvidence,
     });
   }
 
@@ -280,6 +501,10 @@ export const buildAssetEvidenceReport = async (
   const visualReviewRejected = assets.filter((asset) => asset.visualReviewStatus === "rejected").length;
   const visualReviewMissing = assets.filter((asset) => asset.visualReviewStatus === "missing").length;
   const missingPreviews = assets.filter((asset) => asset.previewStatus !== "present" && asset.previewStatus !== "not-required").length;
+  const requiredAssetCount = assets.filter((asset) => asset.reusePolicy === "required").length;
+  const requiredAssetsReferenced = assets.filter((asset) => asset.reusePolicy === "required" && asset.usageStatus === "referenced").length;
+  const requiredAssetsNotReferenced = assets.filter((asset) => asset.reusePolicy === "required" && asset.usageStatus === "not-referenced").length;
+  const requiredAssetsUnverifiable = assets.filter((asset) => asset.reusePolicy === "required" && asset.usageStatus === "unverifiable").length;
   const assetsNotLocal = assets.filter((asset) => asset.localStatus === "not-local").length;
   const emptyFiles = assets.filter((asset) => asset.localStatus === "empty").length;
   const unsafePaths = assets.filter((asset) => asset.localStatus === "unsafe").length;
@@ -325,6 +550,10 @@ export const buildAssetEvidenceReport = async (
       visualReviewRejected,
       visualReviewMissing,
       missingPreviews,
+      requiredAssetCount,
+      requiredAssetsReferenced,
+      requiredAssetsNotReferenced,
+      requiredAssetsUnverifiable,
     },
     shots,
     assets,
