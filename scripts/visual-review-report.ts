@@ -60,6 +60,10 @@ export const buildVisualReviewReport = ({
   renderContext,
 }: VisualReviewInput) => {
   if (!isVideoSha(videoSha256)) throw new Error("videoSha256 must be a valid SHA-256 hash.");
+  if (typeof contactSheetReport?.durationSeconds !== "number" ||
+      !Number.isFinite(contactSheetReport.durationSeconds) || contactSheetReport.durationSeconds <= 0) {
+    throw new Error("The contact-sheet report must include a positive durationSeconds value.");
+  }
   if (!isCommitSha(renderContext.candidateSha)) throw new Error("Render candidate SHA must be a full 40-character commit SHA.");
   if (!isCommitSha(renderContext.sourceCommit)) throw new Error("Render source commit must be a full 40-character commit SHA.");
   if (!renderContext.requestId.trim() || !renderContext.workflowRunId.trim() || !Number.isFinite(Date.parse(renderContext.renderedAt))) {
