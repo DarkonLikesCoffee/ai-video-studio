@@ -8,6 +8,7 @@ import { buildAssetEvidenceReport } from "../scripts/director-asset-evidence";
 const criteria = ["Criterion one", "Criterion two", "Criterion three"];
 const makePlan = () => ({
   schemaVersion: 1,
+  assetVisualReviewRequired: false,
   id: "asset-evidence-test",
   title: "Asset Evidence Test",
   delivery: { durationSeconds: 3, width: 1920, height: 1080, fps: 30, format: "mp4" },
@@ -172,5 +173,123 @@ test("whitespace-only shot and asset references are ignored", async () => {
     assert.deepEqual(report.shots[1]?.plannedAssetRefs, []);
     assert.deepEqual(report.shots[1]?.unresolvedPlannedAssetRefs, []);
     assert.equal(report.summary.unknownManifestShotIds, 0);
+  });
+});
+
+
+test("asset visual review requires an existing preview and complete approval metadata", async () => {
+  await withProject(async (root) => {
+    await mkdir(path.join(root, "previews"), { recursive: true });
+    await writeFile(path.join(root, "previews", "one.svg"), "<svg/>");
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "original artwork",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork.",
+        previewPath: "previews/one.svg",
+        visualReview: {
+          status: "approved",
+          reviewer: "Test reviewer",
+          reviewedAt: "2026-01-01T00:00:00.000Z",
+          notes: "Inspected silhouette, proportions, rendering and clipping; no defects found."
+        }
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.previewStatus, "present");
+    assert.equal(report.assets[0]?.visualReviewStatus, "approved");
+    assert.equal(report.summary.visualReviewApproved, 1);
+    assert.equal(report.summary.visualReviewMissing, 0);
+    assert.equal(report.summary.missingPreviews, 0);
+  });
+});
+
+test("missing, pending, rejected, unsafe and unavailable previews are reported without claiming approval", async () => {
+  await withProject(async (root) => {
+    const plan = makePlan();
+    plan.assetVisualReviewRequired = true;
+    const manifest = {
+      assets: [
+        { file: "one.svg", type: "art", shotIds: ["shot-one"], provenance: "Test", license: "Original", visualReview: { status: "pending" } },
+        { file: "two.svg", type: "art", shotIds: ["shot-two"], provenance: "Test", license: "Original", previewPath: "../outside.svg", visualReview: { status: "approved", reviewer: "R", reviewedAt: "2026-01-01T00:00:00Z", notes: "Reviewed." } },
+        { file: "missing.svg", type: "art", shotIds: ["shot-three"], provenance: "Test", license: "Original", visualReview: { status: "rejected", reviewer: "R", reviewedAt: "2026-01-01T00:00:00Z", notes: "Malformed preview." } }
+      ]
+    };
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.visualReviewStatus, "pending");
+    assert.equal(report.assets[1]?.previewStatus, "unsafe");
+    assert.equal(report.assets[1]?.visualReviewStatus, "missing");
+    assert.equal(report.assets[2]?.visualReviewStatus, "rejected");
+    assert.ok(report.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_PENDING"));
+    assert.ok(report.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_REJECTED"));
+    assert.ok(report.issues.some(issue => issue.code === "ASSET_PREVIEW_UNAVAILABLE"));
+  });
+});
+
+
+test("visual-review issues are opt-in for backwards compatibility and enforced when the plan requires review", async () => {
+  await withProject(async (root) => {
+    const manifest = { assets: [{ file: "one.svg", type: "art", shotIds: ["shot-one"], provenance: "Test", license: "Original" }] };
+    const legacyReport = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(legacyReport.summary.visualReviewMissing, 1);
+    assert.equal(legacyReport.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_MISSING"), false);
+    const requiredPlan = makePlan();
+    requiredPlan.assetVisualReviewRequired = true;
+    const requiredReport = await buildAssetEvidenceReport(requiredPlan, manifest, { projectRoot: root });
+    assert.ok(requiredReport.issues.some(issue => issue.code === "ASSET_PREVIEW_MISSING"));
+    assert.ok(requiredReport.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_MISSING"));
+  });
+});
+
+ 
+test("audio assets are excluded from the visual preview and approval gate", async () => {
+  await withProject(async (root) => {
+    await mkdir(path.join(root, "previews"), { recursive: true });
+    await mkdir(path.join(root, "assets", "audio"), { recursive: true });
+    await writeFile(path.join(root, "previews", "one.svg"), "<svg/>");
+    await writeFile(path.join(root, "assets", "audio", "score.wav"), "RIFF-audio-fixture");
+
+    const plan = makePlan();
+    plan.assetVisualReviewRequired = true;
+    const manifest = {
+      assets: [
+        {
+          file: "one.svg",
+          type: "image/svg+xml",
+          shotIds: ["shot-one"],
+          provenance: "Created for this test.",
+          license: "Original project artwork.",
+          previewPath: "previews/one.svg",
+          visualReview: {
+            status: "approved",
+            reviewer: "Test reviewer",
+            reviewedAt: "2026-01-01T00:00:00.000Z",
+            notes: "Inspected the image preview; no defects found."
+          }
+        },
+        {
+          file: "assets/audio/score.wav",
+          type: "audio/wav",
+          shotIds: ["all"],
+          provenance: "Original score for this test.",
+          license: "Original generated audio."
+        }
+      ]
+    };
+
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
+    const audio = report.assets.find((asset) => asset.reference === "assets/audio/score.wav");
+    assert.ok(audio);
+    assert.equal(audio.visualReviewApplicable, false);
+    assert.equal(audio.previewStatus, "not-required");
+    assert.equal(audio.visualReviewStatus, "not-required");
+    assert.equal(report.summary.visualReviewApproved, 1);
+    assert.equal(report.summary.visualReviewNotRequired, 1);
+    assert.equal(report.summary.visualReviewMissing, 0);
+    assert.equal(report.summary.missingPreviews, 0);
+    assert.equal(report.issues.some((issue) => issue.code === "ASSET_PREVIEW_MISSING" && issue.assetRef === audio.reference), false);
+    assert.equal(report.issues.some((issue) => issue.code === "ASSET_VISUAL_REVIEW_MISSING" && issue.assetRef === audio.reference), false);
   });
 });

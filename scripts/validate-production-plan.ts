@@ -40,6 +40,7 @@ type Plan = {
     assets?: unknown;
   }>;
   renderStrategy?: unknown;
+  assetVisualReviewRequired?: unknown;
   acceptanceCriteria?: unknown;
 };
 
@@ -190,6 +191,8 @@ export const validateProductionPlan = (value: unknown): string[] => {
       plan.acceptanceCriteria.some((item) => typeof item !== "string" || !item.trim() || item.length > 300)) {
     errors.push("acceptanceCriteria must contain 3–10 non-empty strings.");
   }
+
+  if (plan.assetVisualReviewRequired !== undefined && typeof plan.assetVisualReviewRequired !== "boolean") errors.push("assetVisualReviewRequired must be a boolean when provided.");
 
   errors.push(...validateRenderStrategy(plan.renderStrategy));
   errors.push(...validateAcceptanceCoverage(plan));
