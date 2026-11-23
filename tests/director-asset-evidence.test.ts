@@ -632,3 +632,26 @@ test("required audio assets are checked globally and are excluded from per-shot 
     assert.equal(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT"), false);
   });
 });
+
+test("required ProjectVideo visual asset without shot assignments is blocking", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ id: "shot-one", mediaLayers: [{ src: "assets/one.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.equal(report.assets[0]?.shotUsageStatus, "unverifiable");
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_SHOT_USAGE_UNVERIFIABLE" && issue.severity === "error"));
+    assert.equal(report.summary.requiredAssetsShotUsageUnverifiable, 1);
+    assert.equal(report.summary.status, "invalid");
+  });
+});
