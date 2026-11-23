@@ -628,7 +628,9 @@ test("required audio assets are checked globally and are excluded from per-shot 
     };
     const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
     assert.equal(report.assets[0]?.usageStatus, "referenced");
+    assert.deepEqual(report.assets[0]?.usageEvidence, ["scene.json: assets/score.wav"]);
     assert.equal(report.assets[0]?.shotUsageStatus, "not-required");
+    assert.equal(report.summary.requiredAssetsReferenced, 1);
     assert.equal(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED_IN_ASSIGNED_SHOT"), false);
   });
 });
