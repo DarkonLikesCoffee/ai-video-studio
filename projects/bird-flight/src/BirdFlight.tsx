@@ -75,9 +75,10 @@ const OpeningShot = ({frame}:{frame:number}) => {
       <path d="M0 840 Q410 745 770 815 T1440 780 T1920 760 L1920 1080 L0 1080Z" fill="url(#openCliff)"/>
       <g opacity=".5"><Cloud x={350-frame*.35} y={360} scale={1.1}/><Cloud x={1050-frame*.2} y={420} scale={.8}/></g>
       <g transform={`translate(0 ${branchSway})`}>
-      <g transform={"translate(0 " + branchSway + ")}>
+        <path d="M-70 930 Q300 830 550 875 Q780 920 1030 820 Q1150 774 1260 790" fill="none" stroke="#53483B" strokeWidth="43" strokeLinecap="round"/>
         <path d="M460 877 Q565 770 610 650 M835 884 Q905 800 958 745" fill="none" stroke="#584D40" strokeWidth="20" strokeLinecap="round"/>
-        <Pine x={330} y={1040} scale={.88} tone="#2C4D48"/><Pine x={590} y={1035} scale={.64} tone="#496B5A"/>
+        <Pine x={330} y={1040} scale={.88} tone="#2C4D48"/>
+        <Pine x={590} y={1035} scale={.64} tone="#496B5A"/>
       </g>
       <Bird x={760} y={830} scale={1.5} flap={Math.sin(frame/5.8)*1.1} color="#263C3C"/>
       {launch>0&&<Bird x={move(frame,1290,1820,70,150)} y={move(frame,585,180,70,150)} scale={1.35-launch*.25} rotation={-22-launch*8} flap={Math.sin(frame/5.6)} color="#20383B" opacity={launch}/>}
