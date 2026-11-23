@@ -35,3 +35,22 @@ test("both render commands use the explicit 2D branch instead of composition-nam
   assert.ok(!circleRenderStep.includes("LighthouseRepairFilm"));
   assert.ok(!circleRenderStep.includes("MadridTrip"));
 });
+
+
+test("GitHub and CircleCI enforce frozen production state before rendering when a project opts in", () => {
+  const githubGate = githubWorkflow.indexOf("Enforce frozen production state when a project opts in");
+  const githubRender = githubWorkflow.indexOf("Render MP4 with GitHub Actions");
+  const circleGate = circleCiWorkflow.indexOf('STATE_PATH="$PROJECT_DIR/production/production-state.json"');
+  const circleRender = circleCiWorkflow.indexOf("name: Render MP4");
+
+  assert.ok(githubGate >= 0, "GitHub workflow must contain the production-state gate");
+  assert.ok(githubGate < githubRender, "GitHub state validation must happen before rendering");
+  assert.ok(githubWorkflow.includes("--require-evidence --verify-evidence-files"));
+  assert.ok(githubWorkflow.includes("--require-stage frozen"));
+  assert.ok(githubWorkflow.includes("continuing in legacy compatibility mode"));
+  assert.ok(circleGate >= 0, "CircleCI workflow must discover the conventional production-state file");
+  assert.ok(circleGate < circleRender, "CircleCI state validation must happen before rendering");
+  assert.ok(circleCiWorkflow.includes("--require-evidence --verify-evidence-files"));
+  assert.ok(circleCiWorkflow.includes("--require-stage frozen"));
+  assert.ok(circleCiWorkflow.includes("continuing in legacy compatibility mode"));
+});
