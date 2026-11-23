@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "projectId": "bird-flight",
+  "stage": "frozen",
+  "updatedAt": "2026-11-23T22:47:00+01:00",
+  "evidence": {
+    "brief": [
+      "production/creative-brief.md"
+    ],
+    "direction": [
+      "production/creative-direction.md"
+    ],
+    "storyboard": [
+      "production/storyboard.md"
+    ],
+    "assets": [
+      "production/asset-manifest.json"
+    ],
+    "build": [
+      "src/BirdFlight.tsx",
+      "production/shot-to-code-audit.md"
+    ],
+    "render-ready": [
+      "production/render-ready.md"
+    ],
+    "frozen": [
+      "production/frozen.md"
+    ]
+  }
+}

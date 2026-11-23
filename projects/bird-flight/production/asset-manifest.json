@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "projectId": "bird-flight",
+  "assets": [],
+  "notes": "All visual artwork is original procedural SVG/JSX authored in src/BirdFlight.tsx. No external images, video clips, fonts, music or sound recordings; intentionally silent."
+}

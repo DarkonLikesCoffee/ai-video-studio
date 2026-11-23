@@ -11,40 +11,16 @@ import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/N
 import { LighthouseRepairFilm } from "./scenes/LighthouseRepairFilm";
 import { TinyAstronautCrystalCave } from "./scenes/TinyAstronautCrystalCave";
 import { JumpingCat } from "./scenes/JumpingCat";
+import { BirdFlight } from "../../../projects/bird-flight/src/BirdFlight";
 
-// Remotion merges partial --props over defaultProps. Do not leak the example
-// project's soundtrack into projects that intentionally omit audioTracks.
-const defaultProject = {
-  ...(projectExample as unknown as VideoProject),
-  audioTracks: [],
-};
+const defaultProject = { ...(projectExample as unknown as VideoProject), audioTracks: [] };
 
 export const RemotionRoot = () => (
   <>
-    <Composition
-      id="JumpingCat"
-      component={JumpingCat}
-      durationInFrames={600}
-      fps={30}
-      width={1920}
-      height={1080}
-    />
-    <Composition
-      id="TinyAstronautCrystalCave"
-      component={TinyAstronautCrystalCave}
-      durationInFrames={600}
-      fps={30}
-      width={1920}
-      height={1080}
-    />
-    <Composition
-      id="DemoVideo"
-      component={DemoVideo}
-      durationInFrames={300}
-      fps={30}
-      width={1920}
-      height={1080}
-    />
+    <Composition id="JumpingCat" component={JumpingCat} durationInFrames={600} fps={30} width={1920} height={1080} />
+    <Composition id="BirdFlight" component={BirdFlight} durationInFrames={720} fps={30} width={1920} height={1080} />
+    <Composition id="TinyAstronautCrystalCave" component={TinyAstronautCrystalCave} durationInFrames={600} fps={30} width={1920} height={1080} />
+    <Composition id="DemoVideo" component={DemoVideo} durationInFrames={300} fps={30} width={1920} height={1080} />
     <Composition
       id="ProjectVideo"
       component={ProjectVideo}
@@ -60,46 +36,11 @@ export const RemotionRoot = () => (
         height: props.composition.height
       })}
     />
-    <Composition
-      id="ThreeDShowcase"
-      component={ThreeDShowcase}
-      durationInFrames={300}
-      fps={30}
-      width={1920}
-      height={1080}
-    />
-    <Composition
-      id="MadridNewYorkParis"
-      component={MadridNewYorkParis}
-      durationInFrames={900}
-      fps={30}
-      width={1920}
-      height={1080}
-    />
-    <Composition
-      id="MadridTrip"
-      component={MadridTrip}
-      durationInFrames={MADRID_TRIP_DURATION}
-      fps={MADRID_TRIP_FPS}
-      width={MADRID_TRIP_WIDTH}
-      height={MADRID_TRIP_HEIGHT}
-    />
-    <Composition
-      id="CinematicAdBenchmark"
-      component={CinematicAdBenchmark}
-      durationInFrames={600}
-      fps={30}
-      width={1920}
-      height={1080}
-    />
-    <Composition
-      id="LighthouseRepairFilm"
-      component={LighthouseRepairFilm}
-      durationInFrames={720}
-      fps={30}
-      width={1920}
-      height={1080}
-    />
+    <Composition id="ThreeDShowcase" component={ThreeDShowcase} durationInFrames={300} fps={30} width={1920} height={1080} />
+    <Composition id="MadridNewYorkParis" component={MadridNewYorkParis} durationInFrames={900} fps={30} width={1920} height={1080} />
+    <Composition id="MadridTrip" component={MadridTrip} durationInFrames={MADRID_TRIP_DURATION} fps={MADRID_TRIP_FPS} width={MADRID_TRIP_WIDTH} height={MADRID_TRIP_HEIGHT} />
+    <Composition id="CinematicAdBenchmark" component={CinematicAdBenchmark} durationInFrames={600} fps={30} width={1920} height={1080} />
+    <Composition id="LighthouseRepairFilm" component={LighthouseRepairFilm} durationInFrames={720} fps={30} width={1920} height={1080} />
     <Composition
       id="NarratedSkyExplainer"
       component={NarratedSkyExplainer}
