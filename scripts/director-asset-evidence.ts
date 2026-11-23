@@ -322,12 +322,16 @@ const collectCompositionReferences = async (
   return { available: true, source: path.relative(repositoryRoot, componentFile), references };
 };
 
+const normalizeUsagePath = (value: string): string =>
+  value.replace(/\\/g, "/").replace(/^\.\//, "").replace(/^assets\//, "");
+
 const usageMatchesAsset = (reference: SourceReference, asset: RecordValue, localPath: string | null): boolean => {
-  const referenceValue = normalizeRef(reference.value);
+  // Preserve case: asset paths can be case-sensitive on Linux and in CI.
+  const referenceValue = normalizeUsagePath(reference.value);
   if (!referenceValue) return false;
   const candidates = [localPath, asText(asset.path), asText(asset.file)]
     .filter((value): value is string => value !== null)
-    .map(normalizeRef);
+    .map(normalizeUsagePath);
   return candidates.some((candidate) => candidate === referenceValue);
 };
 
