@@ -59,14 +59,18 @@ export const validatePlaybackSession = (session: unknown, artifact: JsonRecord):
     errors.push("Playback session needs valid startedAt and completedAt timestamps.");
   } else if (Date.parse(session.completedAt) < Date.parse(session.startedAt)) {
     errors.push("Playback session completedAt cannot precede startedAt.");
+  } else if (typeof session.elapsedPlaybackSeconds === "number" &&
+      Date.parse(session.completedAt) - Date.parse(session.startedAt) + 1500 < session.elapsedPlaybackSeconds * 1000) {
+    errors.push("Playback session elapsed playback time cannot exceed its recorded wall-clock session.");
   }
-  if (typeof session.elapsedWallSeconds !== "number" || !Number.isFinite(session.elapsedWallSeconds) ||
-      typeof duration !== "number" || session.elapsedWallSeconds < duration * 0.98) {
-    errors.push("Playback session elapsedWallSeconds must be at least 98% of the video duration.");
+  if (typeof session.elapsedPlaybackSeconds !== "number" || !Number.isFinite(session.elapsedPlaybackSeconds) ||
+      typeof duration !== "number" || session.elapsedPlaybackSeconds < duration * 0.98) {
+    errors.push("Playback session elapsedPlaybackSeconds must be at least 98% of the video duration.");
   }
   if (session.endedEventObserved !== true) errors.push("Playback session must record the native video ended event.");
   if (session.complete !== true) errors.push("Playback session must be marked complete by the review player.");
   if (session.pageVisibleThroughout !== true) errors.push("Playback session is invalid because the review page was hidden.");
+  if (session.reviewWindowFocusedThroughout !== true) errors.push("Playback session is invalid because the review window lost focus.");
   if (session.seekAttempts !== 0) errors.push("Playback session must have zero seek attempts.");
   if (session.playbackRate !== 1) errors.push("Playback session must remain at normal 1× playback speed.");
 
@@ -314,8 +318,16 @@ export const validateVisualReviewReport = (report: unknown) => {
     if (!inspection || inspection.method !== "tracked-full-playback") {
       errors.push("Approval requires inspection.method=tracked-full-playback.");
     }
-    const playbackErrors = validatePlaybackSession(inspection?.playbackSession, artifact ?? {});
+    const playbackSession = isRecord(inspection?.playbackSession) ? inspection.playbackSession : undefined;
+    const playbackErrors = validatePlaybackSession(playbackSession, artifact ?? {});
     errors.push(...playbackErrors);
+    if (playbackSession && inspection?.reviewedAt !== playbackSession.completedAt) {
+      errors.push("inspection.reviewedAt must match the playback session completedAt timestamp.");
+    }
+    if (playbackSession && Array.isArray(inspection?.timestampsReviewedSeconds) &&
+        JSON.stringify(inspection.timestampsReviewedSeconds) !== JSON.stringify(playbackSession.checkpointsSeconds)) {
+      errors.push("inspection.timestampsReviewedSeconds must match the playback session checkpoints.");
+    }
     if (!inspection || typeof inspection.reviewer !== "string" || !inspection.reviewer.trim()) {
       errors.push("Approval requires a reviewer.");
     }
