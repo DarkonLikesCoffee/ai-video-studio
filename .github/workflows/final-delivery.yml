@@ -40,8 +40,8 @@ jobs:
 
       - name: Validate dispatch inputs
         env:
-          RENDER_RUN_ID: \${{ inputs.render_run_id }}
-          OUTPUT_NAME: \${{ inputs.output_name }}
+          RENDER_RUN_ID: ${{ inputs.render_run_id }}
+          OUTPUT_NAME: ${{ inputs.output_name }}
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -57,16 +57,16 @@ jobs:
       - name: Download the exact render review artifact
         uses: actions/download-artifact@v4
         with:
-          name: \${{ inputs.output_name }}
-          run-id: \${{ inputs.render_run_id }}
-          github-token: \${{ secrets.GITHUB_TOKEN }}
+          name: ${{ inputs.output_name }}
+          run-id: ${{ inputs.render_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           path: render-output
 
       - name: Validate approval, hash, technical QA and provenance
         env:
-          GITHUB_REPOSITORY: \${{ github.repository }}
-          RENDER_RUN_ID: \${{ inputs.render_run_id }}
-          OUTPUT_NAME: \${{ inputs.output_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RENDER_RUN_ID: ${{ inputs.render_run_id }}
+          OUTPUT_NAME: ${{ inputs.output_name }}
           REVIEW_REPORT_PATH: \${{ inputs.review_report_path }}
         run: |
           npx tsx scripts/validate-final-delivery.ts \
@@ -78,21 +78,21 @@ jobs:
       - name: Upload the approved final delivery package
         uses: actions/upload-artifact@v4
         with:
-          name: \${{ inputs.output_name }}-final-delivery
+          name: ${{ inputs.output_name }}-final-delivery
           path: render-output/
           if-no-files-found: error
           retention-days: 30
 
       - name: Summarize final delivery
         env:
-          OUTPUT_NAME: \${{ inputs.output_name }}
-          RENDER_RUN_ID: \${{ inputs.render_run_id }}
+          OUTPUT_NAME: ${{ inputs.output_name }}
+          RENDER_RUN_ID: ${{ inputs.render_run_id }}
         run: |
           {
             echo "## Final video delivery approved"
             echo "- Output: $OUTPUT_NAME"
             echo "- Render run: $RENDER_RUN_ID"
-            echo "- MP4 SHA-256: $(node -e "const r=require('./render-output/' + process.env.OUTPUT_NAME + '.delivery.json'); process.stdout.write(r.video.sha256)")"
+            echo "- MP4 SHA-256: $(jq -r '.video.sha256' \"render-output/$OUTPUT_NAME.delivery.json\")"
             echo "- Delivery manifest: $OUTPUT_NAME.delivery.json"
             echo "- Final artifact: $OUTPUT_NAME-final-delivery"
           } >> "$GITHUB_STEP_SUMMARY"
