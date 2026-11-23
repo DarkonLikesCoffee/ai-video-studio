@@ -164,6 +164,29 @@ const addJsonStrings = (value: unknown, sourceFile: string, references: SourceRe
   }
 };
 
+const collectProjectVideoAssetReferences = (value: unknown, sourceFile: string): SourceReference[] => {
+  if (!isRecord(value)) return [];
+  const references: SourceReference[] = [];
+  const addSource = (entry: unknown) => {
+    if (isRecord(entry) && typeof entry.src === "string") {
+      references.push({ value: entry.src, sourceFile });
+    }
+  };
+  if (Array.isArray(value.scenes)) {
+    for (const scene of value.scenes) {
+      if (!isRecord(scene)) continue;
+      const mediaItems = Array.isArray(scene.mediaLayers)
+        ? scene.mediaLayers
+        : scene.media ? [scene.media] : [];
+      for (const media of mediaItems) addSource(media);
+    }
+  }
+  if (Array.isArray(value.audioTracks)) {
+    for (const track of value.audioTracks) addSource(track);
+  }
+  return references;
+};
+
 const resolveLocalModule = async (specifier: string, containingFile: string, repositoryRoot: string): Promise<string | null> => {
   if (!specifier.startsWith(".")) return null;
   const base = path.resolve(path.dirname(containingFile), specifier);
@@ -295,8 +318,7 @@ const collectCompositionReferences = async (
     const scenePath = path.join(projectRoot, "scene.json");
     try {
       const scene = JSON.parse(await readFile(scenePath, "utf8")) as unknown;
-      const references: SourceReference[] = [];
-      addJsonStrings(scene, "scene.json", references);
+      const references = collectProjectVideoAssetReferences(scene, "scene.json");
       return { available: true, source: "scene.json", references };
     } catch {
       return { available: false, source: "scene.json", references: [], reason: "The selected ProjectVideo scene.json could not be read." };
