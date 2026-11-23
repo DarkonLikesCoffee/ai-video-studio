@@ -95,6 +95,7 @@
       }
     },
     "assetManifestPath": { "type": "string", "pattern": "^projects/[a-z0-9-]+/production/asset-manifest\\.json$" },
+    "assetVisualReviewRequired": { "type": "boolean", "default": false, "description": "Require every declared asset preview and visual-review approval during strict asset evidence validation." },
     "acceptanceCriteria": {
       "type": "array",
       "minItems": 3,
