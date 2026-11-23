@@ -128,7 +128,18 @@ jobs:
       - name: Enforce Golden Hour local asset evidence
         run: |
           mkdir -p review-output
-          npm run director:asset-evidence -- projects/golden-hour-dog-walk/production/production-plan.json projects/golden-hour-dog-walk/production/asset-manifest.json review-output/golden-hour.asset-evidence.json --strict
+          REPORT_PATH="review-output/golden-hour.asset-evidence.json"
+          npm run director:asset-evidence -- projects/golden-hour-dog-walk/production/production-plan.json projects/golden-hour-dog-walk/production/asset-manifest.json "$REPORT_PATH"
+          node - "$REPORT_PATH" <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+          console.log(JSON.stringify({ summary: report.summary, issues: report.issues }, null, 2));
+          const hasWarningsOrErrors = report.issues.some((issue) => issue.severity === "warning" || issue.severity === "error");
+          if (hasWarningsOrErrors || report.summary.status === "criteria-unavailable" || report.summary.status === "no-assets") {
+            console.error("Golden Hour production asset evidence is not strict-ready.");
+            process.exit(1);
+          }
+          NODE
       - name: Verify Stormlight Keeper audio fixtures
         run: |
           test -s projects/stormlight-keeper/assets/audio/stormlight-score.wav
