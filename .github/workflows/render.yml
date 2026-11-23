@@ -35,6 +35,7 @@ jobs:
         run: node scripts/render-request.mjs render-request.json
 
       - name: Enforce the Director's composition decision
+        id: strategy
         run: node scripts/validate-render-strategy.mjs render-request.json packages/video-engine/src/root.tsx
 
       - name: Install dependencies
