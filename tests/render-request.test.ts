@@ -197,3 +197,13 @@ test("rejects visual review history paths outside or mismatched with the selecte
   });
   assert.ok(withoutProject.errors.includes("visualReviewHistoryPath requires projectPath or productionPlanPath to identify its project."));
 });
+
+
+test("restricts visual review history to the GitHub Actions renderer", () => {
+  const result = validateRenderRequest({
+    ...validProjectRequest,
+    provider: "circleci",
+    visualReviewHistoryPath: "projects/demo/production/visual-review.json",
+  });
+  assert.ok(result.errors.includes("visualReviewHistoryPath is currently supported only by the GitHub Actions render workflow."));
+});
