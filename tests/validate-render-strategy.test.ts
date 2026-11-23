@@ -121,6 +121,7 @@ test("accepts a newly added composition only when both registry and RemotionRoot
   const newEntry = {
     id: "NewStormComposition",
     renderer: "custom-remotion",
+    renderMode: "hybrid",
     selectable: true,
     purpose: "Project-specific storm repair narrative.",
     strengths: ["Custom scenes and original visual events."],
