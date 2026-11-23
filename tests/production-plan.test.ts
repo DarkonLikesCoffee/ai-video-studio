@@ -22,6 +22,8 @@ test("production-plan JSON Schema matches runtime shot requirements and narrativ
   assert.ok(!shotSchema.required.includes("narrativeBeat"), "narrativeBeat remains optional");
   assert.ok(shotSchema.properties.implementationNotes, "free-form implementation notes must be preserved");
   assert.ok(schema.required.includes("renderStrategy"), "a plan must make a whole-video composition decision");
+  assert.deepEqual(schema.properties.audioMode.enum, ["required", "optional", "silent"]);
+  assert.ok(!schema.required.includes("audioMode"), "legacy plans remain valid without audio mode");
   assert.deepEqual(schema.properties.renderStrategy.required, ["renderer", "compositionId", "availability", "rationale", "requiredCapabilities", "fallback"]);
   const coverageSchema = schema.properties.acceptanceCoverage;
   assert.ok(coverageSchema, "schema must define optional acceptance coverage");
