@@ -18,7 +18,8 @@
         "height": 1080
       },
       "file": "lighthouse-main.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "robot-main",
@@ -39,7 +40,8 @@
         "height": 800
       },
       "file": "robot-main.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "beacon-mechanism",
@@ -58,7 +60,8 @@
         "height": 700
       },
       "file": "beacon-mechanism.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "lighthouse-lens",
@@ -76,7 +79,8 @@
         "height": 900
       },
       "file": "lighthouse-lens.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "storm-sea",
@@ -94,7 +98,8 @@
         "height": 1080
       },
       "file": "storm-sea.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "lighthouse-door",
@@ -112,7 +117,8 @@
         "height": 900
       },
       "file": "lighthouse-door.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "spiral-stair",
@@ -130,7 +136,8 @@
         "height": 1000
       },
       "file": "spiral-stair.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "robot-hands",
@@ -148,7 +155,8 @@
         "height": 700
       },
       "file": "robot-hands.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "beacon-beam",
@@ -166,7 +174,8 @@
         "height": 500
       },
       "file": "beacon-beam.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "distant-vessel",
@@ -184,7 +193,8 @@
         "height": 350
       },
       "file": "distant-vessel.svg",
-      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source."
+      "provenance": "Original artwork authored for The Stormlight Keeper in this repository; no external source.",
+      "usageRole": "design-reference"
     },
     {
       "id": "stormlight-score",
@@ -196,7 +206,8 @@
       ],
       "provenance": "Original score synthesized for The Stormlight Keeper by this repository's audio fixture generator.",
       "license": "Original project audio; no third-party material.",
-      "creator": "AI Video Studio"
+      "creator": "AI Video Studio",
+      "usageRole": "rendered-audio"
     },
     {
       "id": "stormlight-atmosphere",
@@ -208,7 +219,8 @@
       ],
       "provenance": "Original storm ambience synthesized for The Stormlight Keeper by this repository's audio fixture generator.",
       "license": "Original project audio; no third-party material.",
-      "creator": "AI Video Studio"
+      "creator": "AI Video Studio",
+      "usageRole": "rendered-audio"
     }
   ],
   "project": "The Stormlight Keeper"
