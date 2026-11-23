@@ -425,14 +425,14 @@ const collectCompositionReferences = async (
   const strategy = isRecord(plan.renderStrategy) ? plan.renderStrategy : {};
   const renderer = asText(strategy.renderer);
   const compositionId = asText(strategy.compositionId);
-  if (!renderer || !compositionId) return { available: false, source: null, references: [], projectVideoScenes: null, reason: "The production plan has no valid render strategy." };
+  if (!renderer || !compositionId) return { available: false, source: null, references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The production plan has no valid render strategy." };
 
   if (renderer === "project-video" && compositionId === "ProjectVideo") {
     const scenePath = path.join(projectRoot, "scene.json");
     try {
       const scene = JSON.parse(await readFile(scenePath, "utf8")) as unknown;
       const collected = collectProjectVideoAssetReferences(scene, "scene.json");
-      return { available: true, source: "scene.json", ...collected };
+      return { available: true, source: "scene.json", referencesByModule: new Map(), reachableModules: new Set(), ...collected };
     } catch {
       return { available: false, source: "scene.json", references: [], projectVideoScenes: null, reason: "The selected ProjectVideo scene.json could not be read." };
     }
@@ -443,18 +443,18 @@ const collectCompositionReferences = async (
   try {
     rootSource = await readFile(rootPath, "utf8");
   } catch {
-    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], projectVideoScenes: null, reason: "The Remotion composition registry source could not be read." };
+    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The Remotion composition registry source could not be read." };
   }
   const moduleSpecifier = findCompositionModule(rootSource, compositionId);
   if (!moduleSpecifier) {
-    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], projectVideoScenes: null, reason: "The selected composition could not be mapped to its imported component in RemotionRoot." };
+    return { available: false, source: path.relative(repositoryRoot, rootPath), references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The selected composition could not be mapped to its imported component in RemotionRoot." };
   }
   const componentFile = await resolveLocalModule(moduleSpecifier, rootPath, repositoryRoot);
   if (!componentFile) {
-    return { available: false, source: moduleSpecifier, references: [], projectVideoScenes: null, reason: "The selected composition component source could not be resolved." };
+    return { available: false, source: moduleSpecifier, references: [], referencesByModule: new Map(), reachableModules: new Set(), projectVideoScenes: null, reason: "The selected composition component source could not be resolved." };
   }
-  const references = await collectImportedSourceReferences(componentFile, repositoryRoot, projectRoot);
-  return { available: true, source: path.relative(repositoryRoot, componentFile), references, projectVideoScenes: null };
+  const collected = await collectImportedSourceReferences(componentFile, repositoryRoot, projectRoot);
+  return { available: true, source: path.relative(repositoryRoot, componentFile), ...collected, projectVideoScenes: null };
 };
 
 const normalizeUsagePath = (value: string): string =>
