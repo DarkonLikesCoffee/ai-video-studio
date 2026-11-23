@@ -69,6 +69,7 @@ export const validatePlaybackSession = (session: unknown, artifact: JsonRecord):
   }
   if (session.endedEventObserved !== true) errors.push("Playback session must record the native video ended event.");
   if (session.complete !== true) errors.push("Playback session must be marked complete by the review player.");
+  if (session.invalidReason !== null) errors.push("Playback session must not contain an invalidReason.");
   if (session.pageVisibleThroughout !== true) errors.push("Playback session is invalid because the review page was hidden.");
   if (session.reviewWindowFocusedThroughout !== true) errors.push("Playback session is invalid because the review window lost focus.");
   if (session.seekAttempts !== 0) errors.push("Playback session must have zero seek attempts.");
