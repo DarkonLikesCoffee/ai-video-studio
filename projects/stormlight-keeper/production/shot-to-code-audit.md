@@ -8,3 +8,8 @@
 - **20–24s — coast-relief:** `FinalShot`; wide storm coast, lighthouse beam sweeps across water and reveals a small vessel turning toward safe harbor.
 
 The renderer is GPU-independent SVG/Remotion, with interpolated transforms and per-frame shapes. The SVG design studies are reviewed separately before the animation and the final composition animates authored vector components, rather than using static slideshow cards. There are no text overlays, captions, logos or voice-over.
+
+
+## Asset implementation note
+
+The standalone SVG files are design references, not files imported by `LighthouseRepairFilm.tsx`. The final composition recreates the selected visual grammar as inline SVG groups and paths and animates those vectors procedurally. The score and atmosphere WAV files are loaded at runtime. Do not interpret the local asset-evidence report's `ready` status as proof of SVG runtime imports or semantic asset use.
