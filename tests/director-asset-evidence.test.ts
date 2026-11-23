@@ -499,3 +499,25 @@ test("ProjectVideo usage ignores filenames mentioned outside rendered media sour
     assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
   });
 });
+
+test("required asset usage must match the complete project-relative path", async () => {
+  await withProject(async (root) => {
+    await writeFile(path.join(root, "scene.json"), JSON.stringify({
+      scenes: [{ mediaLayers: [{ src: "one.svg" }] }]
+    }));
+    const manifest = {
+      assets: [{
+        file: "one.svg",
+        type: "image/svg+xml",
+        reusePolicy: "required",
+        shotIds: ["shot-one"],
+        provenance: "Created for this test.",
+        license: "Original project artwork."
+      }]
+    };
+    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(report.assets[0]?.path, "assets/one.svg");
+    assert.equal(report.assets[0]?.usageStatus, "not-referenced");
+    assert.ok(report.issues.some((issue) => issue.code === "ASSET_REQUIRED_NOT_REFERENCED" && issue.severity === "error"));
+  });
+});
