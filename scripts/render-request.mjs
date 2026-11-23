@@ -16,7 +16,7 @@ export const matchesCompositionMetadata = (project, compositionId) =>
 
 /**
  * Validate the request envelope independently of the selected composition.
- * Remotion remains the source of truth for whether compositionId is registered.
+ * The render preflight checks registry membership and production selectability.
  */
 export const validateRenderRequest = (value) => {
   if (!isRecord(value)) return { errors: ["Render request must be a JSON object."] };
