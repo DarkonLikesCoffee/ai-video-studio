@@ -177,7 +177,7 @@ const run = async (): Promise<void> => {
   const repositoryRoot = process.cwd();
   const projectRoot = projectRootFlag >= 0 ? process.argv[projectRootFlag + 1] : undefined;
   if (!path) {
-    process.stderr.write("Usage: tsx scripts/production-state.ts <production-state.json> [expected-project-id] [--require-evidence] [--verify-evidence-files --project-root <project-dir>]\n");
+    process.stderr.write("Usage: tsx scripts/production-state.ts <production-state.json> [expected-project-id] [--require-evidence] [--verify-evidence-files --project-root <project-dir>] [--require-stage <stage>]\\n");
     process.exitCode = 2;
     return;
   }
