@@ -143,6 +143,9 @@ const run = async () => {
   if (process.env.GITHUB_OUTPUT) {
     await appendFile(process.env.GITHUB_OUTPUT, `render_mode=${selected.renderMode}\n`);
   }
+  if (process.env.CIRCLECI === "true" && process.env.BASH_ENV) {
+    await appendFile(process.env.BASH_ENV, `export RENDER_MODE="${selected.renderMode}"\n`);
+  }
   if (plan) {
     console.log(`Accepted Director strategy: ${plan.renderStrategy.renderer} / ${plan.renderStrategy.compositionId} (${selected.renderMode}, registered and selectable).`);
   } else {
