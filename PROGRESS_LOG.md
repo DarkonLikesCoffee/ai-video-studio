@@ -812,3 +812,14 @@ Append one entry per meaningful development session:
 - Arbitrary string literals used only as title/copy/labels no longer count as proof of required asset usage. Regression tests cover string-copy false positives, imported media files and JSON media fields.
 - Scope remains limited: this is source/data-reference evidence, not proof that an asset is visible or semantically appropriate in rendered pixels. Custom Remotion shot-to-shot asset placement remains unaudited until a shot-to-component mapping contract exists.
 - No production video render was triggered.
+
+
+## 2026-11-23 — Custom Remotion shot-level asset mapping merged (PR #166)
+
+- PR #166, **Verify custom Remotion assets in assigned shots**, merged into `main` as `3f1cd4617006181efbab3dd4776626b2e85d22fb` (squash merge).
+- Exact-head CI run [#45255251121](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45255251121) completed successfully on head `be49ead78093ed3d8f7577f55312d006fa687df3`: all 53 workflow steps passed, including type-check, the full unit suite, example/project validations, Storyboard QA, the Stormlight shot-mapping fixture and global audio checks, and the Studio build.
+- Added a manifest-level `shotComponents` schema v1 contract mapping every production-plan shot to reachable source-module paths in a custom Remotion composition. The audit checks each required visual asset only against the modules mapped to each assigned shot.
+- Invalid/missing/unknown/unsafe/unreachable mappings block strict evidence. Legacy custom manifests without the contract remain explicitly `not-audited`. Required audio remains composition-wide/global.
+- Updated the Director prompt, Asset Producer skill, production workflow docs, Stormlight Keeper manifest and CI.
+- Evidence boundary remains: module-level source association does not prove visible pixels, semantic suitability, prominence or intended timing. Stormlight's existing standalone SVG studies remain reference-only; no false runtime usage claim was introduced.
+- No production video render was triggered.
