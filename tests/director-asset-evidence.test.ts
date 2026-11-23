@@ -207,6 +207,8 @@ test("asset visual review requires an existing preview and complete approval met
 
 test("missing, pending, rejected, unsafe and unavailable previews are reported without claiming approval", async () => {
   await withProject(async (root) => {
+    const plan = makePlan();
+    plan.assetVisualReviewRequired = true;
     const manifest = {
       assets: [
         { file: "one.svg", type: "art", shotIds: ["shot-one"], provenance: "Test", license: "Original", visualReview: { status: "pending" } },
@@ -214,7 +216,7 @@ test("missing, pending, rejected, unsafe and unavailable previews are reported w
         { file: "missing.svg", type: "art", shotIds: ["shot-three"], provenance: "Test", license: "Original", visualReview: { status: "rejected", reviewer: "R", reviewedAt: "2026-01-01T00:00:00Z", notes: "Malformed preview." } }
       ]
     };
-    const report = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    const report = await buildAssetEvidenceReport(plan, manifest, { projectRoot: root });
     assert.equal(report.assets[0]?.visualReviewStatus, "pending");
     assert.equal(report.assets[1]?.previewStatus, "unsafe");
     assert.equal(report.assets[1]?.visualReviewStatus, "missing");
@@ -222,5 +224,20 @@ test("missing, pending, rejected, unsafe and unavailable previews are reported w
     assert.ok(report.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_PENDING"));
     assert.ok(report.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_REJECTED"));
     assert.ok(report.issues.some(issue => issue.code === "ASSET_PREVIEW_UNAVAILABLE"));
+  });
+});
+
+
+test("visual-review issues are opt-in for backwards compatibility and enforced when the plan requires review", async () => {
+  await withProject(async (root) => {
+    const manifest = { assets: [{ file: "one.svg", type: "art", shotIds: ["shot-one"], provenance: "Test", license: "Original" }] };
+    const legacyReport = await buildAssetEvidenceReport(makePlan(), manifest, { projectRoot: root });
+    assert.equal(legacyReport.summary.visualReviewMissing, 1);
+    assert.equal(legacyReport.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_MISSING"), false);
+    const requiredPlan = makePlan();
+    requiredPlan.assetVisualReviewRequired = true;
+    const requiredReport = await buildAssetEvidenceReport(requiredPlan, manifest, { projectRoot: root });
+    assert.ok(requiredReport.issues.some(issue => issue.code === "ASSET_PREVIEW_MISSING"));
+    assert.ok(requiredReport.issues.some(issue => issue.code === "ASSET_VISUAL_REVIEW_MISSING"));
   });
 });
