@@ -40,7 +40,8 @@
     "qa:contact-sheet": "tsx scripts/qa-contact-sheet.ts",
     "render:provenance": "tsx scripts/render-provenance.ts",
     "validate:state": "tsx scripts/production-state.ts",
-    "qa:svg-previews": "node scripts/preview-stormlight-svgs.mjs"
+    "qa:svg-previews": "node scripts/preview-stormlight-svgs.mjs",
+    "qa:visual-review-report": "tsx scripts/visual-review-report.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.6",
