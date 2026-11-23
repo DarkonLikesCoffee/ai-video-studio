@@ -45,6 +45,8 @@ test("GitHub and CircleCI enforce frozen production state before rendering when 
 
   assert.ok(githubGate >= 0, "GitHub workflow must contain the production-state gate");
   assert.ok(githubGate < githubRender, "GitHub state validation must happen before rendering");
+  assert.ok(githubWorkflow.includes("steps.request.outputs.provider == 'github-actions' || steps.request.outputs.project_path != '' || steps.request.outputs.production_plan_path != ''"));
+  assert.ok(githubWorkflow.includes("if: steps.request.outputs.project_path != '' || steps.request.outputs.production_plan_path != ''"));
   assert.ok(githubWorkflow.includes("--require-evidence --verify-evidence-files"));
   assert.ok(githubWorkflow.includes("--require-stage frozen"));
   assert.ok(githubWorkflow.includes("continuing in legacy compatibility mode"));
