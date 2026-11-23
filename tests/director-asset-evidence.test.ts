@@ -761,7 +761,8 @@ test("custom composition JSON imports contribute only src and poster asset field
   }));
   await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
     'import config from "./asset-config.json";',
-    'export const TestFilm = () => <div title={config.label}>{config.video.src}</div>;',
+    'import { Img } from "remotion";',
+    'export const TestFilm = () => <Img src={config.video.src} />;',
     ""
   ].join("\n"));
   try {
