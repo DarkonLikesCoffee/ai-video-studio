@@ -29,6 +29,19 @@ Do not claim autonomous behavior for a prompt, checklist, script handoff or dete
 10. **Iterate** — fix the highest-impact issues, rerender only the target project, and repeat until it passes.
 11. **Deliver** — provide the MP4/artifact, a concise change log and known limitations.
 
+## Production-state ledger — mandatory for new projects
+
+- Every **new agent-led project** must create `projects/<slug>/production/production-state.json` as part of project bootstrap. Use schema version 1, set `projectId` to the lowercase project-directory slug, initialize `stage` to `brief`, set `updatedAt` to an ISO timestamp, and record a real brief artifact in `evidence.brief`. Create the brief file and state file together; do not wait until render time to add the ledger.
+- After completing each production stage, advance `stage` in order and add project-relative evidence paths for that stage while preserving evidence for all earlier stages. Evidence files must exist, be non-empty regular files inside the project directory, and must not be symlinks. Never add an evidence reference merely because a task was discussed or intended.
+- Before committing a render candidate, set the state to exactly `frozen` and provide evidence for `brief`, `direction`, `storyboard`, `assets`, `build`, `render-ready` and `frozen`. Run:
+  ```bash
+  npm run validate:state -- projects/<slug>/production/production-state.json <slug> --require-evidence --verify-evidence-files --project-root projects/<slug> --require-stage frozen
+  ```
+- Include the frozen state file and its evidence in the candidate commit. Then follow the separate, request-only `render-request.json` commit protocol. Do not put the render request in the candidate commit.
+- Render preflight checks this file when present. If it is absent, existing projects use an explicit legacy compatibility path; **new projects must not omit the file to bypass the gate**.
+- After a render, advance the ledger to `rendered`, then `qa`, `accepted` and `delivered` only when the corresponding artifact/review/delivery evidence exists. The workflow never advances the stage automatically. For a corrected candidate, produce and validate a new frozen candidate; preserve prior render/QA history as separate evidence.
+- The ledger establishes stage and file existence, not the truth of file contents, semantic correctness, creative approval or actual MP4 quality. The visual/audio QA and final-delivery checks remain mandatory.
+
 ## Pre-production storyboard review
 
 Before full production, generate a lightweight HTML planning preview with `npm run storyboard:preview -- <production-plan.json> <output.html>`. It lays out the authored shots in timeline order and exposes their action, progression, visual method, framing, camera, transitions and audio cues. It is not a rendered or animated video and does not inspect assets or semantically approve the story. Use it as a review checkpoint, then revise the plan before asset production/rendering.
