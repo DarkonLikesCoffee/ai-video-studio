@@ -810,7 +810,7 @@ Append one entry per meaningful development session:
 - Exact PR-head CI run [#45250261362](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45250261362) completed successfully: 52 workflow steps passed on commit `3493da553d7bbdcb182ca0d99286813b74575534`.
 - The audit recognizes statically resolvable Remotion `staticFile()` references (named/namespace imports and local constants), imported media files, static `new URL()` media references, and JSX/JSON `src`/ `poster` values in the selected component's reachable local import graph.
 - Arbitrary string literals used only as title/copy/labels no longer count as proof of required asset usage. Regression tests cover string-copy false positives, imported media files and JSON media fields.
-- Scope remains limited: this is source/data-reference evidence, not proof that an asset is visible or semantically appropriate in rendered pixels. Custom Remotion shot-to-shot asset placement remains unaudited until a shot-to-component mapping contract exists.
+- Scope remains limited: this is source/data-reference evidence, not proof that an asset is visible or semantically appropriate in rendered pixels. Custom Remotion shot-to-shot structural placement is now audited through PR #166's `shotComponents` contract; rendered-pixel visibility and semantic suitability remain unverified.
 - No production video render was triggered.
 
 
@@ -823,3 +823,13 @@ Append one entry per meaningful development session:
 - Updated the Director prompt, Asset Producer skill, production workflow docs, Stormlight Keeper manifest and CI.
 - Evidence boundary remains: module-level source association does not prove visible pixels, semantic suitability, prominence or intended timing. Stormlight's existing standalone SVG studies remain reference-only; no false runtime usage claim was introduced.
 - No production video render was triggered.
+
+
+## 2026-11-23 — Production-state evidence files verified (PR #168)
+
+- PR #168, **Verify production-state evidence files**, merged into `main` as `daa8980ad2a9342baf25413854caf53d96a967be` (squash merge).
+- Exact-head CI run [#45256848775](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45256848775) completed successfully on head `3d21cf7e15aa164e33720b6e915d6b184fa2357e`: all 53 workflow steps passed, including TypeScript, the full test suite, production-state tests, project and asset-evidence validators, and the Studio build.
+- Added opt-in `--verify-evidence-files --project-root projects/<slug>` validation. Each recorded stage evidence reference must resolve to a non-empty regular file within the specified project root.
+- Rejects absolute paths, Windows separators, traversal, empty/dot path segments, directories, symbolic links and project roots outside the repository. Existing structural/reference-presence-only validation remains backward compatible; adoption remains opt-in.
+- File existence is not content validation, provenance, freshness or creative approval. The state file still is not required by render preflight.
+- No production render or `render-request.json` modification was performed.
