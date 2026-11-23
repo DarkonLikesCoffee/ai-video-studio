@@ -833,3 +833,11 @@ Append one entry per meaningful development session:
 - Rejects absolute paths, Windows separators, traversal, empty/dot path segments, directories, symbolic links and project roots outside the repository. Existing structural/reference-presence-only validation remains backward compatible; adoption remains opt-in.
 - File existence is not content validation, provenance, freshness or creative approval. The state file still is not required by render preflight.
 - No production render or `render-request.json` modification was performed.
+
+
+## 2026-11-23 — Continuity snapshot synchronized (PR #169)
+
+- PR #169 merged as `9e5bf07f6f71531ad41e2f82a04dfeeb4259bd39`.
+- Exact-head CI [#45257516309](https://github.com/DarkonLikesCoffee/ai-video-studio/actions/runs/45257516309) passed all 53 workflow steps, including type-check, full tests, project and asset-evidence validation, preview artifact generation and Studio build.
+- Refreshed the project state and roadmap for PR #168's strict production-state evidence-file check, corrected the historical custom Remotion shot-mapping status, and recorded the PR #168 implementation baseline and PR #169 current-main documentation tip.
+- No production video render was triggered.
