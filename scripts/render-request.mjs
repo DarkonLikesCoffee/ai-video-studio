@@ -53,7 +53,7 @@ export const validateRenderRequest = (value) => {
     errors.push("productionPlanPath, when supplied, must point to production/production-plan.json inside projects/.");
   }
 
-  if (productionPlanPath !== undefined && typeof projectPath === "string" &&
+  if (typeof productionPlanPath === "string" && typeof projectPath === "string" &&
       productionPlanPath.split("/").slice(0, -2).join("/") !== projectPath.split("/").slice(0, -1).join("/")) {
     errors.push("productionPlanPath must belong to the same project directory as projectPath.");
   }
