@@ -1,11 +1,13 @@
 import compositionRegistry from "../schemas/composition-registry.json" with { type: "json" };
 
 export type RendererKind = "project-video" | "custom-remotion";
+export type RenderMode = "2d" | "3d" | "hybrid";
 export type CompositionAvailability = "registered" | "to-be-built";
 
 export type CompositionCapability = {
   id: string;
   renderer: RendererKind;
+  renderMode: RenderMode;
   selectable: boolean;
   purpose: string;
   strengths: string[];
@@ -57,6 +59,8 @@ export const validateRenderStrategy = (value: unknown): string[] => {
     const selected = getCompositionCapability(compositionId);
     if (!selected) {
       errors.push(`renderStrategy.compositionId "${compositionId}" is not registered in the current composition catalogue.`);
+    } else if (!["2d", "3d", "hybrid"].includes(selected.renderMode)) {
+      errors.push(`renderStrategy.compositionId "${compositionId}" must declare renderMode as 2d, 3d, or hybrid.`);
     } else if (!selected.selectable) {
       errors.push(`renderStrategy.compositionId "${compositionId}" is registered for reference/testing only, not production selection.`);
     } else if (renderer !== selected.renderer) {
@@ -86,7 +90,7 @@ export const renderCompositionRegistryForPrompt = (): string =>
   COMPOSITION_REGISTRY.map((composition) => {
     const status = composition.selectable ? "selectable" : "reference/test only — do not select";
     return [
-      `- ${composition.id} [${composition.renderer}; ${status}]`,
+      `- ${composition.id} [${composition.renderer}; ${composition.renderMode}; ${status}]`,
       `  Purpose: ${composition.purpose}`,
       `  Strengths: ${composition.strengths.join("; ")}`,
       `  Limitations: ${composition.limitations.join("; ")}`,

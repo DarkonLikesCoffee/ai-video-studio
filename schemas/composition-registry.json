@@ -9,7 +9,8 @@
     ],
     "limitations": [
       "Not a production creative template."
-    ]
+    ],
+    "renderMode": "2d"
   },
   {
     "id": "JumpingCat",
@@ -23,7 +24,8 @@
     ],
     "limitations": [
       "Purpose-built for a single playful jumping-cat scene."
-    ]
+    ],
+    "renderMode": "2d"
   },
   {
     "id": "ProjectVideo",
@@ -39,7 +41,8 @@
       "Uses a recurring scene layout and title/editorial framing",
       "Does not create arbitrary 3D geometry or a true 3D camera",
       "Do not choose it merely because it is the easiest or default renderer"
-    ]
+    ],
+    "renderMode": "2d"
   },
   {
     "id": "ThreeDShowcase",
@@ -51,7 +54,8 @@
     ],
     "limitations": [
       "A showcase, not a general-purpose production composition."
-    ]
+    ],
+    "renderMode": "3d"
   },
   {
     "id": "MadridNewYorkParis",
@@ -63,7 +67,8 @@
     ],
     "limitations": [
       "Its story, cities and visual structure are hard-coded; adapt or create a new composition for other itineraries."
-    ]
+    ],
+    "renderMode": "hybrid"
   },
   {
     "id": "MadridTrip",
@@ -75,7 +80,8 @@
     ],
     "limitations": [
       "Not a general-purpose map or travel renderer; inspect its scope before reuse."
-    ]
+    ],
+    "renderMode": "hybrid"
   },
   {
     "id": "CinematicAdBenchmark",
@@ -87,7 +93,8 @@
     ],
     "limitations": [
       "The product model, brand copy, timing and shot structure are hard-coded; do not reuse unchanged for unrelated products."
-    ]
+    ],
+    "renderMode": "hybrid"
   },
   {
     "id": "TinyAstronautCrystalCave",
@@ -102,7 +109,8 @@
     "limitations": [
       "Procedural stylized 3D rather than photorealistic rendered assets",
       "Sound design is intentionally omitted for this silent visual story"
-    ]
+    ],
+    "renderMode": "3d"
   },
   {
     "id": "LighthouseRepairFilm",
@@ -117,7 +125,8 @@
     "limitations": [
       "A bespoke short-film composition, not a general-purpose project renderer",
       "The current environment and shot timings are authored for The Stormlight Keeper"
-    ]
+    ],
+    "renderMode": "2d"
   },
   {
     "id": "NarratedSkyExplainer",
@@ -129,6 +138,7 @@
     ],
     "limitations": [
       "Its built-in scene language is tailored to the sky/space explainer; unrelated topics may need a new composition."
-    ]
+    ],
+    "renderMode": "hybrid"
   }
 ]

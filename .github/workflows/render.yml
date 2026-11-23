@@ -35,6 +35,7 @@ jobs:
         run: node scripts/render-request.mjs render-request.json
 
       - name: Enforce the Director's composition decision
+        id: strategy
         run: node scripts/validate-render-strategy.mjs render-request.json packages/video-engine/src/root.tsx
 
       - name: Install dependencies
@@ -207,27 +208,24 @@ jobs:
           PROJECT_PATH: ${{ steps.narration.outputs.project_path || steps.request.outputs.project_path }}
           COMPOSITION_ID: ${{ steps.request.outputs.composition_id }}
           OUTPUT_NAME: ${{ steps.request.outputs.output_name }}
+          RENDER_MODE: ${{ steps.strategy.outputs.render_mode }}
         run: |
           mkdir -p render-output
           if [[ "$COMPOSITION_ID" == "ProjectVideo" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_DIR/.render-project.json" "--public-dir=../../$PROJECT_DIR"
-          elif [[ "$COMPOSITION_ID" == "LighthouseRepairFilm" && -n "$PROJECT_PATH" ]]; then
-            # SVG/Remotion composition: no WebGL context needed on headless GitHub runners.
-            PROJECT_DIR="$(dirname "$PROJECT_PATH")"
-            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
           elif [[ -n "$PROJECT_PATH" ]]; then
             PROJECT_DIR="$(dirname "$PROJECT_PATH")"
-            # Custom 3D compositions use software WebGL on GPU-less GitHub runners.
-            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR" "--concurrency=1" "--gl=swangle"
-          elif [[ "$COMPOSITION_ID" == "MadridTrip" ]]; then
-            # Keep the single WebGL canvas below Chromium's per-runner context limit.
-            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle"
+            if [[ "$RENDER_MODE" == "2d" ]]; then
+              npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
+            else
+              npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR" "--concurrency=1" "--gl=swangle"
+            fi
+          elif [[ "$RENDER_MODE" == "2d" ]]; then
+            npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1"
           else
-            # Custom Three.js scenes use software WebGL on GPU-less GitHub runners.
             npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle"
           fi
-
       - name: Master final ProjectVideo audio
         if: steps.request.outputs.provider == 'github-actions' && steps.request.outputs.composition_id == 'ProjectVideo'
         env:

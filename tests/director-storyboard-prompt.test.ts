@@ -39,7 +39,7 @@ test("handoff warns against generic slide-like visual defaults", () => {
 test("handoff includes the verified composition registry and requires an explicit renderer decision", () => {
   const prompt = buildStoryboardDirectorPrompt(brief);
   assert.match(prompt, /Verified composition registry/);
-  assert.match(prompt, /ProjectVideo \[project-video; selectable\]/);
+  assert.match(prompt, /ProjectVideo \[project-video; 2d; selectable\]/);
   assert.match(prompt, /ProjectVideo is a fixed-layout compatibility renderer, not the default/);
   assert.match(prompt, /"renderStrategy"/);
   assert.match(prompt, /"availability": "registered \| to-be-built"/);
