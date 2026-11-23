@@ -299,9 +299,10 @@ const collectImportedSourceReferences = async (
   const references: SourceReference[] = [];
   const visited = new Set<string>();
   const addModuleRelativeAsset = (specifier: string, sourceAbsolute: string, sourceRelative: string): void => {
-    const value = specifier.startsWith(".") || path.isAbsolute(specifier)
-      ? path.relative(projectRoot, path.resolve(path.dirname(sourceAbsolute), specifier)).split(path.sep).join("/")
-      : specifier;
+    const cleanSpecifier = specifier.split(/[?#]/, 1)[0] ?? specifier;
+    const value = cleanSpecifier.startsWith(".") || path.isAbsolute(cleanSpecifier)
+      ? path.relative(projectRoot, path.resolve(path.dirname(sourceAbsolute), cleanSpecifier)).split(path.sep).join("/")
+      : cleanSpecifier;
     references.push({ value, sourceFile: sourceRelative });
   };
   const visitFile = async (filePath: string): Promise<void> => {
@@ -456,7 +457,7 @@ const collectCompositionReferences = async (
 };
 
 const normalizeUsagePath = (value: string): string =>
-  value.replace(/\\/g, "/").replace(/^\.\//, "");
+  (value.split(/[?#]/, 1)[0] ?? value).replace(/\\/g, "/").replace(/^\.\//, "");
 
 const usageMatchesAsset = (reference: SourceReference, localPath: string | null): boolean => {
   // Compare the canonical project-relative path; preserve folders and case.
