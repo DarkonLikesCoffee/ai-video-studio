@@ -375,12 +375,22 @@ test("required custom-composition assets are found through local source imports"
   await mkdir(path.join(projectRoot, "assets"), { recursive: true });
   await mkdir(engineScenes, { recursive: true });
   await writeFile(path.join(projectRoot, "assets", "one.svg"), "<svg/>");
-  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"),
-    'import { Composition } from "remotion";\\nimport { TestFilm } from "./scenes/TestFilm";\\nexport const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;\\n');
-  await writeFile(path.join(engineScenes, "TestFilm.tsx"),
-    'import { getHeroAsset } from "./asset-helper";\\nexport const TestFilm = () => getHeroAsset();\\n');
-  await writeFile(path.join(engineScenes, "asset-helper.ts"),
-    'import { staticFile } from "remotion";\\nexport const getHeroAsset = () => staticFile("assets/one.svg");\\n');
+  await writeFile(path.join(root, "packages", "video-engine", "src", "root.tsx"), [
+    'import { Composition } from "remotion";',
+    'import { TestFilm } from "./scenes/TestFilm";',
+    'export const Root = () => <Composition id="LighthouseRepairFilm" component={TestFilm} durationInFrames={30} fps={30} width={1920} height={1080} />;',
+    ""
+  ].join("\n"));
+  await writeFile(path.join(engineScenes, "TestFilm.tsx"), [
+    'import { getHeroAsset } from "./asset-helper";',
+    'export const TestFilm = () => getHeroAsset();',
+    ""
+  ].join("\n"));
+  await writeFile(path.join(engineScenes, "asset-helper.ts"), [
+    'import { staticFile } from "remotion";',
+    'export const getHeroAsset = () => staticFile("assets/one.svg");',
+    ""
+  ].join("\n"));
   try {
     const plan = makePlan();
     plan.renderStrategy.renderer = "custom-remotion";
