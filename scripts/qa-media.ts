@@ -39,6 +39,7 @@ const inputPath = resolve(input);
 const outputPath = resolve(options.output ?? inputPath.replace(/\.mp4$/i, "") + ".qa.json");
 try {
   let expectedDurationSeconds: number | undefined;
+  let planAudioMode: "required" | "optional" | "silent" | undefined;
   if (options.planPath) {
     const plan = JSON.parse(await readFile(resolve(options.planPath), "utf8")) as {
       delivery?: { durationSeconds?: unknown };
@@ -49,13 +50,14 @@ try {
       throw new Error("The production plan must define a positive delivery.durationSeconds.");
     }
     expectedDurationSeconds = duration;
+    planAudioMode = plan.audioMode as "required" | "optional" | "silent" | undefined;
     if (plan.audioMode !== undefined && plan.audioMode !== "required" && plan.audioMode !== "optional" && plan.audioMode !== "silent") {
       throw new Error("The production plan audioMode must be required, optional, or silent.");
     }
   }
 
   const report = await inspectMedia(inputPath, {
-    audioMode: options.audioMode ?? "optional",
+    audioMode: options.audioMode ?? planAudioMode ?? "optional",
     ...(expectedDurationSeconds === undefined ? {} : { expectedDurationSeconds }),
     maxExpectedDurationDriftSeconds: options.tolerance,
   });
