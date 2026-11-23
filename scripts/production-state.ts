@@ -92,7 +92,10 @@ const run = async (): Promise<void> => {
   }
   try {
     const value: unknown = JSON.parse(await readFile(resolve(path), "utf8"));
-    const errors = validateProductionState(value, { expectedProjectId, requireEvidence });
+    const errors = validateProductionState(value, {
+      ...(expectedProjectId === undefined ? {} : { expectedProjectId }),
+      requireEvidence,
+    });
     if (errors.length) {
       process.stderr.write(errors.map((error) => `- ${error}`).join("\n") + "\n");
       process.exitCode = 1;
