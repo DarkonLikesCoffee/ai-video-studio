@@ -260,10 +260,13 @@ const collectImportedSourceReferences = async (
       }
       if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) imports.push(node.moduleSpecifier.text);
       if (ts.isExportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) imports.push(node.moduleSpecifier.text);
-      if (ts.isCallExpression(node) && node.arguments.length > 0 && ts.isStringLiteral(node.arguments[0])) {
-        const isRequire = ts.isIdentifier(node.expression) && node.expression.text === "require";
-        const isDynamicImport = node.expression.kind === ts.SyntaxKind.ImportKeyword;
-        if (isRequire || isDynamicImport) imports.push(node.arguments[0].text);
+      if (ts.isCallExpression(node)) {
+        const firstArgument = node.arguments[0];
+        if (firstArgument && ts.isStringLiteral(firstArgument)) {
+          const isRequire = ts.isIdentifier(node.expression) && node.expression.text === "require";
+          const isDynamicImport = node.expression.kind === ts.SyntaxKind.ImportKeyword;
+          if (isRequire || isDynamicImport) imports.push(firstArgument.text);
+        }
       }
       ts.forEachChild(node, visitNode);
     };
