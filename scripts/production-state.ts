@@ -1,5 +1,5 @@
 import { lstat, readFile, realpath, stat, writeFile } from "node:fs/promises";
-import { isAbsolute, relative, resolve } from "node:path";
+import { isAbsolute, relative, resolve, sep } from "node:path";
 
 export const PRODUCTION_STAGES = [
   "brief",
@@ -182,6 +182,10 @@ const run = async (): Promise<void> => {
     return;
   }
   try {
+    if (verifyEvidenceFiles && projectRoot) {
+      const stateReference = relative(resolve(projectRoot), resolve(path)).split(sep).join("/");
+      await resolveProductionEvidenceFile(projectRoot, stateReference);
+    }
     const value: unknown = JSON.parse(await readFile(resolve(path), "utf8"));
     const stateOptions: StateValidationOptions = {
       ...(expectedProjectId === undefined ? {} : { expectedProjectId }),
