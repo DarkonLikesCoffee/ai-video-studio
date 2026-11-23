@@ -79,6 +79,7 @@
   let checkpointTimes = [];
   let sessionInvalidReason = "";
   let hashing = false;
+  let metadataLoaded = false;
 
   const isoNow = () => new Date().toISOString();
   const setStatus = (message) => { status.textContent = message; };
@@ -114,6 +115,23 @@
     const digest = await crypto.subtle.digest("SHA-256", bytes);
     return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
   };
+  const hasCompleteCoverage = (inputRanges, duration) => {
+    if (!Array.isArray(inputRanges) || inputRanges.length === 0 || !Number.isFinite(duration) || duration <= 0) return false;
+    const sorted = [...inputRanges].sort((a, b) => a[0] - b[0]);
+    if (sorted.some(range => !Array.isArray(range) || range.length !== 2 ||
+        !Number.isFinite(range[0]) || !Number.isFinite(range[1]) ||
+        range[0] < 0 || range[1] <= range[0] || range[1] > duration + 0.5)) return false;
+    if (sorted[0][0] > 0.25) return false;
+    let end = sorted[0][1];
+    let covered = end - sorted[0][0];
+    for (let i = 1; i < sorted.length; i += 1) {
+      const [start, nextEnd] = sorted[i];
+      if (start - end > 0.5) return false;
+      covered += Math.max(0, nextEnd - Math.max(start, end));
+      end = Math.max(end, nextEnd);
+    }
+    return end >= duration - 0.25 && covered >= duration * 0.99;
+  };
   const updateProgress = () => {
     if (!Number.isFinite(video.duration) || video.duration <= 0) return;
     progress.value = Math.min(100, video.currentTime / video.duration * 100);
@@ -134,7 +152,7 @@
     downloadButton.disabled = true;
     pauseButton.disabled = true;
     resumeButton.disabled = true;
-    playButton.disabled = !file || !mediaSha256 || hashing;
+    playButton.disabled = !file || !mediaSha256 || !metadataLoaded || hashing;
     progress.value = 0;
   };
 
@@ -142,6 +160,7 @@
     file = fileInput.files?.[0] ?? null;
     resetSession();
     mediaSha256 = null;
+    metadataLoaded = false;
     hashText.textContent = "";
     playButton.disabled = true;
     if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -158,8 +177,8 @@
     try {
       mediaSha256 = await calculateHash(file);
       hashText.textContent = "SHA-256: " + mediaSha256;
-      playButton.disabled = false;
-      setStatus("Ready. Start the full review from the beginning.");
+      playButton.disabled = !metadataLoaded;
+      setStatus(metadataLoaded ? "Ready. Start the full review from the beginning." : "Hash verified. Waiting for video metadata…");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : String(error));
       playButton.disabled = true;
@@ -169,6 +188,8 @@
   });
 
   video.addEventListener("loadedmetadata", () => {
+    metadataLoaded = Number.isFinite(video.duration) && video.duration > 0;
+    playButton.disabled = !file || !mediaSha256 || !metadataLoaded || hashing;
     metadata.textContent = "File: " + (file?.name ?? "") + " · " +
       file?.size.toLocaleString() + " bytes · " +
       video.duration.toFixed(3) + " seconds";
@@ -211,7 +232,8 @@
       pageVisibleThroughout: !hiddenObserved,
       seekAttempts,
       complete: !sessionInvalidReason && !hiddenObserved && seekAttempts === 0 &&
-        video.playbackRate === 1 && video.duration > 0,
+        video.playbackRate === 1 && hasCompleteCoverage(ranges(), video.duration) &&
+        checkpointTimes.length >= 5,
       invalidReason: sessionInvalidReason || null
     };
     session = evidence;
@@ -221,11 +243,12 @@
     playButton.disabled = true;
     setStatus(evidence.complete
       ? "Playback completed. Save the JSON evidence, then import it into the matching visual-review report."
-      : "Playback ended, but this session is invalid: " + (sessionInvalidReason || "the page was hidden."));
+      : "Playback ended, but the session is invalid or incomplete: " +
+        (sessionInvalidReason || "the browser did not record continuous coverage and all five checkpoints."));
   });
 
   playButton.addEventListener("click", async () => {
-    if (!file || !mediaSha256 || sessionInvalidReason || startedAt) return;
+    if (!file || !mediaSha256 || !metadataLoaded || sessionInvalidReason || startedAt) return;
     if (video.currentTime > 0) video.currentTime = 0;
     startedAt = isoNow();
     startClock = performance.now();
