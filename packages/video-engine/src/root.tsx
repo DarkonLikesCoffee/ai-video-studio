@@ -9,6 +9,7 @@ import { MadridTrip, MADRID_TRIP_DURATION, FPS as MADRID_TRIP_FPS, WIDTH as MADR
 import { CinematicAdBenchmark } from "./scenes/CinematicAdBenchmark";
 import { NarratedSkyExplainer, type NarratedSkyExplainerProps } from "./scenes/NarratedSkyExplainer";
 import { LighthouseRepairFilm } from "./scenes/LighthouseRepairFilm";
+import { JumpingCat } from "./scenes/JumpingCat";
 
 // Remotion merges partial --props over defaultProps. Do not leak the example
 // project's soundtrack into projects that intentionally omit audioTracks.
@@ -19,6 +20,14 @@ const defaultProject = {
 
 export const RemotionRoot = () => (
   <>
+    <Composition
+      id="JumpingCat"
+      component={JumpingCat}
+      durationInFrames={600}
+      fps={30}
+      width={1920}
+      height={1080}
+    />
     <Composition
       id="DemoVideo"
       component={DemoVideo}

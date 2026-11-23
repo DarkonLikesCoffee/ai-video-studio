@@ -755,3 +755,12 @@ Append one entry per meaningful development session:
 - Inspected the final artifact's 1-fps contact sheet. It shows six distinct visual setups and changes in the robot, door, mechanism, lens and beacon beam. This is sampled inspection only; the full MP4 was not watched end-to-end and the audio was not listened to. The visual language is restrained flat vector illustration, not realistic 3D.
 - Clarified that the ten SVGs are design references, not imported runtime image assets: `LighthouseRepairFilm.tsx` reconstructs the selected artwork as animated inline SVG groups and paths. Their manifest entries now identify `usageRole: design-reference`; the score and atmosphere WAVs are runtime audio. The asset-evidence report checks file presence/metadata/linkage, not source-code usage.
 - No render request was modified and no production render was triggered on main as part of this migration.
+
+
+## 2026-11-23 — Jumping Cat composition integrated with canonical registry
+
+- Rebuilt the Jumping Cat feature on current main following the shared composition-registry migration. Registered `JumpingCat` in both `packages/video-engine/src/root.tsx` and `schemas/composition-registry.json`; the typed Director continues to consume the JSON source.
+- Preserved the dedicated 2D vector/inline-SVG character scene, 20-second production plan and acceptance coverage, creative brief, empty asset manifest (no external image assets), and generated 20-second wind ambience.
+- Added CI plan/storyboard checks and verification that the generated wind WAV exists and is exactly inspectable by FFprobe. Added a production handoff README explaining the composition and future explicit `productionPlanPath`.
+- The original feature branch's render request is intentionally excluded. No MP4 render is claimed or triggered by this migration; a render request must be a separate frozen-candidate commit with a unique ID.
+- No standalone SVG files are required: the cat, meadow and grass are procedurally drawn as inline SVG geometry in the dedicated Remotion composition.

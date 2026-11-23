@@ -60,6 +60,10 @@ jobs:
         run: npm run validate:plan -- projects/examples/production-plan.json
       - name: Validate Stormlight Keeper production plan
         run: npm run validate:plan -- projects/stormlight-keeper/production/production-plan.json
+      - name: Validate Jumping Cat production plan
+        run: npm run validate:plan -- projects/jumping-cat/production/production-plan.json
+      - name: Run Jumping Cat storyboard QA
+        run: npm run storyboard:qa -- projects/jumping-cat/production/production-plan.json
       - name: Run Stormlight Keeper storyboard QA
         run: npm run storyboard:qa -- projects/stormlight-keeper/production/production-plan.json
       - name: Test machine-readable production state validator
@@ -99,6 +103,10 @@ jobs:
           test -s projects/stormlight-keeper/assets/audio/stormlight-atmosphere.wav
           ffprobe -v error -show_entries format=duration -of csv=p=0 projects/stormlight-keeper/assets/audio/stormlight-score.wav
           ffprobe -v error -show_entries format=duration -of csv=p=0 projects/stormlight-keeper/assets/audio/stormlight-atmosphere.wav
+      - name: Verify Jumping Cat wind ambience
+        run: |
+          test -s packages/video-engine/public/audio/jumping-cat-wind.wav
+          ffprobe -v error -show_entries format=duration -of csv=p=0 packages/video-engine/public/audio/jumping-cat-wind.wav
       - name: Enforce Stormlight Keeper local asset evidence
         run: |
           mkdir -p review-output
