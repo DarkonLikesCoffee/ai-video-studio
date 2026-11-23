@@ -6,11 +6,13 @@ Prompt-driven video production system. GitHub stores projects and source code; C
 
 Remotion compositions include:
 
-- `DemoVideo`: the original fixed M1 pipeline demonstration.
-- `ProjectVideo`: a data-driven composition that reads a project JSON file and renders consecutive scenes.
-- `ThreeDShowcase` and `CinematicAdBenchmark`: bespoke 3D/motion-design benchmarks.
-- `MadridTrip` and `MadridNewYorkParis`: custom geographic/travel compositions.
-- `NarratedSkyExplainer`: a custom 3D composition with Kokoro narration, aligned captions and music; it can also composite reviewed Wikimedia Commons footage as full-bleed B-roll with an animated 3D scientific inset.
+- `ProjectVideo`: a data-driven 2D composition that reads a project JSON file and renders consecutive scenes.
+- `JumpingCat` and `LighthouseRepairFilm`: bespoke SVG/2D animated stories.
+- `ThreeDShowcase` and `TinyAstronautCrystalCave`: dedicated 3D compositions.
+- `CinematicAdBenchmark`, `MadridTrip`, `MadridNewYorkParis` and `NarratedSkyExplainer`: hybrid compositions that combine Three.js/WebGL with 2D, SVG or video layers.
+- `DemoVideo`: the original fixed M1 pipeline demonstration; reference/test-only, not selectable for production.
+
+The shared `schemas/composition-registry.json` declares each composition's `renderMode`: `2d`, `3d` or `hybrid`. Render preflight validates that metadata and both GitHub Actions and CircleCI use it to select the render path. Pure 2D compositions do not request a WebGL context; 3D and hybrid compositions use the software WebGL backend. This avoids applying 3D rendering flags to SVG-only scenes and keeps the two providers aligned.
 
 A `ProjectVideo` project can define:
 - 1–20 scenes of type `title`, `content`, or `outro`.
@@ -695,7 +697,7 @@ Supported providers:
 - `github-actions`: GitHub Actions renders the MP4 and stores it as an artifact for 3 days.
 - `circleci`: a small GitHub Actions dispatcher calls the CircleCI API; CircleCI performs the same Remotion render and stores the MP4 as a CircleCI artifact.
 
-The render request must use a new `requestId` each time. The request must also include `candidateSha`: the full commit SHA of the frozen project candidate already pushed to the branch. Push the project first, then create a separate commit that changes **only** `render-request.json`. The render workflow rejects requests whose candidate SHA does not equal the previous remote branch tip, whose triggering push changes any other file, or whose candidate SHA / request ID has already been submitted. This keeps ordinary project commits out of the render pipeline and prevents duplicate submissions of the same frozen candidate. The selected project JSON is passed to Remotion through `--props`; for `ProjectVideo`, the project folder is also passed as `--public-dir` so its assets load in both providers.
+The render request must use a new `requestId` each time. The request must also include `candidateSha`: the full commit SHA of the frozen project candidate already pushed to the branch. Push the project first, then create a separate commit that changes **only** `render-request.json`. The render workflow rejects requests whose candidate SHA does not equal the previous remote branch tip, whose triggering push changes any other file, or whose candidate SHA / request ID has already been submitted. This keeps ordinary project commits out of the render pipeline and prevents duplicate submissions of the same frozen candidate. The selected project JSON is passed to Remotion through `--props`; for `ProjectVideo`, the project folder is also passed as `--public-dir` so its assets load in both providers. The composition registry's `renderMode` determines whether each provider requests WebGL: `2d` compositions render without `--gl=swangle`, while `3d` and `hybrid` compositions use it.
 
 ### One-time CircleCI setup
 
