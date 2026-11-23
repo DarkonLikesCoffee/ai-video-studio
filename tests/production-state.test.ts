@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { PRODUCTION_STAGES, validateProductionEvidenceFiles, validateProductionState } from "../scripts/production-state";
+import { PRODUCTION_STAGES, resolveProductionEvidenceFile, validateProductionEvidenceFiles, validateProductionState } from "../scripts/production-state";
 
 const valid = {
   schemaVersion: 1,
@@ -169,6 +169,11 @@ test("strict production-state validation rejects symlinks and project roots outs
       requireEvidence: true
     });
     assert.ok(errors.some(error => error.includes("symbolic links")));
+    await symlink(path.join(outsideRoot, "brief.md"), path.join(projectRoot, "production", "production-state.json"));
+    await assert.rejects(
+      resolveProductionEvidenceFile(projectRoot, "production/production-state.json"),
+      /symbolic links/,
+    );
     const outsideProjectErrors = await validateProductionEvidenceFiles(state, {
       repositoryRoot: projectRoot,
       projectRoot: outsideRoot,
