@@ -52,7 +52,7 @@ export const resolveProductionEvidenceFile = async (
   reference: string,
 ): Promise<string> => {
   const projectRoot = await realpath(resolve(projectRootInput));
-  if (!reference.trim() || reference.includes("\\\\") || reference.startsWith("/") ||
+  if (!reference.trim() || reference.includes("\\") || reference.startsWith("/") ||
       reference.split("/").some((part) => !part || part === "." || part === "..")) {
     throw new Error(`Evidence reference is not a safe project-relative path: "${reference}".`);
   }
@@ -165,7 +165,7 @@ const run = async (): Promise<void> => {
   const repositoryRoot = process.cwd();
   const projectRoot = projectRootFlag >= 0 ? process.argv[projectRootFlag + 1] : undefined;
   if (!path) {
-    process.stderr.write("Usage: tsx scripts/production-state.ts <production-state.json> [expected-project-id] [--require-evidence] [--verify-evidence-files --project-root <project-dir>]\\n");
+    process.stderr.write("Usage: tsx scripts/production-state.ts <production-state.json> [expected-project-id] [--require-evidence] [--verify-evidence-files --project-root <project-dir>]\n");
     process.exitCode = 2;
     return;
   }
