@@ -152,3 +152,35 @@ test("accepts a newly added composition only when both registry and RemotionRoot
   });
   assert.ok(missingRegistration.some((error) => error.includes("not registered in packages/video-engine/src/root.tsx")));
 });
+
+
+test("every production catalogue entry declares an explicit render mode", () => {
+  for (const entry of COMPOSITION_REGISTRY) {
+    assert.ok(["2d", "3d", "hybrid"].includes(entry.renderMode), `${entry.id} has renderMode=${String(entry.renderMode)}`);
+  }
+});
+
+test("SVG-only compositions are routed as 2D while ThreeCanvas compositions declare WebGL modes", () => {
+  const modes = new Map(COMPOSITION_REGISTRY.map(entry => [entry.id, entry.renderMode]));
+  assert.equal(modes.get("JumpingCat"), "2d");
+  assert.equal(modes.get("LighthouseRepairFilm"), "2d");
+  assert.equal(modes.get("ProjectVideo"), "2d");
+  assert.equal(modes.get("ThreeDShowcase"), "3d");
+  assert.equal(modes.get("TinyAstronautCrystalCave"), "3d");
+  assert.equal(modes.get("MadridNewYorkParis"), "hybrid");
+  assert.equal(modes.get("MadridTrip"), "hybrid");
+  assert.equal(modes.get("NarratedSkyExplainer"), "hybrid");
+});
+
+test("rejects a selected composition with missing or unsupported render mode metadata", () => {
+  const withoutMode = COMPOSITION_REGISTRY.map(entry =>
+    entry.id === "JumpingCat" ? { ...entry, renderMode: undefined } : entry
+  );
+  const errors = validateRenderStrategyAgainstRequest({
+    request: { compositionId: "JumpingCat" },
+    plan: undefined,
+    registeredCompositionIds: registered,
+    catalogue: withoutMode,
+  });
+  assert.ok(errors.some(error => error.includes("must declare renderMode")));
+});
