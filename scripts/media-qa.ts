@@ -204,7 +204,7 @@ export const buildMediaQaReport = (
   const sizeBytes = Number(format.size ?? 0);
   const videoStream = streams.find(stream => stream.codec_type === "video");
   const audioStream = streams.find(stream => stream.codec_type === "audio");
-  const silenceIntervals = parseSilenceIntervals(audioLog, durationSeconds);
+  const silenceIntervals = audioMode === "silent" ? [] : parseSilenceIntervals(audioLog, durationSeconds);
   const frozenIntervals = parseIntervals(
     videoLog,
     /freeze_start:\s*([0-9.]+)[\s\S]*?freeze_end:\s*([0-9.]+)/g,
