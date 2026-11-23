@@ -178,6 +178,9 @@ export const validateFinalDeliveryBundle = async (options: FinalDeliveryOptions)
   if (provenanceSource.repository !== expectedRepository) {
     throw new Error("Render provenance repository must be " + expectedRepository + ".");
   }
+  if (provenanceSource.workflow !== "Render video") {
+    throw new Error("Final delivery only accepts artifacts produced by the Render video workflow.");
+  }
   if (String(workflowRun.id ?? "") !== expectedRunId || String(reviewArtifact.workflowRunId ?? "") !== expectedRunId) {
     throw new Error("The visual review and provenance must both reference the selected render run ID.");
   }
