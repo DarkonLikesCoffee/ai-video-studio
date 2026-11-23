@@ -94,6 +94,19 @@ jobs:
               fi
               npm run validate:project -- "$PROJECT_PATH"
             fi
+            node - <<'NODE'
+            const fs = require("node:fs");
+            const request = {
+              provider: "circleci",
+              compositionId: process.env.COMPOSITION_ID,
+              outputName: process.env.OUTPUT_NAME,
+              requestId: process.env.REQUEST_ID,
+              ...(process.env.PROJECT_PATH ? { projectPath: process.env.PROJECT_PATH } : {}),
+              ...(process.env.NARRATION_PATH ? { narrationPath: process.env.NARRATION_PATH } : {}),
+            };
+            fs.writeFileSync("/tmp/circleci-render-request.json", JSON.stringify(request, null, 2));
+            NODE
+            node scripts/validate-render-strategy.mjs /tmp/circleci-render-request.json packages/video-engine/src/root.tsx
       - when:
           condition:
             not:
@@ -153,9 +166,15 @@ jobs:
               npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_DIR/.render-project.json" "--public-dir=../../$PROJECT_DIR"
             elif [[ -n "$PROJECT_PATH" ]]; then
               PROJECT_DIR="$(dirname "$PROJECT_PATH")"
-              npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
+              if [[ "$RENDER_MODE" == "2d" ]]; then
+                npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR"
+              else
+                npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--props=../../$PROJECT_PATH" "--public-dir=../../$PROJECT_DIR" "--concurrency=1" "--gl=swangle"
+              fi
+            elif [[ "$RENDER_MODE" == "2d" ]]; then
+              npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1"
             else
-              npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4"
+              npm run render:custom -- "$COMPOSITION_ID" "../../render-output/$OUTPUT_NAME.mp4" "--concurrency=1" "--gl=swangle"
             fi
       - run:
           name: Master final audio
