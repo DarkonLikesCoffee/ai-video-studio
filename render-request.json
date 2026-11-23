@@ -1,6 +1,8 @@
 {
   "provider": "github-actions",
-  "compositionId": "MadridTrip",
-  "outputName": "madrid-trip-geographic-reference",
-  "requestId": "madrid-trip-claude-reference-20261120-final-visual-audio-06"
+  "compositionId": "ProjectVideo",
+  "outputName": "voyager-1-interstellar",
+  "requestId": "voyager-1-interstellar-20261123-01",
+  "projectPath": "projects/voyager-1-interstellar/scene.json",
+  "candidateSha": "d2c233966969cb2615a057c3f098391fae772f17"
 }
