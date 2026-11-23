@@ -1,0 +1,652 @@
+{
+  "schemaVersion": 1,
+  "id": "voyager-1-interstellar",
+  "title": "Voyager 1 — The Long Goodbye",
+  "description": "An original 2D vector motion-graphics journey from Earth to interstellar space.",
+  "composition": {
+    "id": "ProjectVideo",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "scenes": [
+    {
+      "id": "earth",
+      "type": "title",
+      "durationInFrames": 150,
+      "eyebrow": "A MESSAGE FROM OUR WORLD",
+      "title": "VOYAGER 1",
+      "body": "A small machine. A vast ocean of darkness.",
+      "backgroundColor": "#050816",
+      "accentColor": "#77D9FF",
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 18
+      },
+      "cameraMotion": {
+        "zoom": 1.04,
+        "panX": -1,
+        "easing": "ease-in-out"
+      },
+      "particleSystems": [
+        {
+          "id": "stars",
+          "count": 110,
+          "seed": 11,
+          "originX": 50,
+          "originY": 45,
+          "spreadX": 110,
+          "spreadY": 100,
+          "lifeInFrames": 180,
+          "speedMin": 0.1,
+          "speedMax": 0.7,
+          "opacity": 0.7,
+          "sizeMin": 1,
+          "sizeMax": 2.4,
+          "colors": [
+            "#FFFFFF",
+            "#77D9FF",
+            "#A6B8FF"
+          ]
+        }
+      ],
+      "graphics": [
+        {
+          "id": "earth",
+          "type": "ellipse",
+          "x": 8,
+          "y": 43,
+          "width": 33,
+          "height": 66,
+          "fill": "#1D4E9A",
+          "opacity": 0.95,
+          "zIndex": 1
+        },
+        {
+          "id": "earthlight",
+          "type": "ellipse",
+          "x": 9,
+          "y": 43,
+          "width": 32,
+          "height": 64,
+          "fill": "#39C4E8",
+          "opacity": 0.35,
+          "zIndex": 2
+        },
+        {
+          "id": "earthhalo",
+          "type": "ellipse",
+          "x": 5,
+          "y": 40,
+          "width": 39,
+          "height": 72,
+          "fill": "none",
+          "stroke": "#62CFFF",
+          "strokeWidth": 2,
+          "opacity": 0.25,
+          "zIndex": 0
+        },
+        {
+          "id": "title",
+          "type": "text",
+          "x": 48,
+          "y": 37,
+          "width": 46,
+          "height": 25,
+          "text": "VOYAGER 1",
+          "fontSize": 12,
+          "fontWeight": 900,
+          "fill": "#FFFFFF",
+          "zIndex": 5
+        },
+        {
+          "id": "sub",
+          "type": "text",
+          "x": 49,
+          "y": 64,
+          "width": 42,
+          "height": 12,
+          "text": "THE LONG GOODBYE",
+          "fontSize": 4,
+          "fontWeight": 700,
+          "fill": "#7EDCFF",
+          "zIndex": 5
+        }
+      ]
+    },
+    {
+      "id": "departure",
+      "type": "content",
+      "durationInFrames": 150,
+      "eyebrow": "SEPTEMBER 5, 1977",
+      "title": "LEAVING HOME",
+      "body": "Launched from Cape Canaveral, carrying humanity's curiosity beyond the familiar.",
+      "backgroundColor": "#050816",
+      "accentColor": "#8BE1FF",
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 15
+      },
+      "particleSystems": [
+        {
+          "id": "stars",
+          "count": 95,
+          "seed": 22,
+          "originX": 50,
+          "originY": 50,
+          "spreadX": 130,
+          "spreadY": 120,
+          "lifeInFrames": 170,
+          "speedMin": 0.1,
+          "speedMax": 0.5,
+          "opacity": 0.65,
+          "sizeMin": 1,
+          "sizeMax": 2,
+          "colors": [
+            "#FFFFFF",
+            "#A9C6FF"
+          ]
+        }
+      ],
+      "graphics": [
+        {
+          "id": "earth",
+          "type": "ellipse",
+          "x": 5,
+          "y": 40,
+          "width": 26,
+          "height": 55,
+          "fill": "#1B4C96",
+          "opacity": 0.9
+        },
+        {
+          "id": "rocketbody",
+          "type": "path",
+          "x": 52,
+          "y": 40,
+          "width": 28,
+          "height": 24,
+          "d": "M 8 50 L 40 12 Q 54 0 62 0 Q 72 25 50 60 L 8 50 Z",
+          "fill": "#DCEAF2",
+          "zIndex": 2
+        },
+        {
+          "id": "rocketnose",
+          "type": "path",
+          "x": 52,
+          "y": 40,
+          "width": 28,
+          "height": 24,
+          "d": "M 40 12 Q 54 0 62 0 Q 68 15 65 28 L 40 12 Z",
+          "fill": "#F9F5E7",
+          "zIndex": 3
+        },
+        {
+          "id": "flame",
+          "type": "path",
+          "x": 52,
+          "y": 62,
+          "width": 28,
+          "height": 20,
+          "d": "M 18 10 L 32 48 L 44 10 Z",
+          "fill": "#FFB347",
+          "opacity": 0.9,
+          "zIndex": 1,
+          "animations": {
+            "opacity": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 0.6
+                },
+                {
+                  "frame": 40,
+                  "value": 1
+                },
+                {
+                  "frame": 80,
+                  "value": 0.5
+                },
+                {
+                  "frame": 120,
+                  "value": 1
+                },
+                {
+                  "frame": 150,
+                  "value": 0.7
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "label",
+          "type": "text",
+          "x": 48,
+          "y": 18,
+          "width": 46,
+          "height": 10,
+          "text": "A JOURNEY WITHOUT RETURN",
+          "fontSize": 4,
+          "fontWeight": 700,
+          "fill": "#9DDFFF",
+          "zIndex": 4
+        }
+      ]
+    },
+    {
+      "id": "jupiter",
+      "type": "content",
+      "durationInFrames": 150,
+      "eyebrow": "1979 · JUPITER",
+      "title": "A GIANT'S GRAVITY",
+      "body": "Voyager's flyby revealed storms, rings, and moons in a world of impossible scale.",
+      "backgroundColor": "#060817",
+      "accentColor": "#F2C58E",
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 15
+      },
+      "cameraMotion": {
+        "zoom": 1.08,
+        "panX": 2,
+        "easing": "ease-in-out"
+      },
+      "particleSystems": [
+        {
+          "id": "stars",
+          "count": 80,
+          "seed": 33,
+          "originX": 50,
+          "originY": 50,
+          "spreadX": 125,
+          "spreadY": 110,
+          "lifeInFrames": 180,
+          "speedMin": 0.1,
+          "speedMax": 0.4,
+          "opacity": 0.6,
+          "sizeMin": 1,
+          "sizeMax": 2,
+          "colors": [
+            "#FFFFFF",
+            "#BAC8FF"
+          ]
+        }
+      ],
+      "graphics": [
+        {
+          "id": "planet",
+          "type": "ellipse",
+          "x": 63,
+          "y": 8,
+          "width": 58,
+          "height": 110,
+          "fill": "#C78F58",
+          "zIndex": 1
+        },
+        {
+          "id": "band1",
+          "type": "ellipse",
+          "x": 65,
+          "y": 20,
+          "width": 55,
+          "height": 13,
+          "fill": "#E4B17C",
+          "opacity": 0.8,
+          "zIndex": 2
+        },
+        {
+          "id": "band2",
+          "type": "ellipse",
+          "x": 64,
+          "y": 36,
+          "width": 57,
+          "height": 12,
+          "fill": "#8F593F",
+          "opacity": 0.7,
+          "zIndex": 2
+        },
+        {
+          "id": "band3",
+          "type": "ellipse",
+          "x": 66,
+          "y": 52,
+          "width": 54,
+          "height": 12,
+          "fill": "#F0D1A0",
+          "opacity": 0.7,
+          "zIndex": 2
+        },
+        {
+          "id": "storm",
+          "type": "ellipse",
+          "x": 79,
+          "y": 49,
+          "width": 13,
+          "height": 8,
+          "fill": "#B95D43",
+          "zIndex": 3
+        },
+        {
+          "id": "moon",
+          "type": "ellipse",
+          "x": 37,
+          "y": 38,
+          "width": 6,
+          "height": 6,
+          "fill": "#D8D8D0",
+          "zIndex": 2
+        },
+        {
+          "id": "label",
+          "type": "text",
+          "x": 9,
+          "y": 20,
+          "width": 46,
+          "height": 10,
+          "text": "THE OUTER PLANETS OPENED UP",
+          "fontSize": 4,
+          "fontWeight": 700,
+          "fill": "#F0C998",
+          "zIndex": 4
+        }
+      ]
+    },
+    {
+      "id": "saturn",
+      "type": "content",
+      "durationInFrames": 150,
+      "eyebrow": "1980 · SATURN",
+      "title": "THE RINGS, CLOSE UP",
+      "body": "Its path bent onward—past Saturn's majestic rings, toward the edge of the Sun's influence.",
+      "backgroundColor": "#040715",
+      "accentColor": "#E6C78F",
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 15
+      },
+      "cameraMotion": {
+        "zoom": 1.06,
+        "panX": -2,
+        "easing": "ease-in-out"
+      },
+      "particleSystems": [
+        {
+          "id": "stars",
+          "count": 100,
+          "seed": 44,
+          "originX": 50,
+          "originY": 50,
+          "spreadX": 130,
+          "spreadY": 110,
+          "lifeInFrames": 180,
+          "speedMin": 0.1,
+          "speedMax": 0.4,
+          "opacity": 0.65,
+          "sizeMin": 1,
+          "sizeMax": 2,
+          "colors": [
+            "#FFFFFF",
+            "#D9D0FF"
+          ]
+        }
+      ],
+      "graphics": [
+        {
+          "id": "saturn",
+          "type": "ellipse",
+          "x": 59,
+          "y": 22,
+          "width": 45,
+          "height": 76,
+          "fill": "#D9B77E",
+          "zIndex": 2
+        },
+        {
+          "id": "ring",
+          "type": "ellipse",
+          "x": 42,
+          "y": 45,
+          "width": 80,
+          "height": 22,
+          "fill": "none",
+          "stroke": "#D8C5A1",
+          "strokeWidth": 5,
+          "rotation": -18,
+          "opacity": 0.8,
+          "zIndex": 1
+        },
+        {
+          "id": "ring2",
+          "type": "ellipse",
+          "x": 40,
+          "y": 45,
+          "width": 84,
+          "height": 30,
+          "fill": "none",
+          "stroke": "#8C7556",
+          "strokeWidth": 2,
+          "rotation": -18,
+          "opacity": 0.55,
+          "zIndex": 3
+        },
+        {
+          "id": "label",
+          "type": "text",
+          "x": 9,
+          "y": 19,
+          "width": 42,
+          "height": 10,
+          "text": "A WORLD OF ICE AND SHADOW",
+          "fontSize": 4,
+          "fontWeight": 700,
+          "fill": "#E6C78F",
+          "zIndex": 4
+        }
+      ]
+    },
+    {
+      "id": "heliosphere",
+      "type": "content",
+      "durationInFrames": 150,
+      "eyebrow": "2012 · A FIRST",
+      "title": "BEYOND THE SUN",
+      "body": "In August 2012, Voyager 1 crossed into interstellar space—the first human-made object to do so.",
+      "backgroundColor": "#030510",
+      "accentColor": "#91CFFF",
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 18
+      },
+      "particleSystems": [
+        {
+          "id": "stars",
+          "count": 140,
+          "seed": 55,
+          "originX": 50,
+          "originY": 50,
+          "spreadX": 130,
+          "spreadY": 110,
+          "lifeInFrames": 180,
+          "speedMin": 0.15,
+          "speedMax": 0.8,
+          "opacity": 0.75,
+          "sizeMin": 1,
+          "sizeMax": 2.5,
+          "colors": [
+            "#FFFFFF",
+            "#7EDCFF",
+            "#B0A7FF"
+          ]
+        }
+      ],
+      "graphics": [
+        {
+          "id": "sun",
+          "type": "ellipse",
+          "x": 5,
+          "y": 43,
+          "width": 13,
+          "height": 26,
+          "fill": "#FDBB62",
+          "zIndex": 3
+        },
+        {
+          "id": "helio",
+          "type": "ellipse",
+          "x": 12,
+          "y": 28,
+          "width": 60,
+          "height": 48,
+          "fill": "none",
+          "stroke": "#477CA7",
+          "strokeWidth": 2,
+          "opacity": 0.55,
+          "zIndex": 1
+        },
+        {
+          "id": "shock",
+          "type": "ellipse",
+          "x": 22,
+          "y": 22,
+          "width": 78,
+          "height": 64,
+          "fill": "none",
+          "stroke": "#7DCBFF",
+          "strokeWidth": 1,
+          "opacity": 0.3,
+          "zIndex": 1
+        },
+        {
+          "id": "probe",
+          "type": "path",
+          "x": 75,
+          "y": 47,
+          "width": 13,
+          "height": 10,
+          "d": "M 45 5 L 55 35 L 85 35 L 95 5 L 75 50 L 65 50 Z",
+          "fill": "#F2F5F6",
+          "zIndex": 4,
+          "animations": {
+            "x": {
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "value": 68
+                },
+                {
+                  "frame": 149,
+                  "value": 83
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "label",
+          "type": "text",
+          "x": 7,
+          "y": 14,
+          "width": 55,
+          "height": 10,
+          "text": "THE SUN'S BOUNDARY IS NOT THE END",
+          "fontSize": 4,
+          "fontWeight": 700,
+          "fill": "#91CFFF",
+          "zIndex": 5
+        }
+      ]
+    },
+    {
+      "id": "interstellar",
+      "type": "outro",
+      "durationInFrames": 150,
+      "eyebrow": "INTERSTELLAR SPACE",
+      "title": "STILL GOING",
+      "body": "A human-built traveler, more than 24 billion kilometers from home—carrying a record of our world into the dark.",
+      "backgroundColor": "#02030B",
+      "accentColor": "#C5B8FF",
+      "transitionIn": {
+        "type": "fade",
+        "durationInFrames": 22
+      },
+      "particleSystems": [
+        {
+          "id": "stars",
+          "count": 160,
+          "seed": 66,
+          "originX": 50,
+          "originY": 50,
+          "spreadX": 150,
+          "spreadY": 130,
+          "lifeInFrames": 180,
+          "speedMin": 0.1,
+          "speedMax": 0.4,
+          "opacity": 0.8,
+          "sizeMin": 1,
+          "sizeMax": 2.4,
+          "colors": [
+            "#FFFFFF",
+            "#A9C6FF",
+            "#76D9FF"
+          ]
+        }
+      ],
+      "graphics": [
+        {
+          "id": "planet",
+          "type": "ellipse",
+          "x": 4,
+          "y": 43,
+          "width": 12,
+          "height": 25,
+          "fill": "#174B92",
+          "opacity": 0.65,
+          "zIndex": 1
+        },
+        {
+          "id": "probe",
+          "type": "path",
+          "x": 60,
+          "y": 40,
+          "width": 22,
+          "height": 20,
+          "d": "M 45 5 L 55 35 L 85 35 L 95 5 L 75 50 L 65 50 Z",
+          "fill": "#DCE8ED",
+          "zIndex": 3
+        },
+        {
+          "id": "beam",
+          "type": "path",
+          "x": 65,
+          "y": 50,
+          "width": 80,
+          "height": 4,
+          "d": "M 0 50 L 100 50",
+          "fill": "none",
+          "stroke": "#7DDCFF",
+          "strokeWidth": 1,
+          "opacity": 0.2,
+          "zIndex": 1
+        },
+        {
+          "id": "label",
+          "type": "text",
+          "x": 38,
+          "y": 18,
+          "width": 54,
+          "height": 10,
+          "text": "THE VOYAGER GOLDEN RECORD",
+          "fontSize": 4,
+          "fontWeight": 700,
+          "fill": "#C5B8FF",
+          "zIndex": 4
+        }
+      ]
+    }
+  ],
+  "output": {
+    "format": "mp4",
+    "codec": "h264"
+  }
+}
